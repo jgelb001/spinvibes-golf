@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a1a0e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SpinVibes Golf">
+  <meta name="description" content="Jeremy's Golf Pocket Guide — Sub-90 Journey">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>SpinVibes Golf</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #0a1a0e;
+      --surface:   #111f15;
+      --surface2:  #1a2f1e;
+      --surface3:  #223828;
+      --green:     #2d6a3f;
+      --green-b:   #3d8a52;
+      --gold:      #c9a84c;
+      --gold-l:    #e8cc7a;
+      --cream:     #f0ead8;
+      --muted:     #6a8a6e;
+      --red:       #d64f3a;
+      --nav-h:     64px;
+      --safe-b:    env(safe-area-inset-bottom, 0px);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* ── APP SHELL ── */
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+    }
+
+    /* ── TOP BAR ── */
+    #topbar {
+      flex-shrink: 0;
+      background: var(--surface);
+      border-bottom: 1px solid rgba(201,168,76,0.25);
+      padding: 12px 20px 10px;
+      padding-top: calc(12px + env(safe-area-inset-top, 0px));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .topbar-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .topbar-logo span { color: var(--cream); }
+    .topbar-sub {
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+    .offline-badge {
+      font-size: 0.65rem;
+      background: var(--green);
+      color: var(--gold-l);
+      padding: 3px 8px;
+      border-radius: 20px;
+      border: 1px solid var(--green-b);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── PAGES ── */
+    #pages {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      padding-bottom: calc(var(--nav-h) + var(--safe-b) + 16px);
+    }
+    .page.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0);
+    }
+
+    /* ── BOTTOM NAV ── */
+    #nav {
+      flex-shrink: 0;
+      background: var(--surface);
+      border-top: 1px solid rgba(201,168,76,0.2);
+      display: flex;
+      height: calc(var(--nav-h) + var(--safe-b));
+      padding-bottom: var(--safe-b);
+    }
+    .nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border: none;
+      background: none;
+      color: var(--muted);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.15s;
+      padding-top: 6px;
+    }
+    .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-btn.active { color: var(--gold); }
+    .nav-btn.active svg { stroke: var(--gold); }
+
+    /* ── SHARED COMPONENTS ── */
+    .page-header {
+      background: linear-gradient(160deg, var(--surface2) 0%, var(--bg) 100%);
+      padding: 24px 20px 20px;
+      border-bottom: 2px solid rgba(201,168,76,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::after {
+      content: attr(data-icon);
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 3.5rem;
+      opacity: 0.12;
+    }
+    .page-tag {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .page-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .section { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .section:last-child { border-bottom: none; }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .card {
+      background: var(--surface2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 10px;
+    }
+    .card:last-child { margin-bottom: 0; }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 6px;
+    }
+    .tag-gold  { background: var(--gold);   color: #000; }
+    .tag-green { background: var(--green-b); color: #fff; }
+    .tag-red   { background: var(--red);    color: #fff; }
+    .tag-purple{ background: #7a4ab0;       color: #fff; }
+    .tag-blue  { background: #4a6ab0;       color: #fff; }
+    .tag-orange{ background: #c8784a;       color: #fff; }
+
+    .card-title { font-weight: 700; font-size: 0.95rem; color: var(--cream); margin-bottom: 4px; }
+    .card-body  { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+    .card-body strong { color: var(--cream); }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+    .pill {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      color: var(--gold-l);
+      font-weight: 500;
+    }
+
+    .cue-box {
+      background: rgba(201,168,76,0.08);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 8px 8px 0;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      color: var(--gold-l);
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.83rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .check-row:last-child { border-bottom: none; }
+    .check-box {
+      width: 20px; height: 20px;
+      border: 2px solid var(--green-b);
+      border-radius: 5px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .check-box.checked { background: var(--green-b); border-color: var(--green-b); }
+    .check-box.checked::after { content: '✓'; color: white; font-size: 12px; font-weight: 700; }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-around;
+      background: var(--surface2);
+      border-radius: 12px;
+      padding: 16px 12px;
+      margin-bottom: 14px;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .stat-lbl { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+    /* ── HOME PAGE ── */
+    .home-hero {
+      background: linear-gradient(160deg, #0f2a16 0%, var(--bg) 100%);
+      padding: 28px 20px 24px;
+      border-bottom: 2px solid rgba(201,168,76,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    .home-hero::before {
+      content: '⛳';
+      position: absolute;
+      right: -10px; top: -10px;
+      font-size: 8rem;
+      opacity: 0.06;
+    }
+    .home-greeting {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+    .home-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.6rem;
+      letter-spacing: 2px;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .home-title span { color: var(--gold); }
+    .home-goal {
+      margin-top: 12px;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.83rem;
+      color: var(--gold-l);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .home-goal-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .guide-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 16px 20px;
+    }
+    .guide-card {
+      background: var(--surface2);
+      border-radius: 14px;
+      padding: 16px 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      text-align: center;
+      text-decoration: none;
+    }
+    .guide-card:active { background: var(--surface3); transform: scale(0.97); }
+    .guide-card-icon { font-size: 2rem; margin-bottom: 8px; display: block; }
+    .guide-card-title { font-weight: 700; font-size: 0.85rem; color: var(--cream); margin-bottom: 3px; }
+    .guide-card-sub { font-size: 0.7rem; color: var(--muted); }
+
+    /* ── PROGRESS PAGE ── */
+    .progress-bar-wrap {
+      background: var(--surface3);
+      border-radius: 20px;
+      height: 10px;
+      overflow: hidden;
+      margin: 8px 0 4px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--green-b));
+      border-radius: 20px;
+      transition: width 0.5s ease;
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .notes-area {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 12px;
+      color: var(--cream);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      resize: none;
+      min-height: 120px;
+    }
+    .notes-area:focus { outline: none; border-color: var(--gold); }
+    .notes-area::placeholder { color: var(--muted); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.97); opacity: 0.85; }
+    .btn-gold  { background: var(--gold); color: #000; }
+    .btn-green { background: var(--green-b); color: #fff; }
+    .btn-outline { background: transparent; border: 1px solid var(--muted); color: var(--cream); }
+
+    .session-log-item {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .session-date {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem;
+      color: var(--gold);
+      white-space: nowrap;
+      min-width: 60px;
+      line-height: 1.3;
+      text-align: center;
+    }
+    .session-note { font-size: 0.8rem; color: var(--muted); line-height: 1.5; flex: 1; }
+    .session-note strong { color: var(--cream); display: block; margin-bottom: 2px; }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    .delete-btn:hover { color: var(--red); }
+
+    /* ── INPUT ── */
+    input[type="text"], input[type="date"], select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--cream);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--gold); }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); }
+
+    label { font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div>
+      <div class="topbar-logo">Spin<span>Vibes</span> Golf</div>
+      <div class="topbar-sub">⛳ Lefty · Sub-90 Journey</div>
+    </div>
+    <div class="offline-badge" id="offlineBadge">● Offline Ready</div>
+  </div>
+
+  <!-- PAGES -->
+  <div id="pages">
+
+    <!-- ══════════════════════════════════════
+         PAGE: HOME
+    ══════════════════════════════════════ -->
+    <div class="page active" id="page-home">
+
+      <div class="home-hero">
+        <div class="home-greeting">Welcome back, Jeremy</div>
+        <div class="home-title">Your Golf<br><span>Pocket Guide</span></div>
+        <div class="home-goal">
+          <div class="home-goal-num">&lt;90</div>
+          <div>
+            <div style="font-weight:700;color:var(--cream);font-size:0.85rem;">The Goal</div>
+            <div style="font-size:0.75rem;">Lefty beginner · Temecula, CA · Vice Boost bag</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-grid">
+        <a class="guide-card" onclick="showPage('range')">
+          <span class="guide-card-icon">🏌️</span>
+          <div class="guide-card-title">Range Session</div>
+          <div class="guide-card-sub">65-ball plan</div>
+        </a>
+        <a class="guide-card" onclick="showPage('stretches')">
+          <span class="guide-card-icon">🧘</span>
+          <div class="guide-card-title">Pre-Range Stretches</div>
+          <div class="guide-card-sub">5–7 min warmup</div>
+        </a>
+        <a class="guide-card" onclick="showPage('sss')">
+          <span class="guide-card-icon">🎯</span>
+          <div class="guide-card-title">Strike Sequence</div>
+          <div class="guide-card-sub">SSS drill guide</div>
+        </a>
+        <a class="guide-card" onclick="showPage('progress')">
+          <span class="guide-card-icon">📈</span>
+          <div class="guide-card-title">My Progress</div>
+          <div class="guide-card-sub">Log & notes</div>
+        </a>
+      </div>
+
+      <div class="section">
+        <div class="section-title">My Bag — Vice Boost (Lefty)</div>
+        <div class="stat-row">
+          <div class="stat"><div class="stat-num">10.5°</div><div class="stat-lbl">Driver</div></div>
+          <div class="stat"><div class="stat-num">22°</div><div class="stat-lbl">4-Hybrid</div></div>
+          <div class="stat"><div class="stat-num">6–SW</div><div class="stat-lbl">Irons</div></div>
+          <div class="stat"><div class="stat-num">2¾"</div><div class="stat-lbl">Tee Size</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Grip Spec</div>
+          <div class="card-body">Stick Grips Topo Augusta Green · <strong>Midsize</strong> · 8 clubs (all except putter)</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Next Upgrades</div>
+          <div class="card-body">
+            <strong>1.</strong> Gap Wedge 50° (Vokey SM11 or Cleveland CBX4)<br>
+            <strong>2.</strong> 7-Wood (TaylorMade Qi35 Max or Ping G440)<br>
+            <strong>3.</strong> Mallet Putter (Spider Tour or Odyssey Ai-ONE #7)
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Quick Reminders</div>
+        <div class="card">
+          <div class="card-body">
+            🎯 <strong>One swing thought per session</strong> — never change mid-session<br><br>
+            🏥 <strong>Pro lesson:</strong> Temecula Creek Inn at 4–6 weeks<br><br>
+            🛒 <strong>Left-handed gear:</strong> leftiesonlygolf.com · 2ndswing.com
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-home -->
+
+
+    <!-- ══════════════════════════════════════
+         PAGE: RANGE SESSION
+    ══════════════════════════════════════ -->
+    <div class="page" id="page-range">
+
+      <div class="page-header" data-icon="🏌️">
+        <div class="page-tag">⛳ Updated with SSS</div>
+        <div class="page-title">Range Session</div>
+        <div class="page-sub">65 balls · 4 phases · 6–8 week plan</div>
+      </div>
+
+      <div class="section">
+        <div class="stat-row">
+          <div class="stat"><div class="stat-num">65</div><div class="stat-lbl">Balls</div></div>
+          <div class="stat"><div class="stat-num">4</div><div class="stat-lbl">Phases</div></div>
+          <div class="stat"><div class="stat-num">6–8</div><div class="stat-lbl">Weeks</div></div>
+          <div class="stat"><div class="stat-num">&lt;90</div><div class="stat-lbl">Goal</div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="card">
+          <span class="tag tag-purple">Phase 0</span>
+          <div class="card-title">SSS Warmup — No ball needed</div>
+          <div class="pill-row"><span class="pill">8-iron or 9-iron</span><span class="pill">5–7 min</span></div>
+          <div class="card-body">
+            3× No-Turn Backswing (hold each position)<br>
+            5× slow Rotate & Relocate (feel the hip fire)<br>
+            5× full swings — watch divot land <strong>right of ball</strong>
+          </div>
+          <div class="cue-box">💬 Feel: Hips move first, arms follow</div>
+        </div>
+
+        <div class="card">
+          <span class="tag tag-gold">Phase 1</span>
+          <div class="card-title">Short Irons — Contact Quality</div>
+          <div class="pill-row"><span class="pill">PW (45°)</span><span class="pill">9-iron</span><span class="pill">8-iron</span><span class="pill">~20 balls</span></div>
+          <div class="card-body">
+            <strong>Ball position:</strong> center of stance<br>
+            Focus: flush contact, divot right of ball, consistent finish. Don't chase distance.
+          </div>
+          <div class="cue-box">💬 Feel: Ball first, then ground</div>
+        </div>
+
+        <div class="card">
+          <span class="tag tag-orange">Phase 2</span>
+          <div class="card-title">Mid Irons + Hybrid</div>
+          <div class="pill-row"><span class="pill">7-iron</span><span class="pill">6-iron</span><span class="pill">4-Hybrid</span><span class="pill">~25 balls</span></div>
+          <div class="card-body">
+            <strong>Ball position:</strong> slightly right (toward trail foot) as clubs get longer<br>
+            Same hip-fire sequence — hips before arms every time.
+          </div>
+          <div class="cue-box">💬 Feel: Wider arc, same sequence</div>
+        </div>
+
+        <div class="card">
+          <span class="tag tag-blue">Phase 3</span>
+          <div class="card-title">Driver</div>
+          <div class="pill-row"><span class="pill">Driver 10.5°</span><span class="pill">Tee: 2¾" — 3 marks</span><span class="pill">~15 balls</span></div>
+          <div class="card-body">
+            <strong>Ball position:</strong> off right instep (lead foot)<br>
+            Slight upswing at impact. Same hip/chest rotation.<br>
+            <strong>Swing smoother, not harder.</strong>
+          </div>
+          <div class="cue-box">💬 Feel: Sweeping up through the ball</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Golden Rules</div>
+        <div class="check-row"><span>Always aim at a specific target — never hit to nowhere.</span></div>
+        <div class="check-row"><span>One swing thought per session. Never change mid-session.</span></div>
+        <div class="check-row"><span>Bad shot? Reset, breathe, commit to the next one.</span></div>
+        <div class="check-row"><span>Sand Wedge — chipping green only for now.</span></div>
+        <div class="check-row"><span>Pro lesson at Temecula Creek Inn: 4–6 weeks in.</span></div>
+      </div>
+
+    </div><!-- /page-range -->
+
+
+    <!-- ══════════════════════════════════════
+         PAGE: STRETCHES
+    ══════════════════════════════════════ -->
+    <div class="page" id="page-stretches">
+
+      <div class="page-header" data-icon="🧘">
+        <div class="page-tag">Do This First · Every Session</div>
+        <div class="page-title">Pre-Range Stretches</div>
+        <div class="page-sub">5–7 minutes · Never skip · Your back will thank you</div>
+      </div>
+
+      <div class="section">
+        <div class="stat-row">
+          <div class="stat"><div class="stat-num">6</div><div class="stat-lbl">Movements</div></div>
+          <div class="stat"><div class="stat-num">5–7</div><div class="stat-lbl">Minutes</div></div>
+          <div class="stat"><div class="stat-num">0</div><div class="stat-lbl">Excuses</div></div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div style="background:var(--gold);color:#000;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+            <div class="card-title" style="margin:0;">Torso Rotations — 30 sec</div>
+          </div>
+          <div class="card-body">Club across shoulders behind neck. Rotate left and right slowly — this IS your swing motion.</div>
+          <div class="cue-box">↳ Warms up the exact rotation you'll use all session</div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div style="background:var(--gold);color:#000;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+            <div class="card-title" style="margin:0;">Hip Circles — 30 sec each</div>
+          </div>
+          <div class="card-body">Hands on hips, draw big slow circles each direction. Temecula courses have elevation — you need mobile hips.</div>
+          <div class="cue-box">↳ Loose hips = better rotation through the ball</div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div style="background:var(--gold);color:#000;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+            <div class="card-title" style="margin:0;">Shoulder Cross-Body — 20 sec each</div>
+          </div>
+          <div class="card-body">Pull one arm across your chest and hold. Swap sides. Shoulders take heavy load in backswing and follow-through.</div>
+          <div class="cue-box">↳ Prevents shoulder tightness mid-round</div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div style="background:var(--gold);color:#000;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
+            <div class="card-title" style="margin:0;">Wrist Flexion & Extension — 20 sec each</div>
+          </div>
+          <div class="card-body">Extend one arm, gently pull fingers back then forward. Both wrists. Forearms fatigue faster than you expect.</div>
+          <div class="cue-box">↳ Protects wrists and forearms through impact</div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div style="background:var(--gold);color:#000;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">5</div>
+            <div class="card-title" style="margin:0;">Hamstring Hinge — 30 sec</div>
+          </div>
+          <div class="card-body">Feet shoulder-width, soft knees, hinge forward from hips with flat back until you feel the pull. This IS your golf posture.</div>
+          <div class="cue-box">↳ Warming up your address position before you hit</div>
+        </div>
+
+        <div class="card" style="border-color:var(--green-b);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div style="background:var(--green-b);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">6</div>
+            <div class="card-title" style="margin:0;">Slow Practice Swings — 1 min ⭐</div>
+          </div>
+          <div class="card-body">10 slow-motion swings with PW. No ball. Feel the rotation, weight shift, hold the finish. Groove it before speed.</div>
+          <div class="cue-box" style="border-color:var(--green-b);color:var(--green-b);">↳ Most important 60 seconds of your session</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Remember</div>
+        <div class="check-row"><span>Everything is gentle and movement-based. No cold static yanking.</span></div>
+        <div class="check-row"><span>Always finish with slow practice swings before hitting ball one.</span></div>
+        <div class="check-row"><span>If something hurts — stop. Golf should never cause sharp pain.</span></div>
+        <div class="check-row"><span>During recovery: skip swings, do steps 1–5 gently as physio allows.</span></div>
+      </div>
+
+    </div><!-- /page-stretches -->
+
+
+    <!-- ══════════════════════════════════════
+         PAGE: SSS DRILL GUIDE
+    ══════════════════════════════════════ -->
+    <div class="page" id="page-sss">
+
+      <div class="page-header" data-icon="🎯">
+        <div class="page-tag">Simple Strike Sequence · Lefty Edition</div>
+        <div class="page-title">Strike Sequence</div>
+        <div class="page-sub">2 drills · Divot right of ball · No fat shots</div>
+      </div>
+
+      <div class="section">
+        <div class="card" style="background:rgba(201,168,76,0.08);border-color:rgba(201,168,76,0.3);">
+          <div class="card-title" style="color:var(--gold);">🔑 The #1 Thing to Understand</div>
+          <div class="card-body">Your divot should be <strong>in front of the ball</strong> — as a lefty, that means to your <strong>right side</strong>. The low point of your swing happens after impact, not at it. Fat shots happen when you bottom out too early.</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Drill 1 — No-Turn Backswing</div>
+
+        <div class="card">
+          <span class="tag tag-gold">Step 1</span>
+          <div class="card-title">Set Up to the Ball</div>
+          <div class="card-body">Feet shoulder-width. Ball just inside your right heel (lead foot). Slight knee flex, spine tilted from hips — not hunched. Weight 50/50.</div>
+          <div class="cue-box">💬 Feel: Athletic, ready to move</div>
+        </div>
+
+        <div class="card">
+          <span class="tag tag-gold">Step 2</span>
+          <div class="card-title">Raise Arms Straight Up — No Hip Turn</div>
+          <div class="card-body">Lift both arms up like a ref calling a touchdown. Hips stay square to the target line. Body does NOT rotate yet. Teach arm structure first.</div>
+          <div class="cue-box">💬 Feel: Arms floating up, lower body planted</div>
+        </div>
+
+        <div class="card">
+          <span class="tag tag-gold">Step 3</span>
+          <div class="card-title">Tip Clubhead Back 45°</div>
+          <div class="card-body">With arms up and hips square, tilt the clubhead back 45 degrees away from target. Arms widen and extend — this is the width of a good backswing.</div>
+          <div class="cue-box">💬 Feel: Club falling away, arms wide</div>
+        </div>
+
+        <div class="card">
+          <span class="tag tag-gold">Step 4</span>
+          <div class="card-title">Coil Shoulders to the Top</div>
+          <div class="card-body">From the 45° position, rotate your LEFT shoulder under your chin (lefty: left is trail shoulder). Feel the club resist — that's lag building.</div>
+          <div class="cue-box">💬 Feel: Resistance/coil in your trail side</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Drill 2 — Rotate & Relocate</div>
+
+        <div class="card">
+          <span class="tag tag-green">Step A</span>
+          <div class="card-title">Loaded at the Top — Pause</div>
+          <div class="card-body">Weight loaded into trail side (left foot for lefty). Pause for a beat — feel the coil. Do NOT rush the downswing from here.</div>
+          <div class="cue-box">💬 Feel: Loaded spring, patient at the top</div>
+        </div>
+
+        <div class="card">
+          <span class="tag tag-green">Step B</span>
+          <div class="card-title">Fire Lead Hip Toward Target First</div>
+          <div class="card-body">Lead hip (right hip for lefty) bumps and rotates toward target BEFORE arms start down. This relocates the low point forward automatically.</div>
+          <div class="cue-box">💬 Feel: Hips move, arms are still "sleeping"</div>
+        </div>
+
+        <div class="card">
+          <span class="tag tag-green">Step C</span>
+          <div class="card-title">Let Chest Rotate Through Impact</div>
+          <div class="card-body">Once hips are moving, chest follows and pulls arms/club through. Think: chest faces target at impact. This is what moves your divot forward.</div>
+          <div class="cue-box">💬 Feel: Chest chasing the target, not the ball</div>
+        </div>
+
+        <div class="card">
+          <span class="tag tag-green">Step D</span>
+          <div class="card-title">Hold a Balanced Finish — 3 Seconds</div>
+          <div class="card-body">90%+ weight on lead foot (right foot for lefty). Trail foot on its toe. Club behind head. Belt buckle faces target. If you wobble, rotation wasn't complete.</div>
+          <div class="cue-box">💬 Feel: Balanced, tall, facing the target</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">✅ Self-Check After Every Shot</div>
+        <div class="check-row"><span>Was my divot to the <strong>right of the ball</strong>?</span></div>
+        <div class="check-row"><span>Did my <strong>hips move before my arms</strong> started down?</span></div>
+        <div class="check-row"><span>Did I hold a <strong>balanced finish</strong> for 3 seconds?</span></div>
+        <div class="check-row"><span>Was my <strong>backswing slower</strong> than my downswing?</span></div>
+        <div class="check-row"><span>Did my chest end up <strong>facing the target</strong>?</span></div>
+      </div>
+
+    </div><!-- /page-sss -->
+
+
+    <!-- ══════════════════════════════════════
+         PAGE: PROGRESS
+    ══════════════════════════════════════ -->
+    <div class="page" id="page-progress">
+
+      <div class="page-header" data-icon="📈">
+        <div class="page-tag">Track Your Journey</div>
+        <div class="page-title">My Progress</div>
+        <div class="page-sub">Session log · Notes · Milestones</div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Journey Milestones</div>
+
+        <div class="card">
+          <div class="card-title">Week Progress</div>
+          <div id="weekProgress" style="margin-top:6px;">
+            <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;">Range Sessions (target: 2–3/week)</div>
+            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="sessionBar" style="width:0%"></div></div>
+            <div class="progress-label"><span id="sessionCount">0 sessions logged</span><span>Goal: 24 sessions</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Milestone Checklist</div>
+          <div id="milestones">
+            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="grips"></div><span>New midsize grips installed</span></div>
+            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="firstrange"></div><span>First range session completed</span></div>
+            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="sss"></div><span>SSS drills feeling natural</span></div>
+            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="lesson"></div><span>First pro lesson (Temecula Creek Inn)</span></div>
+            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="gapwedge"></div><span>Gap wedge (50°) added to bag</span></div>
+            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="7wood"></div><span>7-wood added to bag</span></div>
+            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="mallet"></div><span>Mallet putter upgrade</span></div>
+            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="firstround"></div><span>First full 18-hole round</span></div>
+            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="sub100"></div><span>First round under 100 🎉</span></div>
+            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="sub90"></div><span>First round under 90 🏆</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Log a Session</div>
+        <label>Date</label>
+        <input type="date" id="sessionDate">
+        <label>Swing Thought</label>
+        <input type="text" id="sessionThought" placeholder="e.g. Hips before arms">
+        <label>Notes</label>
+        <textarea class="notes-area" id="sessionNotes" placeholder="How did it feel? What worked? What didn't?"></textarea>
+        <button class="btn btn-gold" onclick="logSession()" style="width:100%;justify-content:center;margin-top:4px;">+ Log This Session</button>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Session History</div>
+        <div id="sessionHistory">
+          <div style="font-size:0.82rem;color:var(--muted);text-align:center;padding:20px 0;">No sessions logged yet.<br>Hit the range and come back here! 🏌️</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">General Notes</div>
+        <textarea class="notes-area" id="generalNotes" placeholder="Anything you want to remember — tips from the pro, things to work on, gear thoughts..." style="min-height:160px;"></textarea>
+        <button class="btn btn-green" onclick="saveNotes()" style="margin-top:8px;">Save Notes</button>
+        <span id="notesSaved" style="font-size:0.75rem;color:var(--green-b);margin-left:10px;opacity:0;transition:opacity 0.3s;">✓ Saved</span>
+      </div>
+
+    </div><!-- /page-progress -->
+
+  </div><!-- /pages -->
+
+  <!-- BOTTOM NAV -->
+  <nav id="nav">
+    <button class="nav-btn active" onclick="showPage('home')" id="nav-home">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </button>
+    <button class="nav-btn" onclick="showPage('range')" id="nav-range">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      Range
+    </button>
+    <button class="nav-btn" onclick="showPage('stretches')" id="nav-stretches">
+      <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 100 10A5 5 0 0012 2zM6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+      Stretch
+    </button>
+    <button class="nav-btn" onclick="showPage('sss')" id="nav-sss">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Drills
+    </button>
+    <button class="nav-btn" onclick="showPage('progress')" id="nav-progress">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Progress
+    </button>
+  </nav>
+
+</div><!-- /app -->
+
+<script>
+  // ── NAVIGATION ───────────────────────────────────────────────
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    document.getElementById('nav-' + id).classList.add('active');
+    // Scroll to top
+    document.getElementById('page-' + id).scrollTop = 0;
+  }
+
+  // ── STORAGE HELPERS ──────────────────────────────────────────
+  const store = {
+    get: k => { try { return JSON.parse(localStorage.getItem('sv_' + k)); } catch(e) { return null; } },
+    set: (k, v) => localStorage.setItem('sv_' + k, JSON.stringify(v))
+  };
+
+  // ── MILESTONES ───────────────────────────────────────────────
+  function toggleMilestone(el) {
+    el.classList.toggle('checked');
+    saveMilestones();
+  }
+
+  function saveMilestones() {
+    const data = {};
+    document.querySelectorAll('.check-box[data-id]').forEach(b => {
+      data[b.dataset.id] = b.classList.contains('checked');
+    });
+    store.set('milestones', data);
+  }
+
+  function loadMilestones() {
+    const data = store.get('milestones') || {};
+    document.querySelectorAll('.check-box[data-id]').forEach(b => {
+      if (data[b.dataset.id]) b.classList.add('checked');
+    });
+  }
+
+  // ── SESSION LOG ──────────────────────────────────────────────
+  function logSession() {
+    const date     = document.getElementById('sessionDate').value;
+    const thought  = document.getElementById('sessionThought').value.trim();
+    const notes    = document.getElementById('sessionNotes').value.trim();
+    if (!date) { alert('Please pick a date.'); return; }
+
+    const sessions = store.get('sessions') || [];
+    sessions.unshift({ date, thought, notes, id: Date.now() });
+    store.set('sessions', sessions);
+
+    document.getElementById('sessionDate').value = '';
+    document.getElementById('sessionThought').value = '';
+    document.getElementById('sessionNotes').value = '';
+
+    renderSessions();
+  }
+
+  function deleteSession(id) {
+    const sessions = (store.get('sessions') || []).filter(s => s.id !== id);
+    store.set('sessions', sessions);
+    renderSessions();
+  }
+
+  function renderSessions() {
+    const sessions = store.get('sessions') || [];
+    const el = document.getElementById('sessionHistory');
+    const bar = document.getElementById('sessionBar');
+    const countEl = document.getElementById('sessionCount');
+
+    // Update progress bar (goal: 24 sessions over 6–8 weeks)
+    const pct = Math.min((sessions.length / 24) * 100, 100);
+    bar.style.width = pct + '%';
+    countEl.textContent = sessions.length + ' session' + (sessions.length !== 1 ? 's' : '') + ' logged';
+
+    if (!sessions.length) {
+      el.innerHTML = '<div style="font-size:0.82rem;color:var(--muted);text-align:center;padding:20px 0;">No sessions logged yet.<br>Hit the range and come back here! 🏌️</div>';
+      return;
+    }
+
+    el.innerHTML = sessions.map(s => {
+      const d = new Date(s.date + 'T12:00:00');
+      const mon = d.toLocaleString('default', { month: 'short' }).toUpperCase();
+      const day = d.getDate();
+      return `
+        <div class="session-log-item">
+          <div class="session-date">${mon}<br>${day}</div>
+          <div class="session-note">
+            <strong>${s.thought || 'Session'}</strong>
+            ${s.notes || '<span style="font-style:italic;opacity:0.6;">No notes</span>'}
+          </div>
+          <button class="delete-btn" onclick="deleteSession(${s.id})">✕</button>
+        </div>`;
+    }).join('');
+  }
+
+  // ── GENERAL NOTES ────────────────────────────────────────────
+  function saveNotes() {
+    store.set('generalnotes', document.getElementById('generalNotes').value);
+    const badge = document.getElementById('notesSaved');
+    badge.style.opacity = '1';
+    setTimeout(() => badge.style.opacity = '0', 2000);
+  }
+
+  function loadNotes() {
+    const n = store.get('generalnotes');
+    if (n) document.getElementById('generalNotes').value = n;
+  }
+
+  // ── SET TODAY'S DATE ─────────────────────────────────────────
+  function setTodayDate() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('sessionDate').value = today;
+  }
+
+  // ── PWA: SERVICE WORKER ──────────────────────────────────────
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('SW registered'))
+      .catch(e => console.log('SW error:', e));
+  }
+
+  // ── OFFLINE INDICATOR ────────────────────────────────────────
+  function updateOfflineBadge() {
+    const badge = document.getElementById('offlineBadge');
+    if (!navigator.onLine) {
+      badge.textContent = '● Offline Mode';
+      badge.style.background = 'rgba(214,79,58,0.2)';
+      badge.style.borderColor = 'var(--red)';
+      badge.style.color = 'var(--red)';
+    } else {
+      badge.textContent = '● Offline Ready';
+      badge.style.background = '';
+      badge.style.borderColor = '';
+      badge.style.color = '';
+    }
+  }
+  window.addEventListener('online', updateOfflineBadge);
+  window.addEventListener('offline', updateOfflineBadge);
+
+  // ── INIT ─────────────────────────────────────────────────────
+  loadMilestones();
+  renderSessions();
+  loadNotes();
+  setTodayDate();
+  updateOfflineBadge();
+</script>
+</body>
+</html>
