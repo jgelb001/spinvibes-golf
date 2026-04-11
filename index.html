@@ -12,7 +12,27 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <title>SpinVibes Golf</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    // Runs before body renders — only restore profile if same browser session
+    // sessionStorage clears when tab is closed, so fresh tabs always show landing
+    const _p = localStorage.getItem('sv-profile');
+    const _s = sessionStorage.getItem('sv-session');
+    if (_p && _s) document.documentElement.classList.add('has-profile');
+    if (_p === 'girl'    && _s) document.documentElement.classList.add('pre-girl');
+    if (_p === 'son'     && _s) document.documentElement.classList.add('pre-son');
+    if (_p === 'grandma' && _s) document.documentElement.classList.add('pre-grandma');
+  </script>
   <style>
+    /* Pre-render profile state — set by inline <script> in <head> */
+    html.has-profile #landing { display: none !important; }
+    html.has-profile #app     { display: flex !important; }
+    html.pre-girl .son-sect, html.pre-girl .dad-sect { display: none !important; }
+    html.pre-girl .girl-sect { display: block !important; }
+    html.pre-son  .girl-sect, html.pre-son  .dad-sect { display: none !important; }
+    html.pre-son  .son-sect  { display: block !important; }
+    html.pre-grandma .son-sect, html.pre-grandma .dad-sect, html.pre-grandma .girl-sect { display: none !important; }
+    html.pre-grandma .grandma-sect { display: block !important; }
+
     :root {
       --bg:        #0a1a0e;
       --surface:   #111f15;
@@ -127,7 +147,7 @@
       background: none;
       color: var(--muted);
       font-family: 'Outfit', sans-serif;
-      font-size: 0.62rem;
+      font-size: 0.56rem;
       font-weight: 500;
       letter-spacing: 0.5px;
       text-transform: uppercase;
@@ -135,7 +155,7 @@
       transition: color 0.15s;
       padding-top: 6px;
     }
-    .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .nav-btn.active { color: var(--gold); }
     .nav-btn.active svg { stroke: var(--gold); }
 
@@ -461,19 +481,757 @@
     ::-webkit-scrollbar { width: 3px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+
+    /* ── LIGHT MODE ── */
+    body.light-mode {
+      --bg:       #f5f0e8;
+      --surface:  #ffffff;
+      --surface2: #ede8df;
+      --surface3: #ddd7cc;
+      --green:    #2d6a3f;
+      --green-b:  #3d8a52;
+      --gold:     #a8782e;
+      --gold-l:   #7a5418;
+      --cream:    #1a2e1d;
+      --muted:    #5a7a5e;
+    }
+    body.light-mode .card,
+    body.light-mode .guide-card,
+    body.light-mode .stat-row,
+    body.light-mode .session-log-item,
+    body.light-mode .notes-area,
+    body.light-mode input[type="text"],
+    body.light-mode input[type="date"],
+    body.light-mode select {
+      border-color: rgba(0,0,0,0.1);
+    }
+    body.light-mode .pill {
+      background: rgba(0,0,0,0.05);
+      border-color: rgba(0,0,0,0.1);
+      color: var(--gold);
+    }
+    body.light-mode .cue-box {
+      background: rgba(168,120,46,0.08);
+    }
+    body.light-mode .check-row {
+      border-bottom-color: rgba(0,0,0,0.06);
+    }
+    body.light-mode .section {
+      border-bottom-color: rgba(0,0,0,0.07);
+    }
+    body.light-mode .page-header {
+      background: linear-gradient(160deg, var(--surface2) 0%, var(--bg) 100%);
+    }
+    body.light-mode .home-hero {
+      background: linear-gradient(160deg, #dceade 0%, var(--bg) 100%);
+    }
+
+    /* ── STEP LAYOUT ── */
+    .sss-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 2px;
+    }
+    .step-num {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      color: #fff;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step-content { flex: 1; }
+    .step-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--cream);
+      line-height: 1.2;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .step-bullets {
+      list-style: none;
+      padding: 0; margin: 0;
+    }
+    .step-bullets li {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+      padding: 2px 0 2px 14px;
+      position: relative;
+    }
+    .step-bullets li::before {
+      content: '›';
+      position: absolute; left: 2px;
+      color: var(--gold);
+      font-weight: 700;
+    }
+    .step-bullets li strong { color: var(--cream); }
+    .critical-badge {
+      display: inline-block;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: var(--gold);
+      color: #000;
+      padding: 2px 7px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+    .sss-rule {
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.4);
+      border-radius: 10px;
+      padding: 14px 16px;
+      text-align: center;
+    }
+    .sss-rule-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .sss-rule-body {
+      font-size: 0.78rem;
+      color: var(--gold-l);
+      line-height: 1.5;
+    }
+
+    /* ── MODE TOGGLE BUTTON ── */
+    #modeToggle {
+      background: none;
+      border: 1px solid rgba(201,168,76,0.35);
+      border-radius: 20px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      line-height: 1;
+      color: var(--muted);
+      transition: border-color 0.2s, background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-right: 8px;
+    }
+    #modeToggle:active { opacity: 0.7; }
+
+    /* ── EXPANDABLE CARDS ── */
+    .exp-trigger {
+      display:flex; align-items:center; justify-content:space-between;
+      cursor:pointer; user-select:none; -webkit-user-select:none;
+      margin-top:10px; padding-top:10px;
+      border-top:1px solid rgba(255,255,255,0.07);
+      font-size:0.72rem; color:var(--gold); font-weight:600;
+      letter-spacing:0.5px; text-transform:uppercase;
+    }
+    .exp-trigger svg { width:13px; height:13px; stroke:var(--gold); fill:none; stroke-width:2.5; transition:transform 0.25s; flex-shrink:0; }
+    .exp-trigger.open svg { transform:rotate(180deg); }
+    .exp-body { max-height:0; overflow:hidden; transition:max-height 0.45s ease; }
+    .exp-body.open { max-height:1600px; }
+    .exp-inner { padding-top:14px; display:flex; flex-direction:column; gap:10px; }
+    .exp-detail { font-size:0.8rem; color:var(--muted); line-height:1.65; }
+    .exp-detail strong { color:var(--cream); }
+    .exp-list { list-style:none; padding:0; margin:0; }
+    .exp-list li { font-size:0.8rem; color:var(--muted); line-height:1.65; padding-left:14px; position:relative; }
+    .exp-list li::before { content:'›'; color:var(--gold); position:absolute; left:0; font-weight:700; }
+    .exp-mistake { background:rgba(214,79,58,0.08); border-left:2px solid var(--red); border-radius:0 6px 6px 0; padding:8px 10px; }
+    .exp-mistake .em-lbl { font-size:0.65rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--red); margin-bottom:2px; }
+    .exp-mistake p { font-size:0.79rem; color:var(--muted); line-height:1.5; margin:0; }
+    .diagram { background:rgba(0,0,0,0.22); border-radius:10px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:6px; }
+    .diagram-lbl { font-size:0.63rem; color:var(--gold); font-weight:600; text-transform:uppercase; letter-spacing:1.5px; }
+    .exp-close {
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      width:100%; padding:8px 0; margin-top:2px;
+      background:none; border:1px solid rgba(255,255,255,0.09); border-radius:8px;
+      color:var(--muted); font-family:'Outfit',sans-serif; font-size:0.75rem; cursor:pointer;
+    }
+    .exp-close:active { opacity:0.7; }
+    body.light-mode .exp-trigger { border-top-color:rgba(0,0,0,0.08); }
+    body.light-mode .diagram { background:rgba(0,0,0,0.04); }
+    body.light-mode .exp-mistake { background:rgba(214,79,58,0.06); }
+
+    /* ── SON MODE COLORS (Electric Blue / Amber) ── */
+    body.son-mode {
+      --bg:       #030d1c;
+      --surface:  #071428;
+      --surface2: #0d1f40;
+      --surface3: #142852;
+      --green:    #1a56c4;
+      --green-b:  #3b82f6;
+      --gold:     #f59e0b;
+      --gold-l:   #fcd34d;
+      --cream:    #dbeafe;
+      --muted:    #64a0dc;
+      --red:      #ef4444;
+      --nav-h:    64px;
+    }
+    body.light-mode.son-mode {
+      --bg:      #eff6ff;
+      --surface: #ffffff;
+      --surface2:#dbeafe;
+      --surface3:#bfdbfe;
+      --gold:    #d97706;
+      --gold-l:  #92400e;
+      --cream:   #1e3a5f;
+      --muted:   #3b82f6;
+    }
+    body.son-mode .home-hero { background: linear-gradient(160deg, #0d2a5e 0%, var(--bg) 100%); }
+    body.son-mode .topbar-logo span { color: #3b82f6; }
+
+    body.light-mode.girl-mode {
+      --bg:      #fdf2f8;
+      --surface: #ffffff;
+      --surface2:#fce7f3;
+      --surface3:#fbcfe8;
+      --gold:    #be185d;
+      --gold-l:  #9d174d;
+      --cream:   #1f0a14;
+      --muted:   #9d174d;
+      --green:   #0f766e;
+      --green-b: #0d9488;
+    }
+    body.light-mode.girl-mode .home-hero { background: linear-gradient(160deg, #fce7f3 0%, var(--bg) 100%); }
+
+    /* ── GIRL MODE THEME ── */
+    body.girl-mode {
+      --bg:       #120818;
+      --surface:  #1e0d28;
+      --surface2: #2a1238;
+      --surface3: #361848;
+      --green:    #0d9488;
+      --green-b:  #14b8a6;
+      --gold:     #ec4899;
+      --gold-l:   #f472b6;
+      --cream:    #fdf4ff;
+      --muted:    #a78bbd;
+      --red:      #f43f5e;
+    }
+    body.girl-mode .topbar-logo span { color: #14b8a6; }
+    body.girl-mode .home-hero { background: linear-gradient(160deg, #2d0a3d 0%, var(--bg) 100%); }
+
+    /* ── GIRL SECTION ── */
+    .dad-sect, .son-sect, .girl-sect { width: 100%; }
+    .girl-sect { display: none; }
+
+    /* ── GIRL STEP BADGE ── */
+    .girl-step-badge {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    /* ── GIRL FUN BADGE ── */
+    .girl-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    /* ── LANDING CARD GIRL ── */
+    .landing-card-girl {
+      background: linear-gradient(135deg, #1e0830 0%, #2d0a3d 100%);
+      border-color: rgba(236,72,153,0.4);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(236,72,153,0.12);
+    }
+    .landing-card-girl:hover {
+      border-color: #ec4899;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 24px rgba(236,72,153,0.22);
+    }
+    .landing-card-girl .landing-card-name { color: #f472b6; }
+    .landing-card-girl .landing-card-desc { color: #c084fc; }
+
+    /* ── PROFILE SWITCHER ── */
+    #profileSwitch {
+      display: flex;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .profile-pill {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      border: none;
+      background: none;
+      color: var(--muted);
+      padding: 4px 12px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    .profile-pill.active {
+      background: var(--gold);
+      color: #000;
+    }
+    .profile-pill:not(.active):active { opacity: 0.7; }
+
+    /* ── PROFILE SECTIONS ── */
+    .dad-sect, .son-sect, .girl-sect { width: 100%; }
+    .son-sect { display: none; }
+    .girl-sect { display: none; }
+
+    /* ── SON BADGE ── */
+    .fun-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 6px;
+    }
+    .son-step-badge {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════════
+       LANDING PAGE
+    ══════════════════════════════════ */
+    #landing {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 24px 20px;
+      padding-top: calc(24px + env(safe-area-inset-top, 0px));
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    #landing.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.04);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    #landing-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.8rem;
+      letter-spacing: 4px;
+      color: var(--gold);
+      line-height: 1;
+      text-align: center;
+    }
+    #landing-logo span { color: var(--cream); }
+    #landing-sub {
+      font-size: 0.72rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 4px;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    #landing-question {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 3px;
+      color: var(--cream);
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .landing-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 380px;
+    }
+    .landing-card {
+      border-radius: 20px;
+      padding: 18px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border: 2px solid transparent;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .landing-card:active { transform: scale(0.97); }
+    .landing-card-dad {
+      background: linear-gradient(135deg, #0f2614 0%, #162b1a 100%);
+      border-color: rgba(201,168,76,0.4);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(201,168,76,0.12);
+    }
+    .landing-card-dad:hover {
+      border-color: var(--gold);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 24px rgba(201,168,76,0.18);
+    }
+    .landing-card-son {
+      background: linear-gradient(135deg, #071428 0%, #0d1f40 100%);
+      border-color: rgba(59,130,246,0.4);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(59,130,246,0.12);
+    }
+    .landing-card-son:hover {
+      border-color: #3b82f6;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 24px rgba(59,130,246,0.22);
+    }
+    .landing-avatar {
+      font-size: 3.2rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .landing-card-info { flex: 1; }
+    .landing-card-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 3px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .landing-card-dad .landing-card-name { color: var(--gold); }
+    .landing-card-son .landing-card-name { color: #60a5fa; }
+    .landing-card-desc {
+      font-size: 0.72rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .landing-card-dad .landing-card-desc { color: var(--muted); }
+    .landing-card-son .landing-card-desc { color: #64a0dc; }
+    .landing-card-arrow {
+      font-size: 1.4rem;
+      opacity: 0.5;
+      flex-shrink: 0;
+      transition: opacity 0.18s, transform 0.18s;
+    }
+    .landing-card:hover .landing-card-arrow {
+      opacity: 1;
+      transform: translateX(4px);
+    }
+    .landing-footer {
+      margin-top: 32px;
+      font-size: 0.68rem;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-align: center;
+      opacity: 0.6;
+    }
+    /* Orbs / background decoration */
+    .landing-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      opacity: 0.18;
+    }
+    .landing-orb-1 {
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, #2d6a3f, transparent);
+      top: -80px; right: -80px;
+    }
+    .landing-orb-2 {
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, #1a56c4, transparent);
+      bottom: -60px; left: -60px;
+    }
+
+    /* ── GRANDMA MODE THEME (Deep Purple / Champagne) ── */
+    body.grandma-mode {
+      --bg:       #0d0812;
+      --surface:  #160e20;
+      --surface2: #1f1430;
+      --surface3: #2a1a40;
+      --green:    #6d28d9;
+      --green-b:  #8b5cf6;
+      --gold:     #d4af70;
+      --gold-l:   #e8cc8a;
+      --cream:    #faf5ff;
+      --muted:    #9d7dc2;
+      --red:      #e05c8a;
+      --nav-h:    64px;
+    }
+    body.grandma-mode .home-hero { background: linear-gradient(160deg, #1e0840 0%, var(--bg) 100%); }
+    body.grandma-mode .topbar-logo span { color: #8b5cf6; }
+
+    body.light-mode.grandma-mode {
+      --bg:       #faf5ff;
+      --surface:  #ffffff;
+      --surface2: #f3e8ff;
+      --surface3: #e9d5ff;
+      --gold:     #7c3aed;
+      --gold-l:   #5b21b6;
+      --cream:    #1e0840;
+      --muted:    #7c3aed;
+      --green:    #6d28d9;
+      --green-b:  #8b5cf6;
+    }
+    body.light-mode.grandma-mode .home-hero { background: linear-gradient(160deg, #ede9fe 0%, var(--bg) 100%); }
+
+    /* ── GRANDMA SECTION ── */
+    .grandma-sect { display: none; width: 100%; }
+
+    /* ── GRANDMA BADGE ── */
+    .grandma-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #7c3aed, #d4af70);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    /* ── LANDING CARD GRANDMA ── */
+    .landing-card-grandma {
+      background: linear-gradient(135deg, #160820 0%, #1e0d30 100%);
+      border-color: rgba(139,92,246,0.4);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(212,175,112,0.12);
+    }
+    .landing-card-grandma:hover {
+      border-color: #8b5cf6;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 24px rgba(139,92,246,0.22);
+    }
+    .landing-card-grandma .landing-card-name { color: #d4af70; }
+    .landing-card-grandma .landing-card-desc { color: #a78bca; }
+
+    /* ── RESPONSIVE — DESKTOP / TABLET ── */
+    @media (min-width: 600px) {
+      body { background: #000; }
+
+      /* Center the app shell in a phone-sized column */
+      #app {
+        max-width: 500px;
+        margin: 0 auto;
+        box-shadow: 0 0 80px rgba(0,0,0,0.7), 0 0 1px rgba(255,255,255,0.06);
+      }
+
+      /* Center landing content, same max-width */
+      #landing {
+        align-items: center;
+      }
+      #landing > *:not(.landing-orb) {
+        width: 100%;
+        max-width: 500px;
+      }
+
+      /* Slightly more breathing room */
+      .section { padding: 20px 24px; }
+      .page-header { padding: 28px 24px 22px; }
+      .home-hero { padding: 32px 24px 28px; }
+      .guide-grid { padding: 18px 24px; gap: 12px; }
+
+      /* Nav — bigger tap targets and labels */
+      .nav-btn { font-size: 0.65rem; gap: 5px; }
+      .nav-btn svg { width: 22px; height: 22px; }
+
+      /* Topbar — prevent logo wrapping, slim down crowded right side */
+      #topbar { padding-left: 24px; padding-right: 24px; gap: 8px; }
+      .topbar-logo { white-space: nowrap; font-size: 1.2rem; }
+      .topbar-sub { display: none; }
+      #offlineBadge { display: none; }
+      .profile-pill { font-size: 0.62rem; padding: 4px 7px; }
+
+      /* Cards — slightly more padding */
+      .card { padding: 16px 18px; }
+
+      /* Landing cards — comfortable on wider screens */
+      .landing-cards { max-width: 460px; }
+      .landing-card { padding: 20px 22px; }
+      .landing-avatar { font-size: 3.6rem; }
+    }
+
+    /* ── FULL DESKTOP LAYOUT (≥ 960px) ── */
+    /* Uses flex-wrap so #app stays display:flex (JS sets this) but wraps into a
+       topbar row + sidebar+pages row, filling the full viewport. */
+    @media (min-width: 960px) {
+      :root { --desktop-topbar-h: 60px; }
+      body { background: var(--bg); }
+
+      /* Undo phone-column, switch to row+wrap */
+      #app {
+        max-width: 100%;
+        margin: 0;
+        box-shadow: none;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-content: flex-start; /* prevent topbar from swallowing vertical space */
+      }
+
+      /* Topbar — full width, fixed height, first row */
+      #topbar {
+        order: 1;
+        width: 100%;
+        flex-shrink: 0;
+        height: var(--desktop-topbar-h);
+        padding: 0 32px;
+        gap: 16px;
+      }
+      .topbar-logo { font-size: 1.4rem; }
+      .topbar-sub { display: none; }
+      #offlineBadge { display: none; }
+      .profile-pill { font-size: 0.68rem; padding: 5px 10px; }
+
+      /* Pages area — second row, fills remaining height */
+      #pages {
+        order: 3;
+        min-width: 0;
+        height: calc(100dvh - var(--desktop-topbar-h));
+      }
+
+      /* Sidebar nav — second row, left */
+      #nav {
+        order: 2;
+        flex: 0 0 180px;
+        width: 180px;
+        height: calc(100dvh - var(--desktop-topbar-h));
+        border-top: none;
+        border-right: 1px solid rgba(201,168,76,0.15);
+        padding: 12px 8px 24px;
+        overflow-y: auto;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      /* Sidebar nav buttons — icon left, label right */
+      .nav-btn {
+        flex: none;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 11px 14px;
+        font-size: 0.78rem;
+        border-radius: 8px;
+        margin: 2px 0;
+        text-align: left;
+        letter-spacing: 0.3px;
+      }
+      .nav-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+      /* Pages — no bottom-nav offset needed */
+      .page { padding-bottom: 32px; }
+
+      /* Content breathing room */
+      .section { padding: 24px 40px; }
+      .page-header { padding: 32px 40px 26px; }
+      .home-hero { padding: 36px 40px 32px; }
+      .guide-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        padding: 20px 40px;
+      }
+      .card { padding: 18px 20px; }
+
+      /* Landing — center on wide screens */
+      #landing { align-items: center; }
+      #landing > *:not(.landing-orb) { width: 100%; max-width: 560px; }
+      .landing-cards { max-width: 520px; }
+    }
+
+    @media (min-width: 1280px) {
+      #nav { flex: 0 0 200px; width: 200px; }
+      .guide-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
   </style>
 </head>
 <body>
 
-<div id="app">
+<div id="landing">
+  <div class="landing-orb landing-orb-1"></div>
+  <div class="landing-orb landing-orb-2"></div>
+
+  <img src="spinvibes_profile.svg" alt="SpinVibes Golf" style="width:110px;height:110px;border-radius:50%;display:block;margin:0 auto 12px;box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 40px rgba(201,168,76,0.15);">
+  <div id="landing-sub" style="margin-bottom:20px;">⛳ Family pocket caddie</div>
+
+  <div id="landing-question">Who's Playing?</div>
+
+  <div class="landing-cards">
+
+    <div class="landing-card landing-card-dad" onclick="enterProfile('dad')">
+      <div class="landing-avatar">👨</div>
+      <div class="landing-card-info">
+        <div class="landing-card-name">Dad</div>
+        <div class="landing-card-desc">Lefty · Sub-90 Journey</div>
+      </div>
+      <div class="landing-card-arrow">›</div>
+    </div>
+
+    <div class="landing-card landing-card-son" onclick="enterProfile('son')">
+      <div class="landing-avatar">👦</div>
+      <div class="landing-card-info">
+        <div class="landing-card-name">Son</div>
+        <div class="landing-card-desc">Righty · Junior · Fun First</div>
+      </div>
+      <div class="landing-card-arrow">›</div>
+    </div>
+
+    <div class="landing-card landing-card-girl" onclick="enterProfile('girl')">
+      <div class="landing-avatar">👧</div>
+      <div class="landing-card-info">
+        <div class="landing-card-name">Daughter</div>
+        <div class="landing-card-desc">Lefty · Age 5 · Pure Fun</div>
+      </div>
+      <div class="landing-card-arrow">›</div>
+    </div>
+
+    <div class="landing-card landing-card-grandma" onclick="enterProfile('grandma')">
+      <div class="landing-avatar">👵</div>
+      <div class="landing-card-info">
+        <div class="landing-card-name">Grandma</div>
+        <div class="landing-card-desc">Righty · Welcome Back</div>
+      </div>
+      <div class="landing-card-arrow">›</div>
+    </div>
+
+  </div>
+
+  <div class="landing-footer">SpinVibes Golf · Built with ❤️</div>
+</div>
+
+<div id="app" style="display:none">
 
   <!-- TOP BAR -->
   <div id="topbar">
-    <div>
+    <div onclick="goToLanding()" style="cursor:pointer;" title="Back to player select">
       <div class="topbar-logo">Spin<span>Vibes</span> Golf</div>
-      <div class="topbar-sub">⛳ Lefty · Sub-90 Journey</div>
+      <div class="topbar-sub" id="topbarSub">⛳ Lefty · Sub-90 Journey</div>
     </div>
-    <div class="offline-badge" id="offlineBadge">● Offline Ready</div>
+    <div id="profileSwitch">
+      <button id="btnDad" class="profile-pill active" onclick="switchProfile('dad')">👨 Dad</button>
+      <button id="btnSon" class="profile-pill" onclick="switchProfile('son')">👦 Son</button>
+      <button id="btnGirl" class="profile-pill" onclick="switchProfile('girl')">👧 Daughter</button>
+      <button id="btnGrandma" class="profile-pill" onclick="switchProfile('grandma')">👵 Grandma</button>
+    </div>
+    <div style="display:flex;align-items:center;">
+      <button id="modeToggle" onclick="toggleMode()" title="Toggle light/dark mode">☀️</button>
+      <div class="offline-badge" id="offlineBadge">● Offline Ready</div>
+    </div>
   </div>
 
   <!-- PAGES -->
@@ -483,7 +1241,7 @@
          PAGE: HOME
     ══════════════════════════════════════ -->
     <div class="page active" id="page-home">
-
+      <div class="dad-sect">
       <div class="home-hero">
         <div class="home-greeting">Welcome back, Jeremy</div>
         <div class="home-title">Your Golf<br><span>Pocket Guide</span></div>
@@ -491,7 +1249,7 @@
           <div class="home-goal-num">&lt;90</div>
           <div>
             <div style="font-weight:700;color:var(--cream);font-size:0.85rem;">The Goal</div>
-            <div style="font-size:0.75rem;">Lefty beginner · Temecula, CA · Vice Boost bag</div>
+            <div style="font-size:0.75rem;">Lefty beginner · Vice Boost bag</div>
           </div>
         </div>
       </div>
@@ -508,14 +1266,14 @@
           <div class="guide-card-sub">5–7 min warmup</div>
         </a>
         <a class="guide-card" onclick="showPage('sss')">
-          <span class="guide-card-icon">🎯</span>
-          <div class="guide-card-title">Strike Sequence</div>
-          <div class="guide-card-sub">SSS drill guide</div>
+          <span class="guide-card-icon">📺</span>
+          <div class="guide-card-title">Watch This First</div>
+          <div class="guide-card-sub">Me &amp; My Golf · YouTube</div>
         </a>
-        <a class="guide-card" onclick="showPage('progress')">
-          <span class="guide-card-icon">📈</span>
-          <div class="guide-card-title">My Progress</div>
-          <div class="guide-card-sub">Log & notes</div>
+        <a class="guide-card" onclick="showPage('shortgame')">
+          <span class="guide-card-icon">🎯</span>
+          <div class="guide-card-title">Short Game</div>
+          <div class="guide-card-sub">Chipping &amp; putting</div>
         </a>
       </div>
 
@@ -525,18 +1283,18 @@
           <div class="stat"><div class="stat-num">10.5°</div><div class="stat-lbl">Driver</div></div>
           <div class="stat"><div class="stat-num">22°</div><div class="stat-lbl">4-Hybrid</div></div>
           <div class="stat"><div class="stat-num">6–SW</div><div class="stat-lbl">Irons</div></div>
+          <div class="stat"><div class="stat-num">50°</div><div class="stat-lbl">Gap Wedge</div></div>
           <div class="stat"><div class="stat-num">2¾"</div><div class="stat-lbl">Tee Size</div></div>
         </div>
         <div class="card">
           <div class="card-title">Grip Spec</div>
-          <div class="card-body">Stick Grips Topo Augusta Green · <strong>Midsize</strong> · 8 clubs (all except putter)</div>
+          <div class="card-body"><strong>Midsize</strong> grips · All clubs including gap wedge (except putter) · Installed April 2026</div>
         </div>
         <div class="card">
           <div class="card-title">Next Upgrades</div>
           <div class="card-body">
-            <strong>1.</strong> Gap Wedge 50° (Vokey SM11 or Cleveland CBX4)<br>
-            <strong>2.</strong> 7-Wood (TaylorMade Qi35 Max or Ping G440)<br>
-            <strong>3.</strong> Mallet Putter (Spider Tour or Odyssey Ai-ONE #7)
+            <strong>1.</strong> Mallet Putter (Spider Tour or Odyssey Ai-ONE #7)<br>
+            <strong>2.</strong> 7-Wood (TaylorMade Qi35 Max or Ping G440 Max)
           </div>
         </div>
       </div>
@@ -546,11 +1304,214 @@
         <div class="card">
           <div class="card-body">
             🎯 <strong>One swing thought per session</strong> — never change mid-session<br><br>
-            🏥 <strong>Pro lesson:</strong> Temecula Creek Inn at 4–6 weeks<br><br>
+            🏥 <strong>Pro lesson:</strong> Local course – book at 4–6 weeks<br><br>
             🛒 <strong>Left-handed gear:</strong> leftiesonlygolf.com · 2ndswing.com
           </div>
         </div>
       </div>
+
+          </div><!-- /dad-sect -->
+
+      <div class="son-sect">
+
+        <div class="home-hero">
+          <div class="home-greeting">Let's Go! 🤙 You've Got This</div>
+          <div class="home-title" style="font-size:2.4rem;">Your Golf<br><span>Pocket Guide</span></div>
+          <div class="home-goal" style="border-color:rgba(59,130,246,0.4);background:rgba(59,130,246,0.1);">
+            <div class="home-goal-num" style="color:#3b82f6;">8</div>
+            <div>
+              <div style="font-weight:700;color:var(--cream);font-size:0.85rem;">The Goal</div>
+              <div style="font-size:0.75rem;">Have Fun. Learn Right. Make Dad Nervous. 😈</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="guide-grid">
+          <a class="guide-card" onclick="showPage('range')">
+            <span class="guide-card-icon">🏌️</span>
+            <div class="guide-card-title">Range Session</div>
+            <div class="guide-card-sub">30 balls · 3 phases</div>
+          </a>
+          <a class="guide-card" onclick="showPage('stretches')">
+            <span class="guide-card-icon">🧘</span>
+            <div class="guide-card-title">Warm Up Moves</div>
+            <div class="guide-card-sub">6 fun stretches</div>
+          </a>
+          <a class="guide-card" onclick="showPage('sss')">
+            <span class="guide-card-icon">📺</span>
+            <div class="guide-card-title">Watch This First</div>
+            <div class="guide-card-sub">Me &amp; My Golf · YouTube</div>
+          </a>
+        </div>
+
+        <div class="section">
+          <div class="section-title">My Bag — Vice Jr. Set 🎒</div>
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" style="color:#3b82f6;">17°</div><div class="stat-lbl">Driver</div></div>
+            <div class="stat"><div class="stat-num" style="color:#3b82f6;">23°</div><div class="stat-lbl">FW Wood</div></div>
+            <div class="stat"><div class="stat-num" style="color:#3b82f6;">5·7·9</div><div class="stat-lbl">Irons</div></div>
+            <div class="stat"><div class="stat-num" style="color:#3b82f6;">54°</div><div class="stat-lbl">Sand Wed.</div></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Full Set — 8 Pieces 🔥</div>
+            <div class="card-body">
+              <strong>Driver</strong> 17° · <strong>Fairway Wood</strong> 23° · <strong>5-Iron</strong> 27° · <strong>7-Iron</strong> 34° · <strong>9-Iron</strong> 44° · <strong>Sand Wedge</strong> 54° · <strong>Blade Putter</strong> · <strong>Junior Carry Bag</strong><br><br>
+              Right-handed · Ages 9–12 · Vice Golf Pro Jr. Set
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Quick Rules 💡</div>
+          <div class="card">
+            <div class="card-body">
+              💥 <strong>Swing your hardest on the range</strong> — no holding back<br><br>
+              😂 <strong>Miss one? Shake it off</strong> — even pros hit bad shots<br><br>
+              🎯 <strong>One swing thought max:</strong> "TURN and FIRE!"<br><br>
+              🧠 <strong>Start with 7-iron</strong> before trying driver
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /son-sect home -->
+
+      <div class="girl-sect">
+
+        <div class="home-hero">
+          <div class="home-greeting">⛳ Lefty · Age 5 · Top Flite Girls Set</div>
+          <div class="home-title">Let's Play<br><span style="color:#ec4899;">Golf! 🌈</span></div>
+          <div class="home-goal" style="border-color:rgba(236,72,153,0.4);background:rgba(236,72,153,0.08);">
+            <div class="home-goal-num" style="color:#ec4899;">5</div>
+            <div>
+              <div style="font-weight:700;color:var(--cream);font-size:0.85rem;">The Goal</div>
+              <div style="font-size:0.75rem;">Make contact. Laugh out loud. Come back next time. 🌈</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" style="color:#ec4899;">5</div><div class="stat-lbl">Clubs</div></div>
+            <div class="stat"><div class="stat-num" style="color:#14b8a6;">15</div><div class="stat-lbl">Min Max</div></div>
+            <div class="stat"><div class="stat-num" style="color:#ec4899;">😄</div><div class="stat-lbl">Always</div></div>
+            <div class="stat"><div class="stat-num" style="color:#14b8a6;">L</div><div class="stat-lbl">Lefty</div></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Daughter's Bag 🎒</div>
+          <div class="card" style="border-color:rgba(236,72,153,0.3);">
+            <div class="card-title">Top Flite Girls Set · Ages 5–8 · Teal/Pink</div>
+            <div class="card-body">
+              <div class="check-row" style="border:none;padding:4px 0;"><span>🏌️ <strong>Driver</strong> — Big head, easy to hit, great for tee shots</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>🌿 <strong>Hybrid</strong> — Easy club that goes a long way</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>⛳ <strong>7-Iron</strong> — Her go-to club for most shots</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>💨 <strong>Sand Wedge</strong> — Gets the ball up and out</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>🎯 <strong>Putter</strong> — Roll it into the hole!</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>👜 <strong>Stand Bag</strong> — Pink & teal, all hers</span></div>
+            </div>
+            <div class="cue-box" style="border-color:#ec4899;color:#f9a8d4;">Graphite shafts on all clubs — lightweight and built for her swing speed</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Goals 🌟</div>
+          <div class="card" style="border-color:rgba(20,184,166,0.3);">
+            <div class="card-body" style="font-size:1.05rem;line-height:1.8;">
+              🥇 Make contact with the ball<br>
+              😂 Laugh at least once per swing<br>
+              🎉 Want to come back next time<br>
+              🌱 Build a foundation for life
+            </div>
+            <div class="cue-box" style="border-color:#14b8a6;color:#5eead4;margin-top:12px;">
+              <strong>Dad's Rule:</strong> Stop BEFORE she's tired of it. Always leave her wanting more.
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Session Tips for Age 5 👨‍👧</div>
+          <div class="card">
+            <div class="check-row"><span>⏱ <strong>10–15 minutes max</strong> — attention spans are short, that's totally fine</span></div>
+            <div class="check-row"><span>🎯 <strong>One thing at a time</strong> — one thought, one club, one goal per trip</span></div>
+            <div class="check-row"><span>🌈 <strong>Follow her lead</strong> — if she wants to putt all day, putt all day</span></div>
+            <div class="check-row"><span>🚫 <strong>No swing fixes mid-swing</strong> — wait until she asks or keep it super positive</span></div>
+            <div class="check-row"><span>🏆 <strong>Celebrate everything</strong> — any contact = amazing, any attempt = brave</span></div>
+          </div>
+        </div>
+
+      </div><!-- /girl-sect home -->
+
+      <div class="grandma-sect">
+
+        <div class="home-hero">
+          <div class="home-greeting">⛳ Righty · Lynx Lady Regalia · Welcome Back</div>
+          <div class="home-title">Back on<br><span style="color:#d4af70;">the Course 💜</span></div>
+          <div class="home-goal" style="border-color:rgba(212,175,112,0.4);background:rgba(212,175,112,0.08);">
+            <div class="home-goal-num" style="color:#d4af70;">💜</div>
+            <div>
+              <div style="font-weight:700;color:var(--cream);font-size:0.85rem;">The Goal</div>
+              <div style="font-size:0.75rem;">Move gently, enjoy every swing, and welcome golf back into your life.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" style="color:#d4af70;">R</div><div class="stat-lbl">Righty</div></div>
+            <div class="stat"><div class="stat-num" style="color:#8b5cf6;">20</div><div class="stat-lbl">Min Max</div></div>
+            <div class="stat"><div class="stat-num" style="color:#d4af70;">🌸</div><div class="stat-lbl">Tempo</div></div>
+            <div class="stat"><div class="stat-num" style="color:#8b5cf6;">12</div><div class="stat-lbl">Clubs</div></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Grandma's Bag 💜</div>
+          <div class="card" style="border-color:rgba(139,92,246,0.3);">
+            <div class="card-title">Lynx Lady Regalia Purple — Full Set</div>
+            <div class="card-body">
+              <div class="check-row" style="border:none;padding:4px 0;"><span>🏌️ <strong>Driver</strong> — Lightweight, great for easy tee shots</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>🌿 <strong>3-Wood</strong> — Beautiful off the fairway when you need distance</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>🌿 <strong>5-Wood</strong> — Forgiving and smooth from anywhere</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>⭐ <strong>7-Wood</strong> — Your go-to club. Easy to launch, super forgiving</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>⭐ <strong>4/5 Hybrid</strong> — Perfect when you need a gentle long shot</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>⛳ <strong>6–9 Iron</strong> — Hollow body, very forgiving on off-center hits</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>💨 <strong>Pitching Wedge</strong> — Crisp approach shots, 60–80 yards</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>💨 <strong>Sand Wedge</strong> — Gets you out of trouble with ease</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>🎯 <strong>Alignment Putter</strong> — Built-in alignment guides to help hole more putts</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>🛒 <strong>Cart Bag</strong> — Lightweight purple, easy to organize</span></div>
+            </div>
+            <div class="cue-box" style="border-color:#d4af70;color:#e8cc8a;">All graphite shafts — lightweight and built for a smooth, effortless swing</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Goals 🌸</div>
+          <div class="card" style="border-color:rgba(212,175,112,0.3);">
+            <div class="card-body" style="font-size:1.05rem;line-height:1.8;">
+              💜 Feel comfortable and enjoy every swing<br>
+              🌿 Focus on smooth movement, not distance<br>
+              🎯 Make solid contact and watch the ball fly<br>
+              🏌️ Rediscover the joy of being out on the course
+            </div>
+            <div class="cue-box" style="border-color:#8b5cf6;color:#c4b5fd;margin-top:12px;">
+              <strong>The Mantra:</strong> Let the club do the work. Smooth and easy wins every time.
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Session Tips 🌸</div>
+          <div class="card">
+            <div class="check-row"><span>⏱ <strong>15–20 minutes is plenty</strong> — quality over quantity, always</span></div>
+            <div class="check-row"><span>🌿 <strong>Start with your 7-Wood or Hybrid</strong> — your most forgiving clubs</span></div>
+            <div class="check-row"><span>🎵 <strong>Tempo is everything</strong> — nice and easy, no need to rush</span></div>
+            <div class="check-row"><span>🤲 <strong>Light grip pressure</strong> — hold the club like you're holding a flower</span></div>
+            <div class="check-row"><span>🏆 <strong>Celebrate every solid hit</strong> — that's what this is all about</span></div>
+          </div>
+        </div>
+
+      </div><!-- /grandma-sect home -->
 
     </div><!-- /page-home -->
 
@@ -559,9 +1520,9 @@
          PAGE: RANGE SESSION
     ══════════════════════════════════════ -->
     <div class="page" id="page-range">
-
+      <div class="dad-sect">
       <div class="page-header" data-icon="🏌️">
-        <div class="page-tag">⛳ Updated with SSS</div>
+        <div class="page-tag">⛳ Lefty Edition</div>
         <div class="page-title">Range Session</div>
         <div class="page-sub">65 balls · 4 phases · 6–8 week plan</div>
       </div>
@@ -578,25 +1539,80 @@
       <div class="section">
         <div class="card">
           <span class="tag tag-purple">Phase 0</span>
-          <div class="card-title">SSS Warmup — No ball needed</div>
-          <div class="pill-row"><span class="pill">8-iron or 9-iron</span><span class="pill">5–7 min</span></div>
-          <div class="card-body">
-            3× No-Turn Backswing (hold each position)<br>
-            5× slow Rotate & Relocate (feel the hip fire)<br>
-            5× full swings — watch divot land <strong>right of ball</strong>
+          <div class="card-title">Warmup — No ball yet</div>
+          <div class="pill-row"><span class="pill">Pitching Wedge</span><span class="pill">3 min</span><span class="pill">Always first</span></div>
+
+          <div class="card-body" style="display:flex;flex-direction:column;gap:14px;margin-top:10px;">
+
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+                <span class="tag tag-purple" style="margin-bottom:0;">Step 1</span>
+                <strong style="font-size:0.93rem;">Pump Swings</strong>
+                <span style="color:var(--muted);font-size:0.8rem;">· 1 min · 10 swings · no ball</span>
+              </div>
+              <div style="color:var(--muted);font-size:0.88rem;line-height:1.5;">Feel the club swinging like a pendulum. No thoughts. Just rhythm.</div>
+            </div>
+
+            <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:14px;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+                <span class="tag tag-gold" style="margin-bottom:0;">Step 2</span>
+                <strong style="font-size:0.93rem;">Feet Together</strong>
+                <span style="color:var(--muted);font-size:0.8rem;">· 1 min · 5 shots · feet touching</span>
+              </div>
+              <div style="color:var(--muted);font-size:0.88rem;line-height:1.5;">Forces balance automatically. If you fall over, you swung too hard.</div>
+            </div>
+
+            <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:14px;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+                <span class="tag tag-green" style="margin-bottom:0;">Step 3</span>
+                <strong style="font-size:0.93rem;">Half Swings</strong>
+                <span style="color:var(--muted);font-size:0.8rem;">· 1 min · 5 shots · halfway back &amp; through</span>
+              </div>
+              <div style="color:var(--muted);font-size:0.88rem;line-height:1.5;">Club goes to 9 o'clock back, 3 o'clock through. Clean contact before full speed.</div>
+            </div>
+
           </div>
-          <div class="cue-box">💬 Feel: Hips move first, arms follow</div>
         </div>
 
         <div class="card">
           <span class="tag tag-gold">Phase 1</span>
           <div class="card-title">Short Irons — Contact Quality</div>
-          <div class="pill-row"><span class="pill">PW (45°)</span><span class="pill">9-iron</span><span class="pill">8-iron</span><span class="pill">~20 balls</span></div>
+          <div class="pill-row"><span class="pill">GW (50°)</span><span class="pill">PW (45°)</span><span class="pill">9-iron</span><span class="pill">8-iron</span><span class="pill">~25 balls</span></div>
           <div class="card-body">
             <strong>Ball position:</strong> center of stance<br>
             Focus: flush contact, divot right of ball, consistent finish. Don't chase distance.
           </div>
           <div class="cue-box">💬 Feel: Ball first, then ground</div>
+          <div class="exp-trigger" onclick="toggleExp(this)">Ball Position &amp; Tips <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+          <div class="exp-body">
+            <div class="exp-inner">
+              <div class="diagram">
+          <div class="diagram-lbl">Ball Position — Top View (Lefty)</div>
+          <svg viewBox="0 0 195 78" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:220px;">
+            <text x="192" y="39" fill="#c9a84c" font-size="8.5" text-anchor="end" dominant-baseline="middle">TARGET ›</text>
+            <rect x="8" y="14" width="44" height="48" rx="8" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+            <text x="30" y="70" fill="#6a8a6e" font-size="7.5" text-anchor="middle">Trail (L)</text>
+            <rect x="112" y="14" width="44" height="48" rx="8" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+            <text x="134" y="70" fill="#6a8a6e" font-size="7.5" text-anchor="middle">Lead (R)</text>
+            <circle cx="79" cy="38" r="7.5" fill="#c9a84c" stroke="#e8cc7a" stroke-width="1.2"/>
+            <line x1="79" y1="6" x2="79" y2="14" stroke="#c9a84c" stroke-width="1.2" stroke-dasharray="2.5,2"/>
+            <text x="79" y="4" fill="#c9a84c" font-size="7.5" text-anchor="middle" dominant-baseline="auto">CENTER</text>
+          </svg>
+        </div>
+              <ul class="exp-list">
+                <li>Hands slightly ahead of the ball — shaft leans toward target at address</li>
+                <li>Weight 50/50 at setup, shifts fully to lead side at impact</li>
+                <li>These clubs build your core contact habit — quality over distance</li>
+                <li>Watch your divot: it should appear to the <strong>RIGHT of where the ball was</strong></li>
+              </ul>
+              <div class="exp-detail"><strong>Gap Wedge (50°):</strong> Your new scoring club. Same swing as the PW — ball center of stance, hands forward, trust the loft. Focus on <strong>consistent distance control at 70–90 yards</strong>. Don't try to max it out — find your reliable carry number.</div>
+              <div class="exp-mistake">
+                <div class="em-lbl">⚠ Common Mistake</div>
+                <p>Trying to scoop the ball airborne. Trust the loft — hit <strong>down and through</strong>, not up. The club's loft does the lifting.</p>
+              </div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div>
+          </div>
         </div>
 
         <div class="card">
@@ -608,6 +1624,35 @@
             Same hip-fire sequence — hips before arms every time.
           </div>
           <div class="cue-box">💬 Feel: Wider arc, same sequence</div>
+          <div class="exp-trigger" onclick="toggleExp(this)">Ball Position &amp; Tips <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+          <div class="exp-body">
+            <div class="exp-inner">
+              <div class="diagram">
+          <div class="diagram-lbl">Ball Position — Top View (Lefty)</div>
+          <svg viewBox="0 0 195 78" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:220px;">
+            <text x="192" y="39" fill="#c9a84c" font-size="8.5" text-anchor="end" dominant-baseline="middle">TARGET ›</text>
+            <rect x="8" y="14" width="44" height="48" rx="8" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+            <text x="30" y="70" fill="#6a8a6e" font-size="7.5" text-anchor="middle">Trail (L)</text>
+            <rect x="112" y="14" width="44" height="48" rx="8" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+            <text x="134" y="70" fill="#6a8a6e" font-size="7.5" text-anchor="middle">Lead (R)</text>
+            <circle cx="64" cy="38" r="7.5" fill="#c9a84c" stroke="#e8cc7a" stroke-width="1.2"/>
+            <line x1="64" y1="6" x2="64" y2="14" stroke="#c9a84c" stroke-width="1.2" stroke-dasharray="2.5,2"/>
+            <text x="64" y="4" fill="#c9a84c" font-size="7.5" text-anchor="middle" dominant-baseline="auto">TRAIL-CENTER</text>
+          </svg>
+        </div>
+              <ul class="exp-list">
+                <li>Ball moves 1–2 ball-widths toward trail foot compared to short irons</li>
+                <li>Widen stance slightly as clubs get longer — supports the bigger arc</li>
+                <li>4-Hybrid plays like a long iron: ball slightly trail of center, sweep through</li>
+                <li>Same hip-fire sequence as Phase 1 — the swing thought never changes</li>
+              </ul>
+              <div class="exp-mistake">
+                <div class="em-lbl">⚠ Common Mistake</div>
+                <p>Swinging <strong>harder</strong> with longer clubs. Swing <strong>wider and smoother</strong> — the extra shaft length adds distance automatically.</p>
+              </div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div>
+          </div>
         </div>
 
         <div class="card">
@@ -620,17 +1665,441 @@
             <strong>Swing smoother, not harder.</strong>
           </div>
           <div class="cue-box">💬 Feel: Sweeping up through the ball</div>
+          <div class="exp-trigger" onclick="toggleExp(this)">Ball Position &amp; Tee Setup <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+          <div class="exp-body">
+            <div class="exp-inner">
+              <div class="diagram">
+          <div class="diagram-lbl">Ball Position — Top View (Lefty)</div>
+          <svg viewBox="0 0 195 78" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:220px;">
+            <text x="192" y="39" fill="#c9a84c" font-size="8.5" text-anchor="end" dominant-baseline="middle">TARGET ›</text>
+            <rect x="8" y="14" width="44" height="48" rx="8" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+            <text x="30" y="70" fill="#6a8a6e" font-size="7.5" text-anchor="middle">Trail (L)</text>
+            <rect x="112" y="14" width="44" height="48" rx="8" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+            <text x="134" y="70" fill="#6a8a6e" font-size="7.5" text-anchor="middle">Lead (R)</text>
+            <circle cx="124" cy="38" r="7.5" fill="#c9a84c" stroke="#e8cc7a" stroke-width="1.2"/>
+            <line x1="124" y1="6" x2="124" y2="14" stroke="#c9a84c" stroke-width="1.2" stroke-dasharray="2.5,2"/>
+            <text x="124" y="4" fill="#c9a84c" font-size="7.5" text-anchor="middle" dominant-baseline="auto">LEAD HEEL</text>
+          </svg>
+        </div>
+              <div class="diagram">
+                <div class="diagram-lbl">Tee Setup — 2¾" with 3 Marks</div>
+                <svg viewBox="0 0 120 82" xmlns="http://www.w3.org/2000/svg" style="width:90px;height:auto;">
+                  <line x1="10" y1="66" x2="110" y2="66" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                  <line x1="60" y1="24" x2="60" y2="66" stroke="#c9a84c" stroke-width="3" stroke-linecap="round"/>
+                  <polygon points="53,66 60,72 67,66" fill="#c9a84c"/>
+                  <circle cx="60" cy="16" r="9" fill="none" stroke="#e8cc7a" stroke-width="2"/>
+                  <line x1="55" y1="34" x2="65" y2="34" stroke="rgba(255,255,255,0.45)" stroke-width="1.2"/>
+                  <line x1="55" y1="44" x2="65" y2="44" stroke="rgba(255,255,255,0.45)" stroke-width="1.2"/>
+                  <line x1="55" y1="54" x2="65" y2="54" stroke="rgba(255,255,255,0.45)" stroke-width="1.2"/>
+                  <text x="72" y="37" fill="#6a8a6e" font-size="7" dominant-baseline="middle">← 3 marks</text>
+                  <text x="72" y="18" fill="#6a8a6e" font-size="7" dominant-baseline="middle">2¾" height</text>
+                </svg>
+              </div>
+              <ul class="exp-list">
+                <li>Driver is the ONLY club you hit on the upswing — ball forward enables this</li>
+                <li>Widen stance to shoulder-width or beyond for stability</li>
+                <li>Tilt spine slightly away from target — weight a touch trail at address</li>
+                <li>Smoother tempo = straighter, longer drives. Harder = more curve, less control</li>
+              </ul>
+              <div class="exp-mistake">
+                <div class="em-lbl">⚠ Common Mistake</div>
+                <p>Ball too far <strong>back in the stance</strong> — forces a downward hit on the driver, killing distance. Ball off lead heel is the rule.</p>
+              </div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="section">
+        <div class="section-title">🏁 Phase 4 — Short Game Finish</div>
+
+          <div class="card">
+            <span class="fun-badge" style="background:linear-gradient(135deg,#2d6a3f,#1a3a20);">Chipping</span>
+            <div class="card-title">Bump &amp; Run — 5 chips 🎯</div>
+            <div class="pill-row"><span class="pill">7-Iron, PW, or GW (50°)</span><span class="pill">10–25 yards</span><span class="pill">Pick a landing spot</span></div>
+            <div class="card-body">Drop 5 balls just off the edge of the green. Pick a <strong>landing spot</strong> 1–2 feet onto the green and aim for that — not the hole. Let the ball run the rest. The bump-and-run is your most consistent scoring shot as a lefty.</div>
+            <div class="cue-box">💬 Weight forward, hands ahead, brush the grass. It's a long putting stroke with a lofted club.</div>
+            <div class="card-body" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);">🎯 <strong>Gap Wedge (50°):</strong> Excellent for bump and run from 15–25 yards — more loft than the PW, lands softer with less run. Great option when you need to carry a small amount of rough before the green.</div>
+            <div class="exp-trigger" onclick="toggleExp(this)">Technique <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="exp-body"><div class="exp-inner">
+              <div class="exp-detail"><strong>Setup:</strong> Ball back in stance (toward trail foot). Weight 70% on lead foot. Hands pressed forward — shaft leans toward target. This delofts the club and keeps trajectory low.</div>
+              <div class="exp-detail"><strong>Stroke:</strong> Pendulum motion — no wrist flip. Think of it as a long putt. The club brushes the turf, doesn't dig. Follow through matches your backswing length.</div>
+              <div class="exp-mistake"><div class="em-lbl">⚠ Watch For</div><p>Scooping — trying to lift the ball. Trust the loft. Hit down and through. The divot should be small and in front of where the ball was.</p></div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div></div>
+          </div>
+
+          <div class="card">
+            <span class="fun-badge" style="background:linear-gradient(135deg,#c9a84c,#a07830);">Putting</span>
+            <div class="card-title">3-6-9 Putting Challenge 📏</div>
+            <div class="pill-row"><span class="pill">Putter</span><span class="pill">10 putts</span><span class="pill">Practice green</span></div>
+            <div class="card-body">Place 3 balls at 3ft, 3 at 6ft, 3 at 9ft, and 1 at your max comfortable distance. Goal: make the 3-footers, 2-putt the rest. Count your score — 10 makeable putts.</div>
+            <div class="cue-box">💬 Eyes over the ball. Pendulum. Listen for the rattle — don't watch it.</div>
+            <div class="exp-trigger" onclick="toggleExp(this)">Drills <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="exp-body"><div class="exp-inner">
+              <div class="exp-detail"><strong>Gate drill:</strong> Push two tees into the green slightly wider than your putter face, 6 inches in front of the ball. Roll the ball through the gate. Miss the tees = good path. Simple and brutal.</div>
+              <div class="exp-detail"><strong>Distance control drill:</strong> Forget the hole. Putt 5 balls to the fringe trying to stop them within 1 foot of the edge. No hole, just speed. This is where 3-putts are won and lost.</div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div></div>
+          </div>
+
         <div class="section-title">Golden Rules</div>
         <div class="check-row"><span>Always aim at a specific target — never hit to nowhere.</span></div>
         <div class="check-row"><span>One swing thought per session. Never change mid-session.</span></div>
         <div class="check-row"><span>Bad shot? Reset, breathe, commit to the next one.</span></div>
         <div class="check-row"><span>Sand Wedge — chipping green only for now.</span></div>
-        <div class="check-row"><span>Pro lesson at Temecula Creek Inn: 4–6 weeks in.</span></div>
+        <div class="check-row"><span>Pro lesson at your local course: 4–6 weeks in.</span></div>
       </div>
+
+          </div><!-- /dad-sect -->
+
+      <div class="son-sect">
+
+        <div class="page-header" data-icon="🏌️">
+          <div class="page-tag">⚡ Righty · Ages 9-12 · Vice Jr.</div>
+          <div class="page-title">Range Session</div>
+          <div class="page-sub">30 balls · 3 phases · Keep it fun!</div>
+        </div>
+
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" style="color:#3b82f6;">30</div><div class="stat-lbl">Balls</div></div>
+            <div class="stat"><div class="stat-num" style="color:#3b82f6;">3</div><div class="stat-lbl">Phases</div></div>
+            <div class="stat"><div class="stat-num" style="color:#fcd34d;">😂</div><div class="stat-lbl">Have Fun</div></div>
+            <div class="stat"><div class="stat-num" style="color:#3b82f6;">7i</div><div class="stat-lbl">Start Here</div></div>
+          </div>
+        </div>
+
+        <div class="section">
+
+          <div class="card">
+            <span class="fun-badge">Warm Up</span>
+            <div class="card-title">5 Practice Swings — No Ball 🌀</div>
+            <div class="pill-row"><span class="pill">7-Iron</span><span class="pill">5 min</span><span class="pill">Slow motion</span></div>
+            <div class="card-body">
+              Pick up the 7-iron. Take 5 really big, <strong>super slow</strong> practice swings. Feel the club going back, then fire through. No ball yet — just groove the feeling.
+            </div>
+            <div class="cue-box">💬 Think: "Turn back, then FIRE forward!"</div>
+            <div class="exp-trigger" onclick="toggleExp(this)">More Detail <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="exp-body"><div class="exp-inner">
+              <div class="exp-detail">On swing 1–2: go so slow it feels silly. On swing 3–4: normal speed. On swing 5: <strong>try to hold your finish for 3 seconds</strong> without falling. If you can't balance, the swing was too fast or too hard.</div>
+              <div class="exp-detail"><strong>Pro Tip:</strong> Close your eyes for one of the practice swings and just feel the rotation. Where does the club feel heaviest? That's the club head doing its job.</div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div></div>
+          </div>
+
+          <div class="card">
+            <span class="fun-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);">Phase 1</span>
+            <div class="card-title">Contact Challenge 🎯</div>
+            <div class="pill-row"><span class="pill">9-Iron or 7-Iron</span><span class="pill">~10 balls</span></div>
+            <div class="card-body">
+              <strong>The Game:</strong> Hit 7 out of 10 in the air. Count every airborne shot out loud. Celebrate every one that flies! Focus on <strong>making contact</strong> — not how far it goes.
+            </div>
+            <div class="cue-box">💬 Feel: Hit DOWN on it — the club does the lifting!</div>
+            <div class="exp-trigger" onclick="toggleExp(this)">More Detail <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="exp-body"><div class="exp-inner">
+              <div class="exp-detail"><strong>Ball position:</strong> middle of your stance. Feet shoulder-width. Weight 50/50. Take a normal swing — don't try to scoop the ball up. The loft on the 9-iron does that automatically.</div>
+              <div class="exp-detail"><strong>The Game Goal:</strong> If you hit 7+ in the air = you WIN Phase 1! Move to Phase 2. Under 7? No big deal — take 5 more tries. Every shot is practice.</div>
+              <div class="exp-mistake"><div class="em-lbl">⚠ Watch For</div><p>Trying to help the ball up by scooping. Hit <strong>through</strong> the ball into the ground. The divot (or brushed grass) should be in FRONT of where the ball was.</p></div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div></div>
+          </div>
+
+          <div class="card">
+            <span class="fun-badge" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">Phase 2</span>
+            <div class="card-title">Distance Explorer 📏</div>
+            <div class="pill-row"><span class="pill">7-Iron</span><span class="pill">FW Wood 23°</span><span class="pill">~15 balls</span></div>
+            <div class="card-body">
+              <strong>The Game:</strong> Try different clubs and see which goes farthest. Hit 5 with 7-iron, 5 with the Fairway Wood, and 5 mixing it up. Remember your personal record!
+            </div>
+            <div class="cue-box">💬 Feel: Longer club = wider, smoother swing. Same sequence!</div>
+            <div class="exp-trigger" onclick="toggleExp(this)">More Detail <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="exp-body"><div class="exp-inner">
+              <div class="exp-detail"><strong>Ball position moves forward</strong> as clubs get longer — for the fairway wood, play it just inside your LEFT heel (lead heel for a right-hander). Same swing sequence — just a wider arc.</div>
+              <div class="exp-detail"><strong>Track your distances:</strong> Where does your 7-iron land on average? What about the FW Wood? This is super useful info — remember it!</div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div></div>
+          </div>
+
+          <div class="card">
+            <span class="fun-badge" style="background:linear-gradient(135deg,#ef4444,#f97316);">Phase 3</span>
+            <div class="card-title">Rocket Launch 🚀 — Driver Only!</div>
+            <div class="pill-row"><span class="pill">Driver 17°</span><span class="pill">~5 balls</span><span class="pill">Max fun</span></div>
+            <div class="card-body">
+              <strong>Just rip it.</strong> Tee it up, swing as hard as you want, and watch it go. No swing thoughts — just pure fun. If it goes sideways, laugh and try again.
+            </div>
+            <div class="cue-box">💬 Feel: Sweep it up off the tee. Smooth is fast!</div>
+            <div class="exp-trigger" onclick="toggleExp(this)">Tee Setup <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="exp-body"><div class="exp-inner">
+              <div class="exp-detail"><strong>Ball position:</strong> off your LEFT (lead) heel — as far forward as it goes. <strong>Tee height:</strong> about half the ball above the club face. Wide stance. Weight slightly back.</div>
+              <div class="exp-detail">Driver is the ONE club you hit on the <strong>upswing</strong> — ball position forward makes this happen automatically. Just trust the setup and swing!</div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div></div>
+          </div>
+
+        </div>
+
+        <div class="section">
+          <div class="section">
+          <div class="section-title">🏁 Phase 4 — Putting Game</div>
+          <div class="card">
+            <span class="fun-badge" style="background:linear-gradient(135deg,#10b981,#059669);">Putting</span>
+            <div class="card-title">Ring of Fire 🔥</div>
+            <div class="pill-row"><span class="pill">Putter</span><span class="pill">5 balls</span><span class="pill">Practice green</span></div>
+            <div class="card-body">
+              Place 5 balls in a circle around the hole, all exactly <strong>3 feet away</strong>. You have to make ALL 5 in a row. Miss one? Start over. This is the same drill tour pros use every day.
+            </div>
+            <div class="cue-box">💬 Pick a spot on the back of the cup and aim for that. Don't aim at the middle — aim for a specific point.</div>
+            <div class="exp-trigger" onclick="toggleExp(this)">How to Make Every 3-Footer <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="exp-body"><div class="exp-inner">
+              <div class="card" style="background:rgba(0,0,0,0.15);margin-bottom:0;">
+                <div class="card-title" style="font-size:0.85rem;">🎯 Eyes Over the Ball</div>
+                <div class="card-body">Stand over the ball and drop another ball from your nose — it should land on your ball. If it lands in front, you're too far away. If behind, too close. Eyes directly over ball = consistent path.</div>
+              </div>
+              <div class="card" style="background:rgba(0,0,0,0.15);margin-bottom:0;">
+                <div class="card-title" style="font-size:0.85rem;">🎯 Pendulum Only</div>
+                <div class="card-body">Shoulders rock, wrists stay locked. Imagine your arms and putter are one rigid triangle. Backswing and follow-through are the same length. <strong>No flipping the wrists at impact.</strong></div>
+              </div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div></div>
+          </div>
+          </div>
+
+          <div class="section-title">Kid's Golden Rules 🌟</div>
+          <div class="check-row"><span>Count your GOOD shots — forget the bad ones immediately.</span></div>
+          <div class="check-row"><span>Water break whenever you want. Seriously.</span></div>
+          <div class="check-row"><span>Stop when it stops being fun. Quality over quantity.</span></div>
+          <div class="check-row"><span>⏱ Keep sessions to <strong>20–30 minutes</strong> max — short and focused beats long and tired.</span></div>
+          <div class="check-row"><span>One swing thought only: <strong>"TURN and FIRE!"</strong></span></div>
+        </div>
+
+      </div><!-- /son-sect range -->
+
+      <div class="girl-sect">
+
+        <div class="page-header" data-icon="🏌️">
+          <div class="page-tag">⚡ Lefty · Age 5 · Top Flite Girls</div>
+          <div class="page-title">Range Time!</div>
+          <div class="page-sub">10–15 balls · Keep it moving · All smiles</div>
+        </div>
+
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" style="color:#ec4899;">15</div><div class="stat-lbl">Balls Max</div></div>
+            <div class="stat"><div class="stat-num" style="color:#14b8a6;">2</div><div class="stat-lbl">Phases</div></div>
+            <div class="stat"><div class="stat-num" style="color:#ec4899;">😂</div><div class="stat-lbl">Vibe</div></div>
+            <div class="stat"><div class="stat-num" style="color:#14b8a6;">7i</div><div class="stat-lbl">Start Here</div></div>
+          </div>
+        </div>
+
+        <div class="section">
+
+          <div class="card">
+            <span class="girl-badge">Warm Up</span>
+            <div class="card-title">3 Magic Swings — No Ball 🪄</div>
+            <div class="pill-row"><span class="pill">7-Iron</span><span class="pill">Super slow</span><span class="pill">2 min</span></div>
+            <div class="card-body">
+              Pick up the 7-iron and take <strong>3 super slow practice swings</strong> like you're moving through honey. Feel the club go back, then swoop through. No ball yet — just feel it!
+            </div>
+            <div class="cue-box" style="border-color:#ec4899;color:#f9a8d4;">💬 "Reach back and SWOOOOOP!"</div>
+            <div class="exp-trigger" onclick="toggleExp(this)">More Detail <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="exp-body"><div class="exp-inner">
+              <div class="exp-detail">Make it silly — go SO slow that it's funny. Let her laugh. On the 3rd swing ask her to hold the finish and balance on one foot if she can. Any giggles = winning.</div>
+              <div class="exp-detail"><strong>What you're teaching:</strong> Muscle memory for the swing shape before adding the complication of a ball. At age 5 this is huge.</div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div></div>
+          </div>
+
+          <div class="card">
+            <span class="girl-badge" style="background:linear-gradient(135deg,#ec4899,#f97316);">Phase 1</span>
+            <div class="card-title">Make It Move! 🎯</div>
+            <div class="pill-row"><span class="pill">7-Iron</span><span class="pill">~8 balls</span><span class="pill">Just make contact</span></div>
+            <div class="card-body">
+              <strong>The only goal:</strong> hit the ball and make it go forward. ANY forward movement = success! Count every ball that moves and cheer out loud for each one.
+            </div>
+            <div class="cue-box" style="border-color:#ec4899;color:#f9a8d4;">💬 "Just hit it and watch where it goes!"</div>
+            <div class="exp-trigger" onclick="toggleExp(this)">More Detail <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="exp-body"><div class="exp-inner">
+              <div class="exp-detail"><strong>For a 5-year-old lefty:</strong> Ball in the middle of her stance. Right hand on top of the grip (lead hand for lefty). Let her swing naturally — don't over-correct at this age.</div>
+              <div class="exp-detail"><strong>If the ball isn't moving:</strong> Tee it up! A tee makes contact way easier and builds confidence fast. There's no shame in teeing up at the range when you're 5.</div>
+              <div class="exp-detail"><strong>Dad focus:</strong> Watch for her head staying down through impact — that's the one thing worth gently reinforcing at this age. Everything else can wait.</div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div></div>
+          </div>
+
+          <div class="card">
+            <span class="girl-badge" style="background:linear-gradient(135deg,#14b8a6,#6366f1);">Phase 2</span>
+            <div class="card-title">Pick Your Club! 🌈</div>
+            <div class="pill-row"><span class="pill">Her choice</span><span class="pill">~5 balls</span><span class="pill">Pure fun</span></div>
+            <div class="card-body">
+              Let her pick <strong>any club she wants</strong> and just hit. No rules in this phase. Driver off the deck? Sure. Putter at the range targets? Why not. Just swing and smile.
+            </div>
+            <div class="cue-box" style="border-color:#14b8a6;color:#5eead4;">💬 "Which one do you want to try?"</div>
+            <div class="exp-trigger" onclick="toggleExp(this)">More Detail <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="exp-body"><div class="exp-inner">
+              <div class="exp-detail">Autonomy is huge for 5-year-olds. Letting her choose the club gives her ownership of the experience. She'll remember the fun, not whether she used the "right" club.</div>
+              <div class="exp-detail"><strong>End the session here</strong> — while she's still happy and energized. A 15-minute session that ends on a high beats a 45-minute session that ends in a meltdown every time.</div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div></div>
+          </div>
+
+        </div>
+
+        <div class="section">
+          <div class="section">
+          <div class="section-title">🏁 Phase 3 — Putt Putt vs Dad! 🎯</div>
+          <div class="card" style="border-color:rgba(236,72,153,0.35);">
+            <span class="girl-badge">Putting</span>
+            <div class="card-title">Closest to the Hole Wins! 🏆</div>
+            <div class="pill-row"><span class="pill">Putter</span><span class="pill">5 balls each</span><span class="pill">Any distance</span></div>
+            <div class="card-body">
+              Both Dad and daughter each putt 5 balls. <strong>Whoever gets closest to the hole wins that round.</strong> Keep score if she wants to. Let her pick where you putt from each time. She has full control.
+            </div>
+            <div class="cue-box" style="border-color:#ec4899;color:#f9a8d4;">💬 "Eyes on the ball, roll it smooth — like sending it on a little trip to the hole!"</div>
+            <div class="exp-trigger" onclick="toggleExp(this)">Dad Notes <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="exp-body"><div class="exp-inner">
+              <div class="exp-detail"><strong>Let her win sometimes.</strong> Not always — she'll know if it's fake — but occasionally miss on purpose just enough that she beats you legitimately. The feeling of beating Dad is massive motivation at age 5.</div>
+              <div class="exp-detail"><strong>If she sinks one:</strong> Stop everything. Full celebration. Jump around. Make it a huge moment she wants to recreate every time.</div>
+              <div class="exp-detail"><strong>Putting tip for lefties age 5:</strong> Just get her rolling the ball forward with the putter face. Don't correct grip or stance yet — contact and direction are enough for now.</div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div></div>
+          </div>
+          </div>
+
+          <div class="section-title">Golden Rules for Age 5 🌟</div>
+          <div class="check-row"><span>🎉 Cheer for <strong>every</strong> swing — contact or not, she tried!</span></div>
+          <div class="check-row"><span>⏱ Stop at 15 minutes — <strong>always leave her wanting more</strong></span></div>
+          <div class="check-row"><span>🍦 Promise a treat after — she earned it just by showing up</span></div>
+          <div class="check-row"><span>📵 Put your phone away — she notices, and it matters to her</span></div>
+          <div class="check-row"><span>🌈 If she's not feeling it today, that's totally fine — <strong>come back next time</strong></span></div>
+        </div>
+
+      </div><!-- /girl-sect range -->
+
+      <div class="grandma-sect">
+
+        <div class="page-header" data-icon="🏌️">
+          <div class="page-tag">Range Session</div>
+          <div class="page-title">Smooth &amp; Easy</div>
+          <div class="page-sub">20-ball plan · tempo over power · let the club do the work</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Before You Hit 🌸</div>
+          <div class="card" style="border-color:rgba(212,175,112,0.3);">
+            <div class="grandma-badge">Warm-Up First</div>
+            <div class="card-body">Take 2–3 minutes to gently loosen up before reaching for a club. A few slow shoulder rolls, gentle hip circles, and easy torso turns are all you need. There's no rush — the range will wait for you.</div>
+            <div class="cue-box" style="border-color:#d4af70;color:#e8cc8a;">"A warm body swings a happy club."</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Phase 1 · Feel the Swing (6 balls)</div>
+          <div class="card" style="border-color:rgba(139,92,246,0.3);">
+            <div class="grandma-badge">7-Wood or Hybrid</div>
+            <div class="card-body">
+              <strong>Your most forgiving clubs.</strong> Start here every single time. No full swings yet — just easy half-swings to reconnect with the motion. Focus on the rhythm of the club moving back and through. If it feels good after 3, take a fuller swing on the last 3.
+            </div>
+            <div class="pill-row">
+              <span class="pill">Half swing first</span>
+              <span class="pill">Smooth tempo</span>
+              <span class="pill">No power needed</span>
+            </div>
+            <div class="cue-box" style="border-color:#8b5cf6;color:#c4b5fd;">Feel the clubhead swinging — let gravity do the work on the way down.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Phase 2 · Easy Irons (8 balls)</div>
+          <div class="card" style="border-color:rgba(139,92,246,0.3);">
+            <div class="grandma-badge">7-Iron or 8-Iron</div>
+            <div class="card-body">
+              Hit 4 balls with the 7-iron, then 4 with the 8-iron. These hollow-body irons are very forgiving — even off-center hits will fly nicely. <strong>One swing thought only:</strong> finish with your belt buckle facing the target.
+            </div>
+            <div class="pill-row">
+              <span class="pill">Light grip</span>
+              <span class="pill">Smooth finish</span>
+              <span class="pill">Watch it fly 🌸</span>
+            </div>
+            <div class="cue-box" style="border-color:#d4af70;color:#e8cc8a;">Swing to a full finish. If you finish tall, the swing was good.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Phase 3 · Short Game Finish (6 balls)</div>
+          <div class="card" style="border-color:rgba(139,92,246,0.3);">
+            <div class="grandma-badge">Pitching Wedge</div>
+            <div class="card-body">
+              End every session with short, gentle chip shots. Pick a spot about 20–30 yards away. Small, controlled swings — just enough to get the ball there softly. This is the most relaxing part of the session and builds great feel.
+            </div>
+            <div class="pill-row">
+              <span class="pill">Tiny swing</span>
+              <span class="pill">Land softly</span>
+              <span class="pill">Breathe easy</span>
+            </div>
+            <div class="cue-box" style="border-color:#d4af70;color:#e8cc8a;">"Small swing, big confidence." End on a great feeling.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Grandma's Swing Keys 💜</div>
+          <div class="card">
+            <div class="sss-step" style="margin-bottom:14px;">
+              <div class="step-num" style="background:#6d28d9;">1</div>
+              <div class="step-content">
+                <div class="step-title">Light Grip 🤲</div>
+                <ul class="step-bullets"><li>Hold the club gently — tension is the enemy of a smooth swing</li><li>Imagine holding a tube of toothpaste without squeezing any out</li></ul>
+              </div>
+            </div>
+            <div class="sss-step" style="margin-bottom:14px;">
+              <div class="step-num" style="background:#6d28d9;">2</div>
+              <div class="step-content">
+                <div class="step-title">Slow Back, Smooth Through</div>
+                <ul class="step-bullets"><li>Take the club back slowly — there's no hurry</li><li>Let the swing flow through naturally</li></ul>
+              </div>
+            </div>
+            <div class="sss-step" style="margin-bottom:14px;">
+              <div class="step-num" style="background:#6d28d9;">3</div>
+              <div class="step-content">
+                <div class="step-title">Full Finish</div>
+                <ul class="step-bullets"><li>Swing all the way to a tall, balanced finish</li><li>If you can hold the finish for 2 seconds, the swing was perfect</li></ul>
+              </div>
+            </div>
+            <div class="sss-step">
+              <div class="step-num" style="background:#6d28d9;">4</div>
+              <div class="step-content">
+                <div class="step-title">Watch the Ball Fly 🌸</div>
+                <ul class="step-bullets"><li>Keep your eyes on the ball through contact</li><li>Then enjoy watching it soar — you earned it</li></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Optional · Driver Day 🚀</div>
+          <div class="card" style="border-color:rgba(212,175,112,0.4);background:rgba(212,175,112,0.06);">
+            <div class="grandma-badge">When You're Feeling Good</div>
+            <div class="card-body">
+              On days when you feel loose and energized, grab the driver and have some fun. <strong>No pressure — this is purely for enjoyment.</strong> The driver is the longest club in the bag, so it rewards a smooth, easy swing more than anything else.
+            </div>
+            <div class="pill-row">
+              <span class="pill">3–5 balls only</span>
+              <span class="pill">Same easy tempo</span>
+              <span class="pill">Feel, don't force</span>
+            </div>
+            <div style="margin-top:12px;">
+              <div class="check-row"><span>🏌️ <strong>Tee it up high</strong> — half the ball above the clubface</span></div>
+              <div class="check-row"><span>🌿 <strong>Stand tall, grip light</strong> — the driver does the work with a smooth swing</span></div>
+              <div class="check-row"><span>🎵 <strong>Slow backswing</strong> — take it back nice and wide, no rush at all</span></div>
+              <div class="check-row"><span>💜 <strong>Sweep, don't hit</strong> — think of brushing the tee away, not smashing the ball</span></div>
+              <div class="check-row"><span>🌸 <strong>Hold that finish</strong> — tall and balanced, watch it fly</span></div>
+            </div>
+            <div class="cue-box" style="border-color:#d4af70;color:#e8cc8a;">Skip this section any day you're not feeling it — the 7-Wood is always just as satisfying. 💜</div>
+          </div>
+        </div>
+
+      </div><!-- /grandma-sect range -->
 
     </div><!-- /page-range -->
 
@@ -639,7 +2108,7 @@
          PAGE: STRETCHES
     ══════════════════════════════════════ -->
     <div class="page" id="page-stretches">
-
+      <div class="dad-sect">
       <div class="page-header" data-icon="🧘">
         <div class="page-tag">Do This First · Every Session</div>
         <div class="page-title">Pre-Range Stretches</div>
@@ -667,7 +2136,7 @@
             <div style="background:var(--gold);color:#000;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
             <div class="card-title" style="margin:0;">Hip Circles — 30 sec each</div>
           </div>
-          <div class="card-body">Hands on hips, draw big slow circles each direction. Temecula courses have elevation — you need mobile hips.</div>
+          <div class="card-body">Hands on hips, draw big slow circles each direction. Courses have uneven lies — you need mobile hips.</div>
           <div class="cue-box">↳ Loose hips = better rotation through the ball</div>
         </div>
 
@@ -716,169 +2185,753 @@
         <div class="check-row"><span>During recovery: skip swings, do steps 1–5 gently as physio allows.</span></div>
       </div>
 
+          </div><!-- /dad-sect -->
+
+      <div class="son-sect">
+
+        <div class="page-header" data-icon="🧘">
+          <div class="page-tag">Do These First · Every Session · Only 5 Min</div>
+          <div class="page-title">Warm Up Moves</div>
+          <div class="page-sub">7 moves · named after fun stuff · never skip</div>
+        </div>
+
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" style="color:#3b82f6;">7</div><div class="stat-lbl">Moves</div></div>
+            <div class="stat"><div class="stat-num" style="color:#3b82f6;">5</div><div class="stat-lbl">Minutes</div></div>
+            <div class="stat"><div class="stat-num" style="color:#fcd34d;">😎</div><div class="stat-lbl">No Excuses</div></div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="background:#3b82f6;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+              <div class="card-title" style="margin:0;">The Helicopter ✈️ — 10 circles each arm</div>
+            </div>
+            <div class="card-body">Hold arms out wide. Make BIG slow circles forward, then backward. Your arms are helicopter blades. 10 each direction.</div>
+            <div class="cue-box" style="border-color:#3b82f6;color:#93c5fd;">↳ Warms up your shoulders for the backswing</div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="background:#6366f1;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+              <div class="card-title" style="margin:0;">The Washing Machine 🌀 — 10 rotations</div>
+            </div>
+            <div class="card-body">Put your club across your shoulders behind your neck (like a yoke). Rotate left and right slowly, 10 times each way. This IS your exact golf swing motion!</div>
+            <div class="cue-box" style="border-color:#6366f1;color:#a5b4fc;">↳ The same rotation you use every single swing</div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="background:#f59e0b;color:#000;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+              <div class="card-title" style="margin:0;">The Hula Hoop 🌈 — 10 circles each way</div>
+            </div>
+            <div class="card-body">Hands on hips. Draw the biggest circles you can with your hips, 10 each direction. Exaggerate it. The sillier it looks the better it works.</div>
+            <div class="cue-box" style="border-color:#f59e0b;color:#fcd34d;">↳ Mobile hips = more power and rotation</div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="background:#f97316;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
+              <div class="card-title" style="margin:0;">The Lunge Hero 🦸 — 20 seconds each side</div>
+            </div>
+            <div class="card-body">Step your right foot forward into a lunge. Keep your back straight and sink your left knee toward the ground. Hold 20 seconds, then swap legs. This <strong>opens up your hips</strong> — huge for a powerful turn.</div>
+            <div class="cue-box" style="border-color:#f97316;color:#fdba74;">↳ Sitting at school all day tightens your hips — this undoes it</div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="background:#10b981;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">5</div>
+              <div class="card-title" style="margin:0;">Robot Wrists 🤖 — 10 each wrist</div>
+            </div>
+            <div class="card-body">Stick one arm straight out. Slowly flex your wrist UP, then DOWN, 10 times. Swap wrists. Think: robot arm moving on command.</div>
+            <div class="cue-box" style="border-color:#10b981;color:#6ee7b7;">↳ Wrists do a lot of work through impact — protect them</div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="background:#ef4444;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">6</div>
+              <div class="card-title" style="margin:0;">Superhero Landing 🦸 — Hold 10 seconds</div>
+            </div>
+            <div class="card-body">Feet shoulder-width, bend forward from your HIPS (not your back) with a flat back — like you just landed and are about to straighten up. Hold it for 10 seconds. That's your golf posture!</div>
+            <div class="cue-box" style="border-color:#ef4444;color:#fca5a5;">↳ This is literally your address position</div>
+          </div>
+
+          <div class="card" style="border-color:#3b82f6;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">7</div>
+              <div class="card-title" style="margin:0;">Zombie Swings 🧟 — 5 slow-mo swings ⭐</div>
+            </div>
+            <div class="card-body">Grab the 7-iron. Take 5 practice swings so slow it looks like a zombie in slow motion. Feel every part of the swing — back, top, forward, finish. Hold each finish.</div>
+            <div class="cue-box" style="border-color:#3b82f6;color:#93c5fd;">↳ Most important 60 seconds of the whole warmup</div>
+          </div>
+        </div>
+
+      </div><!-- /son-sect stretches -->
+
+      <div class="girl-sect">
+
+        <div class="page-header" data-icon="🧘">
+          <div class="page-tag">Do These First · 3 Minutes · Make It Fun</div>
+          <div class="page-title">Warm Up Moves</div>
+          <div class="page-sub">4 silly moves · never skip · always giggle</div>
+        </div>
+
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" style="color:#ec4899;">4</div><div class="stat-lbl">Moves</div></div>
+            <div class="stat"><div class="stat-num" style="color:#14b8a6;">3</div><div class="stat-lbl">Minutes</div></div>
+            <div class="stat"><div class="stat-num" style="color:#ec4899;">😜</div><div class="stat-lbl">Silly OK</div></div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="background:#ec4899;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+              <div class="card-title" style="margin:0;">Dinosaur Arms 🦕 — 10 big circles</div>
+            </div>
+            <div class="card-body">Stretch both arms out wide like a dinosaur. Make the biggest arm circles you can — 5 forward, 5 backward. Be as loud and silly as you want!</div>
+            <div class="cue-box" style="border-color:#ec4899;color:#f9a8d4;">↳ Warms up your shoulders for the big swing</div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="background:#a855f7;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+              <div class="card-title" style="margin:0;">Hula Hoop 🌈 — 10 big hip circles</div>
+            </div>
+            <div class="card-body">Hands on hips. Make the biggest, silliest circles with your hips — like you're hula-hooping with an invisible hoop! 10 circles each way.</div>
+            <div class="cue-box" style="border-color:#a855f7;color:#d8b4fe;">↳ Loose hips = more power and spin!</div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="background:#14b8a6;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+              <div class="card-title" style="margin:0;">Superhero Landing 🦸‍♀️ — Hold 5 seconds</div>
+            </div>
+            <div class="card-body">Feet apart, bend a little at the knees, lean forward just a tiny bit from your hips — like a superhero who just landed from flying. Hold it for 5 seconds. <strong>That's your golf stance!</strong></div>
+            <div class="cue-box" style="border-color:#14b8a6;color:#5eead4;">↳ This is literally how you stand to hit the ball</div>
+          </div>
+
+          <div class="card" style="border-color:#ec4899;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="background:linear-gradient(135deg,#ec4899,#14b8a6);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:1.2rem;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
+              <div class="card-title" style="margin:0;">Slow-Mo Swing 🐌 — 3 practice swings ⭐</div>
+            </div>
+            <div class="card-body">Pick up the 7-iron. Take 3 super duper slow practice swings — reach back as far as you can, then swooooop all the way through. Hold the finish like a statue!</div>
+            <div class="cue-box" style="border-color:#ec4899;color:#f9a8d4;">↳ The most important part of the whole warm-up!</div>
+          </div>
+        </div>
+
+      </div><!-- /girl-sect stretches -->
+
+      <div class="grandma-sect">
+
+        <div class="page-header" data-icon="🧘">
+          <div class="page-tag">Gentle Warm-Up</div>
+          <div class="page-title">Move With Ease</div>
+          <div class="page-sub">5 min · take breaks as needed · your pace, your way</div>
+        </div>
+
+        <div class="section">
+          <div class="card" style="border-color:rgba(212,175,112,0.3);">
+            <div class="grandma-badge">Before You Begin</div>
+            <div class="card-body">All of these movements are gentle and optional. Do only what feels comfortable, and take a breath or short break between exercises whenever you need to. There is no wrong way to warm up — any movement is a win.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Shoulder &amp; Neck</div>
+          <div class="card" style="margin-bottom:10px;">
+            <div class="card-title">🌀 Slow Shoulder Rolls</div>
+            <div class="card-body">Roll both shoulders forward 5 times, then backward 5 times. Slow and smooth. Feel the tension gently melt away.</div>
+            <div class="cue-box" style="border-color:#8b5cf6;color:#c4b5fd;">Let gravity help — no need to force the movement.</div>
+          </div>
+          <div class="card">
+            <div class="card-title">↔️ Gentle Neck Turns</div>
+            <div class="card-body">Slowly turn your head left, then right. Hold each side for 3 slow breaths. Just a gentle rotation — no strain needed.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Torso &amp; Spine</div>
+          <div class="card" style="margin-bottom:10px;">
+            <div class="card-title">🌿 Standing Torso Twist</div>
+            <div class="card-body">Cross your arms over your chest. Gently rotate your upper body to the right, then to the left. Move only as far as feels comfortable — pause and breathe whenever you need to. This is the core of your golf swing motion.</div>
+            <div class="cue-box" style="border-color:#d4af70;color:#e8cc8a;">This is your golf swing! Every gentle twist makes it feel more natural on the course.</div>
+          </div>
+          <div class="card">
+            <div class="card-title">🏌️ Slow Practice Swings</div>
+            <div class="card-body">Without a ball, make 5 very slow, smooth practice swings with your 7-Wood or a mid-iron. Focus on how the swing feels — not how far the ball would go. This wakes up the right muscles gently.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Hands &amp; Wrists</div>
+          <div class="card" style="margin-bottom:10px;">
+            <div class="card-title">🤲 Gentle Wrist Circles</div>
+            <div class="card-body">Hold your arms in front of you and make slow circles with your wrists — 5 times each direction. Keeps the wrists loose and your grip relaxed.</div>
+          </div>
+          <div class="card">
+            <div class="card-title">🤝 Finger Flex &amp; Release</div>
+            <div class="card-body">Open your hands wide, then gently close them. Repeat 5 times. A simple way to warm up your grip before holding a club.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Hips &amp; Balance</div>
+          <div class="card">
+            <div class="card-title">🔄 Gentle Hip Circles</div>
+            <div class="card-body">Stand with feet shoulder-width apart. Make slow, gentle circles with your hips — 5 each direction. Rest between sets if needed. This helps free up the lower body for a smooth turn.</div>
+            <div class="cue-box" style="border-color:#8b5cf6;color:#c4b5fd;">Hold a club or chair for balance if you'd like — take your time with every movement.</div>
+          </div>
+        </div>
+
+      </div><!-- /grandma-sect stretches -->
+
     </div><!-- /page-stretches -->
 
 
     <!-- ══════════════════════════════════════
-         PAGE: SSS DRILL GUIDE
+         PAGE: FULL SWING SEQUENCE
     ══════════════════════════════════════ -->
     <div class="page" id="page-sss">
-
-      <div class="page-header" data-icon="🎯">
-        <div class="page-tag">Simple Strike Sequence · Lefty Edition</div>
-        <div class="page-title">Strike Sequence</div>
-        <div class="page-sub">2 drills · Divot right of ball · No fat shots</div>
+      <div class="dad-sect">
+      <div class="page-header" data-icon="📺">
+        <div class="page-tag">Visual Learning · YouTube</div>
+        <div class="page-title">Watch This First</div>
+        <div class="page-sub">Video before every range session</div>
       </div>
 
       <div class="section">
-        <div class="card" style="background:rgba(201,168,76,0.08);border-color:rgba(201,168,76,0.3);">
-          <div class="card-title" style="color:var(--gold);">🔑 The #1 Thing to Understand</div>
-          <div class="card-body">Your divot should be <strong>in front of the ball</strong> — as a lefty, that means to your <strong>right side</strong>. The low point of your swing happens after impact, not at it. Fat shots happen when you bottom out too early.</div>
+        <div class="card" style="background:rgba(201,168,76,0.08);border-color:rgba(201,168,76,0.35);padding:20px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--gold);margin-bottom:10px;">📺 Before You Hit Balls</div>
+          <div style="font-size:0.92rem;color:var(--cream);line-height:1.6;margin-bottom:14px;">Jeremy is a visual learner. Skip text-based swing instruction. Instead, go to YouTube and search one of these before your range session.</div>
+          <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;margin-bottom:10px;">
+            <div style="font-size:0.68rem;font-weight:700;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:6px;">Search on YouTube</div>
+            <div style="font-size:0.9rem;color:var(--cream);margin-bottom:6px;">🔍 <strong>Me and My Golf beginner iron strike</strong></div>
+            <div style="font-size:0.9rem;color:var(--cream);">🔍 <strong>Me and My Golf lefty swing</strong></div>
+          </div>
+          <div style="font-size:0.78rem;color:var(--muted);">Watch before your range session. Video is the medium — not text.</div>
         </div>
+      </div>
+
+      </div><!-- /dad-sect -->
+
+      <div class="son-sect">
+      <div class="page-header" data-icon="📺">
+        <div class="page-tag">Visual Learning · YouTube</div>
+        <div class="page-title">Watch This First</div>
+        <div class="page-sub">Video before every range session</div>
       </div>
 
       <div class="section">
-        <div class="section-title">Drill 1 — No-Turn Backswing</div>
-
-        <div class="card">
-          <span class="tag tag-gold">Step 1</span>
-          <div class="card-title">Set Up to the Ball</div>
-          <div class="card-body">Feet shoulder-width. Ball just inside your right heel (lead foot). Slight knee flex, spine tilted from hips — not hunched. Weight 50/50.</div>
-          <div class="cue-box">💬 Feel: Athletic, ready to move</div>
+        <div class="card" style="background:rgba(59,130,246,0.08);border-color:rgba(59,130,246,0.35);padding:20px;">
+          <div style="font-size:0.92rem;color:var(--cream);line-height:1.6;margin-bottom:14px;">Before you hit balls, search YouTube and watch a quick video. Way better than reading steps.</div>
+          <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;">
+            <div style="font-size:0.68rem;font-weight:700;letter-spacing:1.5px;color:#3b82f6;text-transform:uppercase;margin-bottom:6px;">Search on YouTube</div>
+            <div style="font-size:0.9rem;color:var(--cream);margin-bottom:6px;">🔍 <strong>Me and My Golf beginner iron strike</strong></div>
+            <div style="font-size:0.9rem;color:var(--cream);">🔍 <strong>Me and My Golf lefty swing</strong></div>
+          </div>
         </div>
+      </div>
 
-        <div class="card">
-          <span class="tag tag-gold">Step 2</span>
-          <div class="card-title">Raise Arms Straight Up — No Hip Turn</div>
-          <div class="card-body">Lift both arms up like a ref calling a touchdown. Hips stay square to the target line. Body does NOT rotate yet. Teach arm structure first.</div>
-          <div class="cue-box">💬 Feel: Arms floating up, lower body planted</div>
-        </div>
+      </div><!-- /son-sect -->
 
-        <div class="card">
-          <span class="tag tag-gold">Step 3</span>
-          <div class="card-title">Tip Clubhead Back 45°</div>
-          <div class="card-body">With arms up and hips square, tilt the clubhead back 45 degrees away from target. Arms widen and extend — this is the width of a good backswing.</div>
-          <div class="cue-box">💬 Feel: Club falling away, arms wide</div>
-        </div>
-
-        <div class="card">
-          <span class="tag tag-gold">Step 4</span>
-          <div class="card-title">Coil Shoulders to the Top</div>
-          <div class="card-body">From the 45° position, rotate your LEFT shoulder under your chin (lefty: left is trail shoulder). Feel the club resist — that's lag building.</div>
-          <div class="cue-box">💬 Feel: Resistance/coil in your trail side</div>
-        </div>
+      <div class="girl-sect">
+      <div class="page-header" data-icon="📺">
+        <div class="page-tag">Watch &amp; Learn</div>
+        <div class="page-title">Watch This First</div>
+        <div class="page-sub">Video is the way</div>
       </div>
 
       <div class="section">
-        <div class="section-title">Drill 2 — Rotate & Relocate</div>
-
-        <div class="card">
-          <span class="tag tag-green">Step A</span>
-          <div class="card-title">Loaded at the Top — Pause</div>
-          <div class="card-body">Weight loaded into trail side (left foot for lefty). Pause for a beat — feel the coil. Do NOT rush the downswing from here.</div>
-          <div class="cue-box">💬 Feel: Loaded spring, patient at the top</div>
+        <div class="card" style="background:rgba(236,72,153,0.08);border-color:rgba(236,72,153,0.35);padding:20px;">
+          <div style="font-size:0.92rem;color:var(--cream);line-height:1.6;margin-bottom:14px;">Watch a quick golf video before heading to the range. It makes everything click better than reading instructions.</div>
+          <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;">
+            <div style="font-size:0.68rem;font-weight:700;letter-spacing:1.5px;color:#ec4899;text-transform:uppercase;margin-bottom:6px;">Search on YouTube</div>
+            <div style="font-size:0.9rem;color:var(--cream);margin-bottom:6px;">🔍 <strong>Me and My Golf beginner iron strike</strong></div>
+            <div style="font-size:0.9rem;color:var(--cream);">🔍 <strong>Me and My Golf lefty swing</strong></div>
+          </div>
         </div>
+      </div>
 
-        <div class="card">
-          <span class="tag tag-green">Step B</span>
-          <div class="card-title">Fire Lead Hip Toward Target First</div>
-          <div class="card-body">Lead hip (right hip for lefty) bumps and rotates toward target BEFORE arms start down. This relocates the low point forward automatically.</div>
-          <div class="cue-box">💬 Feel: Hips move, arms are still "sleeping"</div>
-        </div>
+      </div><!-- /girl-sect -->
 
-        <div class="card">
-          <span class="tag tag-green">Step C</span>
-          <div class="card-title">Let Chest Rotate Through Impact</div>
-          <div class="card-body">Once hips are moving, chest follows and pulls arms/club through. Think: chest faces target at impact. This is what moves your divot forward.</div>
-          <div class="cue-box">💬 Feel: Chest chasing the target, not the ball</div>
-        </div>
-
-        <div class="card">
-          <span class="tag tag-green">Step D</span>
-          <div class="card-title">Hold a Balanced Finish — 3 Seconds</div>
-          <div class="card-body">90%+ weight on lead foot (right foot for lefty). Trail foot on its toe. Club behind head. Belt buckle faces target. If you wobble, rotation wasn't complete.</div>
-          <div class="cue-box">💬 Feel: Balanced, tall, facing the target</div>
-        </div>
+      <div class="grandma-sect">
+      <div class="page-header" data-icon="📺">
+        <div class="page-tag">Visual Learning · YouTube</div>
+        <div class="page-title">Watch This First</div>
+        <div class="page-sub">Video before every range session</div>
       </div>
 
       <div class="section">
-        <div class="section-title">✅ Self-Check After Every Shot</div>
-        <div class="check-row"><span>Was my divot to the <strong>right of the ball</strong>?</span></div>
-        <div class="check-row"><span>Did my <strong>hips move before my arms</strong> started down?</span></div>
-        <div class="check-row"><span>Did I hold a <strong>balanced finish</strong> for 3 seconds?</span></div>
-        <div class="check-row"><span>Was my <strong>backswing slower</strong> than my downswing?</span></div>
-        <div class="check-row"><span>Did my chest end up <strong>facing the target</strong>?</span></div>
+        <div class="card" style="background:rgba(109,40,217,0.08);border-color:rgba(109,40,217,0.35);padding:20px;">
+          <div style="font-size:0.92rem;color:var(--cream);line-height:1.6;margin-bottom:14px;">Before heading to the range, search YouTube and watch a short video. Seeing a real swing is much more helpful than reading instructions.</div>
+          <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;">
+            <div style="font-size:0.68rem;font-weight:700;letter-spacing:1.5px;color:#a78bfa;text-transform:uppercase;margin-bottom:6px;">Search on YouTube</div>
+            <div style="font-size:0.9rem;color:var(--cream);margin-bottom:6px;">🔍 <strong>Me and My Golf beginner iron strike</strong></div>
+            <div style="font-size:0.9rem;color:var(--cream);">🔍 <strong>Me and My Golf lefty swing</strong></div>
+          </div>
+        </div>
       </div>
+
+      </div><!-- /grandma-sect -->
 
     </div><!-- /page-sss -->
 
 
     <!-- ══════════════════════════════════════
+         PAGE: SHORT GAME
+    ══════════════════════════════════════ -->
+    <div class="page" id="page-shortgame">
+
+      <div class="dad-sect">
+
+        <div class="page-header" data-icon="🎯">
+          <div class="page-tag">Short Game</div>
+          <div class="page-title">Inside 50 Yards</div>
+          <div class="page-sub">Chipping · Putting · Pre-round routine</div>
+        </div>
+
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num">43%</div><div class="stat-lbl">Strokes Here</div></div>
+            <div class="stat"><div class="stat-num">50</div><div class="stat-lbl">Yards In</div></div>
+            <div class="stat"><div class="stat-num">10</div><div class="stat-lbl">Min Routine</div></div>
+            <div class="stat"><div class="stat-num">Sub</div><div class="stat-lbl">90 Won Here</div></div>
+          </div>
+          <div class="card" style="border-color:rgba(201,168,76,0.3);background:rgba(201,168,76,0.06);">
+            <div class="card-body" style="text-align:center;font-size:0.85rem;line-height:1.7;">Nearly <strong>43% of all strokes</strong> happen within 50 yards of the hole.<br><strong style="color:var(--gold-l);">Sub-90 is won and lost on the short game.</strong></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Chipping 🏌️</div>
+
+          <div class="card" style="margin-bottom:10px;">
+            <span class="tag tag-green">Bump &amp; Run Setup</span>
+            <div class="card-title">The Most Reliable Chip in the Bag</div>
+            <div class="pill-row">
+              <span class="pill">Ball back in stance</span>
+              <span class="pill">70% weight lead</span>
+              <span class="pill">Hands forward</span>
+            </div>
+            <div class="card-body">Ball positioned toward your trail foot. Weight 70% on lead (right) foot at setup and through impact. Shaft leans toward target — hands ahead of the ball. This delofts the club and keeps the trajectory low and rolling.</div>
+            <div class="cue-box">💬 Pendulum stroke — no wrist flip. Think long putt with a lofted club. Follow-through matches backswing length.</div>
+          </div>
+
+          <div class="card" style="margin-bottom:10px;">
+            <span class="tag tag-gold">Club Selection Guide</span>
+            <div class="card-body">
+              <div class="check-row" style="border:none;padding:4px 0;"><span>🏒 <strong>7-Iron</strong> — Lots of run. Best from 5+ yards off the fringe on flat ground</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>⛳ <strong>PW (45°)</strong> — Most versatile. Go-to chip for most situations</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>🎯 <strong>GW (50°)</strong> — Softer landing, less run. Best from 15–25 yards or over light rough</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>💨 <strong>SW (54°)</strong> — Use when you need to carry a hazard or stop the ball fast</span></div>
+            </div>
+            <div class="cue-box">💬 More run needed → less loft. More carry needed → more loft. Simple.</div>
+          </div>
+
+          <div class="card">
+            <span class="tag tag-purple">Landing Spot Drill</span>
+            <div class="card-title">Tee Target — Build Consistency</div>
+            <div class="card-body">Place a tee 1.5 feet onto the green from the fringe edge. Forget the hole completely. Drop 10 balls and chip, trying to land each one on the tee. <strong>6 out of 10 = consistent chipper.</strong> Once you hit 6/10, your chipping is predictable enough to score with.</div>
+            <div class="cue-box">💬 Pick a spot. Hit to the spot. Let the ball do the rest. Every chip should have a landing zone, not a hole target.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Putting 🎯</div>
+
+          <div class="card" style="margin-bottom:10px;">
+            <span class="tag tag-gold">Setup Fundamentals</span>
+            <div class="card-body">
+              <div class="check-row"><span>👁️ <strong>Eyes over ball</strong> — lean forward until eyes are directly above the ball</span></div>
+              <div class="check-row"><span>🤲 <strong>Light grip — 4 out of 10</strong> — tension kills feel. Barely there.</span></div>
+              <div class="check-row"><span>⚖️ <strong>Pendulum stroke</strong> — shoulders rock, wrists stay still</span></div>
+              <div class="check-row"><span>↔️ <strong>Follow-through = backswing length</strong> — even tempo both ways</span></div>
+              <div class="check-row"><span>👂 <strong>Listen for the rattle</strong> — don't watch the ball, look up after you hear it</span></div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:10px;">
+            <span class="tag tag-green">Gate Drill</span>
+            <div class="card-title">Path &amp; Face Training</div>
+            <div class="card-body">Push 2 tees into the green 6 inches in front of the ball, slightly wider than your putter face. Roll the ball through the gate without touching either tee. Miss the tees = good path and face. Simple, brutal, effective.</div>
+            <div class="cue-box">💬 Do 10–15 reps from 4–5 feet. This is the single best putting drill you can do.</div>
+          </div>
+
+          <div class="card" style="margin-bottom:10px;">
+            <span class="tag tag-purple">3-6-9 Challenge</span>
+            <div class="card-title">Make the Shorts, Lag the Long</div>
+            <div class="card-body">Place 3 balls at 3ft, 3 at 6ft, and 3 at 9ft from the hole. Goal: <strong>make all three 3-footers</strong>, 2-putt the 6-footers, and lag the 9-footers inside 2 feet. Count total putts out of 9. Target: 12 putts or fewer.</div>
+            <div class="cue-box">💬 3-footers are non-negotiable. Make them before you leave the putting green.</div>
+          </div>
+
+          <div class="card">
+            <span class="tag tag-orange">Distance Ladder</span>
+            <div class="card-title">Speed Control — No Hole Needed</div>
+            <div class="card-body">Putt 5 balls from 10 feet trying to stop within 1 foot of the fringe. Then 5 from 20 feet. Then 5 from 30 feet. No hole — pure speed control. This is where 3-putts are eliminated. The goal is never more than one foot of rollout past your target.</div>
+            <div class="cue-box">💬 Speed kills in putting. If every lag finishes within a foot, you'll never 3-putt.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Pre-Round Routine ⏱ 10 min</div>
+          <div class="card" style="border-color:rgba(201,168,76,0.3);">
+            <div class="card-body" style="margin-bottom:10px;font-size:0.82rem;color:var(--gold-l);">Do this every single time before a round. Not full swings — short game only. This dials in your touch for <em>this specific green on this specific day.</em></div>
+            <div class="check-row"><span>🏌️ <strong>5 putts to the fringe</strong> — no hole. Feel the speed of this green today, not your last round.</span></div>
+            <div class="check-row"><span>🎯 <strong>5 × 3-footers</strong> — build confidence, not mechanics. Make them all before moving on.</span></div>
+            <div class="check-row"><span>⛳ <strong>3 chips from just off the green</strong> — feel the bump and run with GW, PW, and 7-iron once each.</span></div>
+            <div class="check-row"><span>✅ <strong>Always end on a make</strong> — walk to the first tee with the feeling of the ball going in the hole.</span></div>
+            <div class="cue-box" style="margin-top:10px;">💬 This routine takes 10 minutes and can save you 3–5 strokes. Most amateurs skip it. Don't be most amateurs.</div>
+          </div>
+        </div>
+
+      </div><!-- /dad-sect shortgame -->
+
+    </div><!-- /page-shortgame -->
+
+
+    <!-- ══════════════════════════════════════
          PAGE: PROGRESS
     ══════════════════════════════════════ -->
-    <div class="page" id="page-progress">
 
-      <div class="page-header" data-icon="📈">
-        <div class="page-tag">Track Your Journey</div>
-        <div class="page-title">My Progress</div>
-        <div class="page-sub">Session log · Notes · Milestones</div>
-      </div>
 
-      <div class="section">
-        <div class="section-title">Journey Milestones</div>
+    <!-- ══════════════════════════════════════
+         PAGE: PUTTING
+    ══════════════════════════════════════ -->
+    <div class="page" id="page-putting">
 
-        <div class="card">
-          <div class="card-title">Week Progress</div>
-          <div id="weekProgress" style="margin-top:6px;">
-            <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;">Range Sessions (target: 2–3/week)</div>
-            <div class="progress-bar-wrap"><div class="progress-bar-fill" id="sessionBar" style="width:0%"></div></div>
-            <div class="progress-label"><span id="sessionCount">0 sessions logged</span><span>Goal: 24 sessions</span></div>
+      <!-- ── DAD PUTTING ── -->
+      <div class="dad-sect">
+        <div class="page-header" data-icon="⛳">
+          <div class="page-tag">Lefty · Short Game · Score Saver</div>
+          <div class="page-title">Putting & Chipping</div>
+          <div class="page-sub">The fastest way to break 90</div>
+        </div>
+
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" style="color:var(--gold);">43%</div><div class="stat-lbl">Strokes</div></div>
+            <div class="stat"><div class="stat-num" style="color:var(--gold);">3ft</div><div class="stat-lbl">Make These</div></div>
+            <div class="stat"><div class="stat-num" style="color:var(--gold);">2</div><div class="stat-lbl">Putt Goal</div></div>
+          </div>
+          <div class="card" style="background:rgba(201,168,76,0.06);border-color:rgba(201,168,76,0.3);text-align:center;padding:14px;">
+            <div style="font-size:0.82rem;color:var(--gold-l);line-height:1.6;">Nearly half your strokes happen within 50 yards of the hole.<br><strong style="color:var(--cream);">Sub-90 is won and lost on the putting green.</strong></div>
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-title">Milestone Checklist</div>
-          <div id="milestones">
-            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="grips"></div><span>New midsize grips installed</span></div>
-            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="firstrange"></div><span>First range session completed</span></div>
-            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="sss"></div><span>SSS drills feeling natural</span></div>
-            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="lesson"></div><span>First pro lesson (Temecula Creek Inn)</span></div>
-            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="gapwedge"></div><span>Gap wedge (50°) added to bag</span></div>
-            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="7wood"></div><span>7-wood added to bag</span></div>
-            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="mallet"></div><span>Mallet putter upgrade</span></div>
-            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="firstround"></div><span>First full 18-hole round</span></div>
-            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="sub100"></div><span>First round under 100 🎉</span></div>
-            <div class="check-row"><div class="check-box" onclick="toggleMilestone(this)" data-id="sub90"></div><span>First round under 90 🏆</span></div>
+        <div class="section">
+          <div class="section-title">Putting Setup — Lefty</div>
+          <div class="card">
+            <div class="card-title">The Fundamentals</div>
+            <div class="check-row"><span>Eyes directly over the ball — drop a ball from your nose to check</span></div>
+            <div class="check-row"><span>Feet shoulder-width, square to your target line</span></div>
+            <div class="check-row"><span>Grip: light pressure — 4 out of 10. Death grip kills feel.</span></div>
+            <div class="check-row"><span>Pendulum stroke: shoulders rock, wrists stay quiet</span></div>
+            <div class="check-row"><span>Follow-through same length as backswing</span></div>
+            <div class="check-row"><span>Listen for the rattle — don't look up early</span></div>
           </div>
         </div>
-      </div>
 
-      <div class="section">
-        <div class="section-title">Log a Session</div>
-        <label>Date</label>
-        <input type="date" id="sessionDate">
-        <label>Swing Thought</label>
-        <input type="text" id="sessionThought" placeholder="e.g. Hips before arms">
-        <label>Notes</label>
-        <textarea class="notes-area" id="sessionNotes" placeholder="How did it feel? What worked? What didn't?"></textarea>
-        <button class="btn btn-gold" onclick="logSession()" style="width:100%;justify-content:center;margin-top:4px;">+ Log This Session</button>
-      </div>
+        <div class="section">
+          <div class="section-title">Putting Drills</div>
 
-      <div class="section">
-        <div class="section-title">Session History</div>
-        <div id="sessionHistory">
-          <div style="font-size:0.82rem;color:var(--muted);text-align:center;padding:20px 0;">No sessions logged yet.<br>Hit the range and come back here! 🏌️</div>
+          <div class="card">
+            <div class="card-title">Gate Drill 🚪</div>
+            <div class="pill-row"><span class="pill">2 tees</span><span class="pill">3–6 ft putts</span><span class="pill">5 min</span></div>
+            <div class="card-body">Push two tees into the green <strong>6 inches in front of your ball</strong>, slightly wider than your putter face. Every putt must roll cleanly between them. If you clip a tee, your face was open or closed at impact.</div>
+            <div class="cue-box">Start at 3 feet and move back only when you make 5 in a row through the gate.</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">3-6-9 Challenge 📏</div>
+            <div class="pill-row"><span class="pill">9 balls</span><span class="pill">3 distances</span><span class="pill">Par = 15</span></div>
+            <div class="card-body">3 balls at 3ft (should make all 3), 3 balls at 6ft (should make 1-2), 3 balls at 9ft (lag to tap-in). Count total putts. Par is 15 — try to beat it. Tour average from 6ft is about 50%.</div>
+            <div class="cue-box">At 9ft+: forget the hole. Focus only on speed. Get it within a 3-foot circle.</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Distance Ladder 🎯</div>
+            <div class="pill-row"><span class="pill">5 balls</span><span class="pill">No hole</span><span class="pill">Pure feel</span></div>
+            <div class="card-body">Putt to the fringe (no hole). Try to stop each ball within 1 foot of the fringe — not past it, not short. 5 putts from 10ft, then 20ft, then 30ft. This trains the distance control that eliminates 3-putts.</div>
+            <div class="cue-box">Speed kills. 90% of 3-putts are caused by poor distance, not poor direction.</div>
+          </div>
         </div>
-      </div>
 
-      <div class="section">
-        <div class="section-title">General Notes</div>
-        <textarea class="notes-area" id="generalNotes" placeholder="Anything you want to remember — tips from the pro, things to work on, gear thoughts..." style="min-height:160px;"></textarea>
-        <button class="btn btn-green" onclick="saveNotes()" style="margin-top:8px;">Save Notes</button>
-        <span id="notesSaved" style="font-size:0.75rem;color:var(--green-b);margin-left:10px;opacity:0;transition:opacity 0.3s;">✓ Saved</span>
-      </div>
+        <div class="section">
+          <div class="section-title">Chipping — Bump & Run</div>
 
-    </div><!-- /page-progress -->
+          <div class="card">
+            <div class="card-title">Setup & Technique</div>
+            <div class="check-row"><span>Ball back in stance — toward trail (right) foot</span></div>
+            <div class="check-row"><span>Weight 70% on lead (left) foot — stays there throughout</span></div>
+            <div class="check-row"><span>Hands pressed forward — shaft leans toward target</span></div>
+            <div class="check-row"><span>Stroke is a long putting motion — no wrist flip</span></div>
+            <div class="check-row"><span>Pick a landing spot 1–2ft onto the green, aim THERE not the hole</span></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Club Selection Guide</div>
+            <div class="card-body">
+              <div class="check-row" style="border:none;padding:4px 0;"><span>🏌️ <strong>7-Iron</strong> — lots of run, little air. Best when 5+ yards from fringe</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>🏌️ <strong>PW</strong> — balanced air/run. Most versatile chip club</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span>🏌️ <strong>SW</strong> — more air, less run. Use when you need to carry a hazard</span></div>
+            </div>
+            <div class="cue-box">Rule of thumb: use the least loft that gets the ball rolling on the green as quickly as possible.</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Landing Spot Drill</div>
+            <div class="pill-row"><span class="pill">10 chips</span><span class="pill">5 yards off green</span><span class="pill">PW or 7-iron</span></div>
+            <div class="card-body">Place a tee or club cover 1.5ft onto the green as your landing spot. Forget the hole completely — just try to land 10 chips on that spot. Once you can hit it 6/10 times, your chipping becomes very predictable.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Pre-Round Routine (10 min)</div>
+          <div class="card">
+            <div class="check-row"><span>5 putts to the fringe — dial in speed on this green specifically</span></div>
+            <div class="check-row"><span>5 × 3-footers — build confidence, not mechanics</span></div>
+            <div class="check-row"><span>3 chips from off the green — feel the bump-and-run</span></div>
+            <div class="check-row"><span><strong>End on a make</strong> — always walk to the first tee having just made something</span></div>
+          </div>
+        </div>
+      </div><!-- /dad-sect putting -->
+
+      <!-- ── SON PUTTING ── -->
+      <div class="son-sect">
+        <div class="page-header" data-icon="⛳">
+          <div class="page-tag">Righty · Age 8 · Make it a Game</div>
+          <div class="page-title">Putting</div>
+          <div class="page-sub">Games · Drills · Beat Dad</div>
+        </div>
+
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" style="color:#3b82f6;">3ft</div><div class="stat-lbl">Make These</div></div>
+            <div class="stat"><div class="stat-num" style="color:#3b82f6;">🔥</div><div class="stat-lbl">Ring of Fire</div></div>
+            <div class="stat"><div class="stat-num" style="color:#fcd34d;">⭐</div><div class="stat-lbl">Earn Stars</div></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Setup — Righty</div>
+          <div class="card">
+            <div class="check-row"><span>Eyes over the ball — check by dropping a ball from your nose</span></div>
+            <div class="check-row"><span>Feet shoulder-width, square to the target line</span></div>
+            <div class="check-row"><span>Soft grip — if someone tried to pull the putter out, it would come out easily</span></div>
+            <div class="check-row"><span>Shoulders rock the stroke — wrists stay quiet and locked</span></div>
+            <div class="check-row"><span>Same backswing and follow-through length</span></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Putting Games 🎮</div>
+
+          <div class="card">
+            <span class="fun-badge">Game 1</span>
+            <div class="card-title">Ring of Fire 🔥</div>
+            <div class="pill-row"><span class="pill">5 balls</span><span class="pill">3 feet</span><span class="pill">All or nothing</span></div>
+            <div class="card-body">
+              Place 5 balls in a circle around the hole, <strong>all exactly 3 feet away</strong>. Make ALL 5 in a row. Miss one = start over from zero. Same drill the best players in the world do every single day.
+            </div>
+            <div class="cue-box">💬 Pick a spot on the back edge of the cup. Putt to THAT spot — not "the hole."</div>
+            <div class="exp-trigger" onclick="toggleExp(this)">Tips to Make More 3-Footers <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="exp-body"><div class="exp-inner">
+              <div class="card" style="background:rgba(0,0,0,0.15);margin-bottom:0;">
+                <div class="card-title" style="font-size:0.85rem;">🎯 Commit to Your Line</div>
+                <div class="card-body">Before every putt, crouch behind the ball and pick the exact line. Then step up and trust it — no second-guessing. The worst putts happen when you change your mind mid-stroke.</div>
+              </div>
+              <div class="card" style="background:rgba(0,0,0,0.15);margin-bottom:0;">
+                <div class="card-title" style="font-size:0.85rem;">🎯 Keep Your Head Still</div>
+                <div class="card-body">Put a tee in the ground where your ball was. After you putt, see if you can still see the tee — that means your head stayed still. If you can't find it, your head moved. Still head = consistent strike.</div>
+              </div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div></div>
+          </div>
+
+          <div class="card">
+            <span class="fun-badge" style="background:linear-gradient(135deg,#6366f1,#3b82f6);">Game 2</span>
+            <div class="card-title">3-6-9 Star Challenge ⭐</div>
+            <div class="pill-row"><span class="pill">9 balls</span><span class="pill">3 distances</span><span class="pill">Earn stars</span></div>
+            <div class="card-body">
+              3 balls from 3ft ⭐ = 1 star each you make<br>
+              3 balls from 6ft ⭐⭐ = 2 stars each you make<br>
+              3 balls from 9ft ⭐⭐⭐ = 3 stars each you make<br>
+              <strong>Max 18 stars. Beat your personal best each session!</strong>
+            </div>
+            <div class="cue-box">💬 From 9ft+: focus on speed only. Get it close enough to tap in.</div>
+          </div>
+
+          <div class="card">
+            <span class="fun-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);">Game 3</span>
+            <div class="card-title">Longest Putt Challenge 🚀</div>
+            <div class="pill-row"><span class="pill">5 balls</span><span class="pill">As far as possible</span></div>
+            <div class="card-body">
+              Find the longest putt on the green. Putt all 5 balls. Goal: get ALL 5 within a 3-foot circle of the hole. This is pure distance control — direction doesn't matter as much at long range.
+            </div>
+            <div class="cue-box">💬 Imagine a 3-foot circle around the hole. Your job is to park it in the circle, not make it.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Gate Drill — Make Your Stroke Perfect</div>
+          <div class="card">
+            <div class="card-body">Push 2 tees into the green <strong>6 inches in front of your ball</strong>, just wider than your putter. Roll every putt between them. If you clip a tee, your putter face wasn't square. 5 in a row through the gate = perfect stroke.</div>
+            <div class="cue-box">💬 Do this drill for 5 minutes before a round. It makes everything feel automatic.</div>
+          </div>
+        </div>
+      </div><!-- /son-sect putting -->
+
+      <!-- ── DAUGHTER PUTTING ── -->
+      <div class="girl-sect">
+        <div class="page-header" data-icon="⛳">
+          <div class="page-tag">Lefty · Age 5 · Pure Fun</div>
+          <div class="page-title">Putting!</div>
+          <div class="page-sub">Games only · No pressure · Just roll it</div>
+        </div>
+
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" style="color:#ec4899;">🎯</div><div class="stat-lbl">Aim</div></div>
+            <div class="stat"><div class="stat-num" style="color:#14b8a6;">10</div><div class="stat-lbl">Min Max</div></div>
+            <div class="stat"><div class="stat-num" style="color:#ec4899;">😄</div><div class="stat-lbl">Always</div></div>
+          </div>
+          <div class="card" style="background:rgba(236,72,153,0.08);border-color:rgba(236,72,153,0.3);text-align:center;padding:14px;">
+            <div style="font-size:0.85rem;color:var(--cream);line-height:1.6;">Putting is the <strong style="color:#ec4899;">PERFECT</strong> first skill for a 5-year-old.<br>Short attention span ✓ Instant feedback ✓ Can beat Dad ✓</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">The Games 🎮</div>
+
+          <div class="card">
+            <span class="girl-badge">Game 1</span>
+            <div class="card-title">Closest to the Hole Wins! 🏆</div>
+            <div class="pill-row"><span class="pill">Her putter</span><span class="pill">5 balls each</span><span class="pill">Her choice of distance</span></div>
+            <div class="card-body">
+              She picks where you both putt from. Both putt 5 balls. <strong>Whoever is closest wins that round.</strong> She keeps score. She picks the next hole too. Total control = total engagement.
+            </div>
+            <div class="cue-box" style="border-color:#ec4899;color:#f9a8d4;">💬 "Roll it nice and smooth — send it on a trip to the hole!"</div>
+            <div class="exp-trigger" onclick="toggleExp(this)">Dad Notes <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+            <div class="exp-body"><div class="exp-inner">
+              <div class="exp-detail">Let her win enough that it's competitive. If she's crushing you, pretend to try harder. If she's frustrated, miss a few on purpose. The goal is she feels like a real golfer — because she is.</div>
+              <div class="exp-detail"><strong>If she sinks one from distance:</strong> Completely lose your mind. Jump around. Tell her that's the best putt you've ever seen. She'll be talking about it for a week.</div>
+              <button class="exp-close" onclick="closeExp(this)">✕ Close</button>
+            </div></div>
+          </div>
+
+          <div class="card">
+            <span class="girl-badge" style="background:linear-gradient(135deg,#14b8a6,#6366f1);">Game 2</span>
+            <div class="card-title">The Color Target 🌈</div>
+            <div class="pill-row"><span class="pill">5 balls</span><span class="pill">Any distance</span><span class="pill">Pick a color</span></div>
+            <div class="card-body">
+              Put a colorful tee or hair tie on the green as a target (not the hole). She picks the color. Try to hit it. If she rolls over the tee = WIN! Celebrate like crazy. Move the tee to a new spot each round.
+            </div>
+            <div class="cue-box" style="border-color:#14b8a6;color:#5eead4;">💬 This builds aim without any technical explanation. Brains love colors.</div>
+          </div>
+
+          <div class="card">
+            <span class="girl-badge" style="background:linear-gradient(135deg,#f59e0b,#ec4899);">Game 3</span>
+            <div class="card-title">Tiny Putt Challenge 🐌</div>
+            <div class="pill-row"><span class="pill">5 balls</span><span class="pill">1–2 feet</span><span class="pill">Can't miss</span></div>
+            <div class="card-body">
+              Put 5 balls very close to the hole — <strong>1 to 2 feet away.</strong> Challenge: sink all 5. These are nearly unmissable at age 5 and the sound of the ball dropping in the cup is addictive. Once she hears that sound enough times, she's hooked.
+            </div>
+            <div class="cue-box" style="border-color:#f59e0b;color:#fcd34d;">💬 The rattle of the ball in the cup is the best sound in golf. Let her hear it a lot.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Golden Rules for Putting at 5 🌟</div>
+          <div class="check-row"><span>⏱ 10 minutes max — end before she wants to stop</span></div>
+          <div class="check-row"><span>🎉 Celebrate <strong>every</strong> putt that gets close — not just makes</span></div>
+          <div class="check-row"><span>🚫 No technique corrections during games — just play</span></div>
+          <div class="check-row"><span>👑 Let her be in charge — she picks the holes, the games, the order</span></div>
+          <div class="check-row"><span>🌈 If she starts doing something silly with the putter, join in — she's still learning the feel of it</span></div>
+        </div>
+      </div><!-- /girl-sect putting -->
+
+      <div class="grandma-sect">
+
+        <div class="page-header" data-icon="⛳">
+          <div class="page-tag">Putting</div>
+          <div class="page-title">Roll It Smooth</div>
+          <div class="page-sub">Alignment putter · feel the line · tempo over force</div>
+        </div>
+
+        <div class="section">
+          <div class="card" style="border-color:rgba(212,175,112,0.3);">
+            <div class="grandma-badge">Your Alignment Putter</div>
+            <div class="card-body">Your Lynx putter has built-in alignment lines — use them! Line up the stripe on your putter with your intended target line. When the lines match, you're aimed perfectly. Trust the tool and make a smooth stroke.</div>
+            <div class="cue-box" style="border-color:#d4af70;color:#e8cc8a;">"Line it up, breathe out, roll it smooth."</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">The Putting Stroke 💜</div>
+          <div class="card" style="border-color:rgba(139,92,246,0.3);">
+            <div class="sss-step" style="margin-bottom:14px;">
+              <div class="step-num" style="background:#6d28d9;">1</div>
+              <div class="step-content">
+                <div class="step-title">Set Up Comfortably</div>
+                <ul class="step-bullets"><li>Stand relaxed, feet about shoulder-width apart</li><li>Ball just inside your left foot</li><li>Eyes directly over the ball — lean forward gently if needed</li></ul>
+              </div>
+            </div>
+            <div class="sss-step" style="margin-bottom:14px;">
+              <div class="step-num" style="background:#6d28d9;">2</div>
+              <div class="step-content">
+                <div class="step-title">Light, Relaxed Grip</div>
+                <ul class="step-bullets"><li>Hold the putter very gently — light grip pressure is essential</li><li>Tension in the hands ruins feel</li></ul>
+              </div>
+            </div>
+            <div class="sss-step" style="margin-bottom:14px;">
+              <div class="step-num" style="background:#6d28d9;">3</div>
+              <div class="step-content">
+                <div class="step-title">Pendulum Stroke</div>
+                <ul class="step-bullets"><li>Rock your shoulders like a pendulum — back and through, even pace</li><li>No wrist flick needed — let the shoulders do the work</li></ul>
+              </div>
+            </div>
+            <div class="sss-step">
+              <div class="step-num" style="background:#6d28d9;">4</div>
+              <div class="step-content">
+                <div class="step-title">Hold the Finish</div>
+                <ul class="step-bullets"><li>After you stroke it, hold the putter still for a moment</li><li>Watch — and enjoy — the ball rolling toward the hole 🌸</li></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Putting Drills 🎯</div>
+          <div class="card" style="margin-bottom:10px;">
+            <div class="card-title">🎯 Gate Drill</div>
+            <div class="card-body">Place two tees about putter-head width apart, 6 inches in front of your ball. Practice rolling putts through the "gate." This promotes a straight, smooth stroke every time.</div>
+          </div>
+          <div class="card" style="margin-bottom:10px;">
+            <div class="card-title">📏 3-Foot Confidence Builder</div>
+            <div class="card-body">Place 6 balls in a circle about 3 feet from the hole. Putt each one in. When you make all 6, move to 4 feet. This is the most enjoyable drill in golf — and builds real confidence.</div>
+            <div class="cue-box" style="border-color:#d4af70;color:#e8cc8a;">3 feet is where the game is won. Master this distance and watch your scores drop.</div>
+          </div>
+          <div class="card">
+            <div class="card-title">👁️ Eyes Closed Putting</div>
+            <div class="card-body">Set up a 4-foot putt, then close your eyes and stroke it. This forces you to feel the pendulum motion instead of thinking about it. You'll be amazed how often it goes in — and how natural the stroke starts to feel.</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Reading the Green 🌿</div>
+          <div class="card">
+            <div class="check-row"><span>👀 <strong>Walk behind the ball</strong> — crouch and look at the slope between ball and hole</span></div>
+            <div class="check-row"><span>⛰️ <strong>Uphill putts</strong> — aim at the hole, stroke a little firmer</span></div>
+            <div class="check-row"><span>⬇️ <strong>Downhill putts</strong> — aim at the hole, use a very gentle stroke</span></div>
+            <div class="check-row"><span>↩️ <strong>Breaking putts</strong> — aim above the hole and let gravity curve it in</span></div>
+            <div class="check-row"><span>💜 <strong>Trust your read</strong> — commit and make a smooth stroke</span></div>
+          </div>
+        </div>
+
+      </div><!-- /grandma-sect putting -->
+
+    </div><!-- /page-putting -->
 
   </div><!-- /pages -->
 
@@ -900,17 +2953,296 @@
       <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       Drills
     </button>
-    <button class="nav-btn" onclick="showPage('progress')" id="nav-progress">
-      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-      Progress
+    <button class="nav-btn" onclick="showPage('shortgame')" id="nav-shortgame">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="19" r="2"/><path d="M12 17V9"/><path d="M8 13l4-4 4 4"/></svg>
+      Short Game
     </button>
+    <button class="nav-btn" onclick="showPage('putting')" id="nav-putting">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="19" r="2"/><path d="M12 17V5"/><path d="M12 5l5 3"/></svg>
+      Putt
+    </button>
+
   </nav>
 
 </div><!-- /app -->
 
 <script>
+
+
+  // ── PROFILE SWITCHER ─────────────────────────────────────────
+  let currentProfile = 'dad';
+  function applyProfile(who) {
+    currentProfile = who;
+    const isDad     = who === 'dad';
+    const isSon     = who === 'son';
+    const isGirl    = who === 'girl';
+    const isGrandma = who === 'grandma';
+    document.body.classList.toggle('son-mode',     isSon);
+    document.body.classList.toggle('girl-mode',    isGirl);
+    document.body.classList.toggle('grandma-mode', isGrandma);
+    document.querySelectorAll('.dad-sect')    .forEach(el => el.style.display = isDad     ? '' : 'none');
+    document.querySelectorAll('.son-sect')    .forEach(el => el.style.display = isSon     ? 'block' : 'none');
+    document.querySelectorAll('.girl-sect')   .forEach(el => el.style.display = isGirl    ? 'block' : 'none');
+    document.querySelectorAll('.grandma-sect').forEach(el => el.style.display = isGrandma ? 'block' : 'none');
+    const subs = { dad: '⛳ Lefty · Sub-90 Journey', son: '⛳ Righty · Junior · Have Fun!', girl: '⛳ Lefty · Age 5 · Pure Fun!', grandma: '⛳ Righty · Welcome Back · Lynx Lady' };
+    document.getElementById('topbarSub').textContent = subs[who];
+    document.getElementById('btnDad')    .classList.toggle('active', isDad);
+    document.getElementById('btnSon')    .classList.toggle('active', isSon);
+    document.getElementById('btnGirl')   .classList.toggle('active', isGirl);
+    document.getElementById('btnGrandma').classList.toggle('active', isGrandma);
+    localStorage.setItem('sv-profile', who);
+    // Show Short Game nav only for Dad
+    const sgBtn = document.getElementById('nav-shortgame');
+    if (sgBtn) sgBtn.style.display = isDad ? '' : 'none';
+    // Strip pre-render classes — JS owns display state from here
+    document.documentElement.classList.remove('pre-son', 'pre-girl', 'pre-grandma');
+    if (isSon)     { renderSonSessions();     loadSonNotes(); }
+    if (isGirl)    { renderGirlSessions();    loadGirlNotes(); }
+    if (isGrandma) { renderGrandmaSessions(); loadGrandmaNotes(); }
+    if (isDad)     { renderSessions();        loadNotes(); }
+  }
+
+  function showApp() {
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+  }
+
+  function enterProfile(who) {
+    // Called from landing page cards — fade landing out, show app
+    sessionStorage.setItem('sv-session', '1'); // mark session active
+    applyProfile(who);
+    document.getElementById('app').style.display = 'flex';
+    const landing = document.getElementById('landing');
+    landing.classList.add('hidden');
+    setTimeout(() => { landing.style.display = 'none'; }, 380);
+    showPage('home');
+  }
+
+  function switchProfile(who) {
+    // Called from topbar pills — stay in app, no landing
+    applyProfile(who);
+    document.querySelectorAll('.exp-trigger.open').forEach(t => t.classList.remove('open'));
+    document.querySelectorAll('.exp-body.open').forEach(b => b.classList.remove('open'));
+    showPage('home');
+  }
+
+  function goToLanding() {
+    // Strip !important pre-render classes FIRST — otherwise they block
+    // landing.style.display = 'flex' (CSS !important beats inline styles)
+    document.documentElement.classList.remove('has-profile', 'pre-son', 'pre-girl', 'pre-grandma');
+    document.body.classList.remove('son-mode', 'girl-mode', 'grandma-mode');
+    // Now safe to show landing
+    const landing = document.getElementById('landing');
+    landing.style.display = 'flex';
+    landing.classList.remove('hidden');
+    document.getElementById('app').style.display = 'none';
+    document.querySelectorAll('.exp-trigger.open').forEach(t => t.classList.remove('open'));
+    document.querySelectorAll('.exp-body.open').forEach(b => b.classList.remove('open'));
+  }
+
+  function initProfile() {
+    const saved = localStorage.getItem('sv-profile');
+    const inSession = sessionStorage.getItem('sv-session');
+    if (saved && inSession) {
+      // Same session + known profile — skip landing (e.g. page reload mid-session)
+      showApp();
+      applyProfile(saved);
+      showPage('home');
+    }
+    // else: fresh tab or first visit — landing stays visible
+  }
+
+
+  // ── GIRL SESSION LOG ──────────────────────────────────────────
+  function logGirlSession() {
+    const date    = document.getElementById('girl-sessionDate').value;
+    const thought = document.getElementById('girl-sessionThought').value.trim();
+    const notes   = document.getElementById('girl-sessionNotes').value.trim();
+    if (!date) { alert('Please pick a date.'); return; }
+    const sessions = store.get('girl_sessions') || [];
+    sessions.unshift({ date, thought, notes, id: Date.now() });
+    store.set('girl_sessions', sessions);
+    document.getElementById('girl-sessionDate').value = '';
+    document.getElementById('girl-sessionThought').value = '';
+    document.getElementById('girl-sessionNotes').value = '';
+    renderGirlSessions();
+  }
+
+  function renderGirlSessions() {
+    const sessions = store.get('girl_sessions') || [];
+    const el = document.getElementById('girl-sessionHistory');
+    if (!el) return;
+    if (!sessions.length) {
+      el.innerHTML = '<div style="font-size:0.82rem;color:var(--muted);text-align:center;padding:20px 0;">No sessions yet.<br>Go have some fun! 🌈</div>';
+      return;
+    }
+    el.innerHTML = sessions.map(s => {
+      const d = new Date(s.date + 'T12:00:00');
+      const mon = d.toLocaleString('default', { month: 'short' }).toUpperCase();
+      const day = d.getDate();
+      return `<div class="session-log-item">
+        <div class="session-date">${mon}<br>${day}</div>
+        <div class="session-note"><strong>${s.thought || 'Session'}</strong>${s.notes || '<span style="font-style:italic;opacity:0.6;">No notes</span>'}</div>
+        <button class="delete-btn" onclick="deleteGirlSession(${s.id})">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+  function deleteGirlSession(id) {
+    const sessions = (store.get('girl_sessions') || []).filter(s => s.id !== id);
+    store.set('girl_sessions', sessions);
+    renderGirlSessions();
+  }
+
+  function saveGirlNotes() {
+    store.set('girl_generalnotes', document.getElementById('girl-generalNotes').value);
+    const badge = document.getElementById('girl-notesSaved');
+    badge.style.opacity = '1';
+    setTimeout(() => badge.style.opacity = '0', 2000);
+  }
+
+  function loadGirlNotes() {
+    const n = store.get('girl_generalnotes');
+    const el = document.getElementById('girl-generalNotes');
+    if (n && el) el.value = n;
+    const d = document.getElementById('girl-sessionDate');
+    if (d) d.value = new Date().toISOString().split('T')[0];
+  }
+
+  // ── SON SESSION LOG ───────────────────────────────────────────
+  function logSonSession() {
+    const date    = document.getElementById('son-sessionDate').value;
+    const thought = document.getElementById('son-sessionThought').value.trim();
+    const notes   = document.getElementById('son-sessionNotes').value.trim();
+    if (!date) { alert('Please pick a date.'); return; }
+    const sessions = store.get('son_sessions') || [];
+    sessions.unshift({ date, thought, notes, id: Date.now() });
+    store.set('son_sessions', sessions);
+    document.getElementById('son-sessionDate').value = '';
+    document.getElementById('son-sessionThought').value = '';
+    document.getElementById('son-sessionNotes').value = '';
+    renderSonSessions();
+  }
+
+  function renderSonSessions() {
+    const sessions = store.get('son_sessions') || [];
+    const el = document.getElementById('son-sessionHistory');
+    if (!el) return;
+    if (!sessions.length) {
+      el.innerHTML = '<div style="font-size:0.82rem;color:var(--muted);text-align:center;padding:20px 0;">No sessions yet.<br>Hit the range and come back! 🏌️</div>';
+      return;
+    }
+    el.innerHTML = sessions.map(s => {
+      const d = new Date(s.date + 'T12:00:00');
+      const mon = d.toLocaleString('default', { month: 'short' }).toUpperCase();
+      const day = d.getDate();
+      return `<div class="session-log-item">
+        <div class="session-date">${mon}<br>${day}</div>
+        <div class="session-note"><strong>${s.thought || 'Session'}</strong>${s.notes || '<span style="font-style:italic;opacity:0.6;">No notes</span>'}</div>
+        <button class="delete-btn" onclick="deleteSonSession(${s.id})">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+  function deleteSonSession(id) {
+    const sessions = (store.get('son_sessions') || []).filter(s => s.id !== id);
+    store.set('son_sessions', sessions);
+    renderSonSessions();
+  }
+
+  function saveSonNotes() {
+    store.set('son_generalnotes', document.getElementById('son-generalNotes').value);
+    const badge = document.getElementById('son-notesSaved');
+    badge.style.opacity = '1';
+    setTimeout(() => badge.style.opacity = '0', 2000);
+  }
+
+  function loadSonNotes() {
+    const n = store.get('son_generalnotes');
+    const el = document.getElementById('son-generalNotes');
+    if (n && el) el.value = n;
+    const d = document.getElementById('son-sessionDate');
+    if (d) d.value = new Date().toISOString().split('T')[0];
+  }
+
+  // ── GRANDMA SESSION LOG ───────────────────────────────────────
+  function logGrandmaSession() {
+    const date    = document.getElementById('grandma-sessionDate').value;
+    const thought = document.getElementById('grandma-sessionThought').value.trim();
+    const notes   = document.getElementById('grandma-sessionNotes').value.trim();
+    if (!date) { alert('Please pick a date.'); return; }
+    const sessions = store.get('grandma_sessions') || [];
+    sessions.unshift({ date, thought, notes, id: Date.now() });
+    store.set('grandma_sessions', sessions);
+    document.getElementById('grandma-sessionDate').value = '';
+    document.getElementById('grandma-sessionThought').value = '';
+    document.getElementById('grandma-sessionNotes').value = '';
+    renderGrandmaSessions();
+  }
+
+  function renderGrandmaSessions() {
+    const sessions = store.get('grandma_sessions') || [];
+    const el = document.getElementById('grandma-sessionHistory');
+    if (!el) return;
+    if (!sessions.length) {
+      el.innerHTML = '<div style="font-size:0.82rem;color:var(--muted);text-align:center;padding:20px 0;">No sessions yet.<br>Get out there — you\'ve got this! 💜</div>';
+      return;
+    }
+    el.innerHTML = sessions.map(s => {
+      const d = new Date(s.date + 'T12:00:00');
+      const mon = d.toLocaleString('default', { month: 'short' }).toUpperCase();
+      const day = d.getDate();
+      return `<div class="session-log-item">
+        <div class="session-date">${mon}<br>${day}</div>
+        <div class="session-note"><strong>${s.thought || 'Session'}</strong>${s.notes || '<span style="font-style:italic;opacity:0.6;">No notes</span>'}</div>
+        <button class="delete-btn" onclick="deleteGrandmaSession(${s.id})">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+  function deleteGrandmaSession(id) {
+    const sessions = (store.get('grandma_sessions') || []).filter(s => s.id !== id);
+    store.set('grandma_sessions', sessions);
+    renderGrandmaSessions();
+  }
+
+  function saveGrandmaNotes() {
+    store.set('grandma_generalnotes', document.getElementById('grandma-generalNotes').value);
+    const badge = document.getElementById('grandma-notesSaved');
+    badge.style.opacity = '1';
+    setTimeout(() => badge.style.opacity = '0', 2000);
+  }
+
+  function loadGrandmaNotes() {
+    const n = store.get('grandma_generalnotes');
+    const el = document.getElementById('grandma-generalNotes');
+    if (n && el) el.value = n;
+    const d = document.getElementById('grandma-sessionDate');
+    if (d) d.value = new Date().toISOString().split('T')[0];
+  }
+
+  // ── EXPANDABLE CARDS ─────────────────────────────────────────
+  function toggleExp(el) {
+    const body = el.nextElementSibling;
+    el.classList.toggle('open');
+    body.classList.toggle('open');
+    if (el.classList.contains('open')) {
+      setTimeout(() => el.scrollIntoView({ behavior:'smooth', block:'nearest' }), 380);
+    }
+  }
+  function closeExp(btn) {
+    const body = btn.closest('.exp-body');
+    const trigger = body.previousElementSibling;
+    trigger.classList.remove('open');
+    body.classList.remove('open');
+    trigger.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+
   // ── NAVIGATION ───────────────────────────────────────────────
   function showPage(id) {
+    // Collapse all expanded cards before switching tabs
+    document.querySelectorAll('.exp-trigger.open').forEach(t => t.classList.remove('open'));
+    document.querySelectorAll('.exp-body.open').forEach(b => b.classList.remove('open'));
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('page-' + id).classList.add('active');
@@ -1046,7 +3378,52 @@
   window.addEventListener('online', updateOfflineBadge);
   window.addEventListener('offline', updateOfflineBadge);
 
+  // ── LIGHT / DARK MODE ────────────────────────────────────────
+  function toggleMode() {
+    const isLight = document.body.classList.toggle('light-mode');
+    localStorage.setItem('svgolf-theme', isLight ? 'light' : 'dark');
+    document.getElementById('modeToggle').textContent = isLight ? '🌙' : '☀️';
+  }
+
+  function initTheme() {
+    const saved = localStorage.getItem('svgolf-theme');
+    if (saved === 'light') {
+      document.body.classList.add('light-mode');
+      document.getElementById('modeToggle').textContent = '🌙';
+    }
+  }
+
+  // ── BUILD VERSION / CACHE BUSTER ─────────────────────────────
+  // Bump BUILD_ID with every deploy. App checks on load — if version
+  // changed, SW caches are cleared and page reloads. localStorage
+  // (logs, notes, profile) is never touched.
+  const BUILD_ID = '2026-04-02-v28';
+  (function checkBuild() {
+    const prev = localStorage.getItem('sv-build');
+    if (prev && prev !== BUILD_ID) {
+      // New version detected — nuke SW caches silently then reload
+      localStorage.setItem('sv-build', BUILD_ID);
+      if ('caches' in window) {
+        caches.keys()
+          .then(keys => Promise.all(keys.map(k => caches.delete(k))))
+          .then(() => {
+            // Tell any waiting SW to take over, then reload fresh
+            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+              navigator.serviceWorker.controller.postMessage('skipWaiting');
+            }
+            location.reload(true);
+          });
+      } else {
+        location.reload(true);
+      }
+      return; // stop — reload is coming
+    }
+    localStorage.setItem('sv-build', BUILD_ID);
+  })();
+
   // ── INIT ─────────────────────────────────────────────────────
+  initTheme();
+  initProfile();
   loadMilestones();
   renderSessions();
   loadNotes();
