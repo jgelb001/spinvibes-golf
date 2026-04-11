@@ -2996,10 +2996,7 @@
     if (sgBtn) sgBtn.style.display = isDad ? '' : 'none';
     // Strip pre-render classes — JS owns display state from here
     document.documentElement.classList.remove('pre-son', 'pre-girl', 'pre-grandma');
-    if (isSon)     { renderSonSessions();     loadSonNotes(); }
-    if (isGirl)    { renderGirlSessions();    loadGirlNotes(); }
-    if (isGrandma) { renderGrandmaSessions(); loadGrandmaNotes(); }
-    if (isDad)     { renderSessions();        loadNotes(); }
+    // Progress page removed — no session/notes rendering needed
   }
 
   function showApp() {
