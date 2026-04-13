@@ -147,7 +147,7 @@
       background: none;
       color: var(--muted);
       font-family: 'Outfit', sans-serif;
-      font-size: 0.56rem;
+      font-size: 0.5rem;
       font-weight: 500;
       letter-spacing: 0.5px;
       text-transform: uppercase;
@@ -155,7 +155,7 @@
       transition: color 0.15s;
       padding-top: 6px;
     }
-    .nav-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .nav-btn.active { color: var(--gold); }
     .nav-btn.active svg { stroke: var(--gold); }
 
@@ -1159,6 +1159,7 @@
     }
 
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -1274,6 +1275,11 @@
           <span class="guide-card-icon">🎯</span>
           <div class="guide-card-title">Short Game</div>
           <div class="guide-card-sub">Chipping &amp; putting</div>
+        </a>
+        <a class="guide-card dad-sect" onclick="showPage('strategy')">
+          <span class="guide-card-icon">🧠</span>
+          <div class="guide-card-title">Course Strategy</div>
+          <div class="guide-card-sub">Break 90 checklist — your on-course game plan</div>
         </a>
       </div>
 
@@ -2933,6 +2939,215 @@
 
     </div><!-- /page-putting -->
 
+    <!-- ══════════════════════════════════════
+         PAGE: STRATEGY
+    ══════════════════════════════════════ -->
+    <div class="page dad-sect" id="page-strategy">
+      <div class="page-header">
+        <div class="page-tag">GAME PLAN</div>
+        <div class="page-title">Course Strategy</div>
+        <div class="page-sub">Boring golf = lower scores</div>
+        <div class="page-icon">🧠</div>
+      </div>
+
+      <div class="section">
+        <div class="card" style="background:var(--surface2);border-color:rgba(201,168,76,0.4);">
+          <div class="card-body" style="font-size:0.9rem;font-weight:600;color:var(--gold-l);text-align:center;line-height:1.6;">
+            Play for bogeys. Eliminate doubles.<br>
+            Bogey every hole = 89. That IS the sub-90 goal.
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Pre-Round Checklist</div>
+        <div class="card" id="strategy-checklist">
+          <div class="strategy-item" onclick="this.classList.toggle('done')">
+            <div class="strategy-check">✓</div>
+            <div class="strategy-text"><strong>Play every hole like a par 5</strong> — Advance → Advance → Green → 2 putt</div>
+          </div>
+          <div class="strategy-item" onclick="this.classList.toggle('done')">
+            <div class="strategy-check">✓</div>
+            <div class="strategy-text"><strong>Choose the club that keeps it in play off the tee</strong></div>
+          </div>
+          <div class="strategy-item" onclick="this.classList.toggle('done')">
+            <div class="strategy-check">✓</div>
+            <div class="strategy-text"><strong>No hero shots</strong> — punch out when needed</div>
+          </div>
+          <div class="strategy-item" onclick="this.classList.toggle('done')">
+            <div class="strategy-check">✓</div>
+            <div class="strategy-text"><strong>Aim for the fat side of every green</strong></div>
+          </div>
+          <div class="strategy-item" onclick="this.classList.toggle('done')">
+            <div class="strategy-check">✓</div>
+            <div class="strategy-text"><strong>150 yds &amp; in = just hit the green</strong> (no flag hunting)</div>
+          </div>
+          <div class="strategy-item" onclick="this.classList.toggle('done')">
+            <div class="strategy-check">✓</div>
+            <div class="strategy-text"><strong>Zero 3-putts</strong> — lag everything from outside 20 ft</div>
+          </div>
+          <div class="strategy-item" onclick="this.classList.toggle('done')">
+            <div class="strategy-check">✓</div>
+            <div class="strategy-text"><strong>Stick to your stock shot shape only</strong></div>
+          </div>
+          <div class="strategy-item" onclick="this.classList.toggle('done')">
+            <div class="strategy-check">✓</div>
+            <div class="strategy-text"><strong>Full pre-shot routine every shot</strong></div>
+          </div>
+          <div class="strategy-item" onclick="this.classList.toggle('done')">
+            <div class="strategy-check">✓</div>
+            <div class="strategy-text"><strong>Reset after every swing</strong> (no carryover)</div>
+          </div>
+          <div class="strategy-item" onclick="this.classList.toggle('done')">
+            <div class="strategy-check">✓</div>
+            <div class="strategy-text"><strong>Bogey is a win</strong> — doubles are the enemy</div>
+          </div>
+          <div class="strategy-item" onclick="this.classList.toggle('done')">
+            <div class="strategy-check">✓</div>
+            <div class="strategy-text"><strong>Boring golf = lower scores</strong></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /page-strategy -->
+
+    <!-- ══════════════════════════════════════
+         PAGE: DAD PROGRESS
+    ══════════════════════════════════════ -->
+    <div class="page" id="page-dad-progress">
+      <!-- PIN Overlay -->
+      <div id="dad-pin-overlay" style="position:absolute;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;">
+        <div style="font-size:2.5rem;margin-bottom:12px;">🔒</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);letter-spacing:2px;margin-bottom:6px;">Dad's Progress</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:28px;">Enter PIN to continue</div>
+        <div id="dad-pin-dots" style="display:flex;gap:12px;margin-bottom:28px;">
+          <div class="pin-dot" id="dad-dot-0"></div>
+          <div class="pin-dot" id="dad-dot-1"></div>
+          <div class="pin-dot" id="dad-dot-2"></div>
+          <div class="pin-dot" id="dad-dot-3"></div>
+        </div>
+        <div id="dad-pin-error" style="font-size:0.75rem;color:var(--red);margin-bottom:12px;opacity:0;transition:opacity 0.3s;">Incorrect PIN</div>
+        <div class="pin-pad">
+          <button class="pin-key" onclick="dadPinKey('1')">1</button>
+          <button class="pin-key" onclick="dadPinKey('2')">2</button>
+          <button class="pin-key" onclick="dadPinKey('3')">3</button>
+          <button class="pin-key" onclick="dadPinKey('4')">4</button>
+          <button class="pin-key" onclick="dadPinKey('5')">5</button>
+          <button class="pin-key" onclick="dadPinKey('6')">6</button>
+          <button class="pin-key" onclick="dadPinKey('7')">7</button>
+          <button class="pin-key" onclick="dadPinKey('8')">8</button>
+          <button class="pin-key" onclick="dadPinKey('9')">9</button>
+          <button class="pin-key pin-key-empty"></button>
+          <button class="pin-key" onclick="dadPinKey('0')">0</button>
+          <button class="pin-key pin-key-del" onclick="dadPinBackspace()">⌫</button>
+        </div>
+      </div>
+
+      <!-- Page Content -->
+      <div id="dad-progress-content">
+        <div class="page-header">
+          <div class="page-tag">DAD · PRIVATE 🔒</div>
+          <div class="page-title">My Progress</div>
+          <div class="page-icon">📊</div>
+        </div>
+
+        <div class="section">
+          <button class="btn-primary" onclick="openDadModal()" style="width:100%;">⛳ Start New Round</button>
+        </div>
+
+        <div id="dad-stats-bar" style="display:none;" class="section">
+          <div class="stat-row" id="dad-stats-row"></div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Round History</div>
+          <div id="dad-history-list">
+            <div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">
+              <div id="dad-loading-spinner">Loading your rounds... ⏳</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dad Round Entry Modal -->
+      <div id="dad-modal" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);overflow-y:auto;padding-bottom:80px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(201,168,76,0.2);">
+          <div id="dad-modal-step-label" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);">Round Setup</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div id="dad-running-total" style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--cream);display:none;">0</div>
+            <button onclick="closeDadModal()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">✕</button>
+          </div>
+        </div>
+        <div id="dad-modal-body" style="padding:20px;"></div>
+      </div>
+    </div><!-- /page-dad-progress -->
+
+    <!-- ══════════════════════════════════════
+         PAGE: SON PROGRESS
+    ══════════════════════════════════════ -->
+    <div class="page" id="page-son-progress">
+      <!-- PIN Overlay -->
+      <div id="son-pin-overlay" style="position:absolute;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;">
+        <div style="font-size:2.5rem;margin-bottom:12px;">🔒</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:#3b82f6;letter-spacing:2px;margin-bottom:6px;">Son's Progress</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:28px;">Enter PIN to continue</div>
+        <div id="son-pin-dots" style="display:flex;gap:12px;margin-bottom:28px;">
+          <div class="pin-dot" id="son-dot-0"></div>
+          <div class="pin-dot" id="son-dot-1"></div>
+          <div class="pin-dot" id="son-dot-2"></div>
+          <div class="pin-dot" id="son-dot-3"></div>
+        </div>
+        <div id="son-pin-error" style="font-size:0.75rem;color:var(--red);margin-bottom:12px;opacity:0;transition:opacity 0.3s;">Incorrect PIN</div>
+        <div class="pin-pad">
+          <button class="pin-key" onclick="sonPinKey('1')">1</button>
+          <button class="pin-key" onclick="sonPinKey('2')">2</button>
+          <button class="pin-key" onclick="sonPinKey('3')">3</button>
+          <button class="pin-key" onclick="sonPinKey('4')">4</button>
+          <button class="pin-key" onclick="sonPinKey('5')">5</button>
+          <button class="pin-key" onclick="sonPinKey('6')">6</button>
+          <button class="pin-key" onclick="sonPinKey('7')">7</button>
+          <button class="pin-key" onclick="sonPinKey('8')">8</button>
+          <button class="pin-key" onclick="sonPinKey('9')">9</button>
+          <button class="pin-key pin-key-empty"></button>
+          <button class="pin-key" onclick="sonPinKey('0')">0</button>
+          <button class="pin-key pin-key-del" onclick="sonPinBackspace()">⌫</button>
+        </div>
+      </div>
+
+      <!-- Page Content -->
+      <div id="son-progress-content">
+        <div class="page-header">
+          <div class="page-tag">SON · PRIVATE 🔒</div>
+          <div class="page-title">My Scores</div>
+          <div class="page-icon">🏌️</div>
+        </div>
+
+        <div class="section">
+          <button class="btn-primary" onclick="openSonModal()" style="width:100%;">⛳ Start New Round</button>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Round History</div>
+          <div id="son-history-list">
+            <div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">
+              <div id="son-loading-spinner">Loading your rounds... ⏳</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Son Round Entry Modal -->
+      <div id="son-modal" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);overflow-y:auto;padding-bottom:80px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(201,168,76,0.2);">
+          <div id="son-modal-step-label" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);">Round Setup</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div id="son-running-total" style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--cream);display:none;">0</div>
+            <button onclick="closeSonModal()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">✕</button>
+          </div>
+        </div>
+        <div id="son-modal-body" style="padding:20px;"></div>
+      </div>
+    </div><!-- /page-son-progress -->
+
   </div><!-- /pages -->
 
   <!-- BOTTOM NAV -->
@@ -2962,11 +3177,76 @@
       Putt
     </button>
 
+    <button class="nav-btn dad-sect" onclick="showPage('strategy')" id="nav-strategy">
+      <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 017 7c0 3.5-2 6.5-5 7.5V19h-4v-2.5C7 15.5 5 12.5 5 9a7 7 0 017-7z"/><line x1="10" y1="22" x2="14" y2="22"/></svg>
+      Strategy
+    </button>
+    <button class="nav-btn dad-sect" onclick="showPage('dad-progress')" id="nav-dad-progress">
+      <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      My Game
+    </button>
+    <button class="nav-btn son-sect" onclick="showPage('son-progress')" id="nav-son-progress">
+      <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      My Game
+    </button>
+
   </nav>
 
 </div><!-- /app -->
 
 <script>
+
+  // ── SUPABASE ─────────────────────────────────────────────────
+  const SUPABASE_URL  = 'https://zairvjyiwhajsulefyoi.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphaXJ2anlpd2hhanN1bGVmeW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMDkxODAsImV4cCI6MjA5MTY4NTE4MH0.AAdJfqSGHMergPgL4tEoBMn0Wr5d8D1NuxhPMonp_60';
+  const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  // ── SUPABASE HELPERS ─────────────────────────────────────────
+  async function saveDadRound(round) {
+    const { error } = await _sb.from('dad_rounds').insert([round]);
+    if (error) throw error;
+  }
+  async function loadDadRounds() {
+    const { data, error } = await _sb
+      .from('dad_rounds').select('*')
+      .order('date_played', { ascending: false }).limit(50);
+    if (error) throw error;
+    return data;
+  }
+  async function deleteDadRound(id) {
+    const { error } = await _sb.from('dad_rounds').delete().eq('id', id);
+    if (error) throw error;
+  }
+  async function saveSonRound(round) {
+    const { error } = await _sb.from('son_rounds').insert([round]);
+    if (error) throw error;
+  }
+  async function loadSonRounds() {
+    const { data, error } = await _sb
+      .from('son_rounds').select('*')
+      .order('date_played', { ascending: false }).limit(50);
+    if (error) throw error;
+    return data;
+  }
+  async function deleteSonRound(id) {
+    const { error } = await _sb.from('son_rounds').delete().eq('id', id);
+    if (error) throw error;
+  }
+
+  // ── TOAST ────────────────────────────────────────────────────
+  function showToast(msg, type = 'success') {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = `
+      position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+      background:${type==='success'?'var(--green)':'var(--red)'};
+      color:var(--cream);padding:10px 20px;border-radius:20px;
+      font-size:0.85rem;font-weight:600;z-index:9999;
+      box-shadow:0 4px 20px rgba(0,0,0,0.4);transition:opacity 0.4s;
+    `;
+    document.body.appendChild(t);
+    setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),400);},2500);
+  }
 
 
   // ── PROFILE SWITCHER ─────────────────────────────────────────
@@ -3242,10 +3522,29 @@
     document.querySelectorAll('.exp-body.open').forEach(b => b.classList.remove('open'));
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('page-' + id).classList.add('active');
-    document.getElementById('nav-' + id).classList.add('active');
-    // Scroll to top
-    document.getElementById('page-' + id).scrollTop = 0;
+    const pageEl = document.getElementById('page-' + id);
+    if (!pageEl) return;
+    pageEl.classList.add('active');
+    const navEl = document.getElementById('nav-' + id);
+    if (navEl) navEl.classList.add('active');
+    pageEl.scrollTop = 0;
+    // PIN-gated pages
+    if (id === 'dad-progress') {
+      if (sessionStorage.getItem('sv-dad-unlocked') !== '1') {
+        document.getElementById('dad-pin-overlay').style.display = 'flex';
+      } else {
+        document.getElementById('dad-pin-overlay').style.display = 'none';
+        loadDadRoundsAndRender();
+      }
+    }
+    if (id === 'son-progress') {
+      if (sessionStorage.getItem('sv-son-unlocked') !== '1') {
+        document.getElementById('son-pin-overlay').style.display = 'flex';
+      } else {
+        document.getElementById('son-pin-overlay').style.display = 'none';
+        loadSonRoundsAndRender();
+      }
+    }
   }
 
   // ── STORAGE HELPERS ──────────────────────────────────────────
@@ -3394,7 +3693,7 @@
   // Bump BUILD_ID with every deploy. App checks on load — if version
   // changed, SW caches are cleared and page reloads. localStorage
   // (logs, notes, profile) is never touched.
-  const BUILD_ID = '2026-04-02-v28';
+  const BUILD_ID = '2026-04-13-v29';
   (function checkBuild() {
     const prev = localStorage.getItem('sv-build');
     if (prev && prev !== BUILD_ID) {
@@ -3426,6 +3725,667 @@
   loadNotes();
   setTodayDate();
   updateOfflineBadge();
+
+  // ── COURSES LIST ─────────────────────────────────────────────
+  const COURSES = [
+    { name: 'Temecula Creek Inn — Creek Course', par: 72, holes: 18 },
+    { name: 'Temecula Creek Inn — Oaks Course', par: 72, holes: 18 },
+    { name: 'Temecula Creek Inn — Stone Course', par: 72, holes: 18 },
+    { name: 'Pechanga Golf Course', par: 72, holes: 18 },
+    { name: 'Welk Resort — Fountains Course', par: 72, holes: 18 },
+    { name: 'Welk Resort — Oaks Course', par: 29, holes: 9 },
+    { name: 'CrossCreek Golf Club', par: 71, holes: 18 },
+    { name: 'Redhawk Golf Club', par: 72, holes: 18 },
+    { name: 'Bear Creek Golf Club', par: 72, holes: 18 },
+    { name: 'Custom', par: 72, holes: 18 },
+  ];
+
+  // ── DAD PIN ───────────────────────────────────────────────────
+  let _dadPin = '';
+  function dadPinKey(d) {
+    if (_dadPin.length >= 4) return;
+    _dadPin += d;
+    updatePinDots('dad', _dadPin.length);
+    if (_dadPin.length === 4) {
+      if (_dadPin === '4417') {
+        sessionStorage.setItem('sv-dad-unlocked', '1');
+        document.getElementById('dad-pin-overlay').style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('dad-pin-overlay').style.display = 'none';
+          document.getElementById('dad-pin-overlay').style.opacity = '1';
+          loadDadRoundsAndRender();
+        }, 300);
+      } else {
+        const dotsEl = document.getElementById('dad-pin-dots');
+        dotsEl.classList.add('pin-shake');
+        setTimeout(() => dotsEl.classList.remove('pin-shake'), 400);
+        const errEl = document.getElementById('dad-pin-error');
+        errEl.style.opacity = '1';
+        setTimeout(() => errEl.style.opacity = '0', 1500);
+        _dadPin = '';
+        updatePinDots('dad', 0);
+      }
+    }
+  }
+  function dadPinBackspace() {
+    _dadPin = _dadPin.slice(0, -1);
+    updatePinDots('dad', _dadPin.length);
+  }
+  function updatePinDots(who, count) {
+    for (let i = 0; i < 4; i++) {
+      const dot = document.getElementById(who + '-dot-' + i);
+      if (dot) dot.classList.toggle('filled', i < count);
+    }
+  }
+
+  // ── SON PIN ───────────────────────────────────────────────────
+  let _sonPin = '';
+  function sonPinKey(d) {
+    if (_sonPin.length >= 4) return;
+    _sonPin += d;
+    updatePinDots('son', _sonPin.length);
+    if (_sonPin.length === 4) {
+      if (_sonPin === '4417') {
+        sessionStorage.setItem('sv-son-unlocked', '1');
+        document.getElementById('son-pin-overlay').style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('son-pin-overlay').style.display = 'none';
+          document.getElementById('son-pin-overlay').style.opacity = '1';
+          loadSonRoundsAndRender();
+        }, 300);
+      } else {
+        const dotsEl = document.getElementById('son-pin-dots');
+        dotsEl.classList.add('pin-shake');
+        setTimeout(() => dotsEl.classList.remove('pin-shake'), 400);
+        const errEl = document.getElementById('son-pin-error');
+        errEl.style.opacity = '1';
+        setTimeout(() => errEl.style.opacity = '0', 1500);
+        _sonPin = '';
+        updatePinDots('son', 0);
+      }
+    }
+  }
+  function sonPinBackspace() {
+    _sonPin = _sonPin.slice(0, -1);
+    updatePinDots('son', _sonPin.length);
+  }
+
+  // ── DAD ROUND RENDER ─────────────────────────────────────────
+  async function loadDadRoundsAndRender() {
+    const listEl = document.getElementById('dad-history-list');
+    listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">Loading your rounds... ⏳</div>';
+    try {
+      const rounds = await loadDadRounds();
+      renderDadHistory(rounds);
+    } catch(e) {
+      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:0.85rem;">Could not connect — check your signal</div>';
+    }
+  }
+
+  function renderDadHistory(rounds) {
+    const listEl = document.getElementById('dad-history-list');
+    const statsBar = document.getElementById('dad-stats-bar');
+    if (!rounds || rounds.length === 0) {
+      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet. Tap 'Start New Round' after your next game. 🏌️</div>';
+      statsBar.style.display = 'none';
+      return;
+    }
+    // Stats
+    if (rounds.length >= 3) {
+      statsBar.style.display = '';
+      const avg = Math.round(rounds.reduce((a,r) => a + r.total_score, 0) / rounds.length);
+      const best = rounds.reduce((a,r) => r.total_score < a.total_score ? r : a);
+      const putts = rounds.filter(r => r.holes).map(r => {
+        const holes = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]');
+        return holes.reduce((a,h) => a + (h.putts||0), 0);
+      });
+      const avgPutts = putts.length ? Math.round(putts.reduce((a,b)=>a+b,0)/putts.length) : '—';
+      document.getElementById('dad-stats-row').innerHTML = `
+        <div class="stat"><div class="stat-num">${rounds.length}</div><div class="stat-lbl">Rounds</div></div>
+        <div class="stat"><div class="stat-num">${avg}</div><div class="stat-lbl">Avg Score</div></div>
+        <div class="stat"><div class="stat-num">${best.total_score}</div><div class="stat-lbl">Best Round</div></div>
+        <div class="stat"><div class="stat-num">${avgPutts}</div><div class="stat-lbl">Avg Putts</div></div>
+      `;
+    } else {
+      statsBar.style.display = 'none';
+    }
+    listEl.innerHTML = rounds.map((r, idx) => {
+      const d = new Date(r.date_played + 'T12:00:00');
+      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const diff = r.score_vs_par >= 0 ? '+' + r.score_vs_par : r.score_vs_par;
+      const badgeClass = r.total_score < 90 ? 'green' : r.total_score <= 99 ? 'gold' : 'red';
+      const holes = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]');
+      const holeGrid = holes.map(h => `<div class="hole-cell"><div class="h-num">${h.hole}</div><div class="h-score">${h.score}</div><div class="h-par">p${h.par}</div></div>`).join('');
+      const ref = r.reflection ? (typeof r.reflection === 'string' ? JSON.parse(r.reflection) : r.reflection) : {};
+      const fairways = holes.filter(h => h.fairway === 'yes').length;
+      const gir = holes.filter(h => h.gir).length;
+      const totalPutts = holes.reduce((a,h) => a + (h.putts||0), 0);
+      const stars = '⭐'.repeat(r.stars || 0);
+      return `
+        <div class="round-card" id="dad-round-${idx}">
+          <div class="round-card-header" onclick="toggleRoundExpand('dad-round-${idx}')">
+            <div class="round-card-left">
+              <div class="round-card-date">${dateStr}</div>
+              <div class="round-card-course">${r.course_name}</div>
+            </div>
+            <div class="round-card-right">
+              <div class="round-badge ${badgeClass}">${r.total_score} <span style="font-size:0.75rem;opacity:0.7;">(${diff})</span></div>
+            </div>
+          </div>
+          <div class="round-card-expand" id="dad-round-${idx}-expand">
+            <div class="hole-grid">${holeGrid}</div>
+            <div style="margin-bottom:8px;">🏌️ <strong>Putts:</strong> ${totalPutts} &nbsp; ⛳ <strong>Fairways:</strong> ${fairways} &nbsp; 🎯 <strong>GIR:</strong> ${gir}</div>
+            ${r.stars ? '<div style="margin-bottom:8px;">' + stars + '</div>' : ''}
+            ${ref.worked ? '<div style="margin-bottom:6px;">✅ <em>' + ref.worked + '</em></div>' : ''}
+            ${ref.fix ? '<div style="margin-bottom:6px;">🔧 <em>' + ref.fix + '</em></div>' : ''}
+            ${ref.best ? '<div style="margin-bottom:6px;">🏆 <em>' + ref.best + '</em></div>' : ''}
+            ${ref.worst ? '<div style="margin-bottom:6px;">❌ <em>' + ref.worst + '</em></div>' : ''}
+            <button class="round-delete-btn" onclick="confirmDeleteDadRound('${r.id}')">Delete Round</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function toggleRoundExpand(id) {
+    const exp = document.getElementById(id + '-expand');
+    if (exp) exp.classList.toggle('open');
+  }
+
+  async function confirmDeleteDadRound(id) {
+    if (!confirm('Delete this round?')) return;
+    try {
+      await deleteDadRound(id);
+      showToast('Round deleted');
+      loadDadRoundsAndRender();
+    } catch(e) {
+      showToast('Delete failed — check your signal', 'error');
+    }
+  }
+
+  // ── SON ROUND RENDER ─────────────────────────────────────────
+  async function loadSonRoundsAndRender() {
+    const listEl = document.getElementById('son-history-list');
+    listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">Loading your rounds... ⏳</div>';
+    try {
+      const rounds = await loadSonRounds();
+      renderSonHistory(rounds);
+    } catch(e) {
+      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:0.85rem;">Could not connect — check your signal</div>';
+    }
+  }
+
+  function renderSonHistory(rounds) {
+    const listEl = document.getElementById('son-history-list');
+    if (!rounds || rounds.length === 0) {
+      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet. Tap 'Start New Round' after your next game. 🏌️</div>';
+      return;
+    }
+    listEl.innerHTML = rounds.map((r, idx) => {
+      const d = new Date(r.date_played + 'T12:00:00');
+      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const diff = r.score_vs_par >= 0 ? '+' + r.score_vs_par : r.score_vs_par;
+      const badgeClass = r.total_score < 90 ? 'green' : r.total_score <= 99 ? 'gold' : 'red';
+      const holes = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]');
+      const holeGrid = holes.map(h => `<div class="hole-cell"><div class="h-num">${h.hole}</div><div class="h-score">${h.score}</div><div class="h-par">p${h.par}</div></div>`).join('');
+      const ref = r.reflection ? (typeof r.reflection === 'string' ? JSON.parse(r.reflection) : r.reflection) : {};
+      return `
+        <div class="round-card" id="son-round-${idx}">
+          <div class="round-card-header" onclick="toggleRoundExpand('son-round-${idx}')">
+            <div class="round-card-left">
+              <div class="round-card-date">${dateStr}</div>
+              <div class="round-card-course">${r.course_name}</div>
+            </div>
+            <div class="round-card-right">
+              <div class="round-badge ${badgeClass}">${r.total_score} <span style="font-size:0.75rem;opacity:0.7;">(${diff})</span></div>
+            </div>
+          </div>
+          <div class="round-card-expand" id="son-round-${idx}-expand">
+            <div class="hole-grid">${holeGrid}</div>
+            ${ref.best_hole ? '<div style="margin-bottom:6px;">🏆 <em>' + ref.best_hole + '</em></div>' : ''}
+            ${ref.remember ? '<div style="margin-bottom:6px;">📝 <em>' + ref.remember + '</em></div>' : ''}
+            <button class="round-delete-btn" onclick="confirmDeleteSonRound('${r.id}')">Delete Round</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  async function confirmDeleteSonRound(id) {
+    if (!confirm('Delete this round?')) return;
+    try {
+      await deleteSonRound(id);
+      showToast('Round deleted');
+      loadSonRoundsAndRender();
+    } catch(e) {
+      showToast('Delete failed — check your signal', 'error');
+    }
+  }
+
+  // ── DAD ROUND MODAL ─────────────────────────────────────────
+  let _dadRound = {};
+  let _dadHoles = [];
+  let _dadHoleIdx = 0;
+  let _dadStep = 'setup'; // 'setup' | 'holes' | 'reflection'
+
+  function openDadModal() {
+    _dadRound = {};
+    _dadHoles = [];
+    _dadHoleIdx = 0;
+    _dadStep = 'setup';
+    document.getElementById('dad-modal').style.display = 'block';
+    document.getElementById('dad-running-total').style.display = 'none';
+    renderDadModalSetup();
+  }
+  function closeDadModal() {
+    document.getElementById('dad-modal').style.display = 'none';
+  }
+
+  function renderDadModalSetup() {
+    document.getElementById('dad-modal-step-label').textContent = 'Round Setup';
+    const today = new Date().toISOString().split('T')[0];
+    const courseOpts = COURSES.map((c,i) => `<option value="${i}">${c.name} (par ${c.par})</option>`).join('');
+    document.getElementById('dad-modal-body').innerHTML = `
+      <label class="modal-label">Date</label>
+      <input type="date" id="dm-date" class="modal-input" value="${today}">
+      <label class="modal-label">Course</label>
+      <select id="dm-course" class="modal-input" onchange="dadCourseChange(this.value)">
+        ${courseOpts}
+      </select>
+      <div id="dm-custom-wrap" style="display:none;">
+        <input type="text" id="dm-custom-name" class="modal-input" placeholder="Course name">
+        <div style="display:flex;gap:10px;">
+          <input type="number" id="dm-custom-par" class="modal-input" placeholder="Par (e.g. 72)" style="flex:1;">
+          <select id="dm-custom-holes" class="modal-input" style="flex:1;">
+            <option value="18">18 holes</option>
+            <option value="9">9 holes</option>
+          </select>
+        </div>
+      </div>
+      <label class="modal-label">Tee Color</label>
+      <div class="pill-row" id="dm-tee-pills">
+        <div class="pill active" onclick="selectPill(this,'dm-tee-pills')" data-val="White">White</div>
+        <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="Gold">Gold</div>
+        <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="Red">Red</div>
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:10px;" onclick="dadStartRound()">Start Round →</button>
+    `;
+  }
+
+  function dadCourseChange(val) {
+    const custom = document.getElementById('dm-custom-wrap');
+    custom.style.display = parseInt(val) === COURSES.length - 1 ? 'block' : 'none';
+  }
+
+  function selectPill(el, groupId) {
+    document.querySelectorAll('#' + groupId + ' .pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function dadStartRound() {
+    const courseIdx = parseInt(document.getElementById('dm-course').value);
+    let course = COURSES[courseIdx];
+    let courseName = course.name;
+    let coursePar = course.par;
+    let numHoles = course.holes;
+    if (courseIdx === COURSES.length - 1) {
+      courseName = document.getElementById('dm-custom-name').value.trim() || 'Custom Course';
+      coursePar = parseInt(document.getElementById('dm-custom-par').value) || 72;
+      numHoles = parseInt(document.getElementById('dm-custom-holes').value) || 18;
+    }
+    const tee = document.querySelector('#dm-tee-pills .pill.active')?.dataset.val || 'White';
+    _dadRound = {
+      date_played: document.getElementById('dm-date').value,
+      course_name: courseName,
+      course_par: coursePar,
+      tee_color: tee,
+      total_score: 0,
+      score_vs_par: 0,
+    };
+    _dadHoles = [];
+    _dadHoleIdx = 0;
+    const holePar = Math.round(coursePar / numHoles);
+    for (let i = 1; i <= numHoles; i++) {
+      _dadHoles.push({ hole: i, par: holePar, score: holePar, fairway: 'no', gir: false, putts: 2 });
+    }
+    document.getElementById('dad-running-total').style.display = '';
+    renderDadHole();
+  }
+
+  function renderDadHole() {
+    const h = _dadHoles[_dadHoleIdx];
+    const total = _dadHoles.slice(0, _dadHoleIdx).reduce((a, x) => a + x.score, 0) + h.score;
+    document.getElementById('dad-running-total').textContent = total;
+    document.getElementById('dad-modal-step-label').textContent = `Hole ${_dadHoleIdx + 1} of ${_dadHoles.length}`;
+    const isLast = _dadHoleIdx === _dadHoles.length - 1;
+    document.getElementById('dad-modal-body').innerHTML = `
+      <div class="hole-score-block">
+        <div class="hole-number-big">HOLE ${h.hole}</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px;">
+          Par:
+          <button class="stepper-btn" style="width:36px;height:36px;font-size:1rem;" onclick="dadHolePar(-1)">−</button>
+          <span style="font-size:1.1rem;color:var(--cream);margin:0 8px;" id="dh-par">${h.par}</span>
+          <button class="stepper-btn" style="width:36px;height:36px;font-size:1rem;" onclick="dadHolePar(1)">+</button>
+        </div>
+        <label class="modal-label" style="align-self:flex-start;">Score</label>
+        <div class="score-stepper">
+          <button class="stepper-btn" onclick="dadHoleScore(-1)">−</button>
+          <div class="score-val" id="dh-score">${h.score}</div>
+          <button class="stepper-btn" onclick="dadHoleScore(1)">+</button>
+        </div>
+      </div>
+      <label class="modal-label">Fairway Hit?</label>
+      <div class="pill-row" id="dh-fairway-pills">
+        <div class="pill ${h.fairway==='yes'?'active':''}" onclick="selectPill(this,'dh-fairway-pills')" data-val="yes">Yes</div>
+        <div class="pill ${h.fairway==='no'?'active':''}" onclick="selectPill(this,'dh-fairway-pills')" data-val="no">No</div>
+        <div class="pill ${h.par===3?'active':''}" onclick="selectPill(this,'dh-fairway-pills')" data-val="par3">Par 3</div>
+      </div>
+      <label class="modal-label">Green in Regulation?</label>
+      <div class="pill-row" id="dh-gir-pills">
+        <div class="pill ${h.gir?'active':''}" onclick="selectPill(this,'dh-gir-pills')" data-val="yes">Yes</div>
+        <div class="pill ${!h.gir?'active':''}" onclick="selectPill(this,'dh-gir-pills')" data-val="no">No</div>
+      </div>
+      <label class="modal-label">Putts: <span id="dh-putts-val">${h.putts}</span></label>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <button class="stepper-btn" style="width:40px;height:40px;" onclick="dadHolePutts(-1)">−</button>
+        <div style="font-size:1.3rem;font-weight:700;color:var(--cream);" id="dh-putts-big">${h.putts}</div>
+        <button class="stepper-btn" style="width:40px;height:40px;" onclick="dadHolePutts(1)">+</button>
+      </div>
+      <div class="modal-nav-row">
+        <button class="btn-ghost" onclick="dadHoleBack()" ${_dadHoleIdx===0?'disabled style="opacity:0.3;"':''}>← Back</button>
+        <button class="btn-gold" onclick="dadHoleNext()">${isLast ? 'Finish Round →' : 'Next Hole →'}</button>
+      </div>
+    `;
+  }
+
+  function dadHoleScore(delta) {
+    const h = _dadHoles[_dadHoleIdx];
+    h.score = Math.max(1, h.score + delta);
+    document.getElementById('dh-score').textContent = h.score;
+    const total = _dadHoles.slice(0, _dadHoleIdx).reduce((a, x) => a + x.score, 0) + h.score;
+    document.getElementById('dad-running-total').textContent = total;
+  }
+  function dadHolePar(delta) {
+    const h = _dadHoles[_dadHoleIdx];
+    h.par = Math.max(3, Math.min(5, h.par + delta));
+    document.getElementById('dh-par').textContent = h.par;
+  }
+  function dadHolePutts(delta) {
+    const h = _dadHoles[_dadHoleIdx];
+    h.putts = Math.max(0, Math.min(6, h.putts + delta));
+    document.getElementById('dh-putts-val').textContent = h.putts;
+    document.getElementById('dh-putts-big').textContent = h.putts;
+  }
+  function dadHoleSave() {
+    const h = _dadHoles[_dadHoleIdx];
+    h.fairway = document.querySelector('#dh-fairway-pills .pill.active')?.dataset.val || 'no';
+    h.gir = document.querySelector('#dh-gir-pills .pill.active')?.dataset.val === 'yes';
+  }
+  function dadHoleNext() {
+    dadHoleSave();
+    if (_dadHoleIdx === _dadHoles.length - 1) {
+      renderDadReflection();
+    } else {
+      _dadHoleIdx++;
+      renderDadHole();
+    }
+  }
+  function dadHoleBack() {
+    dadHoleSave();
+    if (_dadHoleIdx > 0) { _dadHoleIdx--; renderDadHole(); }
+  }
+
+  let _dadStars = 0;
+  function renderDadReflection() {
+    document.getElementById('dad-running-total').style.display = 'none';
+    const total = _dadHoles.reduce((a, h) => a + h.score, 0);
+    const par = _dadRound.course_par;
+    const diff = total - par;
+    const diffStr = diff >= 0 ? '+' + diff : '' + diff;
+    let motivational = '';
+    if (total < 90) motivational = 'SUB-90! The goal is done. 🏆';
+    else if (total <= 95) motivational = "You're right there. Sub-90 is one clean round away. 🔥";
+    else if (total <= 100) motivational = 'Solid round. Keep eliminating the doubles. 💪';
+    else if (total <= 110) motivational = 'Good data. Every round teaches you something. 🎯';
+    else motivational = 'Every round on the course beats one off it. Keep going. ⛳';
+    _dadStars = 0;
+    document.getElementById('dad-modal-step-label').textContent = 'Post-Round';
+    document.getElementById('dad-modal-body').innerHTML = `
+      <div class="score-summary-card">
+        <div class="score-summary-score">${total}</div>
+        <div class="score-summary-line">You shot ${total} — ${diffStr} on ${_dadRound.course_name}</div>
+        <div class="score-motivational">${motivational}</div>
+      </div>
+      <label class="modal-label">Star Rating</label>
+      <div class="star-row">
+        <span class="star-btn" onclick="dadSetStar(1)" id="dstar-1">⭐</span>
+        <span class="star-btn" onclick="dadSetStar(2)" id="dstar-2">⭐</span>
+        <span class="star-btn" onclick="dadSetStar(3)" id="dstar-3">⭐</span>
+        <span class="star-btn" onclick="dadSetStar(4)" id="dstar-4">⭐</span>
+        <span class="star-btn" onclick="dadSetStar(5)" id="dstar-5">⭐</span>
+      </div>
+      <label class="modal-label">🏆 Best moment this round</label>
+      <textarea id="dr-best" class="modal-input" rows="2" placeholder="Your best moment..."></textarea>
+      <label class="modal-label">❌ Biggest mistake / worst hole</label>
+      <textarea id="dr-worst" class="modal-input" rows="2" placeholder="What went wrong..."></textarea>
+      <label class="modal-label">✅ One thing that worked</label>
+      <textarea id="dr-worked" class="modal-input" rows="2" placeholder="What clicked..."></textarea>
+      <label class="modal-label">🔧 One thing to fix next time</label>
+      <textarea id="dr-fix" class="modal-input" rows="2" placeholder="Focus for next round..."></textarea>
+      <button class="btn-primary" style="width:100%;margin-top:8px;" onclick="saveDadRoundFull()">Save Round</button>
+    `;
+  }
+  function dadSetStar(n) {
+    _dadStars = n;
+    for (let i = 1; i <= 5; i++) {
+      const el = document.getElementById('dstar-' + i);
+      if (el) el.classList.toggle('lit', i <= n);
+    }
+  }
+  async function saveDadRoundFull() {
+    const total = _dadHoles.reduce((a, h) => a + h.score, 0);
+    const roundObj = {
+      date_played: _dadRound.date_played,
+      course_name: _dadRound.course_name,
+      course_par: _dadRound.course_par,
+      tee_color: _dadRound.tee_color,
+      total_score: total,
+      score_vs_par: total - _dadRound.course_par,
+      holes: _dadHoles,
+      reflection: {
+        best: document.getElementById('dr-best').value.trim(),
+        worst: document.getElementById('dr-worst').value.trim(),
+        worked: document.getElementById('dr-worked').value.trim(),
+        fix: document.getElementById('dr-fix').value.trim(),
+        stars: _dadStars
+      },
+      stars: _dadStars
+    };
+    const saveBtn = document.querySelector('#dad-modal-body .btn-primary');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
+    try {
+      await saveDadRound(roundObj);
+      showToast('Round saved! ✓');
+      closeDadModal();
+      loadDadRoundsAndRender();
+    } catch(e) {
+      showToast('Save failed — check your signal', 'error');
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Round'; }
+    }
+  }
+
+  // ── SON ROUND MODAL ─────────────────────────────────────────
+  let _sonRound = {};
+  let _sonHoles = [];
+  let _sonHoleIdx = 0;
+
+  function openSonModal() {
+    _sonRound = {};
+    _sonHoles = [];
+    _sonHoleIdx = 0;
+    document.getElementById('son-modal').style.display = 'block';
+    document.getElementById('son-running-total').style.display = 'none';
+    renderSonModalSetup();
+  }
+  function closeSonModal() {
+    document.getElementById('son-modal').style.display = 'none';
+  }
+
+  function renderSonModalSetup() {
+    document.getElementById('son-modal-step-label').textContent = 'Round Setup';
+    const today = new Date().toISOString().split('T')[0];
+    const courseOpts = COURSES.map((c,i) => `<option value="${i}">${c.name} (par ${c.par})</option>`).join('');
+    document.getElementById('son-modal-body').innerHTML = `
+      <label class="modal-label">Date</label>
+      <input type="date" id="sm-date" class="modal-input" value="${today}">
+      <label class="modal-label">Course</label>
+      <select id="sm-course" class="modal-input" onchange="sonCourseChange(this.value)">
+        ${courseOpts}
+      </select>
+      <div id="sm-custom-wrap" style="display:none;">
+        <input type="text" id="sm-custom-name" class="modal-input" placeholder="Course name">
+        <div style="display:flex;gap:10px;">
+          <input type="number" id="sm-custom-par" class="modal-input" placeholder="Par (e.g. 72)" style="flex:1;">
+          <select id="sm-custom-holes" class="modal-input" style="flex:1;">
+            <option value="18">18 holes</option>
+            <option value="9">9 holes</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:10px;" onclick="sonStartRound()">Start Round →</button>
+    `;
+  }
+
+  function sonCourseChange(val) {
+    const custom = document.getElementById('sm-custom-wrap');
+    custom.style.display = parseInt(val) === COURSES.length - 1 ? 'block' : 'none';
+  }
+
+  function sonStartRound() {
+    const courseIdx = parseInt(document.getElementById('sm-course').value);
+    let course = COURSES[courseIdx];
+    let courseName = course.name;
+    let coursePar = course.par;
+    let numHoles = course.holes;
+    if (courseIdx === COURSES.length - 1) {
+      courseName = document.getElementById('sm-custom-name').value.trim() || 'Custom Course';
+      coursePar = parseInt(document.getElementById('sm-custom-par').value) || 72;
+      numHoles = parseInt(document.getElementById('sm-custom-holes').value) || 18;
+    }
+    _sonRound = {
+      date_played: document.getElementById('sm-date').value,
+      course_name: courseName,
+      course_par: coursePar,
+    };
+    _sonHoles = [];
+    _sonHoleIdx = 0;
+    const holePar = Math.round(coursePar / numHoles);
+    for (let i = 1; i <= numHoles; i++) {
+      _sonHoles.push({ hole: i, par: holePar, score: holePar });
+    }
+    document.getElementById('son-running-total').style.display = '';
+    renderSonHole();
+  }
+
+  function renderSonHole() {
+    const h = _sonHoles[_sonHoleIdx];
+    const total = _sonHoles.slice(0, _sonHoleIdx).reduce((a, x) => a + x.score, 0) + h.score;
+    document.getElementById('son-running-total').textContent = total;
+    document.getElementById('son-modal-step-label').textContent = `Hole ${_sonHoleIdx + 1} of ${_sonHoles.length}`;
+    const isLast = _sonHoleIdx === _sonHoles.length - 1;
+    document.getElementById('son-modal-body').innerHTML = `
+      <div class="hole-score-block">
+        <div class="hole-number-big">HOLE ${h.hole}</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px;">
+          Par:
+          <button class="stepper-btn" style="width:36px;height:36px;font-size:1rem;" onclick="sonHolePar(-1)">−</button>
+          <span style="font-size:1.1rem;color:var(--cream);margin:0 8px;" id="sh-par">${h.par}</span>
+          <button class="stepper-btn" style="width:36px;height:36px;font-size:1rem;" onclick="sonHolePar(1)">+</button>
+        </div>
+        <label class="modal-label" style="align-self:flex-start;">Score</label>
+        <div class="score-stepper">
+          <button class="stepper-btn" onclick="sonHoleScore(-1)">−</button>
+          <div class="score-val" id="sh-score">${h.score}</div>
+          <button class="stepper-btn" onclick="sonHoleScore(1)">+</button>
+        </div>
+      </div>
+      <div class="modal-nav-row">
+        <button class="btn-ghost" onclick="sonHoleBack()" ${_sonHoleIdx===0?'disabled style="opacity:0.3;"':''}>← Back</button>
+        <button class="btn-gold" onclick="sonHoleNext()">${isLast ? 'Finish Round →' : 'Next Hole →'}</button>
+      </div>
+    `;
+  }
+
+  function sonHoleScore(delta) {
+    const h = _sonHoles[_sonHoleIdx];
+    h.score = Math.max(1, h.score + delta);
+    document.getElementById('sh-score').textContent = h.score;
+    const total = _sonHoles.slice(0, _sonHoleIdx).reduce((a, x) => a + x.score, 0) + h.score;
+    document.getElementById('son-running-total').textContent = total;
+  }
+  function sonHolePar(delta) {
+    const h = _sonHoles[_sonHoleIdx];
+    h.par = Math.max(3, Math.min(5, h.par + delta));
+    document.getElementById('sh-par').textContent = h.par;
+  }
+  function sonHoleNext() {
+    if (_sonHoleIdx === _sonHoles.length - 1) {
+      renderSonReflection();
+    } else {
+      _sonHoleIdx++;
+      renderSonHole();
+    }
+  }
+  function sonHoleBack() {
+    if (_sonHoleIdx > 0) { _sonHoleIdx--; renderSonHole(); }
+  }
+
+  function renderSonReflection() {
+    document.getElementById('son-running-total').style.display = 'none';
+    const total = _sonHoles.reduce((a, h) => a + h.score, 0);
+    const par = _sonRound.course_par;
+    const diff = total - par;
+    const diffStr = diff >= 0 ? '+' + diff : '' + diff;
+    document.getElementById('son-modal-step-label').textContent = 'Post-Round';
+    document.getElementById('son-modal-body').innerHTML = `
+      <div class="score-summary-card">
+        <div class="score-summary-score">${total}</div>
+        <div class="score-summary-line">You shot ${total} — ${diffStr} over par</div>
+      </div>
+      <label class="modal-label">🏆 Best hole this round</label>
+      <textarea id="sr-best" class="modal-input" rows="2" placeholder="Your best hole..."></textarea>
+      <label class="modal-label">📝 Anything to remember?</label>
+      <textarea id="sr-remember" class="modal-input" rows="2" placeholder="Notes for next time..."></textarea>
+      <button class="btn-primary" style="width:100%;margin-top:8px;" onclick="saveSonRoundFull()">Save Round</button>
+    `;
+  }
+
+  async function saveSonRoundFull() {
+    const total = _sonHoles.reduce((a, h) => a + h.score, 0);
+    const roundObj = {
+      date_played: _sonRound.date_played,
+      course_name: _sonRound.course_name,
+      course_par: _sonRound.course_par,
+      total_score: total,
+      score_vs_par: total - _sonRound.course_par,
+      holes: _sonHoles,
+      reflection: {
+        best_hole: document.getElementById('sr-best').value.trim(),
+        remember: document.getElementById('sr-remember').value.trim(),
+      }
+    };
+    const saveBtn = document.querySelector('#son-modal-body .btn-primary');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
+    try {
+      await saveSonRound(roundObj);
+      showToast('Round saved! ✓');
+      closeSonModal();
+      loadSonRoundsAndRender();
+    } catch(e) {
+      showToast('Save failed — check your signal', 'error');
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Round'; }
+    }
+  }
+
+
 </script>
 </body>
 </html>
