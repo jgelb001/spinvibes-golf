@@ -626,11 +626,15 @@
     .exp-trigger {
       display:flex; align-items:center; justify-content:space-between;
       cursor:pointer; user-select:none; -webkit-user-select:none;
-      margin-top:10px; padding-top:10px;
-      border-top:1px solid rgba(255,255,255,0.07);
-      font-size:0.72rem; color:var(--gold); font-weight:600;
+      margin-top:12px; padding:10px 12px;
+      border-radius: 8px;
+      background: rgba(201,168,76,0.07);
+      border:1px solid rgba(201,168,76,0.2);
+      font-size:0.75rem; color:var(--gold); font-weight:600;
       letter-spacing:0.5px; text-transform:uppercase;
+      min-height: 44px; /* comfortable tap target on mobile */
     }
+    .exp-trigger:active { background: rgba(201,168,76,0.15); }
     .exp-trigger svg { width:13px; height:13px; stroke:var(--gold); fill:none; stroke-width:2.5; transition:transform 0.25s; flex-shrink:0; }
     .exp-trigger.open svg { transform:rotate(180deg); }
     .exp-body { max-height:0; overflow:hidden; transition:max-height 0.45s ease; }
@@ -1020,6 +1024,32 @@
     .landing-card-grandma .landing-card-name { color: #d4af70; }
     .landing-card-grandma .landing-card-desc { color: #a78bca; }
 
+    /* ── PORTRAIT MOBILE FIXES ── */
+    @media (max-width: 599px) {
+      /* Keep topbar toggle visible on portrait — but slim it down to icon-only */
+      #modeToggle {
+        padding: 6px 8px;
+        margin-right: 0;
+        font-size: 1.1rem;
+        border-radius: 50%;
+        width: 34px; height: 34px;
+        justify-content: center;
+        gap: 0;
+      }
+      /* Compact profile pills on small screens */
+      .profile-pill {
+        font-size: 0.58rem;
+        padding: 4px 5px;
+        letter-spacing: 0;
+      }
+
+      /* Trim nav on portrait: hide Stretch, Short Game, Putt — max 5 tabs */
+      #nav-stretches, #nav-shortgame, #nav-putting { display: none; }
+    }
+
+    /* Float toggle never shown — mode toggle stays in topbar */
+    #floatToggle { display: none; }
+
     /* ── RESPONSIVE — DESKTOP / TABLET ── */
     @media (min-width: 600px) {
       body { background: #000; }
@@ -1212,6 +1242,55 @@
     .gps-dot.ready  { background: #4ade80; }
     .gps-dot.marked { background: var(--gold); }
 
+    /* ── PIN PAD ── */
+    .pin-dot {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid var(--muted);
+      background: transparent;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .pin-dot.filled {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+    .pin-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 72px);
+      gap: 14px;
+    }
+    .pin-key {
+      height: 72px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.3);
+      background: var(--surface2);
+      color: var(--cream);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: background 0.1s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .pin-key:active {
+      background: rgba(201,168,76,0.25);
+      transform: scale(0.92);
+    }
+    .pin-key-empty {
+      background: transparent !important;
+      border: none !important;
+      pointer-events: none;
+    }
+    .pin-key-del { font-size: 1.2rem; }
+    @keyframes pinShake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-8px); }
+      40%      { transform: translateX(8px); }
+      60%      { transform: translateX(-5px); }
+      80%      { transform: translateX(5px); }
+    }
+    .pin-shake { animation: pinShake 0.4s ease; }
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
@@ -1288,6 +1367,9 @@
       <div class="offline-badge" id="offlineBadge">● Offline Ready</div>
     </div>
   </div>
+
+  <!-- Floating mode toggle for portrait mobile -->
+  <button id="floatToggle" onclick="toggleMode()" title="Toggle light/dark mode">☀️</button>
 
   <!-- PAGES -->
   <div id="pages">
@@ -3732,7 +3814,10 @@
   function toggleMode() {
     const isLight = document.body.classList.toggle('light-mode');
     localStorage.setItem('svgolf-theme', isLight ? 'light' : 'dark');
-    document.getElementById('modeToggle').textContent = isLight ? '🌙' : '☀️';
+    const icon = isLight ? '🌙' : '☀️';
+    document.getElementById('modeToggle').textContent = icon;
+    const f = document.getElementById('floatToggle');
+    if (f) f.textContent = icon;
   }
 
   function initTheme() {
@@ -3740,6 +3825,8 @@
     if (saved === 'light') {
       document.body.classList.add('light-mode');
       document.getElementById('modeToggle').textContent = '🌙';
+      const f = document.getElementById('floatToggle');
+      if (f) f.textContent = '🌙';
     }
   }
 
