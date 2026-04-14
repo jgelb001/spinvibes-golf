@@ -1158,6 +1158,60 @@
       .guide-grid { grid-template-columns: repeat(4, 1fr); }
     }
 
+
+    /* ── LIVE GPS SCORECARD ── */
+    .live-distance-card {
+      background: var(--surface2);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 14px; padding: 16px 14px 12px; margin-bottom: 14px;
+    }
+    .live-yards {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem; color: var(--gold); line-height: 1; text-align: center;
+    }
+    .yardage-pill {
+      padding: 7px 11px; background: var(--surface3);
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
+      color: var(--cream); font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .yardage-pill.sv-active { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+    .mark-ball-btn {
+      background: var(--surface3); border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 10px; padding: 10px 12px; color: var(--gold-l);
+      font-size: 0.82rem; font-weight: 600; cursor: pointer;
+      white-space: nowrap; flex-shrink: 0; transition: all 0.15s;
+    }
+    .mark-ball-btn.marked {
+      background: rgba(45,106,63,0.35); border-color: var(--green-b); color: #4ade80;
+    }
+    .live-club-card {
+      background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(45,106,63,0.08));
+      border: 1px solid rgba(201,168,76,0.35); border-radius: 14px;
+      padding: 14px 16px; margin-bottom: 14px; text-align: center;
+    }
+    .live-club-name {
+      font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; color: var(--gold-l);
+      letter-spacing: 1px; line-height: 1; margin-bottom: 5px;
+    }
+    .live-club-note { font-size: 0.73rem; color: var(--muted); line-height: 1.4; }
+    .club-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .club-chip {
+      padding: 6px 10px; background: var(--surface3);
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
+      color: var(--muted); font-size: 0.72rem; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .club-chip.used {
+      background: rgba(45,106,63,0.35); border-color: var(--green-b); color: #4ade80;
+    }
+    .gps-dot {
+      display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+      background: var(--muted); margin-right: 4px; vertical-align: middle;
+    }
+    .gps-dot.ready  { background: #4ade80; }
+    .gps-dot.marked { background: var(--gold); }
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
@@ -3693,7 +3747,7 @@
   // Bump BUILD_ID with every deploy. App checks on load — if version
   // changed, SW caches are cleared and page reloads. localStorage
   // (logs, notes, profile) is never touched.
-  const BUILD_ID = '2026-04-13-v29';
+  const BUILD_ID = '2026-04-13-v30';
   (function checkBuild() {
     const prev = localStorage.getItem('sv-build');
     if (prev && prev !== BUILD_ID) {
@@ -3725,6 +3779,286 @@
   loadNotes();
   setTodayDate();
   updateOfflineBadge();
+
+
+  // ── CLUB SYSTEM ──────────────────────────────────────────────
+  const CLUBS = [
+    { name: 'Driver',    dist: 185 },
+    { name: '4-Hybrid',  dist: 155 },
+    { name: '6-iron',    dist: 140 },
+    { name: '7-iron',    dist: 130 },
+    { name: '8-iron',    dist: 118 },
+    { name: '9-iron',    dist: 107 },
+    { name: 'PW',        dist: 95  },
+    { name: 'Gap (50°)', dist: 82  },
+    { name: 'SW',        dist: 68  },
+  ];
+
+  function getClubDist(name) {
+    const saved = JSON.parse(localStorage.getItem('sv-clubs') || '{}');
+    const def   = CLUBS.find(c => c.name === name);
+    return saved[name] !== undefined ? saved[name] : (def ? def.dist : 100);
+  }
+
+  function recordClubHit(clubName, yards) {
+    if (!yards || yards < 10 || yards > 370) return;
+    const saved = JSON.parse(localStorage.getItem('sv-clubs') || '{}');
+    const n   = (saved[clubName + '_n'] || 0) + 1;
+    const old = saved[clubName] !== undefined
+      ? saved[clubName]
+      : (CLUBS.find(c => c.name === clubName)?.dist || 100);
+    saved[clubName]        = Math.round((old * (n - 1) + yards) / n);
+    saved[clubName + '_n'] = n;
+    localStorage.setItem('sv-clubs', JSON.stringify(saved));
+  }
+
+  function suggestClub(yards) {
+    if (!yards || yards < 1) return null;
+    const ranked = CLUBS.map(c => ({ ...c, avg: getClubDist(c.name) }))
+                        .sort((a, b) => a.avg - b.avg);
+    const canReach = ranked.filter(c => c.avg >= yards);
+    return canReach.length ? canReach[0] : ranked[ranked.length - 1];
+  }
+
+  function clubNote(club, yards) {
+    if (!club) return '';
+    const avg  = getClubDist(club.name);
+    const n    = JSON.parse(localStorage.getItem('sv-clubs') || '{}')[club.name + '_n'] || 0;
+    const diff = avg - yards;
+    if (n === 0)   return 'default estimate · no hits logged yet';
+    if (diff <= 4) return `tight fit — consider one more club · ${n} hit${n !== 1 ? 's' : ''} logged`;
+    return `avg ${avg} yds · ${diff} yds buffer · ${n} hit${n !== 1 ? 's' : ''} logged`;
+  }
+
+  // ── GPS ───────────────────────────────────────────────────────
+  let _gpsWatchId = null, _currentPos = null, _markedPos = null;
+  let _manualYards = null, _selectedApproachClub = null;
+
+  function startGPS() {
+    if (!('geolocation' in navigator)) return;
+    _currentPos = null; _markedPos = null; _manualYards = null; _selectedApproachClub = null;
+    _gpsWatchId = navigator.geolocation.watchPosition(
+      p => {
+        _currentPos = { lat: p.coords.latitude, lng: p.coords.longitude,
+                        acc: Math.round(p.coords.accuracy * 1.094) };
+        refreshGPSDisplay();
+      },
+      () => {},
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 3000 }
+    );
+  }
+
+  function stopGPS() {
+    if (_gpsWatchId !== null) {
+      navigator.geolocation.clearWatch(_gpsWatchId); _gpsWatchId = null;
+    }
+    _currentPos = null; _markedPos = null; _manualYards = null; _selectedApproachClub = null;
+  }
+
+  function markBall() {
+    if (!_currentPos) { showToast('GPS not ready — wait a moment', 'error'); return; }
+    _markedPos = { ..._currentPos };
+    const btn = document.querySelector('.mark-ball-btn');
+    if (btn) btn.classList.add('marked');
+    showToast('Ball marked ✓');
+    refreshGPSDisplay();
+  }
+
+  function refreshGPSDisplay() {
+    const yEl = document.getElementById('live-yards');
+    const aEl = document.getElementById('live-gps-acc');
+    if (!yEl) return;
+    if (_manualYards !== null) {
+      yEl.textContent = _manualYards;
+      if (aEl) aEl.innerHTML = '<span class="gps-dot marked"></span>manual entry';
+      refreshClubSuggestion(_manualYards); return;
+    }
+    if (!_currentPos) {
+      yEl.textContent = '—';
+      if (aEl) aEl.innerHTML = '<span class="gps-dot"></span>finding GPS…'; return;
+    }
+    if (!_markedPos) {
+      yEl.textContent = '—';
+      if (aEl) aEl.innerHTML = `<span class="gps-dot ready"></span>GPS ready (±${_currentPos.acc} yds) · tap Mark Ball at your ball`; return;
+    }
+    yEl.textContent = '—';
+    if (aEl) aEl.innerHTML = `<span class="gps-dot marked"></span>ball marked (±${_markedPos.acc} yds) · now enter yardage from a marker`;
+  }
+
+  function setManualYards(val) {
+    const n = parseInt(val);
+    if (!val || isNaN(n) || n < 1) {
+      _manualYards = null; refreshGPSDisplay();
+      const s = document.getElementById('live-club-suggest');
+      if (s) s.style.display = 'none'; return;
+    }
+    _manualYards = n; refreshGPSDisplay();
+    const s = document.getElementById('live-club-suggest');
+    if (s) s.style.display = '';
+  }
+
+  function tapYardage(y) {
+    _manualYards = y;
+    const inp = document.getElementById('live-yardage-input');
+    if (inp) inp.value = y;
+    document.querySelectorAll('.yardage-pill').forEach(p =>
+      p.classList.toggle('sv-active', parseInt(p.textContent) === y));
+    refreshGPSDisplay();
+    const s = document.getElementById('live-club-suggest');
+    if (s) s.style.display = '';
+  }
+
+  function refreshClubSuggestion(yards) {
+    const el = document.getElementById('live-club-suggest');
+    if (!el) return;
+    const club = suggestClub(yards);
+    if (!club) return;
+    const note = clubNote(club, yards);
+    el.innerHTML = `<div class="live-club-name">${club.name}</div>
+      <div class="live-club-note">${note} · aim fat side of green · boring golf 🧠</div>`;
+    document.querySelectorAll('.club-chip').forEach(c =>
+      c.classList.toggle('used', c.dataset.club === club.name && !_selectedApproachClub));
+  }
+
+  function toggleHoleDetails() {
+    const w = document.getElementById('hole-details-wrap');
+    const b = document.getElementById('details-toggle-btn');
+    if (!w) return;
+    const open = w.style.display === 'none';
+    w.style.display = open ? 'block' : 'none';
+    if (b) b.textContent = open
+      ? '− Hide details'
+      : '+ Details (fairway · GIR · putts · approach club)';
+  }
+
+  function selectApproachClub(el, clubName) {
+    _selectedApproachClub = clubName;
+    document.querySelectorAll('.club-chip').forEach(c => c.classList.remove('used'));
+    el.classList.add('used');
+  }
+
+  function renderDadLiveHole() {
+    const h      = _dadHoles[_dadHoleIdx];
+    const played = _dadHoles.slice(0, _dadHoleIdx);
+    const total  = played.reduce((a, x) => a + x.score, 0) + h.score;
+    const vsRaw  = played.reduce((a, x) => a + x.score - x.par, 0) + (h.score - h.par);
+    const vsStr  = vsRaw >= 0 ? '+' + vsRaw : '' + vsRaw;
+    const isLast = _dadHoleIdx === _dadHoles.length - 1;
+
+    document.getElementById('dad-modal-step-label').textContent = `Hole ${h.hole} / ${_dadHoles.length}`;
+    document.getElementById('dad-running-total').textContent    = `${total} (${vsStr})`;
+    document.getElementById('dad-running-total').style.display  = '';
+
+    const fw  = h.fairway === 'yes' ? 'active' : '';
+    const fno = h.fairway === 'no'  ? 'active' : '';
+    const fp3 = h.par === 3         ? 'active' : '';
+    const gy  = h.gir               ? 'active' : '';
+    const gn  = !h.gir              ? 'active' : '';
+    const parLabel  = h.par === 3 ? 'Par 3 🏹' : h.par === 5 ? 'Par 5 💪' : 'Par 4 ⛳';
+    const nextLabel = isLast ? 'Finish Round →' : 'Next Hole →';
+    const backAttr  = _dadHoleIdx === 0 ? 'disabled style="opacity:0.3;"' : '';
+    const chips = CLUBS.map(c =>
+      `<button class="club-chip${_selectedApproachClub === c.name ? ' used' : ''}" data-club="${c.name}" onclick="selectApproachClub(this,'${c.name}')">${c.name}</button>`
+    ).join('');
+
+    document.getElementById('dad-modal-body').innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:0.78rem;color:var(--muted);">${parLabel}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button class="stepper-btn" style="width:30px;height:30px;font-size:0.9rem;" onclick="dadHolePar(-1)">−</button>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--gold);">PAR <span id="dh-par">${h.par}</span></div>
+          <button class="stepper-btn" style="width:30px;height:30px;font-size:0.9rem;" onclick="dadHolePar(1)">+</button>
+        </div>
+      </div>
+      <div class="live-distance-card">
+        <div style="display:flex;align-items:baseline;justify-content:center;gap:6px;">
+          <div class="live-yards" id="live-yards">—</div>
+          <div style="font-size:1rem;color:var(--muted);padding-bottom:4px;">yds</div>
+        </div>
+        <div id="live-gps-acc" style="font-size:0.68rem;color:var(--muted);text-align:center;margin-bottom:10px;">
+          <span class="gps-dot"></span>finding GPS…
+        </div>
+        <div style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;">
+          <button class="yardage-pill" onclick="tapYardage(50)">50</button>
+          <button class="yardage-pill" onclick="tapYardage(75)">75</button>
+          <button class="yardage-pill" onclick="tapYardage(100)">100</button>
+          <button class="yardage-pill" onclick="tapYardage(125)">125</button>
+          <button class="yardage-pill" onclick="tapYardage(150)">150</button>
+          <button class="yardage-pill" onclick="tapYardage(175)">175</button>
+          <button class="yardage-pill" onclick="tapYardage(200)">200</button>
+          <button class="yardage-pill" onclick="tapYardage(225)">225</button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="number" id="live-yardage-input" class="modal-input"
+            placeholder="Type exact yardage…" inputmode="numeric"
+            style="margin-bottom:0;flex:1;text-align:center;font-size:1.1rem;font-weight:700;"
+            oninput="setManualYards(this.value)">
+          <button class="mark-ball-btn" onclick="markBall()">📍 Mark Ball</button>
+        </div>
+      </div>
+      <div class="live-club-card" id="live-club-suggest" style="display:none;"></div>
+      <div style="margin:6px 0 14px;text-align:center;">
+        <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Your Score</div>
+        <div class="score-stepper" style="justify-content:center;">
+          <button class="stepper-btn" onclick="dadHoleScore(-1)">−</button>
+          <div class="score-val" id="dh-score">${h.score}</div>
+          <button class="stepper-btn" onclick="dadHoleScore(1)">+</button>
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <button id="details-toggle-btn" onclick="toggleHoleDetails()"
+          style="background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;display:block;margin:0 auto;text-decoration:underline;">
+          + Details (fairway · GIR · putts · approach club)
+        </button>
+        <div id="hole-details-wrap" style="display:none;margin-top:12px;">
+          <label class="modal-label">Fairway Hit?</label>
+          <div class="pill-row" id="dh-fairway-pills">
+            <div class="pill ${fw}" onclick="selectPill(this,'dh-fairway-pills')" data-val="yes">Yes</div>
+            <div class="pill ${fno}" onclick="selectPill(this,'dh-fairway-pills')" data-val="no">No</div>
+            <div class="pill ${fp3}" onclick="selectPill(this,'dh-fairway-pills')" data-val="par3">Par 3</div>
+          </div>
+          <label class="modal-label">Green in Regulation?</label>
+          <div class="pill-row" id="dh-gir-pills">
+            <div class="pill ${gy}" onclick="selectPill(this,'dh-gir-pills')" data-val="yes">Yes</div>
+            <div class="pill ${gn}" onclick="selectPill(this,'dh-gir-pills')" data-val="no">No</div>
+          </div>
+          <label class="modal-label">Putts: <span id="dh-putts-val">${h.putts}</span></label>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+            <button class="stepper-btn" style="width:38px;height:38px;" onclick="dadHolePutts(-1)">−</button>
+            <div style="font-size:1.3rem;font-weight:700;color:var(--cream);" id="dh-putts-big">${h.putts}</div>
+            <button class="stepper-btn" style="width:38px;height:38px;" onclick="dadHolePutts(1)">+</button>
+          </div>
+          <label class="modal-label">Approach club used?</label>
+          <div class="club-chip-row">${chips}</div>
+        </div>
+      </div>
+      <div class="modal-nav-row">
+        <button class="btn-ghost" onclick="dadLiveBack()" ${backAttr}>← Back</button>
+        <button class="btn-gold" onclick="dadLiveNext()">${nextLabel}</button>
+      </div>
+    `;
+    if (_manualYards !== null) {
+      document.getElementById('live-yardage-input').value = _manualYards;
+      document.getElementById('live-club-suggest').style.display = '';
+      refreshClubSuggestion(_manualYards);
+    }
+    refreshGPSDisplay();
+  }
+
+  function dadLiveNext() {
+    dadHoleSave();
+    if (_selectedApproachClub && _manualYards) recordClubHit(_selectedApproachClub, _manualYards);
+    _selectedApproachClub = null; _manualYards = null;
+    if (_dadHoleIdx === _dadHoles.length - 1) { renderDadReflection(); }
+    else { _dadHoleIdx++; renderDadLiveHole(); }
+  }
+
+  function dadLiveBack() {
+    dadHoleSave();
+    _manualYards = null; _selectedApproachClub = null;
+    if (_dadHoleIdx > 0) { _dadHoleIdx--; renderDadLiveHole(); }
+  }
+
 
   // ── COURSES LIST ─────────────────────────────────────────────
   const COURSES = [
@@ -3977,6 +4311,7 @@
   }
   function closeDadModal() {
     document.getElementById('dad-modal').style.display = 'none';
+    stopGPS();
   }
 
   function renderDadModalSetup() {
@@ -4047,7 +4382,8 @@
       _dadHoles.push({ hole: i, par: holePar, score: holePar, fairway: 'no', gir: false, putts: 2 });
     }
     document.getElementById('dad-running-total').style.display = '';
-    renderDadHole();
+    startGPS();
+    renderDadLiveHole();
   }
 
   function renderDadHole() {
