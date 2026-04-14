@@ -3646,6 +3646,9 @@
     const bar = document.getElementById('sessionBar');
     const countEl = document.getElementById('sessionCount');
 
+    // Guard: elements may not exist on every page/profile
+    if (!bar || !countEl || !el) return;
+
     // Update progress bar (goal: 24 sessions over 6–8 weeks)
     const pct = Math.min((sessions.length / 24) * 100, 100);
     bar.style.width = pct + '%';
