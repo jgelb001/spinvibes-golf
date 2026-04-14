@@ -135,9 +135,14 @@
       display: flex;
       height: calc(var(--nav-h) + var(--safe-b));
       padding-bottom: var(--safe-b);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;  /* Firefox */
     }
+    #nav::-webkit-scrollbar { display: none; }  /* Chrome/Safari */
     .nav-btn {
-      flex: 1;
+      flex: 0 0 auto;
+      min-width: 64px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1043,8 +1048,7 @@
         letter-spacing: 0;
       }
 
-      /* Trim nav on portrait: hide Stretch, Short Game, Putt — max 5 tabs */
-      #nav-stretches, #nav-shortgame, #nav-putting { display: none; }
+      /* Nav scrolls horizontally — all tabs visible, no hiding needed */
     }
 
     /* Float toggle never shown — mode toggle stays in topbar */
@@ -1402,11 +1406,6 @@
           <div class="guide-card-title">Pre-Range Stretches</div>
           <div class="guide-card-sub">5–7 min warmup</div>
         </a>
-        <a class="guide-card" onclick="showPage('sss')">
-          <span class="guide-card-icon">📺</span>
-          <div class="guide-card-title">Watch This First</div>
-          <div class="guide-card-sub">Me &amp; My Golf · YouTube</div>
-        </a>
         <a class="guide-card" onclick="showPage('shortgame')">
           <span class="guide-card-icon">🎯</span>
           <div class="guide-card-title">Short Game</div>
@@ -1478,11 +1477,6 @@
             <span class="guide-card-icon">🧘</span>
             <div class="guide-card-title">Warm Up Moves</div>
             <div class="guide-card-sub">6 fun stretches</div>
-          </a>
-          <a class="guide-card" onclick="showPage('sss')">
-            <span class="guide-card-icon">📺</span>
-            <div class="guide-card-title">Watch This First</div>
-            <div class="guide-card-sub">Me &amp; My Golf · YouTube</div>
           </a>
         </div>
 
@@ -2534,90 +2528,6 @@
     <!-- ══════════════════════════════════════
          PAGE: FULL SWING SEQUENCE
     ══════════════════════════════════════ -->
-    <div class="page" id="page-sss">
-      <div class="dad-sect">
-      <div class="page-header" data-icon="📺">
-        <div class="page-tag">Visual Learning · YouTube</div>
-        <div class="page-title">Watch This First</div>
-        <div class="page-sub">Video before every range session</div>
-      </div>
-
-      <div class="section">
-        <div class="card" style="background:rgba(201,168,76,0.08);border-color:rgba(201,168,76,0.35);padding:20px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--gold);margin-bottom:10px;">📺 Before You Hit Balls</div>
-          <div style="font-size:0.92rem;color:var(--cream);line-height:1.6;margin-bottom:14px;">Jeremy is a visual learner. Skip text-based swing instruction. Instead, go to YouTube and search one of these before your range session.</div>
-          <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;margin-bottom:10px;">
-            <div style="font-size:0.68rem;font-weight:700;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:6px;">Search on YouTube</div>
-            <div style="font-size:0.9rem;color:var(--cream);margin-bottom:6px;">🔍 <strong>Me and My Golf beginner iron strike</strong></div>
-            <div style="font-size:0.9rem;color:var(--cream);">🔍 <strong>Me and My Golf lefty swing</strong></div>
-          </div>
-          <div style="font-size:0.78rem;color:var(--muted);">Watch before your range session. Video is the medium — not text.</div>
-        </div>
-      </div>
-
-      </div><!-- /dad-sect -->
-
-      <div class="son-sect">
-      <div class="page-header" data-icon="📺">
-        <div class="page-tag">Visual Learning · YouTube</div>
-        <div class="page-title">Watch This First</div>
-        <div class="page-sub">Video before every range session</div>
-      </div>
-
-      <div class="section">
-        <div class="card" style="background:rgba(59,130,246,0.08);border-color:rgba(59,130,246,0.35);padding:20px;">
-          <div style="font-size:0.92rem;color:var(--cream);line-height:1.6;margin-bottom:14px;">Before you hit balls, search YouTube and watch a quick video. Way better than reading steps.</div>
-          <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;">
-            <div style="font-size:0.68rem;font-weight:700;letter-spacing:1.5px;color:#3b82f6;text-transform:uppercase;margin-bottom:6px;">Search on YouTube</div>
-            <div style="font-size:0.9rem;color:var(--cream);margin-bottom:6px;">🔍 <strong>Me and My Golf beginner iron strike</strong></div>
-            <div style="font-size:0.9rem;color:var(--cream);">🔍 <strong>Me and My Golf lefty swing</strong></div>
-          </div>
-        </div>
-      </div>
-
-      </div><!-- /son-sect -->
-
-      <div class="girl-sect">
-      <div class="page-header" data-icon="📺">
-        <div class="page-tag">Watch &amp; Learn</div>
-        <div class="page-title">Watch This First</div>
-        <div class="page-sub">Video is the way</div>
-      </div>
-
-      <div class="section">
-        <div class="card" style="background:rgba(236,72,153,0.08);border-color:rgba(236,72,153,0.35);padding:20px;">
-          <div style="font-size:0.92rem;color:var(--cream);line-height:1.6;margin-bottom:14px;">Watch a quick golf video before heading to the range. It makes everything click better than reading instructions.</div>
-          <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;">
-            <div style="font-size:0.68rem;font-weight:700;letter-spacing:1.5px;color:#ec4899;text-transform:uppercase;margin-bottom:6px;">Search on YouTube</div>
-            <div style="font-size:0.9rem;color:var(--cream);margin-bottom:6px;">🔍 <strong>Me and My Golf beginner iron strike</strong></div>
-            <div style="font-size:0.9rem;color:var(--cream);">🔍 <strong>Me and My Golf lefty swing</strong></div>
-          </div>
-        </div>
-      </div>
-
-      </div><!-- /girl-sect -->
-
-      <div class="grandma-sect">
-      <div class="page-header" data-icon="📺">
-        <div class="page-tag">Visual Learning · YouTube</div>
-        <div class="page-title">Watch This First</div>
-        <div class="page-sub">Video before every range session</div>
-      </div>
-
-      <div class="section">
-        <div class="card" style="background:rgba(109,40,217,0.08);border-color:rgba(109,40,217,0.35);padding:20px;">
-          <div style="font-size:0.92rem;color:var(--cream);line-height:1.6;margin-bottom:14px;">Before heading to the range, search YouTube and watch a short video. Seeing a real swing is much more helpful than reading instructions.</div>
-          <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:14px;">
-            <div style="font-size:0.68rem;font-weight:700;letter-spacing:1.5px;color:#a78bfa;text-transform:uppercase;margin-bottom:6px;">Search on YouTube</div>
-            <div style="font-size:0.9rem;color:var(--cream);margin-bottom:6px;">🔍 <strong>Me and My Golf beginner iron strike</strong></div>
-            <div style="font-size:0.9rem;color:var(--cream);">🔍 <strong>Me and My Golf lefty swing</strong></div>
-          </div>
-        </div>
-      </div>
-
-      </div><!-- /grandma-sect -->
-
-    </div><!-- /page-sss -->
 
 
     <!-- ══════════════════════════════════════
@@ -3151,7 +3061,7 @@
     ══════════════════════════════════════ -->
     <div class="page" id="page-dad-progress">
       <!-- PIN Overlay -->
-      <div id="dad-pin-overlay" style="position:absolute;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;">
+      <div id="dad-pin-overlay" style="position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;overflow-y:auto;">
         <div style="font-size:2.5rem;margin-bottom:12px;">🔒</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);letter-spacing:2px;margin-bottom:6px;">Dad's Progress</div>
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:28px;">Enter PIN to continue</div>
@@ -3222,7 +3132,7 @@
     ══════════════════════════════════════ -->
     <div class="page" id="page-son-progress">
       <!-- PIN Overlay -->
-      <div id="son-pin-overlay" style="position:absolute;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;">
+      <div id="son-pin-overlay" style="position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;overflow-y:auto;">
         <div style="font-size:2.5rem;margin-bottom:12px;">🔒</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:#3b82f6;letter-spacing:2px;margin-bottom:6px;">Son's Progress</div>
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:28px;">Enter PIN to continue</div>
@@ -3299,10 +3209,6 @@
     <button class="nav-btn" onclick="showPage('stretches')" id="nav-stretches">
       <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 100 10A5 5 0 0012 2zM6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
       Stretch
-    </button>
-    <button class="nav-btn" onclick="showPage('sss')" id="nav-sss">
-      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Drills
     </button>
     <button class="nav-btn" onclick="showPage('shortgame')" id="nav-shortgame">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="19" r="2"/><path d="M12 17V9"/><path d="M8 13l4-4 4 4"/></svg>
