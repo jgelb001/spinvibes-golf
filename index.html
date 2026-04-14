@@ -4160,7 +4160,7 @@
     const listEl = document.getElementById('dad-history-list');
     const statsBar = document.getElementById('dad-stats-bar');
     if (!rounds || rounds.length === 0) {
-      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet. Tap 'Start New Round' after your next game. 🏌️</div>';
+      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet. Tap \u2018Start New Round\u2019 after your next game. \uD83C\uDFCC\uFE0F</div>';
       statsBar.style.display = 'none';
       return;
     }
@@ -4251,7 +4251,7 @@
   function renderSonHistory(rounds) {
     const listEl = document.getElementById('son-history-list');
     if (!rounds || rounds.length === 0) {
-      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet. Tap 'Start New Round' after your next game. 🏌️</div>';
+      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet. Tap \u2018Start New Round\u2019 after your next game. \uD83C\uDFCC\uFE0F</div>';
       return;
     }
     listEl.innerHTML = rounds.map((r, idx) => {
