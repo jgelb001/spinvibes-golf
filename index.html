@@ -3685,13 +3685,15 @@
 
   function loadNotes() {
     const n = store.get('generalnotes');
-    if (n) document.getElementById('generalNotes').value = n;
+    const el = document.getElementById('generalNotes');
+    if (n && el) el.value = n;
   }
 
   // ── SET TODAY'S DATE ─────────────────────────────────────────
   function setTodayDate() {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('sessionDate').value = today;
+    const el = document.getElementById('sessionDate');
+    if (!el) return;
+    el.value = new Date().toISOString().split('T')[0];
   }
 
   // ── PWA: SERVICE WORKER ──────────────────────────────────────
@@ -3704,6 +3706,7 @@
   // ── OFFLINE INDICATOR ────────────────────────────────────────
   function updateOfflineBadge() {
     const badge = document.getElementById('offlineBadge');
+    if (!badge) return;
     if (!navigator.onLine) {
       badge.textContent = '● Offline Mode';
       badge.style.background = 'rgba(214,79,58,0.2)';
