@@ -141,8 +141,10 @@
     }
     #nav::-webkit-scrollbar { display: none; }  /* Chrome/Safari */
     .nav-btn {
-      flex: 0 0 auto;
-      min-width: 64px;
+      flex: 1 1 0;
+      min-width: 0;
+      padding-left: 2px;
+      padding-right: 2px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1426,6 +1428,33 @@
           <div class="stat"><div class="stat-num">6–SW</div><div class="stat-lbl">Irons</div></div>
           <div class="stat"><div class="stat-num">50°</div><div class="stat-lbl">Gap Wedge</div></div>
           <div class="stat"><div class="stat-num">2¾"</div><div class="stat-lbl">Tee Size</div></div>
+        </div>
+        <div class="card" onclick="toggleBagDetails()" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+          <strong>🏌️ Full bag — lofts & carry yardages</strong>
+          <span id="bag-caret" style="color:var(--gold);font-size:0.78rem;">▾ Tap for lofts</span>
+        </div>
+        <div class="card" id="bag-details" style="display:none;padding:12px 14px;">
+          <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+            <thead>
+              <tr style="border-bottom:1px solid rgba(201,168,76,0.3);">
+                <th style="text-align:left;padding:6px 4px;color:var(--gold-l);font-weight:600;">Club</th>
+                <th style="text-align:center;padding:6px 4px;color:var(--gold-l);font-weight:600;">Loft</th>
+                <th style="text-align:right;padding:6px 4px;color:var(--gold-l);font-weight:600;">Carry</th>
+              </tr>
+            </thead>
+            <tbody style="font-size:0.82rem;">
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;">Driver</td><td style="text-align:center;">10.5°</td><td style="text-align:right;color:var(--muted);">185 yds</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;">4-Hybrid</td><td style="text-align:center;">22°</td><td style="text-align:right;color:var(--muted);">155 yds</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;">6-Iron</td><td style="text-align:center;">26°</td><td style="text-align:right;color:var(--muted);">140 yds</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;">7-Iron</td><td style="text-align:center;">30°</td><td style="text-align:right;color:var(--muted);">130 yds</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;">8-Iron</td><td style="text-align:center;">34°</td><td style="text-align:right;color:var(--muted);">118 yds</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;">9-Iron</td><td style="text-align:center;">38°</td><td style="text-align:right;color:var(--muted);">107 yds</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;"><strong>PW</strong> · Pitching</td><td style="text-align:center;color:var(--gold-l);">44°</td><td style="text-align:right;color:var(--muted);">95 yds</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;"><strong>GW</strong> · Gap</td><td style="text-align:center;color:var(--gold-l);">50°</td><td style="text-align:right;color:var(--muted);">82 yds</td></tr>
+              <tr><td style="padding:6px 4px;"><strong>SW</strong> · Sand</td><td style="text-align:center;color:var(--gold-l);">56°</td><td style="text-align:right;color:var(--muted);">68 yds</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:10px;font-size:0.68rem;color:var(--muted);line-height:1.4;">Lofts = standard Vice Boost spec. Carry yardages update as you log hits in Live Scorecard.</div>
         </div>
         <div class="card">
           <div class="card-title">Grip Spec</div>
@@ -3096,8 +3125,9 @@
           <div class="page-icon">📊</div>
         </div>
 
-        <div class="section">
-          <button class="btn-primary" onclick="openDadModal()" style="width:100%;">⛳ Start New Round</button>
+        <div class="section" style="display:flex;gap:10px;">
+          <button class="btn-primary" onclick="openDadModal()" style="flex:1;">⛳ Start New Round</button>
+          <button onclick="lockDadProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(201,168,76,0.35);border-radius:10px;padding:0 14px;color:var(--gold-l);font-size:1.1rem;font-weight:600;cursor:pointer;">🔒</button>
         </div>
 
         <div id="dad-stats-bar" style="display:none;" class="section">
@@ -3167,8 +3197,9 @@
           <div class="page-icon">🏌️</div>
         </div>
 
-        <div class="section">
-          <button class="btn-primary" onclick="openSonModal()" style="width:100%;">⛳ Start New Round</button>
+        <div class="section" style="display:flex;gap:10px;">
+          <button class="btn-primary" onclick="openSonModal()" style="flex:1;">⛳ Start New Round</button>
+          <button onclick="lockSonProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(59,130,246,0.35);border-radius:10px;padding:0 14px;color:#93c5fd;font-size:1.1rem;font-weight:600;cursor:pointer;">🔒</button>
         </div>
 
         <div class="section">
@@ -4066,7 +4097,7 @@
     { name: 'Temecula Creek Inn — Stone Course', par: 72, holes: 18 },
     { name: 'Pechanga Golf Course', par: 72, holes: 18 },
     { name: 'Welk Resort — Fountains Course', par: 72, holes: 18 },
-    { name: 'Welk Resort — Oaks Course', par: 29, holes: 9 },
+    { name: 'Welk Resort — Oaks Course (Par 3)', par: 54, holes: 18 },
     { name: 'CrossCreek Golf Club', par: 71, holes: 18 },
     { name: 'Redhawk Golf Club', par: 72, holes: 18 },
     { name: 'Bear Creek Golf Club', par: 72, holes: 18 },
@@ -4103,6 +4134,25 @@
   function dadPinBackspace() {
     _dadPin = _dadPin.slice(0, -1);
     updatePinDots('dad', _dadPin.length);
+  }
+  function lockDadProgress() {
+    sessionStorage.removeItem('sv-dad-unlocked');
+    _dadPin = '';
+    updatePinDots('dad', 0);
+    document.getElementById('dad-pin-overlay').style.display = 'flex';
+  }
+  function lockSonProgress() {
+    sessionStorage.removeItem('sv-son-unlocked');
+    _sonPin = '';
+    updatePinDots('son', 0);
+    document.getElementById('son-pin-overlay').style.display = 'flex';
+  }
+  function toggleBagDetails() {
+    const d = document.getElementById('bag-details');
+    const c = document.getElementById('bag-caret');
+    const open = d.style.display === 'none' || !d.style.display;
+    d.style.display = open ? 'block' : 'none';
+    if (c) c.textContent = open ? '▴ Hide' : '▾ Tap for lofts';
   }
   function updatePinDots(who, count) {
     for (let i = 0; i < 4; i++) {
