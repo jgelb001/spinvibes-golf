@@ -1442,19 +1442,9 @@
                 <th style="text-align:right;padding:6px 4px;color:var(--gold-l);font-weight:600;">Carry</th>
               </tr>
             </thead>
-            <tbody style="font-size:0.82rem;">
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;">Driver</td><td style="text-align:center;">10.5°</td><td style="text-align:right;color:var(--muted);">185 yds</td></tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;">4-Hybrid</td><td style="text-align:center;">22°</td><td style="text-align:right;color:var(--muted);">155 yds</td></tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;">6-Iron</td><td style="text-align:center;">26°</td><td style="text-align:right;color:var(--muted);">140 yds</td></tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;">7-Iron</td><td style="text-align:center;">30°</td><td style="text-align:right;color:var(--muted);">130 yds</td></tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;">8-Iron</td><td style="text-align:center;">34°</td><td style="text-align:right;color:var(--muted);">118 yds</td></tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;">9-Iron</td><td style="text-align:center;">38°</td><td style="text-align:right;color:var(--muted);">107 yds</td></tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;"><strong>PW</strong> · Pitching</td><td style="text-align:center;color:var(--gold-l);">44°</td><td style="text-align:right;color:var(--muted);">95 yds</td></tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);"><td style="padding:6px 4px;"><strong>GW</strong> · Gap</td><td style="text-align:center;color:var(--gold-l);">50°</td><td style="text-align:right;color:var(--muted);">82 yds</td></tr>
-              <tr><td style="padding:6px 4px;"><strong>SW</strong> · Sand</td><td style="text-align:center;color:var(--gold-l);">56°</td><td style="text-align:right;color:var(--muted);">68 yds</td></tr>
-            </tbody>
+            <tbody id="bag-details-body" style="font-size:0.82rem;"></tbody>
           </table>
-          <div style="margin-top:10px;font-size:0.68rem;color:var(--muted);line-height:1.4;">Lofts = standard Vice Boost spec. Carry yardages update as you log hits in Live Scorecard.</div>
+          <div style="margin-top:10px;font-size:0.68rem;color:var(--muted);line-height:1.4;">Lofts = standard Vice Boost spec. <span style="color:#4ade80;">Green dot</span> = your logged average; gray = starting estimate (updates as you log hits in Live Scorecard).</div>
         </div>
         <div class="card">
           <div class="card-title">Grip Spec</div>
@@ -3813,15 +3803,15 @@
 
   // ── CLUB SYSTEM ──────────────────────────────────────────────
   const CLUBS = [
-    { name: 'Driver',    dist: 185 },
-    { name: '4-Hybrid',  dist: 155 },
-    { name: '6-iron',    dist: 140 },
-    { name: '7-iron',    dist: 130 },
-    { name: '8-iron',    dist: 118 },
-    { name: '9-iron',    dist: 107 },
-    { name: 'PW',        dist: 95  },
-    { name: 'Gap (50°)', dist: 82  },
-    { name: 'SW',        dist: 68  },
+    { name: 'Driver',    dist: 210, loft: '10.5°', display: 'Driver' },
+    { name: '4-Hybrid',  dist: 180, loft: '22°',   display: '4-Hybrid' },
+    { name: '6-iron',    dist: 150, loft: '26°',   display: '6-Iron' },
+    { name: '7-iron',    dist: 140, loft: '30°',   display: '7-Iron' },
+    { name: '8-iron',    dist: 130, loft: '34°',   display: '8-Iron' },
+    { name: '9-iron',    dist: 120, loft: '38°',   display: '9-Iron' },
+    { name: 'PW',        dist: 105, loft: '44°',   display: 'PW · Pitching', wedge: true },
+    { name: 'Gap (50°)', dist: 90,  loft: '50°',   display: 'GW · Gap',      wedge: true },
+    { name: 'SW',        dist: 75,  loft: '56°',   display: 'SW · Sand',     wedge: true },
   ];
 
   function getClubDist(name) {
@@ -4153,6 +4143,28 @@
     const open = d.style.display === 'none' || !d.style.display;
     d.style.display = open ? 'block' : 'none';
     if (c) c.textContent = open ? '▴ Hide' : '▾ Tap for lofts';
+    if (open) renderBagDetails();
+  }
+  function renderBagDetails() {
+    const saved = JSON.parse(localStorage.getItem('sv-clubs') || '{}');
+    const body = document.getElementById('bag-details-body');
+    if (!body) return;
+    body.innerHTML = CLUBS.map((c, i) => {
+      const logged = saved[c.name];
+      const hits   = saved[c.name + '_n'] || 0;
+      const carry  = logged !== undefined ? logged : c.dist;
+      const isLast = i === CLUBS.length - 1;
+      const nameCell = c.wedge ? `<strong>${c.display}</strong>` : c.display;
+      const loftStyle = c.wedge ? 'color:var(--gold-l);' : '';
+      const carryBadge = hits > 0
+        ? `<span style="color:#4ade80;">●</span> <span style="font-size:0.68rem;color:var(--muted);">${hits} hit${hits>1?'s':''}</span>`
+        : `<span style="font-size:0.68rem;color:var(--muted);">est.</span>`;
+      return `<tr${isLast ? '' : ' style="border-bottom:1px solid rgba(255,255,255,0.04);"'}>
+        <td style="padding:6px 4px;">${nameCell}</td>
+        <td style="text-align:center;${loftStyle}">${c.loft}</td>
+        <td style="text-align:right;"><span style="color:var(--cream);">${carry}</span> <span style="color:var(--muted);font-size:0.72rem;">yds</span><br>${carryBadge}</td>
+      </tr>`;
+    }).join('');
   }
   function updatePinDots(who, count) {
     for (let i = 0; i < 4; i++) {
