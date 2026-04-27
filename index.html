@@ -249,6 +249,7 @@
     .card-body  { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
     .card-body strong { color: var(--cream); }
 
+    /* static label pills (range phases, club labels) */
     .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
     .pill {
       background: rgba(255,255,255,0.07);
@@ -303,7 +304,7 @@
       padding: 16px 12px;
       margin-bottom: 14px;
     }
-    .stat { text-align: center; }
+    .stat { text-align: center; flex: 1; }
     .stat-num {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 1.8rem;
@@ -1259,6 +1260,262 @@
       .guide-grid { grid-template-columns: repeat(4, 1fr); }
     }
 
+
+    /* ══════════════════════════════════
+       MODAL / ROUND ENTRY UI
+    ══════════════════════════════════ */
+
+    /* Inputs & labels */
+    .modal-input {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--surface2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--cream);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.92rem;
+      margin-bottom: 10px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .modal-input:focus { outline: none; border-color: var(--gold); }
+    .modal-label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+      margin-top: 10px;
+    }
+
+    /* Primary action button */
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 16px 20px;
+      background: var(--green-b);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      transition: opacity 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      min-height: 52px;
+    }
+    .btn-primary:active { opacity: 0.82; transform: scale(0.98); }
+    .btn-primary:disabled { opacity: 0.4; }
+
+    /* Ghost (back) button */
+    .btn-ghost {
+      padding: 14px 20px;
+      background: var(--surface2);
+      color: var(--muted);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      min-height: 52px;
+      min-width: 90px;
+    }
+    .btn-ghost:active { opacity: 0.7; }
+    .btn-ghost:disabled { opacity: 0.3; pointer-events: none; }
+
+    /* Gold CTA button (Next Hole, Finish Round) */
+    .btn-gold {
+      padding: 16px 28px;
+      background: var(--gold);
+      color: #000;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      min-height: 52px;
+    }
+    .btn-gold:active { opacity: 0.85; transform: scale(0.98); }
+
+    /* Hole nav row (Back / Next) */
+    .modal-nav-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .modal-nav-row .btn-ghost { flex: 0 0 auto; }
+    .modal-nav-row .btn-gold  { flex: 1; }
+
+    /* Score stepper */
+    .score-stepper {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+    }
+    .stepper-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--surface3);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--cream);
+      font-size: 2rem;
+      font-weight: 300;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: background 0.1s, transform 0.1s;
+      flex-shrink: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .stepper-btn:active  { background: rgba(201,168,76,0.25); transform: scale(0.92); }
+    .stepper-btn:disabled { opacity: 0.3; pointer-events: none; }
+    .score-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4.5rem;
+      color: var(--cream);
+      line-height: 1;
+      min-width: 72px;
+      text-align: center;
+    }
+    .hole-score-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .hole-number-big {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 4px;
+      color: var(--muted);
+    }
+
+    /* Round history cards */
+    .round-card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .round-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .round-card-header:active { background: rgba(255,255,255,0.03); }
+    .round-card-left { flex: 1; min-width: 0; }
+    .round-card-right { flex-shrink: 0; margin-left: 10px; }
+    .round-card-date { font-size: 0.7rem; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 2px; }
+    .round-card-course { font-size: 0.88rem; color: var(--cream); font-weight: 600; }
+    .round-badge {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      padding: 4px 14px;
+      border-radius: 10px;
+      line-height: 1.1;
+    }
+    .round-badge.green { background: rgba(45,106,63,0.35); color: #4ade80; }
+    .round-badge.gold  { background: rgba(201,168,76,0.2);  color: var(--gold); }
+    .round-badge.red   { background: rgba(214,79,58,0.2);   color: #f87171; }
+    .round-card-expand { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; padding: 0 16px; }
+    .round-card-expand.open { max-height: 800px; padding: 0 16px 14px; }
+    .round-delete-btn {
+      margin-top: 10px;
+      padding: 8px 14px;
+      background: none;
+      border: 1px solid rgba(214,79,58,0.35);
+      border-radius: 8px;
+      color: #f87171;
+      font-size: 0.78rem;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+    }
+
+    /* Hole grid */
+    .hole-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .hole-cell {
+      background: var(--surface2);
+      border-radius: 6px;
+      padding: 5px 2px;
+      text-align: center;
+    }
+    .h-num   { font-size: 0.55rem; color: var(--muted); margin-bottom: 2px; }
+    .h-score { font-size: 0.88rem; font-weight: 700; color: var(--cream); }
+    .h-par   { font-size: 0.52rem; color: var(--muted); margin-top: 1px; }
+
+    /* Star rating */
+    .star-row { display: flex; gap: 10px; margin-bottom: 14px; }
+    .star-btn  { font-size: 1.8rem; cursor: pointer; opacity: 0.4; transition: opacity 0.1s, transform 0.1s; }
+    .star-btn.active { opacity: 1; }
+    .star-btn:active { transform: scale(1.2); }
+
+    /* Score summary card */
+    .score-summary-card {
+      background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(45,106,63,0.08));
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .score-summary-score {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5rem;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .score-summary-line { font-size: 0.85rem; color: var(--cream); margin: 4px 0 8px; }
+    .score-motivational { font-size: 0.8rem; color: var(--muted); font-style: italic; }
+
+    /* Interactive pill selectors (modal: tee, fairway, GIR) */
+    .pill.active {
+      background: rgba(201,168,76,0.2);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    /* Modal pills need bigger tap targets */
+    #dh-fairway-pills .pill,
+    #dh-gir-pills .pill,
+    #dm-tee-pills .pill {
+      padding: 10px 16px;
+      font-size: 0.88rem;
+      min-height: 44px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
 
     /* ── LIVE GPS SCORECARD ── */
     .live-distance-card {
@@ -4562,9 +4819,9 @@
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div style="font-size:0.78rem;color:var(--muted);">${parLabel}</div>
         <div style="display:flex;align-items:center;gap:8px;">
-          <button class="stepper-btn" style="width:30px;height:30px;font-size:0.9rem;" onclick="dadHolePar(-1)">−</button>
+          <button class="stepper-btn" onclick="dadHolePar(-1)">−</button>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--gold);">PAR <span id="dh-par">${h.par}</span></div>
-          <button class="stepper-btn" style="width:30px;height:30px;font-size:0.9rem;" onclick="dadHolePar(1)">+</button>
+          <button class="stepper-btn" onclick="dadHolePar(1)">+</button>
         </div>
       </div>
       <div class="live-distance-card">
@@ -4621,9 +4878,9 @@
           </div>
           <label class="modal-label">Putts: <span id="dh-putts-val">${h.putts}</span></label>
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-            <button class="stepper-btn" style="width:38px;height:38px;" onclick="dadHolePutts(-1)">−</button>
+            <button class="stepper-btn" onclick="dadHolePutts(-1)">−</button>
             <div style="font-size:1.3rem;font-weight:700;color:var(--cream);" id="dh-putts-big">${h.putts}</div>
-            <button class="stepper-btn" style="width:38px;height:38px;" onclick="dadHolePutts(1)">+</button>
+            <button class="stepper-btn" onclick="dadHolePutts(1)">+</button>
           </div>
           <label class="modal-label">Approach club used?</label>
           <div class="club-chip-row">${chips}</div>
@@ -5130,9 +5387,9 @@
         <div class="hole-number-big">HOLE ${h.hole}</div>
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px;">
           Par:
-          <button class="stepper-btn" style="width:36px;height:36px;font-size:1rem;" onclick="dadHolePar(-1)">−</button>
+          <button class="stepper-btn" onclick="dadHolePar(-1)">−</button>
           <span style="font-size:1.1rem;color:var(--cream);margin:0 8px;" id="dh-par">${h.par}</span>
-          <button class="stepper-btn" style="width:36px;height:36px;font-size:1rem;" onclick="dadHolePar(1)">+</button>
+          <button class="stepper-btn" onclick="dadHolePar(1)">+</button>
         </div>
         <label class="modal-label" style="align-self:flex-start;">Score</label>
         <div class="score-stepper">
@@ -5154,9 +5411,9 @@
       </div>
       <label class="modal-label">Putts: <span id="dh-putts-val">${h.putts}</span></label>
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-        <button class="stepper-btn" style="width:40px;height:40px;" onclick="dadHolePutts(-1)">−</button>
+        <button class="stepper-btn" onclick="dadHolePutts(-1)">−</button>
         <div style="font-size:1.3rem;font-weight:700;color:var(--cream);" id="dh-putts-big">${h.putts}</div>
-        <button class="stepper-btn" style="width:40px;height:40px;" onclick="dadHolePutts(1)">+</button>
+        <button class="stepper-btn" onclick="dadHolePutts(1)">+</button>
       </div>
       <div class="modal-nav-row">
         <button class="btn-ghost" onclick="dadHoleBack()" ${_dadHoleIdx===0?'disabled style="opacity:0.3;"':''}>← Back</button>
@@ -5366,9 +5623,9 @@
         <div class="hole-number-big">HOLE ${h.hole}</div>
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px;">
           Par:
-          <button class="stepper-btn" style="width:36px;height:36px;font-size:1rem;" onclick="sonHolePar(-1)">−</button>
+          <button class="stepper-btn" onclick="sonHolePar(-1)">−</button>
           <span style="font-size:1.1rem;color:var(--cream);margin:0 8px;" id="sh-par">${h.par}</span>
-          <button class="stepper-btn" style="width:36px;height:36px;font-size:1rem;" onclick="sonHolePar(1)">+</button>
+          <button class="stepper-btn" onclick="sonHolePar(1)">+</button>
         </div>
         <label class="modal-label" style="align-self:flex-start;">Score</label>
         <div class="score-stepper">
