@@ -1523,13 +1523,14 @@
         </div>
         <div class="card">
           <div class="card-title">Grip Spec</div>
-          <div class="card-body"><strong>Midsize</strong> grips · All clubs including gap wedge (except putter) · Installed April 2026</div>
+          <div class="card-body"><strong>Midsize</strong> grips · All clubs including gap wedge (except putter) · Installed April 2026<br><span style="font-size:0.8rem;color:var(--muted);">Putter: Odyssey Ai-ONE #7 Mallet · 2×30g weights · Installed April 2026</span></div>
         </div>
         <div class="card">
-          <div class="card-title">Next Upgrades</div>
-          <div class="card-body">
-            <strong>1.</strong> Mallet Putter (Spider Tour or Odyssey Ai-ONE #7)<br>
-            <strong>2.</strong> 7-Wood (TaylorMade Qi35 Max or Ping G440 Max)
+          <div class="card-title">Upgrade Roadmap</div>
+          <div class="card-body" style="line-height:1.9;">
+            <span style="color:#4ade80;">✅</span> <strong>Gap Wedge (50°)</strong> — Callaway Opus S Grind · Installed April 2026<br>
+            <span style="color:#4ade80;">✅</span> <strong>Mallet Putter</strong> — Odyssey Ai-ONE #7 · 2×30g weights · Installed April 2026<br>
+            <span style="color:var(--gold);">▶ Next Buy:</span> <strong>7-Wood</strong> — Fills 180–195 yd gap on Sage/Black tees · Options: TaylorMade Qi35 Max or Ping G440 Max
           </div>
         </div>
       </div>
@@ -4253,15 +4254,15 @@
 
   // ── CLUB SYSTEM ──────────────────────────────────────────────
   const CLUBS = [
-    { name: 'Driver',    dist: 210, loft: '10.5°', display: 'Driver' },
-    { name: '4-Hybrid',  dist: 180, loft: '22°',   display: '4-Hybrid' },
-    { name: '6-iron',    dist: 150, loft: '26°',   display: '6-Iron' },
-    { name: '7-iron',    dist: 140, loft: '30°',   display: '7-Iron' },
-    { name: '8-iron',    dist: 130, loft: '34°',   display: '8-Iron' },
-    { name: '9-iron',    dist: 120, loft: '38°',   display: '9-Iron' },
-    { name: 'PW',        dist: 105, loft: '44°',   display: 'PW · Pitching', wedge: true },
-    { name: 'Gap (50°)', dist: 90,  loft: '50°',   display: 'GW · Gap',      wedge: true },
-    { name: 'SW',        dist: 75,  loft: '56°',   display: 'SW · Sand',     wedge: true },
+    { name: 'Driver',    dist: 195, loft: '10.5°', display: 'Driver',       note: '190–200 yds · Comfort 7/10 · confirmed Apr 2026' },
+    { name: '4-Hybrid',  dist: 175, loft: '22°',   display: '4-Hybrid',     note: '170–180 yds · confirmed' },
+    { name: '6-iron',    dist: 150, loft: '26°',   display: '6-Iron',       note: 'estimated — confirm at range' },
+    { name: '7-iron',    dist: 135, loft: '30°',   display: '7-Iron',       note: '130–140 yds · benchmark club' },
+    { name: '8-iron',    dist: 125, loft: '34°',   display: '8-Iron',       note: 'estimated — confirm at range' },
+    { name: '9-iron',    dist: 115, loft: '38°',   display: '9-Iron',       note: '110–120 yds · confirmed' },
+    { name: 'PW',        dist: 100, loft: '44°',   display: 'PW · Pitching', wedge: true, note: '90–110 yds · confirmed' },
+    { name: 'Gap (50°)', dist: 95,  loft: '50°',   display: 'GW · Gap',      wedge: true, note: '85–105 yds · 105 yd confirmed Apr 2026' },
+    { name: 'SW',        dist: 80,  loft: '54°',   display: 'SW · Sand',     wedge: true, note: '80 yds · 80% swing feet together' },
   ];
 
   function getClubDist(name) {
@@ -4515,18 +4516,43 @@
     refreshGPSDisplay();
   }
 
+  // ── IN-PROGRESS ROUND PERSISTENCE ────────────────────────────
+  const _ROUND_DRAFT_KEY = 'spinvibes-round-scores';
+  function _saveDraftRound() {
+    try {
+      localStorage.setItem(_ROUND_DRAFT_KEY, JSON.stringify({
+        round: _dadRound,
+        holes: _dadHoles,
+        holeIdx: _dadHoleIdx,
+        ts: Date.now()
+      }));
+    } catch(e) {}
+  }
+  function _clearDraftRound() {
+    try { localStorage.removeItem(_ROUND_DRAFT_KEY); } catch(e) {}
+  }
+  function _loadDraftRound() {
+    try { return JSON.parse(localStorage.getItem(_ROUND_DRAFT_KEY)); } catch(e) { return null; }
+  }
+
   function dadLiveNext() {
     dadHoleSave();
     if (_selectedApproachClub && _manualYards) recordClubHit(_selectedApproachClub, _manualYards);
     _selectedApproachClub = null; _manualYards = null;
-    if (_dadHoleIdx === _dadHoles.length - 1) { renderDadReflection(); }
-    else { _dadHoleIdx++; renderDadLiveHole(); }
+    if (_dadHoleIdx === _dadHoles.length - 1) {
+      _clearDraftRound();
+      renderDadReflection();
+    } else {
+      _dadHoleIdx++;
+      _saveDraftRound();
+      renderDadLiveHole();
+    }
   }
 
   function dadLiveBack() {
     dadHoleSave();
     _manualYards = null; _selectedApproachClub = null;
-    if (_dadHoleIdx > 0) { _dadHoleIdx--; renderDadLiveHole(); }
+    if (_dadHoleIdx > 0) { _dadHoleIdx--; _saveDraftRound(); renderDadLiveHole(); }
   }
 
 
@@ -4609,12 +4635,17 @@
       const carryBadge = hits > 0
         ? `<span style="color:#4ade80;">●</span> <span style="font-size:0.68rem;color:var(--muted);">${hits} hit${hits>1?'s':''}</span>`
         : `<span style="font-size:0.68rem;color:var(--muted);">est.</span>`;
+      const noteCell = c.note ? `<div style="font-size:0.65rem;color:var(--muted);line-height:1.3;margin-top:2px;">${c.note}</div>` : '';
       return `<tr${isLast ? '' : ' style="border-bottom:1px solid rgba(255,255,255,0.04);"'}>
-        <td style="padding:6px 4px;">${nameCell}</td>
+        <td style="padding:6px 4px;">${nameCell}${noteCell}</td>
         <td style="text-align:center;${loftStyle}">${c.loft}</td>
         <td style="text-align:right;"><span style="color:var(--cream);">${carry}</span> <span style="color:var(--muted);font-size:0.72rem;">yds</span><br>${carryBadge}</td>
       </tr>`;
-    }).join('');
+    }).join('') + `<tr>
+      <td style="padding:6px 4px;border-top:1px solid rgba(201,168,76,0.15);"><strong>Putter</strong><div style="font-size:0.65rem;color:var(--muted);line-height:1.3;margin-top:2px;">Odyssey Ai-ONE #7 · 2×30g weights · Installed Apr 2026</div></td>
+      <td style="text-align:center;border-top:1px solid rgba(201,168,76,0.15);color:var(--muted);">—</td>
+      <td style="text-align:right;border-top:1px solid rgba(201,168,76,0.15);"><span style="font-size:0.68rem;color:var(--muted);">on green only</span></td>
+    </tr>`;
   }
   function updatePinDots(who, count) {
     for (let i = 0; i < 4; i++) {
@@ -4670,11 +4701,8 @@
   function renderDadHistory(rounds) {
     const listEl = document.getElementById('dad-history-list');
     const statsBar = document.getElementById('dad-stats-bar');
-    if (!rounds || rounds.length === 0) {
-      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet. Tap \u2018Start New Round\u2019 after your next game. \uD83C\uDFCC\uFE0F</div>';
-      statsBar.style.display = 'none';
-      return;
-    }
+    if (!rounds || rounds.length === 0) { rounds = []; }
+    statsBar.style.display = 'none';
     // Stats
     if (rounds.length >= 3) {
       statsBar.style.display = '';
@@ -4694,6 +4722,51 @@
     } else {
       statsBar.style.display = 'none';
     }
+    const legacyCards = `
+      <div class="round-card" id="dad-round-legacy-apr26">
+        <div class="round-card-header" onclick="toggleRoundExpand('dad-round-legacy-apr26')">
+          <div class="round-card-left">
+            <div class="round-card-date">Apr 2026</div>
+            <div class="round-card-course">Stonehouse + Oaks · Autumn · Rain-shortened</div>
+          </div>
+          <div class="round-card-right">
+            <div class="round-badge gold">48 <span style="font-size:0.75rem;opacity:0.7;">(9 holes)</span></div>
+          </div>
+        </div>
+        <div class="round-card-expand" id="dad-round-legacy-apr26-expand">
+          <div class="hole-grid">
+            <div class="hole-cell"><div class="h-num">1</div><div class="h-score">6</div><div class="h-par">p4</div></div>
+            <div class="hole-cell"><div class="h-num">2</div><div class="h-score" style="color:#4ade80;">4</div><div class="h-par">p4</div></div>
+            <div class="hole-cell"><div class="h-num">3</div><div class="h-score">6</div><div class="h-par">p4</div></div>
+            <div class="hole-cell"><div class="h-num">4</div><div class="h-score" style="color:#4ade80;">4</div><div class="h-par">p4</div></div>
+            <div class="hole-cell"><div class="h-num">5</div><div class="h-score" style="color:#4ade80;">4</div><div class="h-par">p3</div></div>
+            <div class="hole-cell"><div class="h-num">6</div><div class="h-score">7</div><div class="h-par">p4</div></div>
+            <div class="hole-cell"><div class="h-num">7</div><div class="h-score" style="color:#4ade80;">5</div><div class="h-par">p4</div></div>
+            <div class="hole-cell"><div class="h-num">8</div><div class="h-score">5</div><div class="h-par">p3</div></div>
+            <div class="hole-cell"><div class="h-num">9</div><div class="h-score">7</div><div class="h-par">p5</div></div>
+          </div>
+          <div style="margin-bottom:8px;">🏆 <strong>Pars:</strong> H2, H4, H5, H7 &nbsp; 📉 <strong>12-stroke improvement</strong> on Stonehouse</div>
+          <div style="margin-bottom:6px;">✅ <em>Driver comfort 7/10 — working confidently all day</em></div>
+          <div style="margin-bottom:6px;">🔧 <em>Lag putts on Bermuda · commit fully on water holes · downhill = one club less</em></div>
+          <div style="margin-bottom:6px;font-size:0.75rem;color:var(--muted);">Called after H10 (Oaks) due to rain</div>
+        </div>
+      </div>
+      <div class="round-card" id="dad-round-legacy-dec25">
+        <div class="round-card-header" onclick="toggleRoundExpand('dad-round-legacy-dec25')">
+          <div class="round-card-left">
+            <div class="round-card-date">Dec 2025</div>
+            <div class="round-card-course">Creek + Stonehouse · Sage tees</div>
+          </div>
+          <div class="round-card-right">
+            <div class="round-badge red">118</div>
+          </div>
+        </div>
+        <div class="round-card-expand" id="dad-round-legacy-dec25-expand">
+          <div style="margin-bottom:8px;">56 Creek · 60 Stonehouse</div>
+          <div style="margin-bottom:6px;color:var(--gold);font-weight:600;">⛳ First ever round on a golf course</div>
+        </div>
+      </div>`;
+
     listEl.innerHTML = rounds.map((r, idx) => {
       const d = new Date(r.date_played + 'T12:00:00');
       const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -4728,7 +4801,7 @@
             <button class="round-delete-btn" onclick="confirmDeleteDadRound('${r.id}')">Delete Round</button>
           </div>
         </div>`;
-    }).join('');
+    }).join('') + legacyCards;
   }
 
   function toggleRoundExpand(id) {
@@ -4812,6 +4885,27 @@
   let _dadStep = 'setup'; // 'setup' | 'holes' | 'reflection'
 
   function openDadModal() {
+    // Check for an unfinished in-progress round saved to localStorage
+    const draft = _loadDraftRound();
+    if (draft && draft.holes && draft.holes.length > 0) {
+      const ageMin = Math.round((Date.now() - (draft.ts || 0)) / 60000);
+      const ageStr = ageMin < 60 ? `${ageMin} min ago` : `${Math.round(ageMin/60)}h ago`;
+      const holesPlayed = draft.holeIdx + 1;
+      const runningTotal = draft.holes.slice(0, holesPlayed).reduce((a, h) => a + h.score, 0);
+      if (confirm(`Resume your round in progress?\n\n${draft.round.course_name || 'Saved round'} · ${holesPlayed} holes · Score so far: ${runningTotal}\nSaved ${ageStr}\n\nTap OK to resume, Cancel to start fresh.`)) {
+        _dadRound = draft.round;
+        _dadHoles = draft.holes;
+        _dadHoleIdx = draft.holeIdx;
+        _dadStep = 'holes';
+        document.getElementById('dad-modal').style.display = 'block';
+        document.getElementById('dad-running-total').style.display = '';
+        startGPS();
+        renderDadLiveHole();
+        return;
+      } else {
+        _clearDraftRound();
+      }
+    }
     _dadRound = {};
     _dadHoles = [];
     _dadHoleIdx = 0;
@@ -4823,6 +4917,8 @@
   function closeDadModal() {
     document.getElementById('dad-modal').style.display = 'none';
     stopGPS();
+    // Draft is intentionally kept — user may want to resume later.
+    // It is cleared automatically on successful save or when they start a fresh round.
   }
 
   function renderDadModalSetup() {
@@ -5050,6 +5146,7 @@
     if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
     try {
       await saveDadRound(roundObj);
+      _clearDraftRound();
       showToast('Round saved! ✓');
       closeDadModal();
       loadDadRoundsAndRender();
