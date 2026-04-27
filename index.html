@@ -3595,6 +3595,125 @@
     </div><!-- /page-dad-progress -->
 
     <!-- ══════════════════════════════════════
+         PAGE: AI CADDIE
+    ══════════════════════════════════════ -->
+    <div class="page dad-sect" id="page-caddie">
+      <div class="page-header">
+        <div class="page-tag">AI CADDIE</div>
+        <div class="page-title">On The Bag</div>
+        <div class="page-icon">🎙️</div>
+      </div>
+
+      <!-- API Key Setup -->
+      <div id="caddie-key-setup" style="display:none;">
+        <div class="section">
+          <div class="card" style="border-color:rgba(201,168,76,0.4);">
+            <div class="card-title">One-time setup</div>
+            <div class="card-body" style="margin-bottom:12px;">Enter your Anthropic API key to activate your caddie. Get one at <strong>console.anthropic.com</strong> → API Keys. Stored only on this device, never sent anywhere except Anthropic.</div>
+            <input type="password" id="caddie-key-input" class="modal-input" placeholder="sk-ant-…" autocomplete="off" style="margin-bottom:8px;">
+            <button class="btn-primary" style="width:100%;" onclick="saveCaddieKey()">Save Key &amp; Start</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main caddie UI -->
+      <div id="caddie-main" style="display:none;">
+
+        <!-- Context panel -->
+        <div class="section">
+          <div class="card">
+            <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span>⛳ Hole Context</span>
+              <button onclick="toggleCaddieCtx()" id="caddie-ctx-toggle" style="background:none;border:none;color:var(--gold);font-size:0.78rem;cursor:pointer;font-weight:600;">▾ Edit</button>
+            </div>
+            <div id="caddie-ctx-display" style="font-size:0.83rem;color:var(--muted);line-height:1.6;">No hole set — tap Edit to set your situation</div>
+            <div id="caddie-ctx-form" style="display:none;margin-top:14px;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+                <div>
+                  <label class="modal-label" style="margin-bottom:4px;font-size:0.72rem;">Course</label>
+                  <select id="cc-course" class="modal-input" style="margin:0;font-size:0.8rem;padding:8px 10px;">
+                    <option value="Stonehouse">Stonehouse</option>
+                    <option value="Oaks">Oaks</option>
+                    <option value="Creek">Creek</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="modal-label" style="margin-bottom:4px;font-size:0.72rem;">Tees</label>
+                  <select id="cc-tees" class="modal-input" style="margin:0;font-size:0.8rem;padding:8px 10px;">
+                    <option value="Autumn">Autumn</option>
+                    <option value="Sage">Sage</option>
+                    <option value="Black">Black</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="modal-label" style="margin-bottom:4px;font-size:0.72rem;">Hole #</label>
+                  <input type="number" id="cc-hole" class="modal-input" style="margin:0;padding:8px 10px;" placeholder="1–18" min="1" max="18">
+                </div>
+                <div>
+                  <label class="modal-label" style="margin-bottom:4px;font-size:0.72rem;">Yardage to pin</label>
+                  <input type="number" id="cc-yards" class="modal-input" style="margin:0;padding:8px 10px;" placeholder="e.g. 145">
+                </div>
+                <div>
+                  <label class="modal-label" style="margin-bottom:4px;font-size:0.72rem;">Wind</label>
+                  <select id="cc-wind" class="modal-input" style="margin:0;font-size:0.8rem;padding:8px 10px;">
+                    <option value="none">Calm</option>
+                    <option value="light tailwind">Light tailwind</option>
+                    <option value="light headwind">Light headwind</option>
+                    <option value="strong headwind">Strong headwind</option>
+                    <option value="crosswind left">Crosswind left</option>
+                    <option value="crosswind right">Crosswind right</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="modal-label" style="margin-bottom:4px;font-size:0.72rem;">Lie</label>
+                  <select id="cc-lie" class="modal-input" style="margin:0;font-size:0.8rem;padding:8px 10px;">
+                    <option value="fairway">Fairway</option>
+                    <option value="rough">Rough</option>
+                    <option value="tee box">Tee box</option>
+                    <option value="fringe">Fringe</option>
+                    <option value="bunker">Bunker</option>
+                  </select>
+                </div>
+              </div>
+              <div style="margin-bottom:8px;">
+                <label class="modal-label" style="margin-bottom:4px;font-size:0.72rem;">Score so far (optional)</label>
+                <input type="number" id="cc-score" class="modal-input" style="margin:0;padding:8px 10px;" placeholder="e.g. 38 through 7 holes">
+              </div>
+              <button class="btn-gold" style="width:100%;" onclick="applyCaddieCtx()">Set Context →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat -->
+        <div class="section">
+          <div id="caddie-messages" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;max-height:55vh;overflow-y:auto;padding-right:2px;"></div>
+          <div style="display:flex;gap:8px;align-items:flex-end;">
+            <textarea id="caddie-input"
+              style="flex:1;background:var(--surface2);border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:var(--cream);font-size:0.9rem;padding:10px 14px;resize:none;font-family:inherit;line-height:1.5;overflow-y:auto;"
+              placeholder="Ask your caddie…" rows="2"
+              onkeydown="caddieInputKeydown(event)"></textarea>
+            <button id="caddie-send-btn" onclick="sendCaddieMessage()"
+              style="flex-shrink:0;background:var(--gold);border:none;border-radius:12px;width:44px;height:44px;color:var(--bg);font-weight:700;font-size:1.1rem;cursor:pointer;align-self:flex-end;">➤</button>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;align-items:center;">
+            <div style="font-size:0.66rem;color:var(--muted);">Powered by Claude Haiku · ~$0.01/round</div>
+            <button onclick="clearCaddieChat()" style="background:none;border:none;color:var(--muted);font-size:0.7rem;cursor:pointer;text-decoration:underline;">Clear chat</button>
+          </div>
+        </div>
+
+        <!-- Key management -->
+        <div class="section" style="padding-top:0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:0 2px;">
+            <div style="font-size:0.7rem;color:var(--muted);">Key: <span id="caddie-key-hint">—</span></div>
+            <button onclick="resetCaddieKey()" style="background:none;border:none;color:var(--muted);font-size:0.7rem;cursor:pointer;text-decoration:underline;">Change key</button>
+          </div>
+        </div>
+
+      </div><!-- /caddie-main -->
+    </div><!-- /page-caddie -->
+
+    <!-- ══════════════════════════════════════
          PAGE: SON PROGRESS
     ══════════════════════════════════════ -->
     <div class="page" id="page-son-progress">
@@ -3690,6 +3809,10 @@
     <button class="nav-btn dad-sect" onclick="showPage('strategy')" id="nav-strategy">
       <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 017 7c0 3.5-2 6.5-5 7.5V19h-4v-2.5C7 15.5 5 12.5 5 9a7 7 0 017-7z"/><line x1="10" y1="22" x2="14" y2="22"/></svg>
       Strategy
+    </button>
+    <button class="nav-btn dad-sect" onclick="showPage('caddie')" id="nav-caddie">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Caddie
     </button>
     <button class="nav-btn dad-sect" onclick="showPage('dad-progress')" id="nav-dad-progress">
       <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
@@ -4058,6 +4181,9 @@
         document.getElementById('son-pin-overlay').style.display = 'none';
         loadSonRoundsAndRender();
       }
+    }
+    if (id === 'caddie') {
+      initCaddieTab();
     }
   }
 
@@ -5300,6 +5426,211 @@
       <textarea id="sr-remember" class="modal-input" rows="2" placeholder="Notes for next time..."></textarea>
       <button class="btn-primary" style="width:100%;margin-top:8px;" onclick="saveSonRoundFull()">Save Round</button>
     `;
+  }
+
+  // ── AI CADDIE ─────────────────────────────────────────────────
+  const _CADDIE_KEY_STORE = 'sv-caddie-key';
+  let _caddieHistory = [];
+  let _caddieCtx = null;
+  let _caddieCtxOpen = false;
+
+  // Lean but complete system prompt — ~350 tokens
+  const _CADDIE_SYSTEM = `You are Jeremy's personal golf caddie. He is left-handed, a beginner, goal is to break 90. Your job: give club recommendations fast and short. Lead with the club name, then one sentence of reason. Never waffle. Never give more than 3 sentences total.
+
+YARDAGE CARD (carry distances, all confirmed):
+Driver 10.5°: 190-200 yds | 4-Hybrid 22°: 170-180 | 6-Iron: 145-155 | 7-Iron: 130-140 | 8-Iron: 120-130 | 9-Iron: 110-120 | PW 45°: 90-110 | GW 50°: 85-105 | SW 54°: 80
+
+LEFTY NOTE: Lead foot = right foot. Divot goes right of ball. Ball off right instep for driver.
+
+KEY RULES:
+- Downhill shots: always play one club less than yardage (ball flies further, lands hot)
+- Into headwind: one club more, 80% swing. Strong headwind: two clubs more.
+- Over water: full committed swing, never decelerate
+- Tight fairway / OB risk: 4-Hybrid or 7-Iron instead of driver every time
+- Par 5 in 2 temptation: lay up to 85-90 yds (GW/SW distance), bogey beats double
+- Sub-90 formula: bogey every hole + save 1-2. Avoid doubles at all costs.
+
+TEMECULA CREEK INN — STONEHOUSE par 35:
+Hole 1 par4 (315yd Autumn / 350yd Sage): Driver, open fairway.
+Hole 2 par4 (249 / 311): 4-Hybrid off tee, shorter hole.
+Hole 3 par4 (325 / 335): Driver. Downhill approach — play one club less.
+Hole 4 par4 (275 / 299): Driver, GW or SW into green.
+Hole 5 par3 (103 Autumn / 143 Sage): Wind hole. PW from Autumn, 6-Iron from Sage. Adjust for wind.
+Hole 6 par4 (246 / 321): Wind-exposed. Hybrid safer in wind.
+Hole 7 par4 (260 / 305): Driver at 70% power confirmed to work.
+Hole 8 par3 (76 Autumn / 132 Sage): GW pitch. Land front of green, let it roll to pin.
+Hole 9 par5 (378 / 480): Driver, 4-Hybrid layup, then GW/PW over water. Commit fully — no deceleration over water.
+
+TEMECULA CREEK INN — OAKS par 36 (Autumn tees):
+Hole 10 par4 (280): Driver.
+Hole 11 par5 (455): Driver + 4-Hybrid + SW. Three shots only, do not try to reach in two.
+Hole 12 par3 (113): 9-Iron. Center of green, no pin hunting.
+Hole 13 par4 (350): Driver.
+Hole 14 par4 (321): Driver.
+Hole 15 par3 (145): 7-Iron. Take extra club in wind.
+Hole 16 par5 (397): Driver + 4-Hybrid + GW. Three shots.
+Hole 17 par4 (335): Driver.
+Hole 18 par4 (306): 4-Hybrid off tee to keep it in play.
+
+FORMAT: Always start with the club in capitals (e.g. "7-IRON." or "4-HYBRID."), then brief reason. If given yardage, recommend specific club instantly.`;
+
+  function _caddieSystemWithCtx() {
+    if (!_caddieCtx) return _CADDIE_SYSTEM;
+    const c = _caddieCtx;
+    let ctx = '\n\nCURRENT SITUATION:';
+    if (c.course) ctx += ` ${c.course} course`;
+    if (c.tees)   ctx += ` · ${c.tees} tees`;
+    if (c.hole)   ctx += ` · Hole ${c.hole}`;
+    if (c.yards)  ctx += ` · ${c.yards} yds to pin`;
+    if (c.wind && c.wind !== 'none') ctx += ` · Wind: ${c.wind}`;
+    if (c.lie)    ctx += ` · Lie: ${c.lie}`;
+    if (c.score)  ctx += ` · Score so far: ${c.score}`;
+    return _CADDIE_SYSTEM + ctx;
+  }
+
+  function initCaddieTab() {
+    const key = localStorage.getItem(_CADDIE_KEY_STORE);
+    if (key) {
+      document.getElementById('caddie-key-setup').style.display = 'none';
+      document.getElementById('caddie-main').style.display = '';
+      document.getElementById('caddie-key-hint').textContent = key.slice(0, 14) + '…';
+      renderCaddieMessages(false);
+    } else {
+      document.getElementById('caddie-key-setup').style.display = '';
+      document.getElementById('caddie-main').style.display = 'none';
+    }
+  }
+
+  function saveCaddieKey() {
+    const k = document.getElementById('caddie-key-input').value.trim();
+    if (!k.startsWith('sk-')) { alert('Key should start with "sk-" — double-check from console.anthropic.com'); return; }
+    localStorage.setItem(_CADDIE_KEY_STORE, k);
+    initCaddieTab();
+  }
+
+  function resetCaddieKey() {
+    if (!confirm('Remove saved API key?')) return;
+    localStorage.removeItem(_CADDIE_KEY_STORE);
+    initCaddieTab();
+  }
+
+  function toggleCaddieCtx() {
+    _caddieCtxOpen = !_caddieCtxOpen;
+    document.getElementById('caddie-ctx-form').style.display = _caddieCtxOpen ? '' : 'none';
+    document.getElementById('caddie-ctx-toggle').textContent = _caddieCtxOpen ? '▴ Done' : '▾ Edit';
+  }
+
+  function applyCaddieCtx() {
+    _caddieCtx = {
+      course: document.getElementById('cc-course').value,
+      tees:   document.getElementById('cc-tees').value,
+      hole:   document.getElementById('cc-hole').value,
+      yards:  document.getElementById('cc-yards').value,
+      wind:   document.getElementById('cc-wind').value,
+      lie:    document.getElementById('cc-lie').value,
+      score:  document.getElementById('cc-score').value
+    };
+    const parts = [];
+    if (_caddieCtx.hole)  parts.push(`Hole ${_caddieCtx.hole} · ${_caddieCtx.course} · ${_caddieCtx.tees} tees`);
+    if (_caddieCtx.yards) parts.push(`${_caddieCtx.yards} yds to pin`);
+    if (_caddieCtx.wind && _caddieCtx.wind !== 'none') parts.push(_caddieCtx.wind);
+    if (_caddieCtx.lie)   parts.push(`${_caddieCtx.lie} lie`);
+    if (_caddieCtx.score) parts.push(`Score: ${_caddieCtx.score}`);
+    document.getElementById('caddie-ctx-display').innerHTML =
+      parts.length
+        ? `<span style="color:var(--cream);">${parts.join(' &nbsp;·&nbsp; ')}</span>`
+        : 'No context set — tap Edit';
+    if (_caddieCtxOpen) toggleCaddieCtx();
+  }
+
+  function caddieInputKeydown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendCaddieMessage(); }
+  }
+
+  async function sendCaddieMessage() {
+    const inp = document.getElementById('caddie-input');
+    const msg = inp.value.trim();
+    if (!msg) return;
+    const key = localStorage.getItem(_CADDIE_KEY_STORE);
+    if (!key) { initCaddieTab(); return; }
+
+    inp.value = '';
+    _caddieHistory.push({ role: 'user', content: msg });
+    renderCaddieMessages(true);
+
+    const btn = document.getElementById('caddie-send-btn');
+    btn.disabled = true;
+    btn.textContent = '…';
+
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 200,
+          system: _caddieSystemWithCtx(),
+          messages: _caddieHistory.slice(-12)
+        })
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        if (resp.status === 401) {
+          showToast('API key invalid — tap Change key', 'error');
+        } else {
+          showToast(err?.error?.message || `Error ${resp.status}`, 'error');
+        }
+        _caddieHistory.pop();
+        renderCaddieMessages(false);
+        return;
+      }
+
+      const data = await resp.json();
+      const reply = data?.content?.[0]?.text || '—';
+      _caddieHistory.push({ role: 'assistant', content: reply });
+      renderCaddieMessages(false);
+    } catch(e) {
+      showToast('No signal — check your connection', 'error');
+      _caddieHistory.pop();
+      renderCaddieMessages(false);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '➤';
+    }
+  }
+
+  function renderCaddieMessages(showTyping) {
+    const el = document.getElementById('caddie-messages');
+    if (!el) return;
+    const welcome = `<div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:14px 16px;font-size:0.85rem;color:var(--cream);line-height:1.6;">👋 <strong>On the bag.</strong> Set your hole context above, then ask me anything — club selection, layup vs. go for it, wind adjustments. I know your yardages and every hole at TCI.</div>`;
+    const msgs = _caddieHistory.map(m => {
+      const isUser = m.role === 'user';
+      return `<div style="
+        align-self:${isUser ? 'flex-end' : 'flex-start'};
+        max-width:88%;
+        background:${isUser ? 'rgba(201,168,76,0.15)' : 'var(--surface2)'};
+        border:1px solid ${isUser ? 'rgba(201,168,76,0.3)' : 'rgba(255,255,255,0.08)'};
+        border-radius:${isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
+        padding:10px 14px;font-size:0.87rem;color:var(--cream);line-height:1.55;white-space:pre-wrap;word-break:break-word;
+      ">${m.content}</div>`;
+    }).join('');
+    const typing = showTyping
+      ? `<div style="align-self:flex-start;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-radius:16px 16px 16px 4px;padding:10px 16px;font-size:1rem;color:var(--muted);letter-spacing:3px;">⛳ ···</div>`
+      : '';
+    el.innerHTML = (_caddieHistory.length === 0 ? welcome : '') + msgs + typing;
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function clearCaddieChat() {
+    if (_caddieHistory.length > 0 && !confirm('Clear this conversation?')) return;
+    _caddieHistory = [];
+    renderCaddieMessages(false);
   }
 
   async function saveSonRoundFull() {
