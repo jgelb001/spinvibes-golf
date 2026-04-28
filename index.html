@@ -1727,6 +1727,13 @@
             <div style="font-size:0.75rem;">Lefty beginner · Vice Boost bag</div>
           </div>
         </div>
+        <div class="home-goal" style="margin-top:8px;border-color:rgba(74,222,128,0.5);background:rgba(74,222,128,0.08);">
+          <div class="home-goal-num" style="color:#4ade80;font-size:1.6rem;">&lt;95</div>
+          <div>
+            <div style="font-weight:700;color:#4ade80;font-size:0.85rem;">Next Target</div>
+            <div style="font-size:0.75rem;">✅ Broke 100 — Apr 28, 2026 · Shot 98</div>
+          </div>
+        </div>
       </div>
 
       <div class="guide-grid">
@@ -3829,6 +3836,28 @@
         </div>
 
         <div class="section">
+          <div class="section-title">🏆 Milestones</div>
+          <div class="round-card" style="border-color:rgba(74,222,128,0.4);">
+            <div class="round-card-header" onclick="toggleRoundExpand('milestone-broke100')">
+              <div class="round-card-left">
+                <div class="round-card-date" style="color:#4ade80;">Apr 28, 2026</div>
+                <div class="round-card-course" style="color:#4ade80;">✅ Broke 100</div>
+              </div>
+              <div class="round-card-right">
+                <div class="round-badge gold">98</div>
+              </div>
+            </div>
+            <div class="round-card-expand" id="milestone-broke100-expand">
+              <div style="margin-bottom:8px;color:#4ade80;font-weight:700;">🎉 First time shooting under 100!</div>
+              <div style="margin-bottom:6px;">Creek + Oaks · Sage tees · Temecula Creek Inn</div>
+              <div style="margin-bottom:6px;">Front 9 (Creek): 51 · Back 9 (Oaks): 47</div>
+              <div style="margin-bottom:6px;font-style:italic;color:var(--muted);">"Loose as a silly goose"</div>
+              <div style="margin-bottom:6px;">✅ <em>7 straight bogeys on back 9 — very consistent. Driver solid all day. Chipping was a strength.</em></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
           <div class="section-title">Round History</div>
           <div id="dad-history-list">
             <div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">
@@ -5177,6 +5206,10 @@
             <div class="hole-grid">${holeGrid}</div>
             <div style="margin-bottom:8px;">🏌️ <strong>Putts:</strong> ${totalPutts} &nbsp; ⛳ <strong>Fairways:</strong> ${fairways} &nbsp; 🎯 <strong>GIR:</strong> ${gir}</div>
             ${r.stars ? '<div style="margin-bottom:8px;">' + stars + '</div>' : ''}
+            ${ref.milestone ? '<div style="margin-bottom:8px;color:#4ade80;font-weight:700;">🎉 ' + ref.milestone + '</div>' : ''}
+            ${ref.swing_thought ? '<div style="margin-bottom:6px;font-style:italic;color:var(--muted);">"' + ref.swing_thought + '"</div>' : ''}
+            ${ref.wins ? '<div style="margin-bottom:6px;">✅ <em>' + ref.wins + '</em></div>' : ''}
+            ${ref.learnings ? '<div style="margin-bottom:6px;">🔧 <em>' + ref.learnings + '</em></div>' : ''}
             ${ref.worked ? '<div style="margin-bottom:6px;">✅ <em>' + ref.worked + '</em></div>' : ''}
             ${ref.fix ? '<div style="margin-bottom:6px;">🔧 <em>' + ref.fix + '</em></div>' : ''}
             ${ref.best ? '<div style="margin-bottom:6px;">🏆 <em>' + ref.best + '</em></div>' : ''}
