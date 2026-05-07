@@ -5727,9 +5727,11 @@ If hole yardage is provided in context, use it with the distance card above. If 
     grandma: { key:'grandma', name:'Grandma', emoji:'\u2B50',        color:'#d4af70', bg:'rgba(212,175,112,0.12)', saveFn: r => saveGrandmaRound(r) },
   };
 
-  let _famRound   = {};
-  let _famHoles   = [];
-  let _famHoleIdx = 0;
+  let _famRound         = {};
+  let _famHoles         = [];
+  let _famHoleIdx       = 0;
+  let _famCaddieHistory = [];   // persists across hole navigation
+  let _famCaddieOpen    = false;
 
   function openFamilyModal() {
     _famRound   = {};
@@ -5866,7 +5868,9 @@ If hole yardage is provided in context, use it with the distance card above. If 
     }
 
     _famRound = { date_played: document.getElementById('fm-date').value, course_name: courseName, course_par: coursePar, players };
-    _famHoleIdx = 0;
+    _famHoleIdx       = 0;
+    _famCaddieHistory = [];
+    _famCaddieOpen    = false;
     const holePar = Math.round(coursePar / numHoles);
     _famHoles = Array.from({length: numHoles}, (_, i) => {
       const scores = {};
@@ -5946,7 +5950,28 @@ If hole yardage is provided in context, use it with the distance card above. If 
         <button class="btn-ghost" onclick="famHoleBack()" ${_famHoleIdx===0?'disabled style="opacity:0.3;"':''}>\u2190 Back</button>
         <button class="btn-gold" onclick="famHoleNext()">${isLast ? 'See Results \u2192' : 'Next Hole \u2192'}</button>
       </div>
+
+      <!-- CADDIE PANEL -->
+      <div style="margin-top:14px;">
+        <button onclick="toggleFamCaddie()" id="fam-caddie-toggle"
+          style="width:100%;background:var(--surface2);border:1px solid rgba(201,168,76,0.25);border-radius:10px;padding:11px 16px;color:var(--gold-l);font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;">
+          <span>\ud83c\udf99\ufe0f Ask Caddie \u2014 Hole ${h.hole}, Par ${h.par}</span>
+          <span id="fam-caddie-caret">${_famCaddieOpen ? '\u25b2' : '\u25bc'}</span>
+        </button>
+        <div id="fam-caddie-panel" style="display:${_famCaddieOpen ? 'block' : 'none'};background:var(--surface);border:1px solid rgba(201,168,76,0.15);border-top:none;border-radius:0 0 10px 10px;padding:12px 14px;">
+          <div id="fam-caddie-msgs" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;font-size:0.83rem;line-height:1.5;"></div>
+          <div style="display:flex;gap:8px;align-items:flex-end;">
+            <textarea id="fam-caddie-input" rows="2"
+              style="flex:1;background:var(--surface2);border:1px solid rgba(201,168,76,0.25);border-radius:8px;padding:8px 10px;color:var(--cream);font-family:'Outfit',sans-serif;font-size:0.85rem;resize:none;"
+              placeholder="How far to the pin? What's your lie?"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendFamCaddieMsg();}"></textarea>
+            <button onclick="sendFamCaddieMsg()" id="fam-caddie-send"
+              style="background:var(--green);border:none;border-radius:8px;padding:10px 14px;color:var(--cream);font-weight:700;font-size:0.85rem;cursor:pointer;flex-shrink:0;">Send</button>
+          </div>
+        </div>
+      </div>
     `;
+    renderFamCaddieMessages();
   }
 
   function famHoleScore(pk, delta) {
@@ -6025,6 +6050,88 @@ If hole yardage is provided in context, use it with the distance card above. If 
       <button class="btn-primary" style="width:100%;margin-top:12px;" onclick="saveFamRound(this)">Save to My Game \u2713</button>
       <button class="btn-ghost"   style="width:100%;margin-top:8px;"  onclick="closeFamilyModal()">Done</button>
     `;
+  }
+
+
+  function renderFamCaddieMessages(showTyping) {
+    const el = document.getElementById('fam-caddie-msgs');
+    if (!el) return;
+    const h = _famHoles[_famHoleIdx];
+    const holeCtx = h ? `Hole ${h.hole}, Par ${h.par}` : '';
+    const welcome = `<div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px 14px;font-size:0.82rem;color:var(--cream);line-height:1.55;">🎙️ <strong>Caddie ready.</strong> ${holeCtx ? 'You\'re on ' + holeCtx + '.' : ''} Ask anything — club, layup vs. go, wind adjustments.</div>`;
+    const msgs = _famCaddieHistory.map(m => {
+      const isUser = m.role === 'user';
+      return `<div style="
+        align-self:${isUser ? 'flex-end' : 'flex-start'};
+        max-width:90%;
+        background:${isUser ? 'rgba(201,168,76,0.15)' : 'var(--surface2)'};
+        border:1px solid ${isUser ? 'rgba(201,168,76,0.3)' : 'rgba(255,255,255,0.08)'};
+        border-radius:${isUser ? '14px 14px 4px 14px' : '14px 14px 14px 4px'};
+        padding:9px 13px;font-size:0.83rem;color:var(--cream);line-height:1.5;white-space:pre-wrap;word-break:break-word;
+      ">${m.content}</div>`;
+    }).join('');
+    const typing = showTyping
+      ? `<div style="align-self:flex-start;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-radius:14px 14px 14px 4px;padding:9px 14px;font-size:1rem;color:var(--muted);letter-spacing:3px;">⛳ ···</div>`
+      : '';
+    el.innerHTML = (_famCaddieHistory.length === 0 ? welcome : '') + msgs + typing;
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function toggleFamCaddie() {
+    _famCaddieOpen = !_famCaddieOpen;
+    const panel  = document.getElementById('fam-caddie-panel');
+    const caret  = document.getElementById('fam-caddie-caret');
+    if (panel) panel.style.display = _famCaddieOpen ? 'block' : 'none';
+    if (caret) caret.textContent   = _famCaddieOpen ? '▲' : '▼';
+    if (_famCaddieOpen) renderFamCaddieMessages(false);
+  }
+
+  async function sendFamCaddieMsg() {
+    const inp = document.getElementById('fam-caddie-input');
+    if (!inp) return;
+    const msg = inp.value.trim();
+    if (!msg) return;
+
+    inp.value = '';
+    _famCaddieHistory.push({ role: 'user', content: msg });
+    renderFamCaddieMessages(true);
+
+    const btn = document.getElementById('fam-caddie-send');
+    if (btn) { btn.disabled = true; btn.textContent = '…'; }
+
+    const h = _famHoles[_famHoleIdx];
+    const holeCtx = h ? `\n\nCurrent hole: Hole ${h.hole}, Par ${h.par}.` : '';
+    const systemPrompt = _caddieSystemWithCtx() + holeCtx;
+
+    try {
+      const resp = await fetch('https://golf.spinvibes.com/.netlify/functions/caddie', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: _famCaddieHistory.slice(-6),
+          systemPrompt
+        })
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        showToast(err?.error || `Error ${resp.status}`, 'error');
+        _famCaddieHistory.pop();
+        renderFamCaddieMessages(false);
+        return;
+      }
+
+      const data  = await resp.json();
+      const reply = data?.reply || '—';
+      _famCaddieHistory.push({ role: 'assistant', content: reply });
+      renderFamCaddieMessages(false);
+    } catch(e) {
+      showToast('No signal — check your connection', 'error');
+      _famCaddieHistory.pop();
+      renderFamCaddieMessages(false);
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = '➤'; }
+    }
   }
 
   async function saveFamRound(btn) {
