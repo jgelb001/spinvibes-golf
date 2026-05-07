@@ -1619,6 +1619,87 @@
     }
     .pin-shake { animation: pinShake 0.4s ease; }
 
+    /* ── FAMILY SCORECARD ── */
+    .fam-checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 10px 0 16px;
+    }
+    .fam-checkbox-card {
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 14px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .fam-checkbox-card.selected {
+      border-color: #4ade80;
+      background: rgba(74,222,128,0.1);
+    }
+    .fam-checkbox-card .fam-cb-emoji { font-size: 1.8rem; display: block; margin-bottom: 4px; }
+    .fam-checkbox-card .fam-cb-name  { font-size: 0.75rem; font-weight: 600; color: var(--cream); }
+    .fam-player-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .fam-player-row:last-child { border-bottom: none; }
+    .fam-player-badge {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; flex-shrink: 0;
+    }
+    .fam-player-label { flex: 1; }
+    .fam-player-name  { font-weight: 700; font-size: 0.9rem; line-height: 1.2; }
+    .fam-player-vpar  { font-size: 0.72rem; }
+    .fam-score-stepper { display: flex; align-items: center; gap: 10px; }
+    .fam-score-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; min-width: 40px; text-align: center; line-height: 1;
+    }
+    .fam-running-bar  { display: flex; gap: 8px; flex-wrap: wrap; }
+    .fam-running-chip { padding: 4px 11px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; }
+    .fam-scroll-wrap  { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .fam-sc-table     { border-collapse: collapse; font-size: 0.76rem; min-width: 100%; }
+    .fam-sc-table th  {
+      background: var(--surface3); padding: 7px 8px; text-align: center;
+      font-weight: 700; color: var(--gold-l); font-size: 0.7rem; white-space: nowrap;
+    }
+    .fam-sc-table th:first-child { text-align: left; }
+    .fam-sc-table td  { padding: 7px 8px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .fam-sc-table td:first-child { text-align: left; color: var(--muted); font-size: 0.7rem; }
+    .fam-sc-table tr.total-row td {
+      background: var(--surface3); font-weight: 700; color: var(--cream);
+      border-top: 1px solid rgba(201,168,76,0.35); font-size: 0.85rem;
+    }
+    .fam-sc-table tr.total-row td:first-child { color: var(--gold); }
+    .fam-eagle  { background: linear-gradient(135deg,#7c3aed,#4c1d95); color:#fff; border-radius:4px; padding:1px 4px; }
+    .fam-birdie { background: linear-gradient(135deg,#2563eb,#1e40af); color:#fff; border-radius:4px; padding:1px 4px; }
+    .fam-par    { color:#4ade80; font-weight:700; }
+    .fam-bogey  { color:var(--cream); }
+    .fam-double { color:var(--red); font-weight:700; }
+    .fam-triple { color:#ff4444; font-weight:800; }
+    .family-cta {
+      margin: 0 16px 14px;
+      background: linear-gradient(135deg, #1a2f1e, #1e2d3a);
+      border: 1px solid rgba(99,179,255,0.25);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex; align-items: center; gap: 14px;
+      cursor: pointer; transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .family-cta:active { transform: scale(0.98); opacity: 0.9; }
+    .family-cta-icon  { font-size: 2rem; flex-shrink: 0; }
+    .family-cta-title { font-weight: 700; font-size: 1rem; color: #93c5fd; line-height: 1.2; }
+    .family-cta-sub   { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    .family-cta-arrow { margin-left: auto; color: #93c5fd; font-size: 1.1rem; flex-shrink: 0; }
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
@@ -2089,6 +2170,16 @@
         </div>
 
       </div><!-- /mom-sect home -->
+
+    <!-- Family Round CTA — visible all profiles -->
+    <div class="family-cta" onclick="openFamilyModal()">
+      <div class="family-cta-icon">👨‍👧‍👦</div>
+      <div class="family-cta-text">
+        <div class="family-cta-title">Family Round</div>
+        <div class="family-cta-sub">Live scorecard for the whole crew</div>
+      </div>
+      <div class="family-cta-arrow">›</div>
+    </div>
 
     </div><!-- /page-home -->
 
@@ -3779,6 +3870,20 @@
     </button>
 
   </nav>
+
+  <!-- ══════════════════════════════════════
+       FAMILY SCORECARD MODAL
+  ══════════════════════════════════════ -->
+  <div id="family-modal" style="display:none;position:fixed;inset:0;z-index:400;background:var(--bg);overflow-y:auto;padding-bottom:80px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(99,179,255,0.2);position:sticky;top:0;background:var(--bg);z-index:1;">
+      <div id="fam-modal-label" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#93c5fd;">Family Round</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="fam-running-bar" class="fam-running-bar" style="display:none;"></div>
+        <button onclick="closeFamilyModal()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;padding:0 4px;">✕</button>
+      </div>
+    </div>
+    <div id="fam-modal-body" style="padding:20px;"></div>
+  </div>
 
 </div><!-- /app -->
 
@@ -5568,6 +5673,294 @@ If hole yardage is provided in context, use it with the distance card above. If 
     }
   }
 
+
+
+  // ── FAMILY SCORECARD ──────────────────────────────────────────
+
+  const FAM_PLAYERS = {
+    dad:  { key:'dad',  name:'Dad',      emoji:'\uD83C\uDFCC', color:'#c9a84c', bg:'rgba(201,168,76,0.12)' },
+    son:  { key:'son',  name:'Owen',     emoji:'\u26F3', color:'#60a5fa', bg:'rgba(96,165,250,0.12)' },
+    girl: { key:'girl', name:'Daughter', emoji:'\uD83C\uDF38', color:'#f472b6', bg:'rgba(244,114,182,0.12)' },
+  };
+
+  let _famRound   = {};
+  let _famHoles   = [];
+  let _famHoleIdx = 0;
+
+  function openFamilyModal() {
+    _famRound   = {};
+    _famHoles   = [];
+    _famHoleIdx = 0;
+    document.getElementById('family-modal').style.display = 'block';
+    document.getElementById('fam-running-bar').style.display = 'none';
+    renderFamSetup();
+  }
+
+  function closeFamilyModal() {
+    document.getElementById('family-modal').style.display = 'none';
+  }
+
+  function renderFamSetup() {
+    document.getElementById('fam-modal-label').textContent = 'Family Round';
+    const today = new Date().toISOString().split('T')[0];
+    const courseOpts = COURSES.map((c,i) => `<option value="${i}">${c.name} (par ${c.par})</option>`).join('');
+    document.getElementById('fam-modal-body').innerHTML = `
+      <label class="modal-label">Date</label>
+      <input type="date" id="fm-date" class="modal-input" value="${today}">
+      <label class="modal-label">Course</label>
+      <select id="fm-course" class="modal-input" onchange="famCourseChange(this.value)">
+        ${courseOpts}
+      </select>
+      <div id="fm-custom-wrap" style="display:none;">
+        <input type="text" id="fm-custom-name" class="modal-input" placeholder="Course name">
+        <div style="display:flex;gap:10px;">
+          <input type="number" id="fm-custom-par" class="modal-input" placeholder="Par (e.g. 54)" style="flex:1;">
+          <select id="fm-custom-holes" class="modal-input" style="flex:1;">
+            <option value="18">18 holes</option>
+            <option value="9">9 holes</option>
+          </select>
+        </div>
+      </div>
+      <label class="modal-label">Who's playing?</label>
+      <div class="fam-checkbox-grid">
+        <div class="fam-checkbox-card selected" data-player="dad" onclick="famTogglePlayer(this)">
+          <span class="fam-cb-emoji">\uD83C\uDFCC</span>
+          <span class="fam-cb-name">Dad</span>
+        </div>
+        <div class="fam-checkbox-card selected" data-player="son" onclick="famTogglePlayer(this)">
+          <span class="fam-cb-emoji">\u26F3</span>
+          <span class="fam-cb-name">Owen</span>
+        </div>
+        <div class="fam-checkbox-card" data-player="girl" onclick="famTogglePlayer(this)">
+          <span class="fam-cb-emoji">\uD83C\uDF38</span>
+          <span class="fam-cb-name">Daughter</span>
+        </div>
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:6px;" onclick="startFamRound()">Start Round \u2192</button>
+    `;
+  }
+
+  function famCourseChange(val) {
+    const wrap = document.getElementById('fm-custom-wrap');
+    wrap.style.display = parseInt(val) === COURSES.length - 1 ? 'block' : 'none';
+  }
+
+  function famTogglePlayer(el) { el.classList.toggle('selected'); }
+
+  function startFamRound() {
+    const players = Array.from(document.querySelectorAll('#fam-modal-body .fam-checkbox-card.selected'))
+                         .map(c => c.dataset.player);
+    if (!players.length) { showToast('Pick at least one player', 'error'); return; }
+
+    const courseIdx = parseInt(document.getElementById('fm-course').value);
+    let course = COURSES[courseIdx];
+    let courseName = course.name, coursePar = course.par, numHoles = course.holes;
+    if (courseIdx === COURSES.length - 1) {
+      courseName = document.getElementById('fm-custom-name').value.trim() || 'Custom Course';
+      coursePar  = parseInt(document.getElementById('fm-custom-par').value) || 54;
+      numHoles   = parseInt(document.getElementById('fm-custom-holes').value) || 18;
+    }
+
+    _famRound = { date_played: document.getElementById('fm-date').value, course_name: courseName, course_par: coursePar, players };
+    _famHoleIdx = 0;
+    const holePar = Math.round(coursePar / numHoles);
+    _famHoles = Array.from({length: numHoles}, (_, i) => {
+      const scores = {};
+      players.forEach(p => { scores[p] = holePar; });
+      return { hole: i+1, par: holePar, scores };
+    });
+
+    document.getElementById('fam-running-bar').style.display = 'flex';
+    renderFamHole();
+  }
+
+  function famScoreColor(diff) {
+    if (diff <= -2) return '#a78bfa';
+    if (diff === -1) return '#60a5fa';
+    if (diff === 0)  return '#4ade80';
+    if (diff === 1)  return 'var(--cream)';
+    if (diff === 2)  return 'var(--red)';
+    return '#ff4444';
+  }
+
+  function famScoreClass(diff) {
+    if (diff <= -2) return 'fam-eagle';
+    if (diff === -1) return 'fam-birdie';
+    if (diff === 0)  return 'fam-par';
+    if (diff === 1)  return 'fam-bogey';
+    if (diff === 2)  return 'fam-double';
+    return 'fam-triple';
+  }
+
+  function updateFamRunningBar() {
+    const bar = document.getElementById('fam-running-bar');
+    if (!bar) return;
+    bar.innerHTML = _famRound.players.map(pk => {
+      const p = FAM_PLAYERS[pk];
+      const total = _famHoles.slice(0, _famHoleIdx + 1).reduce((a, h) => a + (h.scores[pk] || 0), 0);
+      return `<span class="fam-running-chip" style="background:${p.bg};color:${p.color};">${p.emoji} ${total}</span>`;
+    }).join('');
+  }
+
+  function renderFamHole() {
+    const h      = _famHoles[_famHoleIdx];
+    const isLast = _famHoleIdx === _famHoles.length - 1;
+    document.getElementById('fam-modal-label').textContent = `Hole ${h.hole} / ${_famHoles.length}`;
+    updateFamRunningBar();
+
+    const playerRows = _famRound.players.map(pk => {
+      const p    = FAM_PLAYERS[pk];
+      const sc   = h.scores[pk];
+      const diff = sc - h.par;
+      const dLbl = diff === 0 ? 'E' : (diff > 0 ? '+'+diff : ''+diff);
+      return `<div class="fam-player-row">
+        <div class="fam-player-badge" style="background:${p.bg};">${p.emoji}</div>
+        <div class="fam-player-label">
+          <div class="fam-player-name" style="color:${p.color};">${p.name}</div>
+          <div class="fam-player-vpar" id="fvpar-${pk}" style="color:${famScoreColor(diff)};">${dLbl} this hole</div>
+        </div>
+        <div class="fam-score-stepper">
+          <button class="stepper-btn" onclick="famHoleScore('${pk}',-1)">\u2212</button>
+          <div class="fam-score-val" id="fsc-${pk}" style="color:${famScoreColor(diff)};">${sc}</div>
+          <button class="stepper-btn" onclick="famHoleScore('${pk}',1)">+</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('fam-modal-body').innerHTML = `
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--cream);line-height:1;">HOLE ${h.hole}</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-top:4px;">
+          Par &nbsp;
+          <button class="stepper-btn" onclick="famHolePar(-1)">\u2212</button>
+          <span id="fh-par" style="font-size:1rem;color:var(--cream);font-weight:700;margin:0 8px;">${h.par}</span>
+          <button class="stepper-btn" onclick="famHolePar(1)">+</button>
+        </div>
+      </div>
+      <div id="fam-player-rows" style="background:var(--surface);border-radius:12px;padding:4px 14px;">${playerRows}</div>
+      <div class="modal-nav-row" style="margin-top:20px;">
+        <button class="btn-ghost" onclick="famHoleBack()" ${_famHoleIdx===0?'disabled style="opacity:0.3;"':''}>\u2190 Back</button>
+        <button class="btn-gold" onclick="famHoleNext()">${isLast ? 'See Results \u2192' : 'Next Hole \u2192'}</button>
+      </div>
+    `;
+  }
+
+  function famHoleScore(pk, delta) {
+    const h = _famHoles[_famHoleIdx];
+    h.scores[pk] = Math.max(1, (h.scores[pk] || h.par) + delta);
+    const sc   = h.scores[pk];
+    const diff = sc - h.par;
+    const dLbl = diff === 0 ? 'E' : (diff > 0 ? '+'+diff : ''+diff);
+    const scoreEl = document.getElementById('fsc-' + pk);
+    const vparEl  = document.getElementById('fvpar-' + pk);
+    if (scoreEl) { scoreEl.textContent = sc; scoreEl.style.color = famScoreColor(diff); }
+    if (vparEl)  { vparEl.textContent = dLbl + ' this hole'; vparEl.style.color = famScoreColor(diff); }
+    updateFamRunningBar();
+  }
+
+  function famHolePar(delta) {
+    const h = _famHoles[_famHoleIdx];
+    h.par = Math.max(3, Math.min(5, h.par + delta));
+    renderFamHole();
+  }
+
+  function famHoleNext() {
+    if (_famHoleIdx === _famHoles.length - 1) { renderFamSummary(); }
+    else { _famHoleIdx++; renderFamHole(); }
+  }
+
+  function famHoleBack() {
+    if (_famHoleIdx > 0) { _famHoleIdx--; renderFamHole(); }
+  }
+
+  function renderFamSummary() {
+    document.getElementById('fam-modal-label').textContent = 'Scorecard';
+    document.getElementById('fam-running-bar').style.display = 'none';
+
+    const players = _famRound.players;
+    const totals  = {};
+    players.forEach(pk => { totals[pk] = 0; });
+    _famHoles.forEach(h => players.forEach(pk => { totals[pk] += h.scores[pk] || 0; }));
+    const totalPar = _famHoles.reduce((a, h) => a + h.par, 0);
+
+    const hdrCells  = players.map(pk => `<th style="color:${FAM_PLAYERS[pk].color};">${FAM_PLAYERS[pk].emoji} ${FAM_PLAYERS[pk].name}</th>`).join('');
+    const holeRows  = _famHoles.map(h => {
+      const cells = players.map(pk => {
+        const diff = (h.scores[pk]||0) - h.par;
+        return `<td><span class="${famScoreClass(diff)}">${h.scores[pk]||0}</span></td>`;
+      }).join('');
+      return `<tr><td>H${h.hole} &middot; P${h.par}</td>${cells}</tr>`;
+    }).join('');
+    const totCells  = players.map(pk => {
+      const diff    = totals[pk] - totalPar;
+      const diffStr = diff === 0 ? 'E' : (diff > 0 ? '+'+diff : ''+diff);
+      return `<td style="color:${famScoreColor(diff)};">${totals[pk]}<br><span style="font-size:0.68rem;">${diffStr}</span></td>`;
+    }).join('');
+
+    const minScore = Math.min(...players.map(pk => totals[pk]));
+    const winners  = players.filter(pk => totals[pk] === minScore);
+    const winMsg   = winners.length === players.length ? '\uD83E\uDD1D Tied!' :
+      '\uD83C\uDFC6 ' + winners.map(pk => FAM_PLAYERS[pk].name).join(' & ') + (winners.length === 1 ? ' wins!' : ' tie!');
+
+    document.getElementById('fam-modal-body').innerHTML = `
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--cream);">${_famRound.course_name}</div>
+        <div style="font-size:0.8rem;color:var(--muted);">${_famRound.date_played} &middot; Par ${totalPar}</div>
+        <div style="font-size:1.15rem;margin-top:10px;">${winMsg}</div>
+      </div>
+      <div class="fam-scroll-wrap">
+        <table class="fam-sc-table">
+          <thead><tr><th>Hole</th>${hdrCells}</tr></thead>
+          <tbody>
+            ${holeRows}
+            <tr class="total-row"><td>TOTAL</td>${totCells}</tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="fam-save-status" style="margin-top:14px;"></div>
+      <button class="btn-primary" style="width:100%;margin-top:12px;" onclick="saveFamRound(this)">Save to My Game \u2713</button>
+      <button class="btn-ghost"   style="width:100%;margin-top:8px;"  onclick="closeFamilyModal()">Done</button>
+    `;
+  }
+
+  async function saveFamRound(btn) {
+    btn.disabled = true; btn.textContent = 'Saving...';
+    const players  = _famRound.players;
+    const statusEl = document.getElementById('fam-save-status');
+    const saved = [], failed = [];
+
+    for (const pk of players) {
+      const total    = _famHoles.reduce((a, h) => a + (h.scores[pk] || 0), 0);
+      const holeData = _famHoles.map(h => ({ hole: h.hole, par: h.par, score: h.scores[pk] || 0 }));
+      const roundObj = {
+        date_played:  _famRound.date_played,
+        course_name:  _famRound.course_name + ' (Family)',
+        course_par:   _famRound.course_par,
+        total_score:  total,
+        score_vs_par: total - _famRound.course_par,
+        holes:        holeData,
+        reflection:   { best:'', worked:'', worst:'', fix:'', stars:0 },
+        stars:        0,
+      };
+      if (pk === 'dad') {
+        roundObj.tee_color = 'White';
+        try { await saveDadRound(roundObj); saved.push(FAM_PLAYERS[pk].name); }
+        catch(e) { failed.push(FAM_PLAYERS[pk].name); }
+      } else if (pk === 'son') {
+        try { await saveSonRound(roundObj); saved.push(FAM_PLAYERS[pk].name); }
+        catch(e) { failed.push(FAM_PLAYERS[pk].name); }
+      } else {
+        const existing = JSON.parse(localStorage.getItem('sv_girl_rounds') || '[]');
+        existing.unshift({...roundObj, id: Date.now()});
+        localStorage.setItem('sv_girl_rounds', JSON.stringify(existing.slice(0,20)));
+        saved.push(FAM_PLAYERS[pk].name);
+      }
+    }
+
+    if (saved.length)  statusEl.innerHTML += `<div style="color:#4ade80;font-size:0.85rem;">\u2713 Saved for ${saved.join(', ')}</div>`;
+    if (failed.length) statusEl.innerHTML += `<div style="color:var(--red);font-size:0.85rem;">\u2717 Failed for ${failed.join(', ')} \u2014 check signal</div>`;
+    btn.textContent = saved.length === players.length ? 'Saved! \u2713' : 'Partial Save';
+  }
 
 </script>
 </body>
