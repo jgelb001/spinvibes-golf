@@ -5720,9 +5720,11 @@ If hole yardage is provided in context, use it with the distance card above. If 
   // ── FAMILY SCORECARD ──────────────────────────────────────────
 
   const FAM_PLAYERS = {
-    dad:  { key:'dad',  name:'Dad',      emoji:'\uD83C\uDFCC', color:'#c9a84c', bg:'rgba(201,168,76,0.12)' },
-    son:  { key:'son',  name:'Owen',     emoji:'\u26F3', color:'#60a5fa', bg:'rgba(96,165,250,0.12)' },
-    girl: { key:'girl', name:'Daughter', emoji:'\uD83C\uDF38', color:'#f472b6', bg:'rgba(244,114,182,0.12)' },
+    dad:     { key:'dad',     name:'Dad',     emoji:'\uD83C\uDFCC', color:'#c9a84c', bg:'rgba(201,168,76,0.12)',   saveFn: r => saveDadRound({...r, tee_color:'White'}) },
+    son:     { key:'son',     name:'Owen',    emoji:'\u26F3',        color:'#60a5fa', bg:'rgba(96,165,250,0.12)',   saveFn: r => saveSonRound(r)     },
+    girl:    { key:'girl',    name:'Daughter',emoji:'\uD83C\uDF38',  color:'#f472b6', bg:'rgba(244,114,182,0.12)', saveFn: r => saveGirlRound(r)    },
+    mom:     { key:'mom',     name:'Mom',     emoji:'\uD83C\uDF3A',  color:'#f2c879', bg:'rgba(242,200,121,0.12)', saveFn: r => saveMomRound(r)     },
+    grandma: { key:'grandma', name:'Grandma', emoji:'\u2B50',        color:'#d4af70', bg:'rgba(212,175,112,0.12)', saveFn: r => saveGrandmaRound(r) },
   };
 
   let _famRound   = {};
@@ -5777,13 +5779,21 @@ If hole yardage is provided in context, use it with the distance card above. If 
           <span class="fam-cb-emoji">\uD83C\uDF38</span>
           <span class="fam-cb-name">Daughter</span>
         </div>
+        <div class="fam-checkbox-card" data-player="mom" onclick="famTogglePlayer(this)">
+          <span class="fam-cb-emoji">\uD83C\uDF3A</span>
+          <span class="fam-cb-name">Mom</span>
+        </div>
+        <div class="fam-checkbox-card" data-player="grandma" onclick="famTogglePlayer(this)">
+          <span class="fam-cb-emoji">\u2B50</span>
+          <span class="fam-cb-name">Grandma</span>
+        </div>
       </div>
       <button class="btn-primary" style="width:100%;margin-top:6px;" onclick="startFamRound()">Start Round \u2192</button>
       <div id="fam-history-section" style="margin-top:20px;">
         <div style="font-size:0.75rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Past Family Rounds</div>
         <div id="fam-history-list" style="color:var(--muted);font-size:0.85rem;text-align:center;padding:12px 0;">Loading...</div>
       </div>
-    \`;
+    `;
     loadFamHistory();
   }
 
