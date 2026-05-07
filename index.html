@@ -3926,6 +3926,48 @@
     if (error) throw error;
   }
 
+
+  async function saveGirlRound(round) {
+    const { error } = await _sb.from('girl_rounds').insert([round]);
+    if (error) throw error;
+  }
+  async function loadGirlRounds() {
+    const { data, error } = await _sb.from('girl_rounds').select('*')
+      .order('date_played', { ascending: false }).limit(50);
+    if (error) throw error;
+    return data;
+  }
+  async function saveMomRound(round) {
+    const { error } = await _sb.from('mom_rounds').insert([round]);
+    if (error) throw error;
+  }
+  async function loadMomRounds() {
+    const { data, error } = await _sb.from('mom_rounds').select('*')
+      .order('date_played', { ascending: false }).limit(50);
+    if (error) throw error;
+    return data;
+  }
+  async function saveGrandmaRound(round) {
+    const { error } = await _sb.from('grandma_rounds').insert([round]);
+    if (error) throw error;
+  }
+  async function loadGrandmaRounds() {
+    const { data, error } = await _sb.from('grandma_rounds').select('*')
+      .order('date_played', { ascending: false }).limit(50);
+    if (error) throw error;
+    return data;
+  }
+  async function saveFamilyRound(round) {
+    const { error } = await _sb.from('family_rounds').insert([round]);
+    if (error) throw error;
+  }
+  async function loadFamilyRounds() {
+    const { data, error } = await _sb.from('family_rounds').select('*')
+      .order('date_played', { ascending: false }).limit(30);
+    if (error) throw error;
+    return data;
+  }
+
   // ── TOAST ────────────────────────────────────────────────────
   function showToast(msg, type = 'success') {
     const t = document.createElement('div');
@@ -5737,7 +5779,12 @@ If hole yardage is provided in context, use it with the distance card above. If 
         </div>
       </div>
       <button class="btn-primary" style="width:100%;margin-top:6px;" onclick="startFamRound()">Start Round \u2192</button>
-    `;
+      <div id="fam-history-section" style="margin-top:20px;">
+        <div style="font-size:0.75rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Past Family Rounds</div>
+        <div id="fam-history-list" style="color:var(--muted);font-size:0.85rem;text-align:center;padding:12px 0;">Loading...</div>
+      </div>
+    \`;
+    loadFamHistory();
   }
 
   function famCourseChange(val) {
@@ -5746,6 +5793,53 @@ If hole yardage is provided in context, use it with the distance card above. If 
   }
 
   function famTogglePlayer(el) { el.classList.toggle('selected'); }
+
+  async function loadFamHistory() {
+    const listEl = document.getElementById('fam-history-list');
+    if (!listEl) return;
+    try {
+      const rounds = await loadFamilyRounds();
+      if (!rounds || rounds.length === 0) {
+        listEl.textContent = 'No family rounds yet — start one above!';
+        return;
+      }
+      listEl.innerHTML = rounds.map(r => {
+        const totals  = r.totals || {};
+        const players = r.players || [];
+        const chips   = players.map(pk => {
+          const p = FAM_PLAYERS[pk];
+          if (!p) return '';
+          return `<span style="background:${p.bg};color:${p.color};padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:700;">${p.emoji} ${totals[pk] ?? '?'}</span>`;
+        }).join('');
+        return `<div onclick="viewFamRound(${JSON.stringify(r).replace(/"/g,'&quot;')})"
+                     style="background:var(--surface);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,0.05);">
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:0.88rem;color:var(--cream);">${r.course_name}</div>
+            <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">${r.date_played}</div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;">${chips}</div>
+          <div style="color:var(--muted);font-size:0.9rem;">›</div>
+        </div>`;
+      }).join('');
+    } catch(e) {
+      listEl.textContent = 'Could not load history — check signal';
+    }
+  }
+
+  function viewFamRound(r) {
+    // Reconstruct _famRound and _famHoles from saved data to reuse renderFamSummary
+    _famRound = { date_played: r.date_played, course_name: r.course_name, course_par: r.course_par, players: r.players };
+    _famHoles = r.holes;
+    renderFamSummary();
+    // Override the save button — this is a read-only view
+    setTimeout(() => {
+      const saveBtn = document.querySelector('#fam-modal-body .btn-primary');
+      if (saveBtn) saveBtn.style.display = 'none';
+      const doneBtn = document.querySelector('#fam-modal-body .btn-ghost');
+      if (doneBtn) doneBtn.textContent = '\u2190 Back';
+      if (doneBtn) doneBtn.setAttribute('onclick','openFamilyModal()');
+    }, 50);
+  }
 
   function startFamRound() {
     const players = Array.from(document.querySelectorAll('#fam-modal-body .fam-checkbox-card.selected'))
@@ -5929,8 +6023,16 @@ If hole yardage is provided in context, use it with the distance card above. If 
     const statusEl = document.getElementById('fam-save-status');
     const saved = [], failed = [];
 
+    // Build totals map
+    const totals = {};
+    players.forEach(pk => {
+      totals[pk] = _famHoles.reduce((a, h) => a + (h.scores[pk] || 0), 0);
+    });
+
+    // Save individual round to each player's table
     for (const pk of players) {
-      const total    = _famHoles.reduce((a, h) => a + (h.scores[pk] || 0), 0);
+      const p        = FAM_PLAYERS[pk];
+      const total    = totals[pk];
       const holeData = _famHoles.map(h => ({ hole: h.hole, par: h.par, score: h.scores[pk] || 0 }));
       const roundObj = {
         date_played:  _famRound.date_played,
@@ -5942,20 +6044,26 @@ If hole yardage is provided in context, use it with the distance card above. If 
         reflection:   { best:'', worked:'', worst:'', fix:'', stars:0 },
         stars:        0,
       };
-      if (pk === 'dad') {
-        roundObj.tee_color = 'White';
-        try { await saveDadRound(roundObj); saved.push(FAM_PLAYERS[pk].name); }
-        catch(e) { failed.push(FAM_PLAYERS[pk].name); }
-      } else if (pk === 'son') {
-        try { await saveSonRound(roundObj); saved.push(FAM_PLAYERS[pk].name); }
-        catch(e) { failed.push(FAM_PLAYERS[pk].name); }
-      } else {
-        const existing = JSON.parse(localStorage.getItem('sv_girl_rounds') || '[]');
-        existing.unshift({...roundObj, id: Date.now()});
-        localStorage.setItem('sv_girl_rounds', JSON.stringify(existing.slice(0,20)));
-        saved.push(FAM_PLAYERS[pk].name);
+      if (pk === 'dad') roundObj.tee_color = 'White';
+      try {
+        await p.saveFn(roundObj);
+        saved.push(p.name);
+      } catch(e) {
+        failed.push(p.name);
       }
     }
+
+    // Save full family round snapshot to family_rounds
+    try {
+      await saveFamilyRound({
+        date_played: _famRound.date_played,
+        course_name: _famRound.course_name,
+        course_par:  _famRound.course_par,
+        players:     players,
+        holes:       _famHoles,
+        totals:      totals,
+      });
+    } catch(e) { /* non-fatal — individual saves already done */ }
 
     if (saved.length)  statusEl.innerHTML += `<div style="color:#4ade80;font-size:0.85rem;">\u2713 Saved for ${saved.join(', ')}</div>`;
     if (failed.length) statusEl.innerHTML += `<div style="color:var(--red);font-size:0.85rem;">\u2717 Failed for ${failed.join(', ')} \u2014 check signal</div>`;

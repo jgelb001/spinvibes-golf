@@ -1,7 +1,7 @@
-// SpinVibes Golf — Service Worker v22
+// SpinVibes Golf — Service Worker v23
 // Strategy: network-first for HTML, cache-first for everything else
 
-const CACHE = 'spinvibes-golf-v51';
+const CACHE = 'spinvibes-golf-v52';
 
 const ASSETS = [
   '/',
