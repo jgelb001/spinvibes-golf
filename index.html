@@ -3732,6 +3732,8 @@
               style="flex:1;background:var(--surface2);border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:var(--cream);font-size:0.9rem;padding:10px 14px;resize:none;font-family:inherit;line-height:1.5;overflow-y:auto;"
               placeholder="Ask your caddie…" rows="2"
               onkeydown="caddieInputKeydown(event)"></textarea>
+            <button id="caddie-mic-btn" onclick="toggleCaddieMic()"
+              style="flex-shrink:0;background:var(--surface2);border:1px solid rgba(255,255,255,0.12);border-radius:12px;width:44px;height:44px;color:var(--muted);font-size:1.2rem;cursor:pointer;align-self:flex-end;">🏙️</button>
             <button id="caddie-send-btn" onclick="sendCaddieMessage()"
               style="flex-shrink:0;background:var(--gold);border:none;border-radius:12px;width:44px;height:44px;color:var(--bg);font-weight:700;font-size:1.1rem;cursor:pointer;align-self:flex-end;">➤</button>
           </div>
@@ -5680,6 +5682,54 @@ If hole yardage is provided in context, use it with the distance card above. If 
       : '';
     el.innerHTML = (_caddieHistory.length === 0 ? welcome : '') + msgs + typing;
     el.scrollTop = el.scrollHeight;
+  }
+
+  // ── VOICE INPUT ──────────────────────────────────────────────
+  let _caddieRecognition = null;
+  let _caddieListening   = false;
+
+  function toggleCaddieMic() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      showToast('Voice not supported on this browser', 'error');
+      return;
+    }
+    if (_caddieListening) {
+      _caddieRecognition && _caddieRecognition.stop();
+      return;
+    }
+    _caddieRecognition = new SpeechRecognition();
+    _caddieRecognition.lang = 'en-US';
+    _caddieRecognition.interimResults = false;
+    _caddieRecognition.maxAlternatives = 1;
+
+    const micBtn = document.getElementById('caddie-mic-btn');
+
+    _caddieRecognition.onstart = () => {
+      _caddieListening = true;
+      if (micBtn) { micBtn.textContent = '🔴'; micBtn.style.color = '#ef4444'; micBtn.style.borderColor = '#ef4444'; }
+    };
+    _caddieRecognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      const inp = document.getElementById('caddie-input');
+      if (inp) {
+        inp.value = (inp.value ? inp.value + ' ' : '') + transcript;
+      }
+    };
+    _caddieRecognition.onend = () => {
+      _caddieListening = false;
+      if (micBtn) { micBtn.textContent = '🎙️'; micBtn.style.color = ''; micBtn.style.borderColor = ''; }
+      // Auto-send if there's content
+      const inp = document.getElementById('caddie-input');
+      if (inp && inp.value.trim()) sendCaddieMessage();
+    };
+    _caddieRecognition.onerror = (e) => {
+      _caddieListening = false;
+      if (micBtn) { micBtn.textContent = '🎙️'; micBtn.style.color = ''; micBtn.style.borderColor = ''; }
+      if (e.error !== 'no-speech') showToast('Mic error: ' + e.error, 'error');
+    };
+
+    _caddieRecognition.start();
   }
 
   function clearCaddieChat() {
