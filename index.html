@@ -3658,79 +3658,13 @@
       <!-- Main caddie UI -->
       <div id="caddie-main">
 
-        <!-- Context panel -->
-        <div class="section">
-          <div class="card">
-            <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <span>⛳ Hole Context</span>
-              <button onclick="toggleCaddieCtx()" id="caddie-ctx-toggle" style="background:none;border:none;color:var(--gold);font-size:0.78rem;cursor:pointer;font-weight:600;">▾ Edit</button>
-            </div>
-            <div id="caddie-ctx-display" style="font-size:0.83rem;color:var(--muted);line-height:1.6;">No hole set — tap Edit to set your situation</div>
-            <div id="caddie-ctx-form" style="display:none;margin-top:14px;">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-                <div>
-                  <label class="modal-label" style="margin-bottom:4px;font-size:0.72rem;">Course</label>
-                  <select id="cc-course" class="modal-input" style="margin:0;font-size:0.8rem;padding:8px 10px;">
-                    <option value="Stonehouse">Stonehouse</option>
-                    <option value="Oaks">Oaks</option>
-                    <option value="Creek">Creek</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="modal-label" style="margin-bottom:4px;font-size:0.72rem;">Tees</label>
-                  <select id="cc-tees" class="modal-input" style="margin:0;font-size:0.8rem;padding:8px 10px;">
-                    <option value="Autumn">Autumn</option>
-                    <option value="Sage">Sage</option>
-                    <option value="Black">Black</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="modal-label" style="margin-bottom:4px;font-size:0.72rem;">Hole #</label>
-                  <input type="number" id="cc-hole" class="modal-input" style="margin:0;padding:8px 10px;" placeholder="1–18" min="1" max="18">
-                </div>
-                <div>
-                  <label class="modal-label" style="margin-bottom:4px;font-size:0.72rem;">Yardage to pin</label>
-                  <input type="number" id="cc-yards" class="modal-input" style="margin:0;padding:8px 10px;" placeholder="e.g. 145">
-                </div>
-                <div>
-                  <label class="modal-label" style="margin-bottom:4px;font-size:0.72rem;">Wind</label>
-                  <select id="cc-wind" class="modal-input" style="margin:0;font-size:0.8rem;padding:8px 10px;">
-                    <option value="none">Calm</option>
-                    <option value="light tailwind">Light tailwind</option>
-                    <option value="light headwind">Light headwind</option>
-                    <option value="strong headwind">Strong headwind</option>
-                    <option value="crosswind left">Crosswind left</option>
-                    <option value="crosswind right">Crosswind right</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="modal-label" style="margin-bottom:4px;font-size:0.72rem;">Lie</label>
-                  <select id="cc-lie" class="modal-input" style="margin:0;font-size:0.8rem;padding:8px 10px;">
-                    <option value="fairway">Fairway</option>
-                    <option value="rough">Rough</option>
-                    <option value="tee box">Tee box</option>
-                    <option value="fringe">Fringe</option>
-                    <option value="bunker">Bunker</option>
-                  </select>
-                </div>
-              </div>
-              <div style="margin-bottom:8px;">
-                <label class="modal-label" style="margin-bottom:4px;font-size:0.72rem;">Score so far (optional)</label>
-                <input type="number" id="cc-score" class="modal-input" style="margin:0;padding:8px 10px;" placeholder="e.g. 38 through 7 holes">
-              </div>
-              <button class="btn-gold" style="width:100%;" onclick="applyCaddieCtx()">Set Context →</button>
-            </div>
-          </div>
-        </div>
-
         <!-- Chat -->
         <div class="section">
           <div id="caddie-messages" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;max-height:55vh;overflow-y:auto;padding-right:2px;"></div>
           <div style="display:flex;gap:8px;align-items:flex-end;">
             <textarea id="caddie-input"
               style="flex:1;background:var(--surface2);border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:var(--cream);font-size:0.9rem;padding:10px 14px;resize:none;font-family:inherit;line-height:1.5;overflow-y:auto;"
-              placeholder="Ask your caddie…" rows="2"
+              placeholder="e.g. 'About 140 out, into the wind'" rows="2"
               onkeydown="caddieInputKeydown(event)"></textarea>
             <button id="caddie-mic-btn" onclick="toggleCaddieMic()"
               style="flex-shrink:0;background:var(--surface2);border:1px solid rgba(255,255,255,0.12);border-radius:12px;width:44px;height:44px;color:var(--muted);font-size:1.2rem;cursor:pointer;align-self:flex-end;">🏙️</button>
@@ -4287,7 +4221,7 @@
       }
     }
     if (id === 'caddie') {
-      initCaddieTab();
+      renderCaddieMessages(false);
     }
   }
 
@@ -5539,79 +5473,11 @@
 
   // ── AI CADDIE ─────────────────────────────────────────────────
   let _caddieHistory = [];
-  let _caddieCtx = null;
-  let _caddieCtxOpen = false;
+  // Caddie system prompt — lean, fast
+  const _CADDIE_SYSTEM = `Jeremy's carries: Driver 190-200 | 4H 170-180 | 6i 145-155 | 7i 130-140 | 8i 120-130 | 9i 110-120 | PW 90-110 | GW 85-105 | SW 80. Left-handed beginner, goal: break 90.
+Name the club. Show distance math in one line. One sentence of strategy. 2 sentences total. If no distance given, ask for it first.`;
 
-  // Caddie system prompt — yardage card first, distance math required
-  const _CADDIE_SYSTEM = `JEREMY'S CONFIRMED CARRY DISTANCES — USE ONLY THESE. NEVER USE GENERAL GOLF KNOWLEDGE FOR CLUB SELECTION.
-Driver: 190-200 yds | 4-Hybrid: 170-180 | 6-Iron: 145-155 | 7-Iron: 130-140 | 8-Iron: 120-130 | 9-Iron: 110-120 | PW: 90-110 | GW: 85-105 | SW: 80
-
-MANDATORY FORMAT: Every club call must show the distance math inline.
-Example: "7-IRON. (135 yds fits 130-140 carry.) One sentence of reason."
-Never suggest a club without checking the distance card above first. 3 sentences max. No waffling.
-
-PLAYER: Jeremy. Left-handed. Beginner. Goal: break 90. Lead foot = right foot.
-
-ADJUSTMENTS (apply before recommending):
-- Downhill: subtract one club (ball flies further)
-- Headwind: add one club, 80% swing. Strong headwind: add two.
-- Rough/bad lie: add one club
-- Over water: commit fully — never decelerate
-- OB risk / tight fairway: 4-Hybrid or 7-Iron instead of driver
-
-STRATEGY:
-- 150+ yds out: middle of green, no pin hunting, no hero shots
-- Par 5 layup target: 85-90 yds (GW/SW range)
-- Bogey every hole. One double is recoverable. Two is a spiral.
-
-If hole yardage is provided in context, use it with the distance card above. If no yardage is given, ask for it before recommending a club.`;
-
-  function _caddieSystemWithCtx() {
-    if (!_caddieCtx) return _CADDIE_SYSTEM;
-    const c = _caddieCtx;
-    let ctx = '\n\nCURRENT SITUATION:';
-    if (c.course) ctx += ` ${c.course} course`;
-    if (c.tees)   ctx += ` · ${c.tees} tees`;
-    if (c.hole)   ctx += ` · Hole ${c.hole}`;
-    if (c.yards)  ctx += ` · ${c.yards} yds to pin`;
-    if (c.wind && c.wind !== 'none') ctx += ` · Wind: ${c.wind}`;
-    if (c.lie)    ctx += ` · Lie: ${c.lie}`;
-    if (c.score)  ctx += ` · Score so far: ${c.score}`;
-    return _CADDIE_SYSTEM + ctx;
-  }
-
-  function initCaddieTab() {
-    renderCaddieMessages(false);
-  }
-
-  function toggleCaddieCtx() {
-    _caddieCtxOpen = !_caddieCtxOpen;
-    document.getElementById('caddie-ctx-form').style.display = _caddieCtxOpen ? '' : 'none';
-    document.getElementById('caddie-ctx-toggle').textContent = _caddieCtxOpen ? '▴ Done' : '▾ Edit';
-  }
-
-  function applyCaddieCtx() {
-    _caddieCtx = {
-      course: document.getElementById('cc-course').value,
-      tees:   document.getElementById('cc-tees').value,
-      hole:   document.getElementById('cc-hole').value,
-      yards:  document.getElementById('cc-yards').value,
-      wind:   document.getElementById('cc-wind').value,
-      lie:    document.getElementById('cc-lie').value,
-      score:  document.getElementById('cc-score').value
-    };
-    const parts = [];
-    if (_caddieCtx.hole)  parts.push(`Hole ${_caddieCtx.hole} · ${_caddieCtx.course} · ${_caddieCtx.tees} tees`);
-    if (_caddieCtx.yards) parts.push(`${_caddieCtx.yards} yds to pin`);
-    if (_caddieCtx.wind && _caddieCtx.wind !== 'none') parts.push(_caddieCtx.wind);
-    if (_caddieCtx.lie)   parts.push(`${_caddieCtx.lie} lie`);
-    if (_caddieCtx.score) parts.push(`Score: ${_caddieCtx.score}`);
-    document.getElementById('caddie-ctx-display').innerHTML =
-      parts.length
-        ? `<span style="color:var(--cream);">${parts.join(' &nbsp;·&nbsp; ')}</span>`
-        : 'No context set — tap Edit';
-    if (_caddieCtxOpen) toggleCaddieCtx();
-  }
+  function _caddieSystemWithCtx() { return _CADDIE_SYSTEM; }
 
   function caddieInputKeydown(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendCaddieMessage(); }
@@ -5665,7 +5531,7 @@ If hole yardage is provided in context, use it with the distance card above. If 
   function renderCaddieMessages(showTyping) {
     const el = document.getElementById('caddie-messages');
     if (!el) return;
-    const welcome = `<div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:14px 16px;font-size:0.85rem;color:var(--cream);line-height:1.6;">👋 <strong>On the bag.</strong> Set your hole context above, then ask me anything — club selection, layup vs. go for it, wind adjustments. I know your yardages and every hole at TCI.</div>`;
+    const welcome = `<div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:14px 16px;font-size:0.85rem;color:var(--cream);line-height:1.6;">🎙️ <strong>On the bag.</strong> Just say your distance and situation — I'll pick the club. Try: <em>"About 140 out, slight headwind"</em> or <em>"Tee shot, tight fairway."</em></div>`;
     const msgs = _caddieHistory.map(m => {
       const isUser = m.role === 'user';
       return `<div style="
