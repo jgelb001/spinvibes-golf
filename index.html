@@ -4243,12 +4243,9 @@
     }
     if (id === 'caddie') {
       renderCaddieMessages(false);
-<<<<<<< HEAD
-=======
     }
     if (id === 'girl-progress') {
       loadGirlRoundsAndRender();
->>>>>>> 5e8f39a (Family scorecard: all 5 players, Supabase tables for everyone, family round history. SW v52.)
     }
   }
 
@@ -5553,8 +5550,6 @@
 Name the club. Show distance math in one line. One sentence of strategy. 2 sentences total. If no distance given, ask for it first.`;
 
   function _caddieSystemWithCtx() { return _CADDIE_SYSTEM; }
-<<<<<<< HEAD
-=======
 
   // Family-round caddie — player-aware yardage cards
   const _FAM_YARDAGES = {
@@ -5575,7 +5570,6 @@ ${activePlayers}
 
 RULES: Always state which player you are advising. Use ONLY that player's yardage card — never mix up players' distances. Show distance math inline (e.g. "7-iron. 130-140 fits the 135 yd gap."). Name the club. One sentence strategy. 3 sentences max. If the user doesn't say who they're asking for, ask. If a player's distances are unknown, ask before recommending.`;
   }
->>>>>>> 5e8f39a (Family scorecard: all 5 players, Supabase tables for everyone, family round history. SW v52.)
 
   function caddieInputKeydown(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendCaddieMessage(); }
@@ -5735,11 +5729,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
   const FAM_PLAYERS = {
     dad:     { key:'dad',     name:'Dad',     emoji:'\uD83C\uDFCC', color:'#c9a84c', bg:'rgba(201,168,76,0.12)',   saveFn: r => saveDadRound({...r, tee_color:'White'}) },
-<<<<<<< HEAD
-    son:     { key:'son',     name:'Owen',    emoji:'\u26F3',        color:'#60a5fa', bg:'rgba(96,165,250,0.12)',   saveFn: r => saveSonRound(r)     },
-=======
     son:     { key:'son',     name:'Son',    emoji:'\u26F3',        color:'#60a5fa', bg:'rgba(96,165,250,0.12)',   saveFn: r => saveSonRound(r)     },
->>>>>>> 5e8f39a (Family scorecard: all 5 players, Supabase tables for everyone, family round history. SW v52.)
     girl:    { key:'girl',    name:'Daughter',emoji:'\uD83C\uDF38',  color:'#f472b6', bg:'rgba(244,114,182,0.12)', saveFn: r => saveGirlRound(r)    },
     mom:     { key:'mom',     name:'Mom',     emoji:'\uD83C\uDF3A',  color:'#f2c879', bg:'rgba(242,200,121,0.12)', saveFn: r => saveMomRound(r)     },
     grandma: { key:'grandma', name:'Grandma', emoji:'\u2B50',        color:'#d4af70', bg:'rgba(212,175,112,0.12)', saveFn: r => saveGrandmaRound(r) },
@@ -6181,11 +6171,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     const h = _famHoles[_famHoleIdx];
     const holeCtx = h ? `\n\nCurrent hole: Hole ${h.hole}, Par ${h.par}.` : '';
-<<<<<<< HEAD
-    const systemPrompt = _caddieSystemWithCtx() + holeCtx;
-=======
     const systemPrompt = _famCaddieSystem() + holeCtx;
->>>>>>> 5e8f39a (Family scorecard: all 5 players, Supabase tables for everyone, family round history. SW v52.)
 
     try {
       const resp = await fetch('https://golf.spinvibes.com/.netlify/functions/caddie', {
@@ -6218,12 +6204,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     }
   }
 
-<<<<<<< HEAD
-=======
   // Stores per-player round objects that failed to save, keyed by player key
   let _famFailedRounds = {};
 
->>>>>>> 5e8f39a (Family scorecard: all 5 players, Supabase tables for everyone, family round history. SW v52.)
   async function saveFamRound(btn) {
     btn.disabled = true; btn.textContent = 'Saving...';
     const players  = _famRound.players;
