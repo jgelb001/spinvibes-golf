@@ -4747,15 +4747,35 @@
 
   // ── COURSES LIST ─────────────────────────────────────────────
   const COURSES = [
-    // ── Known courses (with hole yardages where available) ─────
-    { name: 'Temecula Creek Inn — Creek Course', par: 72, holes: 18 },
-    { name: 'Temecula Creek Inn — Oaks Course', par: 72, holes: 18 },
-    { name: 'Temecula Creek Inn — Stone Course', par: 72, holes: 18 },
+    // ── Temecula Creek Inn ─────────────────────────────────────
+    // Source: physical scorecard. Creek = front 9, Stonehouse = back 9.
+    { name: 'TCI — Creek + Stonehouse', par: 71, holes: 18,
+      holePars:  [4,3,4,5,4,4,3,5,4, 4,4,4,4,3,4,4,3,5],
+      yardages:  [333,150,323,492,349,367,163,453,334, 350,311,335,299,143,321,305,132,480], // Sage
+    },
+    { name: 'TCI — Creek (9 holes)', par: 36, holes: 9,
+      holePars:  [4,3,4,5,4,4,3,5,4],
+      yardages:  [333,150,323,492,349,367,163,453,334], // Sage
+    },
+    { name: 'TCI — Stonehouse (9 holes)', par: 35, holes: 9,
+      holePars:  [4,4,4,4,3,4,4,3,5],
+      yardages:  [350,311,335,299,143,321,305,132,480], // Sage
+    },
+    // Source: physical scorecard. Creek = front 9 (C10-C18), Oaks = back 9 (O1-O9). Sage tees.
+    { name: 'TCI — Creek + Oaks', par: 72, holes: 18,
+      holePars:  [4,3,4,5,4,4,3,5,4, 4,5,3,4,4,3,5,4,4],
+      yardages:  [315,150,323,492,349,367,163,453,334, 300,475,140,385,365,110,438,363,333], // Sage
+    },
+    { name: 'TCI — Oaks (9 holes)', par: 36, holes: 9,
+      holePars:  [4,5,3,4,4,3,5,4,4],
+      yardages:  [300,475,140,385,365,110,438,363,333], // Sage
+    },
+    // ── Other local courses ────────────────────────────────────
     { name: 'Pechanga Golf Course', par: 72, holes: 18 },
     { name: 'Welk Resort — Fountains Course', par: 72, holes: 18 },
     { name: 'Welk Resort — Oaks Course (Par 3)', par: 54, holes: 18,
-      // Blue tees only — source: physical scorecard Apr 2026
-      yardages: [90,101,107,86,92,110,88,83,127,121,80,110,91,105,91,73,83,126]
+      holePars:  [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],
+      yardages:  [90,101,107,86,92,110,88,83,127,121,80,110,91,105,91,73,83,126], // Blue tees
     },
     { name: 'CrossCreek Golf Club', par: 71, holes: 18 },
     { name: 'Redhawk Golf Club', par: 72, holes: 18 },
