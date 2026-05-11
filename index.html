@@ -4747,15 +4747,23 @@
 
   // ── COURSES LIST ─────────────────────────────────────────────
   const COURSES = [
+    // ── Known courses (with hole yardages where available) ─────
     { name: 'Temecula Creek Inn — Creek Course', par: 72, holes: 18 },
     { name: 'Temecula Creek Inn — Oaks Course', par: 72, holes: 18 },
     { name: 'Temecula Creek Inn — Stone Course', par: 72, holes: 18 },
     { name: 'Pechanga Golf Course', par: 72, holes: 18 },
     { name: 'Welk Resort — Fountains Course', par: 72, holes: 18 },
-    { name: 'Welk Resort — Oaks Course (Par 3)', par: 54, holes: 18 },
+    { name: 'Welk Resort — Oaks Course (Par 3)', par: 54, holes: 18,
+      // Blue tees only — source: physical scorecard Apr 2026
+      yardages: [90,101,107,86,92,110,88,83,127,121,80,110,91,105,91,73,83,126]
+    },
     { name: 'CrossCreek Golf Club', par: 71, holes: 18 },
     { name: 'Redhawk Golf Club', par: 72, holes: 18 },
     { name: 'Bear Creek Golf Club', par: 72, holes: 18 },
+    // ── Generic templates ──────────────────────────────────────
+    { name: 'Par-3 Course (18 holes)', par: 54, holes: 18 },
+    { name: 'Executive Par-3 (9 holes)', par: 27, holes: 9 },
+    { name: 'Blank — all par 3, adjust as you play', par: 54, holes: 18, blankPars: true },
     { name: 'Custom', par: 72, holes: 18 },
   ];
 
@@ -5221,9 +5229,10 @@
     };
     _dadHoles = [];
     _dadHoleIdx = 0;
-    const holePar = Math.round(coursePar / numHoles);
+    const holePar = course.blankPars ? 3 : Math.round(coursePar / numHoles);
     for (let i = 1; i <= numHoles; i++) {
-      _dadHoles.push({ hole: i, par: holePar, score: holePar, fairway: 'no', gir: false, putts: 2 });
+      const yds = course.yardages ? course.yardages[i - 1] : null;
+      _dadHoles.push({ hole: i, par: holePar, score: holePar, fairway: 'no', gir: false, putts: 2, yds });
     }
     document.getElementById('dad-running-total').style.display = '';
     startGPS();
@@ -5239,6 +5248,7 @@
     document.getElementById('dad-modal-body').innerHTML = `
       <div class="hole-score-block">
         <div class="hole-number-big">HOLE ${h.hole}</div>
+        ${h.yds ? `<div style="font-size:0.85rem;color:var(--gold);font-weight:700;letter-spacing:1px;margin-bottom:4px;">${h.yds} yds</div>` : ''}
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px;">
           Par:
           <button class="stepper-btn" onclick="dadHolePar(-1)">−</button>
@@ -5896,11 +5906,12 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     _famHoleIdx       = 0;
     _famCaddieHistory = [];
     _famCaddieOpen    = false;
-    const holePar = Math.round(coursePar / numHoles);
+    const holePar = course.blankPars ? 3 : Math.round(coursePar / numHoles);
     _famHoles = Array.from({length: numHoles}, (_, i) => {
       const scores = {};
       players.forEach(p => { scores[p] = holePar; });
-      return { hole: i+1, par: holePar, scores, photo: null };
+      const yds = course.yardages ? course.yardages[i] : null;
+      return { hole: i+1, par: holePar, scores, photo: null, yds };
     });
 
     document.getElementById('fam-running-bar').style.display = 'flex';
@@ -5963,6 +5974,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     document.getElementById('fam-modal-body').innerHTML = `
       <div style="text-align:center;margin-bottom:16px;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--cream);line-height:1;">HOLE ${h.hole}</div>
+        ${h.yds ? `<div style="font-size:0.85rem;color:var(--gold);font-weight:700;letter-spacing:1px;margin-top:2px;">${h.yds} yds</div>` : ''}
         <div style="font-size:0.8rem;color:var(--muted);margin-top:4px;">
           Par &nbsp;
           <button class="stepper-btn" onclick="famHolePar(-1)">\u2212</button>
@@ -6170,7 +6182,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     if (btn) { btn.disabled = true; btn.textContent = '…'; }
 
     const h = _famHoles[_famHoleIdx];
-    const holeCtx = h ? `\n\nCurrent hole: Hole ${h.hole}, Par ${h.par}.` : '';
+    const holeCtx = h ? `\n\nCurrent hole: Hole ${h.hole}, Par ${h.par}${h.yds ? `, ${h.yds} yards` : ''}.` : '';
     const systemPrompt = _famCaddieSystem() + holeCtx;
 
     try {
