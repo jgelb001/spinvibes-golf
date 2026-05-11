@@ -3740,7 +3740,7 @@
               </div>
             </div>
             <div class="round-card-expand" id="son-milestone-par1-expand">
-              <div style="margin-bottom:8px;color:#93c5fd;font-weight:700;">🎉 Owen's 1st Par — Hole 14!</div>
+              <div style="margin-bottom:8px;color:#93c5fd;font-weight:700;">🎉 Son's 1st Par — Hole 14!</div>
               <div style="margin-bottom:6px;">Welk Resort SD — Oaks par 3 · Blue tees</div>
               <div style="margin-bottom:6px;">Par 3 · 105 yards · Score: 3</div>
               <div style="font-size:0.82rem;color:var(--muted);">Played with Dad. Ball signed and put on his shelf. 🏌️</div>
@@ -3771,6 +3771,20 @@
         <div id="son-modal-body" style="padding:20px;"></div>
       </div>
     </div><!-- /page-son-progress -->
+
+    <!-- ══════════════════════════════════════
+         GIRL PROGRESS PAGE
+    ══════════════════════════════════════ -->
+    <div class="page" id="page-girl-progress" style="display:none;overflow-y:auto;">
+      <div class="page-header" data-icon="🌸" style="background:linear-gradient(160deg,rgba(236,72,153,0.18) 0%,var(--bg) 100%);border-bottom-color:rgba(236,72,153,0.3);">
+        <div class="page-tag" style="color:#ec4899;">My Game</div>
+        <div class="page-title" style="color:#f9a8d4;">Daughter's Rounds 🌸</div>
+        <div class="page-sub">Family rounds · All her best moments</div>
+      </div>
+      <div class="section" id="girl-rounds-content" style="padding-bottom:40px;">
+        <div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0;">Loading...</div>
+      </div>
+    </div><!-- /page-girl-progress -->
 
   </div><!-- /pages -->
 
@@ -3804,6 +3818,10 @@
       <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
       My Game
     </button>
+    <button class="nav-btn girl-sect" onclick="showPage('girl-progress')" id="nav-girl-progress">
+      <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      My Game
+    </button>
 
   </nav>
 
@@ -3832,7 +3850,10 @@
 
   // ── SUPABASE HELPERS ─────────────────────────────────────────
   async function saveDadRound(round) {
-    const { error } = await _sb.from('dad_rounds').insert([round]);
+    // Ensure stars meets DB check constraint (must be >= 1)
+    const safeRound = { ...round, stars: Math.max(1, round.stars || 1) };
+    if (safeRound.reflection) safeRound.reflection = { ...safeRound.reflection, stars: Math.max(1, safeRound.reflection.stars || 1) };
+    const { error } = await _sb.from('dad_rounds').insert([safeRound]);
     if (error) throw error;
   }
   async function loadDadRounds() {
@@ -3934,10 +3955,10 @@
     document.body.classList.toggle('grandma-mode', isGrandma);
     document.body.classList.toggle('mom-mode',     isMom);
     document.querySelectorAll('.dad-sect')    .forEach(el => el.style.display = isDad     ? '' : 'none');
-    document.querySelectorAll('.son-sect')    .forEach(el => el.style.display = isSon     ? 'block' : 'none');
-    document.querySelectorAll('.girl-sect')   .forEach(el => el.style.display = isGirl    ? 'block' : 'none');
-    document.querySelectorAll('.grandma-sect').forEach(el => el.style.display = isGrandma ? 'block' : 'none');
-    document.querySelectorAll('.mom-sect')    .forEach(el => el.style.display = isMom     ? 'block' : 'none');
+    document.querySelectorAll('.son-sect')    .forEach(el => el.style.display = isSon     ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
+    document.querySelectorAll('.girl-sect')   .forEach(el => el.style.display = isGirl    ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
+    document.querySelectorAll('.grandma-sect').forEach(el => el.style.display = isGrandma ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
+    document.querySelectorAll('.mom-sect')    .forEach(el => el.style.display = isMom     ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
     const subs = { dad: '⛳ Lefty · Sub-90 Journey', son: '⛳ Righty · Junior · Have Fun!', girl: '⛳ Lefty · Age 5 · Pure Fun!', grandma: '⛳ Righty · Welcome Back · Lynx Lady', mom: '⛳ Righty · Beginner · Welcome to the Range' };
     document.getElementById('topbarSub').textContent = subs[who];
     document.getElementById('btnDad')    .classList.toggle('active', isDad);
@@ -4222,6 +4243,12 @@
     }
     if (id === 'caddie') {
       renderCaddieMessages(false);
+<<<<<<< HEAD
+=======
+    }
+    if (id === 'girl-progress') {
+      loadGirlRoundsAndRender();
+>>>>>>> 5e8f39a (Family scorecard: all 5 players, Supabase tables for everyone, family round history. SW v52.)
     }
   }
 
@@ -4737,6 +4764,7 @@
 
   // ── DAD PIN ───────────────────────────────────────────────────
   let _dadPin = '';
+  let _pendingAfterPin = null; // optional callback name to run after PIN success
   function dadPinKey(d) {
     if (_dadPin.length >= 4) return;
     _dadPin += d;
@@ -4748,6 +4776,11 @@
         setTimeout(() => {
           document.getElementById('dad-pin-overlay').style.display = 'none';
           document.getElementById('dad-pin-overlay').style.opacity = '1';
+          if (_pendingAfterPin) {
+            const fn = _pendingAfterPin;
+            _pendingAfterPin = null;
+            if (fn === '_openFamilyModalUnlocked') { _openFamilyModalUnlocked(); return; }
+          }
           loadDadRoundsAndRender();
         }, 300);
       } else {
@@ -5047,6 +5080,44 @@
     }
   }
 
+  // ── GIRL PROGRESS ─────────────────────────────────────────
+  async function loadGirlRoundsAndRender() {
+    const el = document.getElementById('girl-rounds-content');
+    if (!el) return;
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">Loading rounds... ⏳</div>';
+    try {
+      const rounds = await loadGirlRounds();
+      if (!rounds || rounds.length === 0) {
+        el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet — join a Family Round to get started! 🌸</div>';
+        return;
+      }
+      el.innerHTML = rounds.map((r, idx) => {
+        const d = new Date(r.date_played + 'T12:00:00');
+        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const diff = r.score_vs_par >= 0 ? '+' + r.score_vs_par : r.score_vs_par;
+        const holes = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]');
+        const holeGrid = holes.map(h => `<div class="hole-cell"><div class="h-num">${h.hole}</div><div class="h-score">${h.score}</div><div class="h-par">p${h.par}</div></div>`).join('');
+        return `
+          <div class="round-card" id="girl-round-${idx}" style="border-color:rgba(236,72,153,0.25);">
+            <div class="round-card-header" onclick="toggleRoundExpand('girl-round-${idx}')">
+              <div class="round-card-left">
+                <div class="round-card-date">${dateStr}</div>
+                <div class="round-card-course" style="color:#f9a8d4;">${r.course_name}</div>
+              </div>
+              <div class="round-card-right">
+                <div class="round-badge" style="background:rgba(236,72,153,0.18);color:#f9a8d4;border:1px solid rgba(236,72,153,0.4);">${r.total_score} <span style="font-size:0.75rem;opacity:0.7;">(${diff})</span></div>
+              </div>
+            </div>
+            <div class="round-card-expand" id="girl-round-${idx}-expand">
+              <div class="hole-grid">${holeGrid}</div>
+            </div>
+          </div>`;
+      }).join('');
+    } catch(e) {
+      el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:0.85rem;">Could not connect — check your signal</div>';
+    }
+  }
+
   // ── DAD ROUND MODAL ─────────────────────────────────────────
   let _dadRound = {};
   let _dadHoles = [];
@@ -5320,8 +5391,12 @@
       closeDadModal();
       loadDadRoundsAndRender();
     } catch(e) {
-      showToast('Save failed — check your signal', 'error');
-      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Round'; }
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = '↺ Retry Save';
+        saveBtn.style.background = 'var(--red)';
+      }
+      showToast('Save failed — tap Retry Save when you have signal', 'error');
     }
   }
 
@@ -5478,6 +5553,29 @@
 Name the club. Show distance math in one line. One sentence of strategy. 2 sentences total. If no distance given, ask for it first.`;
 
   function _caddieSystemWithCtx() { return _CADDIE_SYSTEM; }
+<<<<<<< HEAD
+=======
+
+  // Family-round caddie — player-aware yardage cards
+  const _FAM_YARDAGES = {
+    dad:     `Dad (Jeremy, left-handed): Driver 190-200 | 4H 170-180 | 6i 145-155 | 7i 130-140 | 8i 120-130 | 9i 110-120 | PW 90-110 | GW 85-105 | SW 80`,
+    son:     `Son (right-handed, junior set, age 8): Driver ~60-80 | FW Wood ~50-65 | 5i ~40-55 | 7i ~30-45 | 9i ~25-35 | SW ~15-25`,
+    girl:    `Daughter (lefty, age 5, junior set): distances vary — ask how far she hits before recommending`,
+    mom:     `Mom (right-handed, beginner): distances unknown — ask how far she hits before recommending`,
+    grandma: `Grandma (right-handed): distances unknown — ask how far she hits before recommending`,
+  };
+
+  function _famCaddieSystem() {
+    const activePlayers = (_famRound.players || [])
+      .map(pk => _FAM_YARDAGES[pk] || pk)
+      .join('\n');
+    return `FAMILY ROUND CADDIE — multiple players on the course.
+PLAYER YARDAGE CARDS:
+${activePlayers}
+
+RULES: Always state which player you are advising. Use ONLY that player's yardage card — never mix up players' distances. Show distance math inline (e.g. "7-iron. 130-140 fits the 135 yd gap."). Name the club. One sentence strategy. 3 sentences max. If the user doesn't say who they're asking for, ask. If a player's distances are unknown, ask before recommending.`;
+  }
+>>>>>>> 5e8f39a (Family scorecard: all 5 players, Supabase tables for everyone, family round history. SW v52.)
 
   function caddieInputKeydown(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendCaddieMessage(); }
@@ -5637,7 +5735,11 @@ Name the club. Show distance math in one line. One sentence of strategy. 2 sente
 
   const FAM_PLAYERS = {
     dad:     { key:'dad',     name:'Dad',     emoji:'\uD83C\uDFCC', color:'#c9a84c', bg:'rgba(201,168,76,0.12)',   saveFn: r => saveDadRound({...r, tee_color:'White'}) },
+<<<<<<< HEAD
     son:     { key:'son',     name:'Owen',    emoji:'\u26F3',        color:'#60a5fa', bg:'rgba(96,165,250,0.12)',   saveFn: r => saveSonRound(r)     },
+=======
+    son:     { key:'son',     name:'Son',    emoji:'\u26F3',        color:'#60a5fa', bg:'rgba(96,165,250,0.12)',   saveFn: r => saveSonRound(r)     },
+>>>>>>> 5e8f39a (Family scorecard: all 5 players, Supabase tables for everyone, family round history. SW v52.)
     girl:    { key:'girl',    name:'Daughter',emoji:'\uD83C\uDF38',  color:'#f472b6', bg:'rgba(244,114,182,0.12)', saveFn: r => saveGirlRound(r)    },
     mom:     { key:'mom',     name:'Mom',     emoji:'\uD83C\uDF3A',  color:'#f2c879', bg:'rgba(242,200,121,0.12)', saveFn: r => saveMomRound(r)     },
     grandma: { key:'grandma', name:'Grandma', emoji:'\u2B50',        color:'#d4af70', bg:'rgba(212,175,112,0.12)', saveFn: r => saveGrandmaRound(r) },
@@ -5650,6 +5752,17 @@ Name the club. Show distance math in one line. One sentence of strategy. 2 sente
   let _famCaddieOpen    = false;
 
   function openFamilyModal() {
+    // Require dad's PIN — same session lock used by My Game
+    if (sessionStorage.getItem('sv-dad-unlocked') !== '1') {
+      // Show PIN overlay; on success it will call _openFamilyModalUnlocked()
+      _pendingAfterPin = '_openFamilyModalUnlocked';
+      showPage('dad-progress'); // triggers PIN overlay
+      return;
+    }
+    _openFamilyModalUnlocked();
+  }
+
+  function _openFamilyModalUnlocked() {
     _famRound   = {};
     _famHoles   = [];
     _famHoleIdx = 0;
@@ -5665,7 +5778,11 @@ Name the club. Show distance math in one line. One sentence of strategy. 2 sente
   function renderFamSetup() {
     document.getElementById('fam-modal-label').textContent = 'Family Round';
     const today = new Date().toISOString().split('T')[0];
-    const courseOpts = COURSES.map((c,i) => `<option value="${i}">${c.name} (par ${c.par})</option>`).join('');
+    const lastCourse = localStorage.getItem('sv-last-fam-course') || '';
+    const courseOpts = [
+      `<option value="-1" disabled ${lastCourse === '' ? 'selected' : ''}>— Select a course —</option>`,
+      ...COURSES.map((c,i) => `<option value="${i}" ${lastCourse === String(i) ? 'selected' : ''}>${c.name} (par ${c.par})</option>`)
+    ].join('');
     document.getElementById('fam-modal-body').innerHTML = `
       <label class="modal-label">Date</label>
       <input type="date" id="fm-date" class="modal-input" value="${today}">
@@ -5691,7 +5808,7 @@ Name the club. Show distance math in one line. One sentence of strategy. 2 sente
         </div>
         <div class="fam-checkbox-card selected" data-player="son" onclick="famTogglePlayer(this)">
           <span class="fam-cb-emoji">\u26F3</span>
-          <span class="fam-cb-name">Owen</span>
+          <span class="fam-cb-name">Son</span>
         </div>
         <div class="fam-checkbox-card" data-player="girl" onclick="famTogglePlayer(this)">
           <span class="fam-cb-emoji">\uD83C\uDF38</span>
@@ -5775,6 +5892,8 @@ Name the club. Show distance math in one line. One sentence of strategy. 2 sente
     if (!players.length) { showToast('Pick at least one player', 'error'); return; }
 
     const courseIdx = parseInt(document.getElementById('fm-course').value);
+    if (courseIdx < 0 || isNaN(courseIdx)) { showToast('Please select a course', 'error'); return; }
+    localStorage.setItem('sv-last-fam-course', String(courseIdx));
     let course = COURSES[courseIdx];
     let courseName = course.name, coursePar = course.par, numHoles = course.holes;
     if (courseIdx === COURSES.length - 1) {
@@ -5791,7 +5910,7 @@ Name the club. Show distance math in one line. One sentence of strategy. 2 sente
     _famHoles = Array.from({length: numHoles}, (_, i) => {
       const scores = {};
       players.forEach(p => { scores[p] = holePar; });
-      return { hole: i+1, par: holePar, scores };
+      return { hole: i+1, par: holePar, scores, photo: null };
     });
 
     document.getElementById('fam-running-bar').style.display = 'flex';
@@ -5862,7 +5981,17 @@ Name the club. Show distance math in one line. One sentence of strategy. 2 sente
         </div>
       </div>
       <div id="fam-player-rows" style="background:var(--surface);border-radius:12px;padding:4px 14px;">${playerRows}</div>
-      <div class="modal-nav-row" style="margin-top:20px;">
+
+      <!-- HOLE PHOTO -->
+      <div style="margin-top:14px;display:flex;align-items:center;gap:10px;">
+        <input type="file" id="fam-hole-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="famLoadHolePhoto(this)">
+        <button onclick="document.getElementById('fam-hole-photo-input').click()" style="flex:1;background:var(--surface2);border:1px dashed rgba(201,168,76,0.3);border-radius:10px;padding:10px;color:var(--muted);font-size:0.82rem;cursor:pointer;">
+          ${h.photo ? '\ud83d\udcf7 Change Photo' : '\ud83d\udcf7 Add Hole Photo'}
+        </button>
+        ${h.photo ? `<img src="${h.photo}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid rgba(201,168,76,0.3);" onclick="famViewPhoto()">` : ''}
+      </div>
+
+      <div class="modal-nav-row" style="margin-top:16px;">
         <button class="btn-ghost" onclick="famHoleBack()" ${_famHoleIdx===0?'disabled style="opacity:0.3;"':''}>\u2190 Back</button>
         <button class="btn-gold" onclick="famHoleNext()">${isLast ? 'See Results \u2192' : 'Next Hole \u2192'}</button>
       </div>
@@ -5909,6 +6038,38 @@ Name the club. Show distance math in one line. One sentence of strategy. 2 sente
     renderFamHole();
   }
 
+  function famLoadHolePhoto(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      _famHoles[_famHoleIdx].photo = e.target.result;
+      renderFamHole(); // re-render to show thumbnail
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function _showPhotoOverlay(src) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;';
+    overlay.onclick = () => document.body.removeChild(overlay);
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.cssText = 'max-width:96vw;max-height:90vh;border-radius:12px;';
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+  }
+
+  function famViewPhoto() {
+    const h = _famHoles[_famHoleIdx];
+    if (h && h.photo) _showPhotoOverlay(h.photo);
+  }
+
+  function famViewScorecardPhoto(holeNum) {
+    const h = _famHoles.find(x => x.hole === parseInt(holeNum));
+    if (h && h.photo) _showPhotoOverlay(h.photo);
+  }
+
   function famHoleNext() {
     if (_famHoleIdx === _famHoles.length - 1) { renderFamSummary(); }
     else { _famHoleIdx++; renderFamHole(); }
@@ -5934,7 +6095,10 @@ Name the club. Show distance math in one line. One sentence of strategy. 2 sente
         const diff = (h.scores[pk]||0) - h.par;
         return `<td><span class="${famScoreClass(diff)}">${h.scores[pk]||0}</span></td>`;
       }).join('');
-      return `<tr><td>H${h.hole} &middot; P${h.par}</td>${cells}</tr>`;
+      const photoThumb = h.photo
+        ? `<img src="${h.photo}" onclick="famViewScorecardPhoto('${h.hole}')" style="width:22px;height:22px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-left:4px;cursor:pointer;">`
+        : '';
+      return `<tr><td>H${h.hole}&middot;P${h.par}${photoThumb}</td>${cells}</tr>`;
     }).join('');
     const totCells  = players.map(pk => {
       const diff    = totals[pk] - totalPar;
@@ -6017,7 +6181,11 @@ Name the club. Show distance math in one line. One sentence of strategy. 2 sente
 
     const h = _famHoles[_famHoleIdx];
     const holeCtx = h ? `\n\nCurrent hole: Hole ${h.hole}, Par ${h.par}.` : '';
+<<<<<<< HEAD
     const systemPrompt = _caddieSystemWithCtx() + holeCtx;
+=======
+    const systemPrompt = _famCaddieSystem() + holeCtx;
+>>>>>>> 5e8f39a (Family scorecard: all 5 players, Supabase tables for everyone, family round history. SW v52.)
 
     try {
       const resp = await fetch('https://golf.spinvibes.com/.netlify/functions/caddie', {
@@ -6050,6 +6218,12 @@ Name the club. Show distance math in one line. One sentence of strategy. 2 sente
     }
   }
 
+<<<<<<< HEAD
+=======
+  // Stores per-player round objects that failed to save, keyed by player key
+  let _famFailedRounds = {};
+
+>>>>>>> 5e8f39a (Family scorecard: all 5 players, Supabase tables for everyone, family round history. SW v52.)
   async function saveFamRound(btn) {
     btn.disabled = true; btn.textContent = 'Saving...';
     const players  = _famRound.players;
@@ -6074,15 +6248,17 @@ Name the club. Show distance math in one line. One sentence of strategy. 2 sente
         total_score:  total,
         score_vs_par: total - _famRound.course_par,
         holes:        holeData,
-        reflection:   { best:'', worked:'', worst:'', fix:'', stars:0 },
-        stars:        0,
+        reflection:   { best:'', worked:'', worst:'', fix:'', stars:1 },
+        stars:        1,
       };
       if (pk === 'dad') roundObj.tee_color = 'White';
       try {
         await p.saveFn(roundObj);
-        saved.push(p.name);
+        saved.push(pk);
+        delete _famFailedRounds[pk];
       } catch(e) {
-        failed.push(p.name);
+        failed.push(pk);
+        _famFailedRounds[pk] = roundObj;
       }
     }
 
@@ -6096,11 +6272,47 @@ Name the club. Show distance math in one line. One sentence of strategy. 2 sente
         holes:       _famHoles,
         totals:      totals,
       });
-    } catch(e) { /* non-fatal — individual saves already done */ }
+    } catch(e) { /* non-fatal \u2014 individual saves already done */ }
 
-    if (saved.length)  statusEl.innerHTML += `<div style="color:#4ade80;font-size:0.85rem;">\u2713 Saved for ${saved.join(', ')}</div>`;
-    if (failed.length) statusEl.innerHTML += `<div style="color:var(--red);font-size:0.85rem;">\u2717 Failed for ${failed.join(', ')} \u2014 check signal</div>`;
-    btn.textContent = saved.length === players.length ? 'Saved! \u2713' : 'Partial Save';
+    statusEl.innerHTML = '';
+    if (saved.length) {
+      const savedNames = saved.map(pk => FAM_PLAYERS[pk]?.name || pk).join(', ');
+      statusEl.innerHTML += `<div style="color:#4ade80;font-size:0.85rem;margin-bottom:6px;">\u2713 Saved for ${savedNames}</div>`;
+    }
+    if (failed.length) {
+      const failedNames = failed.map(pk => FAM_PLAYERS[pk]?.name || pk).join(', ');
+      statusEl.innerHTML += `<div style="color:var(--red);font-size:0.85rem;margin-bottom:8px;">\u2717 Failed for ${failedNames} \u2014 check signal</div>`;
+      statusEl.innerHTML += `<button onclick="retryFailedFamSaves(this)" style="background:var(--red);border:none;border-radius:8px;padding:9px 18px;color:#fff;font-weight:700;font-size:0.82rem;cursor:pointer;width:100%;">\u21ba Retry Failed Saves</button>`;
+    }
+    btn.textContent = failed.length === 0 ? 'Saved! \u2713' : 'Partial Save';
+    if (failed.length === 0) btn.disabled = false;
+  }
+
+  async function retryFailedFamSaves(btn) {
+    btn.disabled = true; btn.textContent = 'Retrying...';
+    const statusEl = document.getElementById('fam-save-status');
+    const nowSaved = [], stillFailed = [];
+
+    for (const pk of Object.keys(_famFailedRounds)) {
+      const p = FAM_PLAYERS[pk];
+      if (!p) continue;
+      try {
+        await p.saveFn(_famFailedRounds[pk]);
+        nowSaved.push(p.name);
+        delete _famFailedRounds[pk];
+      } catch(e) {
+        stillFailed.push(p.name);
+      }
+    }
+
+    statusEl.innerHTML = '';
+    if (nowSaved.length) statusEl.innerHTML += `<div style="color:#4ade80;font-size:0.85rem;margin-bottom:6px;">\u2713 Saved for ${nowSaved.join(', ')}</div>`;
+    if (stillFailed.length) {
+      statusEl.innerHTML += `<div style="color:var(--red);font-size:0.85rem;margin-bottom:8px;">\u2717 Still failing for ${stillFailed.join(', ')} \u2014 try again when you have signal</div>`;
+      statusEl.innerHTML += `<button onclick="retryFailedFamSaves(this)" style="background:var(--red);border:none;border-radius:8px;padding:9px 18px;color:#fff;font-weight:700;font-size:0.82rem;cursor:pointer;width:100%;">\u21ba Retry Again</button>`;
+    } else {
+      btn.textContent = 'All Saved! \u2713';
+    }
   }
 
 </script>
