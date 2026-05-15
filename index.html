@@ -4815,6 +4815,7 @@
           <button class="stepper-btn" onclick="dadHolePar(1)">+</button>
         </div>
       </div>
+      ${h.yds ? `<div style="text-align:center;font-size:0.72rem;color:var(--muted);margin-bottom:6px;letter-spacing:0.5px;">📋 SCORECARD: <strong style="color:var(--gold);">${h.yds} yds</strong></div>` : ''}
       <div class="live-distance-card" style="padding:8px 12px 8px;margin-bottom:10px;">
         <div style="display:flex;align-items:baseline;justify-content:center;gap:4px;">
           <div class="live-yards" id="live-yards" style="font-size:2.8rem;">—</div>
@@ -4989,36 +4990,36 @@
   const COURSES = [
     // ── Temecula Creek Inn ─────────────────────────────────────
     // Source: physical scorecard. Creek = front 9, Stonehouse = back 9.
-    { name: 'TCI — Creek + Stonehouse', par: 71, holes: 18,
+    { name: 'TCI — Creek + Stonehouse', par: 71, holes: 18, teeColor: 'Sage',
       holePars:  [4,3,4,5,4,4,3,5,4, 4,4,4,4,3,4,4,3,5],
-      yardages:  [333,150,323,492,349,367,163,453,334, 350,311,335,299,143,321,305,132,480], // Sage
+      yardages:  [333,150,323,492,349,367,163,453,334, 350,311,335,299,143,321,305,132,480],
     },
-    { name: 'TCI — Creek (9 holes)', par: 36, holes: 9,
+    { name: 'TCI — Creek (9 holes)', par: 36, holes: 9, teeColor: 'Sage',
       holePars:  [4,3,4,5,4,4,3,5,4],
-      yardages:  [333,150,323,492,349,367,163,453,334], // Sage
+      yardages:  [333,150,323,492,349,367,163,453,334],
     },
-    { name: 'TCI — Stonehouse (9 holes)', par: 35, holes: 9,
+    { name: 'TCI — Stonehouse (9 holes)', par: 35, holes: 9, teeColor: 'Sage',
       holePars:  [4,4,4,4,3,4,4,3,5],
-      yardages:  [350,311,335,299,143,321,305,132,480], // Sage
+      yardages:  [350,311,335,299,143,321,305,132,480],
     },
     // Source: physical scorecard. Creek = front 9 (C10-C18), Oaks = back 9 (O1-O9). Sage tees.
-    { name: 'TCI — Creek + Oaks', par: 72, holes: 18,
+    { name: 'TCI — Creek + Oaks', par: 72, holes: 18, teeColor: 'Sage',
       holePars:  [4,3,4,5,4,4,3,5,4, 4,5,3,4,4,3,5,4,4],
-      yardages:  [315,150,323,492,349,367,163,453,334, 300,475,140,385,365,110,438,363,333], // Sage
+      yardages:  [315,150,323,492,349,367,163,453,334, 300,475,140,385,365,110,438,363,333],
     },
-    { name: 'TCI — Oaks (9 holes)', par: 36, holes: 9,
+    { name: 'TCI — Oaks (9 holes)', par: 36, holes: 9, teeColor: 'Sage',
       holePars:  [4,5,3,4,4,3,5,4,4],
-      yardages:  [300,475,140,385,365,110,438,363,333], // Sage
+      yardages:  [300,475,140,385,365,110,438,363,333],
     },
     // ── Other local courses ────────────────────────────────────
     { name: 'Pechanga Golf Course', par: 72, holes: 18 },
-    { name: 'Welk Resort — Fountains Course', par: 62, holes: 18,
-      holePars: [3,4,3,3,4,3,4,3,4, 4,3,4,3,3,3,4,3,4], // Resort tees (par 60 from Ladies — H10+H16 play as par 3)
-      yardages: [132,250,102,145,290,152,288,133,303, 219,119,282,169,137,172,192,110,268], // Resort tees, 3463 yds
+    { name: 'Welk Resort — Fountains Course', par: 62, holes: 18, teeColor: 'Resort',
+      holePars: [3,4,3,3,4,3,4,3,4, 4,3,4,3,3,3,4,3,4],
+      yardages: [132,250,102,145,290,152,288,133,303, 219,119,282,169,137,172,192,110,268],
     },
-    { name: 'Welk Resort — Oaks Course (Par 3)', par: 54, holes: 18,
+    { name: 'Welk Resort — Oaks Course (Par 3)', par: 54, holes: 18, teeColor: 'Blue',
       holePars:  [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],
-      yardages:  [90,101,107,86,92,110,88,83,127,121,80,110,91,105,91,73,83,126], // Blue tees
+      yardages:  [90,101,107,86,92,110,88,83,127,121,80,110,91,105,91,73,83,126],
     },
     { name: 'CrossCreek Golf Club', par: 71, holes: 18 },
     { name: 'Redhawk Golf Club', par: 72, holes: 18 },
@@ -5558,18 +5559,38 @@
       </div>
       <label class="modal-label">Tee Color</label>
       <div class="pill-row" id="dm-tee-pills">
-        <div class="pill active" onclick="selectPill(this,'dm-tee-pills')" data-val="White">White</div>
+        <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="White">White</div>
         <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="Gold">Gold</div>
         <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="Red">Red</div>
+        <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="Sage">Sage</div>
+        <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="Blue">Blue</div>
+        <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="Resort">Resort</div>
       </div>
       <button class="btn-ghost" style="width:100%;margin-top:8px;font-size:0.8rem;" onclick="openAddCourseOverlay('dad')">+ Add New Course</button>
       <button class="btn-primary" style="width:100%;margin-top:10px;" onclick="dadStartRound()">Start Round →</button>
     `;
+    dadCourseChange(document.getElementById('dm-course').value);
   }
 
   function dadCourseChange(val) {
     const custom = document.getElementById('dm-custom-wrap');
-    custom.style.display = parseInt(val) === getAllCourses().length - 1 ? 'block' : 'none';
+    const idx = parseInt(val);
+    custom.style.display = idx === getAllCourses().length - 1 ? 'block' : 'none';
+    // Auto-select tee color matching the course's stored tee
+    const course = getAllCourses()[idx];
+    if (course && course.teeColor) {
+      const pill = document.querySelector(`#dm-tee-pills .pill[data-val="${course.teeColor}"]`);
+      if (pill) {
+        document.querySelectorAll('#dm-tee-pills .pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        return;
+      }
+    }
+    // Default to White if no match
+    const whitePill = document.querySelector('#dm-tee-pills .pill[data-val="White"]');
+    if (whitePill && !document.querySelector('#dm-tee-pills .pill.active')) {
+      whitePill.classList.add('active');
+    }
   }
 
   function selectPill(el, groupId) {
