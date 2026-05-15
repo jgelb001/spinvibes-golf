@@ -3574,6 +3574,8 @@
           <div class="stat-row" id="dad-stats-row"></div>
         </div>
 
+        <div id="dad-approach-stats" style="display:none;margin-bottom:12px;"></div>
+
         <!-- GAME PLAN SECTION -->
         <div style="margin-bottom:12px;">
           <button
@@ -5186,6 +5188,7 @@
     } else {
       statsBar.style.display = 'none';
     }
+    renderApproachStats(rounds);
     const legacyCards = `
       <div class="round-card" id="dad-round-legacy-apr26">
         <div class="round-card-header" onclick="toggleRoundExpand('dad-round-legacy-apr26')">
@@ -5279,6 +5282,90 @@
           </div>
         </div>`;
     }).join('') + legacyCards;
+  }
+
+  function renderApproachStats(rounds) {
+    const el = document.getElementById('dad-approach-stats');
+    if (!el) return;
+
+    // Aggregate approach data across all rounds
+    const clubData = {};
+    let totalApproachHoles = 0;
+    let totalApproachVsPar = 0;
+
+    rounds.forEach(r => {
+      const holes = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]');
+      holes.forEach(h => {
+        if (!h.approach_club) return;
+        const club = h.approach_club;
+        if (!clubData[club]) clubData[club] = { count: 0, totalYds: 0, ydsCount: 0, totalVsPar: 0 };
+        clubData[club].count++;
+        totalApproachHoles++;
+        const vp = (h.score || 0) - (h.par || 0);
+        clubData[club].totalVsPar += vp;
+        totalApproachVsPar += vp;
+        if (h.approach_yds && h.approach_yds > 0) {
+          clubData[club].totalYds += h.approach_yds;
+          clubData[club].ydsCount++;
+        }
+      });
+    });
+
+    const clubs = Object.keys(clubData);
+    if (clubs.length === 0) { el.style.display = 'none'; return; }
+
+    // Sort by frequency
+    clubs.sort((a,b) => clubData[b].count - clubData[a].count);
+
+    const overallAvg = totalApproachVsPar / totalApproachHoles;
+    const overallStr = overallAvg >= 0 ? '+' + overallAvg.toFixed(1) : overallAvg.toFixed(1);
+    const overallColor = overallAvg <= 0.5 ? '#4ade80' : overallAvg <= 1.2 ? 'var(--gold)' : 'var(--red)';
+    const roundsWithData = rounds.filter(r => {
+      const holes = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]');
+      return holes.some(h => h.approach_club);
+    }).length;
+
+    const rows = clubs.map(club => {
+      const d = clubData[club];
+      const avgYds = d.ydsCount ? Math.round(d.totalYds / d.ydsCount) + 'y' : '—';
+      const avg = d.totalVsPar / d.count;
+      const avgStr = avg >= 0 ? '+' + avg.toFixed(1) : avg.toFixed(1);
+      const color = avg <= 0.5 ? '#4ade80' : avg <= 1.2 ? 'var(--gold)' : 'var(--red)';
+      return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+        <td style="padding:7px 8px 7px 0;font-weight:600;font-size:0.82rem;color:var(--cream);">${club}</td>
+        <td style="padding:7px 4px;text-align:center;font-size:0.8rem;color:var(--muted);">${d.count}</td>
+        <td style="padding:7px 4px;text-align:center;font-size:0.8rem;color:var(--cream);">${avgYds}</td>
+        <td style="padding:7px 0 7px 4px;text-align:right;font-size:0.82rem;font-weight:700;color:${color};">${avgStr}</td>
+      </tr>`;
+    }).join('');
+
+    el.style.display = '';
+    el.innerHTML = `
+      <button onclick="var p=this.nextElementSibling;p.style.display=p.style.display==='none'?'block':'none';this.querySelector('.arrow').textContent=p.style.display==='none'?'▼':'▲';"
+        style="width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:14px 18px;font-size:16px;font-weight:700;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+        <span>🏌️‍♂️ Approach Stats</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div style="display:none;background:var(--surface2);border:1px solid rgba(201,168,76,0.2);border-radius:0 0 10px 10px;padding:16px;">
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:12px;">
+          ${totalApproachHoles} approach${totalApproachHoles !== 1 ? 'es' : ''} tracked across ${roundsWithData} round${roundsWithData !== 1 ? 's' : ''}
+          &nbsp;·&nbsp; avg <span style="color:${overallColor};font-weight:700;">${overallStr}</span> vs par on approach holes
+        </div>
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(201,168,76,0.25);">
+              <th style="text-align:left;font-size:0.68rem;color:var(--muted);font-weight:600;padding-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">Club</th>
+              <th style="text-align:center;font-size:0.68rem;color:var(--muted);font-weight:600;padding-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">Used</th>
+              <th style="text-align:center;font-size:0.68rem;color:var(--muted);font-weight:600;padding-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">Avg Yds</th>
+              <th style="text-align:right;font-size:0.68rem;color:var(--muted);font-weight:600;padding-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">Avg ±Par</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div style="margin-top:12px;font-size:0.72rem;color:var(--muted);line-height:1.5;">
+          ✅ Green = avg ≤ +0.5 &nbsp; 🟡 Gold = ≤ +1.2 &nbsp; 🔴 Red = > +1.2
+        </div>
+      </div>`;
   }
 
   function toggleRoundExpand(id) {
