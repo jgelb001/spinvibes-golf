@@ -3995,6 +3995,10 @@
   }
 
 
+  async function deleteGirlRound(id) {
+    const { error } = await _sb.from('girl_rounds').delete().eq('id', id);
+    if (error) throw error;
+  }
   async function saveGirlRound(round) {
     const { error } = await _sb.from('girl_rounds').insert([round]);
     if (error) throw error;
@@ -4004,6 +4008,10 @@
       .order('date_played', { ascending: false }).limit(50);
     if (error) throw error;
     return data;
+  }
+  async function deleteMomRound(id) {
+    const { error } = await _sb.from('mom_rounds').delete().eq('id', id);
+    if (error) throw error;
   }
   async function saveMomRound(round) {
     const { error } = await _sb.from('mom_rounds').insert([round]);
@@ -4015,6 +4023,10 @@
     if (error) throw error;
     return data;
   }
+  async function deleteGrandmaRound(id) {
+    const { error } = await _sb.from('grandma_rounds').delete().eq('id', id);
+    if (error) throw error;
+  }
   async function saveGrandmaRound(round) {
     const { error } = await _sb.from('grandma_rounds').insert([round]);
     if (error) throw error;
@@ -4024,6 +4036,10 @@
       .order('date_played', { ascending: false }).limit(50);
     if (error) throw error;
     return data;
+  }
+  async function deleteFamilyRound(id) {
+    const { error } = await _sb.from('family_rounds').delete().eq('id', id);
+    if (error) throw error;
   }
   async function saveFamilyRound(round) {
     const { error } = await _sb.from('family_rounds').insert([round]);
@@ -5320,11 +5336,23 @@
             </div>
             <div class="round-card-expand" id="girl-round-${idx}-expand">
               <div class="hole-grid">${holeGrid}</div>
+              <button class="round-delete-btn" onclick="confirmDeleteGirlRound('${r.id}')">Delete Round</button>
             </div>
           </div>`;
       }).join('');
     } catch(e) {
       el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:0.85rem;">Could not connect — check your signal</div>';
+    }
+  }
+
+  async function confirmDeleteGirlRound(id) {
+    if (!confirm('Delete this round?')) return;
+    try {
+      await deleteGirlRound(id);
+      showToast('Round deleted');
+      loadGirlRoundsAndRender();
+    } catch(e) {
+      showToast('Delete failed — check your signal', 'error');
     }
   }
 
@@ -6044,6 +6072,17 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
   function famTogglePlayer(el) { el.classList.toggle('selected'); }
 
+  async function confirmDeleteFamilyRound(id) {
+    if (!confirm('Delete this family round?')) return;
+    try {
+      await deleteFamilyRound(id);
+      showToast('Round deleted');
+      loadFamHistory();
+    } catch(e) {
+      showToast('Delete failed — check your signal', 'error');
+    }
+  }
+
   async function loadFamHistory() {
     const listEl = document.getElementById('fam-history-list');
     if (!listEl) return;
@@ -6061,14 +6100,18 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
           if (!p) return '';
           return `<span style="background:${p.bg};color:${p.color};padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:700;">${p.emoji} ${totals[pk] ?? '?'}</span>`;
         }).join('');
-        return `<div onclick="viewFamRound(${JSON.stringify(r).replace(/"/g,'&quot;')})"
-                     style="background:var(--surface);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,0.05);">
-          <div style="flex:1;">
-            <div style="font-weight:700;font-size:0.88rem;color:var(--cream);">${r.course_name}</div>
-            <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">${r.date_played}</div>
+        return `<div style="background:var(--surface);border-radius:10px;padding:12px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.05);">
+          <div onclick="viewFamRound(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:0.88rem;color:var(--cream);">${r.course_name}</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">${r.date_played}</div>
+            </div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;">${chips}</div>
+            <div style="color:var(--muted);font-size:0.9rem;">›</div>
           </div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;">${chips}</div>
-          <div style="color:var(--muted);font-size:0.9rem;">›</div>
+          <div style="text-align:right;margin-top:8px;">
+            <button class="round-delete-btn" onclick="confirmDeleteFamilyRound('${r.id}')">Delete Round</button>
+          </div>
         </div>`;
       }).join('');
     } catch(e) {
