@@ -146,6 +146,8 @@
     .nav-btn {
       flex: 1 1 0;
       min-width: 0;
+      height: var(--nav-h);
+      align-self: flex-start;
       padding-left: 2px;
       padding-right: 2px;
       display: flex;
@@ -1555,10 +1557,12 @@
     .live-club-note { font-size: 0.73rem; color: var(--muted); line-height: 1.4; }
     .club-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
     .club-chip {
-      padding: 6px 10px; background: var(--surface3);
+      padding: 8px 12px; background: var(--surface3);
       border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
       color: var(--muted); font-size: 0.72rem; font-weight: 600;
       cursor: pointer; transition: all 0.15s;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+      user-select: none; -webkit-user-select: none;
     }
     .club-chip.used {
       background: rgba(45,106,63,0.35); border-color: var(--green-b); color: #4ade80;
@@ -4701,7 +4705,19 @@
   }
 
   function markBall() {
-    if (!_currentPos) { showToast('GPS not ready — wait a moment', 'error'); return; }
+    if (!_currentPos) {
+      // No GPS — apply manually typed yardage if present
+      const inp = document.getElementById('live-yardage-input');
+      if (inp && inp.value) {
+        setManualYards(inp.value);
+        const btn = document.querySelector('.mark-ball-btn');
+        if (btn) btn.classList.add('marked');
+        showToast('Yardage set ✓');
+      } else {
+        showToast('No GPS — type yardage in the field above', 'error');
+      }
+      return;
+    }
     _markedPos = { ..._currentPos };
     const btn = document.querySelector('.mark-ball-btn');
     if (btn) btn.classList.add('marked');
@@ -4835,8 +4851,8 @@
           <button class="yardage-pill" onclick="tapYardage(225)" style="padding:5px 9px;font-size:0.75rem;">225</button>
         </div>
         <div style="display:flex;gap:6px;align-items:center;">
-          <input type="number" id="live-yardage-input" class="modal-input"
-            placeholder="Type exact yardage…" inputmode="numeric"
+          <input type="text" id="live-yardage-input" class="modal-input"
+            placeholder="Type exact yardage…" inputmode="numeric" pattern="[0-9]*"
             style="margin-bottom:0;flex:1;text-align:center;font-size:1rem;font-weight:700;padding:8px 10px;"
             oninput="setManualYards(this.value)">
           <button class="mark-ball-btn" onclick="markBall()" style="padding:8px 10px;font-size:0.78rem;">📍 Mark</button>
@@ -4861,7 +4877,7 @@
           <div class="pill-row" id="dh-fairway-pills">
             <div class="pill ${fw}" onclick="selectPill(this,'dh-fairway-pills')" data-val="yes">Yes</div>
             <div class="pill ${fno}" onclick="selectPill(this,'dh-fairway-pills')" data-val="no">No</div>
-            <div class="pill ${fp3}" onclick="selectPill(this,'dh-fairway-pills')" data-val="par3">Par 3</div>
+            <div class="pill ${fp3}" onclick="selectPill(this,'dh-fairway-pills')" data-val="par3">N/A</div>
           </div>
           <label class="modal-label">Green in Regulation?</label>
           <div class="pill-row" id="dh-gir-pills">
@@ -5658,7 +5674,7 @@
       <div class="pill-row" id="dh-fairway-pills">
         <div class="pill ${h.fairway==='yes'?'active':''}" onclick="selectPill(this,'dh-fairway-pills')" data-val="yes">Yes</div>
         <div class="pill ${h.fairway==='no'?'active':''}" onclick="selectPill(this,'dh-fairway-pills')" data-val="no">No</div>
-        <div class="pill ${h.par===3?'active':''}" onclick="selectPill(this,'dh-fairway-pills')" data-val="par3">Par 3</div>
+        <div class="pill ${h.par===3?'active':''}" onclick="selectPill(this,'dh-fairway-pills')" data-val="par3">N/A</div>
       </div>
       <label class="modal-label">Green in Regulation?</label>
       <div class="pill-row" id="dh-gir-pills">
