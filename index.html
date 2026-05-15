@@ -4036,6 +4036,29 @@
     return data;
   }
 
+  // Upload any base64 hole photos to Supabase Storage and replace with public URLs
+  async function uploadRoundPhotos(roundId) {
+    for (const h of _famHoles) {
+      if (!h.photo || h.photo.startsWith('http')) continue; // skip nulls and already-uploaded URLs
+      try {
+        const res  = await fetch(h.photo);
+        const blob = await res.blob();
+        const path = `${roundId}/hole-${h.hole}.jpg`;
+        const { error } = await _sb.storage.from('round-photos').upload(path, blob, {
+          contentType: 'image/jpeg',
+          upsert: true,
+        });
+        if (!error) {
+          const { data } = _sb.storage.from('round-photos').getPublicUrl(path);
+          h.photo = data.publicUrl; // replace base64 with persistent URL
+        }
+      } catch(e) {
+        console.warn('Photo upload failed for hole', h.hole, e);
+        // Non-fatal — photo won't persist but round saves fine
+      }
+    }
+  }
+
   // ── TOAST ────────────────────────────────────────────────────
   function showToast(msg, type = 'success') {
     const t = document.createElement('div');
@@ -6177,13 +6200,30 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     renderFamHole();
   }
 
+  function famResizePhoto(dataUrl, maxPx = 1200) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        const ratio = Math.min(maxPx / img.width, maxPx / img.height, 1);
+        const w = Math.round(img.width * ratio);
+        const h = Math.round(img.height * ratio);
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.src = dataUrl;
+    });
+  }
+
   function famLoadHolePhoto(input) {
     const file = input.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = e => {
-      _famHoles[_famHoleIdx].photo = e.target.result;
-      renderFamHole(); // re-render to show thumbnail
+    reader.onload = async e => {
+      const resized = await famResizePhoto(e.target.result);
+      _famHoles[_famHoleIdx].photo = resized;
+      renderFamHole();
     };
     reader.readAsDataURL(file);
   }
@@ -6362,6 +6402,15 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const statusEl = document.getElementById('fam-save-status');
     const saved = [], failed = [];
 
+    // Upload hole photos to Supabase Storage before saving
+    const roundId   = crypto.randomUUID();
+    const hasPhotos = _famHoles.some(h => h.photo && !h.photo.startsWith('http'));
+    if (hasPhotos) {
+      btn.textContent = 'Uploading photos...';
+      await uploadRoundPhotos(roundId);
+    }
+    btn.textContent = 'Saving...';
+
     // Build totals map
     const totals = {};
     players.forEach(pk => {
@@ -6372,7 +6421,10 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     for (const pk of players) {
       const p        = FAM_PLAYERS[pk];
       const total    = totals[pk];
-      const holeData = _famHoles.map(h => ({ hole: h.hole, par: h.par, score: h.scores[pk] || 0 }));
+      const holeData = _famHoles.map(h => ({
+        hole: h.hole, par: h.par, score: h.scores[pk] || 0,
+        photo_url: (h.photo && h.photo.startsWith('http')) ? h.photo : null,
+      }));
       const roundObj = {
         date_played:  _famRound.date_played,
         course_name:  _famRound.course_name + ' (Family)',
@@ -6395,13 +6447,18 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     }
 
     // Save full family round snapshot to family_rounds
+    // Strip any remaining base64 (upload failed) so we don't bloat the DB row
     try {
+      const safeFamHoles = _famHoles.map(h => ({
+        ...h,
+        photo: (h.photo && h.photo.startsWith('http')) ? h.photo : null,
+      }));
       await saveFamilyRound({
         date_played: _famRound.date_played,
         course_name: _famRound.course_name,
         course_par:  _famRound.course_par,
         players:     players,
-        holes:       _famHoles,
+        holes:       safeFamHoles,
         totals:      totals,
       });
     } catch(e) { /* non-fatal \u2014 individual saves already done */ }
