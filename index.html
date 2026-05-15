@@ -75,7 +75,7 @@
       background: var(--surface);
       border-bottom: 1px solid rgba(201,168,76,0.25);
       padding: 12px 20px 10px;
-      padding-top: calc(12px + env(safe-area-inset-top, 0px));
+      padding-top: calc(16px + env(safe-area-inset-top, 0px));
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -3530,7 +3530,7 @@
     ══════════════════════════════════════ -->
     <div class="page" id="page-dad-progress">
       <!-- PIN Overlay -->
-      <div id="dad-pin-overlay" style="position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;overflow-y:auto;">
+      <div id="dad-pin-overlay" style="position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;padding-top:calc(32px + env(safe-area-inset-top,0px));overflow-y:auto;">
         <div style="font-size:2.5rem;margin-bottom:12px;">🔒</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);letter-spacing:2px;margin-bottom:6px;">Dad's Progress</div>
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:28px;">Enter PIN to continue</div>
@@ -3743,7 +3743,7 @@
       </div>
 
       <!-- Dad Round Entry Modal -->
-      <div id="dad-modal" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);overflow-y:auto;padding-bottom:80px;">
+      <div id="dad-modal" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);overflow-y:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(80px + env(safe-area-inset-bottom,0px));">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(201,168,76,0.2);">
           <div id="dad-modal-step-label" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);">Round Setup</div>
           <div style="display:flex;align-items:center;gap:12px;">
@@ -3797,7 +3797,7 @@
     ══════════════════════════════════════ -->
     <div class="page" id="page-son-progress">
       <!-- PIN Overlay -->
-      <div id="son-pin-overlay" style="position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;overflow-y:auto;">
+      <div id="son-pin-overlay" style="position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;padding-top:calc(32px + env(safe-area-inset-top,0px));overflow-y:auto;">
         <div style="font-size:2.5rem;margin-bottom:12px;">🔒</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:#3b82f6;letter-spacing:2px;margin-bottom:6px;">Son's Progress</div>
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:28px;">Enter PIN to continue</div>
@@ -3871,7 +3871,7 @@
       </div>
 
       <!-- Son Round Entry Modal -->
-      <div id="son-modal" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);overflow-y:auto;padding-bottom:80px;">
+      <div id="son-modal" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);overflow-y:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(80px + env(safe-area-inset-bottom,0px));">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(201,168,76,0.2);">
           <div id="son-modal-step-label" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);">Round Setup</div>
           <div style="display:flex;align-items:center;gap:12px;">
@@ -3939,8 +3939,8 @@
   <!-- ══════════════════════════════════════
        FAMILY SCORECARD MODAL
   ══════════════════════════════════════ -->
-  <div id="family-modal" style="display:none;position:fixed;inset:0;z-index:400;background:var(--bg);overflow-y:auto;padding-bottom:80px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(99,179,255,0.2);position:sticky;top:0;background:var(--bg);z-index:1;">
+  <div id="family-modal" style="display:none;position:fixed;inset:0;z-index:400;background:var(--bg);overflow-y:auto;padding-bottom:calc(80px + env(safe-area-inset-bottom,0px));">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;padding-top:calc(16px + env(safe-area-inset-top,0px));border-bottom:1px solid rgba(99,179,255,0.2);position:sticky;top:0;background:var(--bg);z-index:1;">
       <div id="fam-modal-label" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#93c5fd;">Family Round</div>
       <div style="display:flex;align-items:center;gap:10px;">
         <div id="fam-running-bar" class="fam-running-bar" style="display:none;"></div>
@@ -6190,7 +6190,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
   function _showPhotoOverlay(src) {
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);';
     overlay.onclick = () => document.body.removeChild(overlay);
     const img = document.createElement('img');
     img.src = src;
