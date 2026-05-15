@@ -4759,50 +4759,50 @@
     ).join('');
 
     document.getElementById('dad-modal-body').innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div style="font-size:0.78rem;color:var(--muted);">${parLabel}</div>
-        <div style="display:flex;align-items:center;gap:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:0.75rem;color:var(--muted);">${parLabel}</div>
+        <div style="display:flex;align-items:center;gap:6px;">
           <button class="stepper-btn" onclick="dadHolePar(-1)">−</button>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--gold);">PAR <span id="dh-par">${h.par}</span></div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);">PAR <span id="dh-par">${h.par}</span></div>
           <button class="stepper-btn" onclick="dadHolePar(1)">+</button>
         </div>
       </div>
-      <div class="live-distance-card">
-        <div style="display:flex;align-items:baseline;justify-content:center;gap:6px;">
-          <div class="live-yards" id="live-yards">—</div>
-          <div style="font-size:1rem;color:var(--muted);padding-bottom:4px;">yds</div>
+      <div class="live-distance-card" style="padding:8px 12px 8px;margin-bottom:10px;">
+        <div style="display:flex;align-items:baseline;justify-content:center;gap:4px;">
+          <div class="live-yards" id="live-yards" style="font-size:2.8rem;">—</div>
+          <div style="font-size:0.85rem;color:var(--muted);padding-bottom:2px;">yds</div>
         </div>
-        <div id="live-gps-acc" style="font-size:0.68rem;color:var(--muted);text-align:center;margin-bottom:10px;">
+        <div id="live-gps-acc" style="font-size:0.65rem;color:var(--muted);text-align:center;margin-bottom:7px;">
           <span class="gps-dot"></span>finding GPS…
         </div>
-        <div style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;">
-          <button class="yardage-pill" onclick="tapYardage(50)">50</button>
-          <button class="yardage-pill" onclick="tapYardage(75)">75</button>
-          <button class="yardage-pill" onclick="tapYardage(100)">100</button>
-          <button class="yardage-pill" onclick="tapYardage(125)">125</button>
-          <button class="yardage-pill" onclick="tapYardage(150)">150</button>
-          <button class="yardage-pill" onclick="tapYardage(175)">175</button>
-          <button class="yardage-pill" onclick="tapYardage(200)">200</button>
-          <button class="yardage-pill" onclick="tapYardage(225)">225</button>
+        <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-bottom:7px;">
+          <button class="yardage-pill" onclick="tapYardage(50)" style="padding:5px 9px;font-size:0.75rem;">50</button>
+          <button class="yardage-pill" onclick="tapYardage(75)" style="padding:5px 9px;font-size:0.75rem;">75</button>
+          <button class="yardage-pill" onclick="tapYardage(100)" style="padding:5px 9px;font-size:0.75rem;">100</button>
+          <button class="yardage-pill" onclick="tapYardage(125)" style="padding:5px 9px;font-size:0.75rem;">125</button>
+          <button class="yardage-pill" onclick="tapYardage(150)" style="padding:5px 9px;font-size:0.75rem;">150</button>
+          <button class="yardage-pill" onclick="tapYardage(175)" style="padding:5px 9px;font-size:0.75rem;">175</button>
+          <button class="yardage-pill" onclick="tapYardage(200)" style="padding:5px 9px;font-size:0.75rem;">200</button>
+          <button class="yardage-pill" onclick="tapYardage(225)" style="padding:5px 9px;font-size:0.75rem;">225</button>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;">
+        <div style="display:flex;gap:6px;align-items:center;">
           <input type="number" id="live-yardage-input" class="modal-input"
             placeholder="Type exact yardage…" inputmode="numeric"
-            style="margin-bottom:0;flex:1;text-align:center;font-size:1.1rem;font-weight:700;"
+            style="margin-bottom:0;flex:1;text-align:center;font-size:1rem;font-weight:700;padding:8px 10px;"
             oninput="setManualYards(this.value)">
-          <button class="mark-ball-btn" onclick="markBall()">📍 Mark Ball</button>
+          <button class="mark-ball-btn" onclick="markBall()" style="padding:8px 10px;font-size:0.78rem;">📍 Mark</button>
         </div>
       </div>
       <div class="live-club-card" id="live-club-suggest" style="display:none;"></div>
-      <div style="margin:6px 0 14px;text-align:center;">
-        <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Your Score</div>
-        <div class="score-stepper" style="justify-content:center;">
+      <div style="margin:4px 0 10px;display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-radius:12px;padding:8px 16px;">
+        <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Score</div>
+        <div class="score-stepper" style="margin:0;">
           <button class="stepper-btn" onclick="dadHoleScore(-1)">−</button>
           <div class="score-val" id="dh-score">${h.score}</div>
           <button class="stepper-btn" onclick="dadHoleScore(1)">+</button>
         </div>
       </div>
-      <div style="margin-bottom:14px;">
+      <div style="margin-bottom:10px;">
         <button id="details-toggle-btn" onclick="toggleHoleDetails()"
           style="background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;display:block;margin:0 auto;text-decoration:underline;">
           + Details (fairway · GIR · putts · approach club)
@@ -4831,6 +4831,7 @@
       </div>
       <div class="modal-nav-row">
         <button class="btn-ghost" onclick="dadLiveBack()" ${backAttr}>← Back</button>
+        <button class="btn-ghost" onclick="dadMidRoundScorecard()" style="font-size:0.78rem;padding:10px 12px;">📋 Card</button>
         <button class="btn-gold" onclick="dadLiveNext()">${nextLabel}</button>
       </div>
     `;
@@ -4879,6 +4880,50 @@
     dadHoleSave();
     _manualYards = null; _selectedApproachClub = null;
     if (_dadHoleIdx > 0) { _dadHoleIdx--; _saveDraftRound(); renderDadLiveHole(); }
+  }
+
+  function dadMidRoundScorecard() {
+    dadHoleSave();
+    const total    = _dadHoles.reduce((a, h) => a + h.score, 0);
+    const totalPar = _dadHoles.reduce((a, h) => a + h.par, 0);
+    const diff     = total - totalPar;
+    const diffStr  = diff === 0 ? 'E' : (diff > 0 ? '+' + diff : '' + diff);
+    const thru     = _dadHoleIdx + 1;
+
+    const rows = _dadHoles.map((h, i) => {
+      const d    = h.score - h.par;
+      const dStr = d === 0 ? 'E' : (d > 0 ? '+' + d : '' + d);
+      const cls  = d <= -2 ? 'fam-eagle' : d === -1 ? 'fam-birdie' : d === 0 ? 'fam-par' : d === 1 ? 'fam-bogey' : 'fam-double';
+      const cur  = i === _dadHoleIdx ? 'background:rgba(201,168,76,0.1);' : '';
+      return `<tr style="${cur}">
+        <td style="padding:5px 8px;color:var(--muted);font-size:0.78rem;">${i === _dadHoleIdx ? '▶ ' : ''}H${h.hole}</td>
+        <td style="padding:5px 8px;text-align:center;font-size:0.78rem;color:var(--muted);">${h.par}</td>
+        <td style="padding:5px 8px;text-align:center;"><span class="${cls}" style="font-size:0.85rem;">${h.score}</span></td>
+        <td style="padding:5px 8px;text-align:center;font-size:0.78rem;color:var(--muted);">${dStr}</td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('dad-modal-step-label').textContent = 'Scorecard · In Progress';
+    document.getElementById('dad-modal-body').innerHTML = `
+      <div style="text-align:center;margin-bottom:14px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2.8rem;color:var(--cream);line-height:1;">${total}</div>
+        <div style="font-size:0.82rem;color:var(--muted);margin-top:4px;">${diffStr} &middot; Thru H${thru} of ${_dadHoles.length}</div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+              <th style="padding:5px 8px;text-align:left;font-size:0.68rem;color:var(--muted);font-weight:600;">HOLE</th>
+              <th style="padding:5px 8px;text-align:center;font-size:0.68rem;color:var(--muted);font-weight:600;">PAR</th>
+              <th style="padding:5px 8px;text-align:center;font-size:0.68rem;color:var(--muted);font-weight:600;">SCORE</th>
+              <th style="padding:5px 8px;text-align:center;font-size:0.68rem;color:var(--muted);font-weight:600;">+/−</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <button class="btn-ghost" style="width:100%;margin-top:16px;" onclick="renderDadLiveHole()">← Back to Hole ${thru}</button>
+    `;
   }
 
 
@@ -6155,6 +6200,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
       <div class="modal-nav-row" style="margin-top:16px;">
         <button class="btn-ghost" onclick="famHoleBack()" ${_famHoleIdx===0?'disabled style="opacity:0.3;"':''}>\u2190 Back</button>
+        <button class="btn-ghost" onclick="famMidRoundScorecard()" style="font-size:0.78rem;padding:10px 12px;">\ud83d\udccb Card</button>
         <button class="btn-gold" onclick="famHoleNext()">${isLast ? 'See Results \u2192' : 'Next Hole \u2192'}</button>
       </div>
 
@@ -6311,6 +6357,23 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     `;
   }
 
+
+  function famMidRoundScorecard() {
+    renderFamSummary();
+    // Replace Save + Done buttons with a single Back-to-round button
+    setTimeout(() => {
+      const saveBtn = document.querySelector('#fam-modal-body .btn-primary');
+      if (saveBtn) saveBtn.style.display = 'none';
+      const doneBtn = document.querySelector('#fam-modal-body .btn-ghost');
+      if (doneBtn) {
+        doneBtn.textContent = '← Back to Hole ' + (_famHoleIdx + 1);
+        doneBtn.setAttribute('onclick', 'renderFamHole()');
+      }
+      // Add in-progress badge so it's clear this isn't the final scorecard
+      const label = document.getElementById('fam-modal-label');
+      if (label) label.textContent = 'Scorecard · In Progress';
+    }, 30);
+  }
 
   function renderFamCaddieMessages(showTyping) {
     const el = document.getElementById('fam-caddie-msgs');
