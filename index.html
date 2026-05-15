@@ -4881,6 +4881,10 @@
   function dadLiveNext() {
     dadHoleSave();
     if (_selectedApproachClub && _manualYards) recordClubHit(_selectedApproachClub, _manualYards);
+    // Persist approach data into the hole object before clearing
+    _dadHoles[_dadHoleIdx].approach_yds  = _manualYards || null;
+    _dadHoles[_dadHoleIdx].approach_club = _selectedApproachClub
+      || (_manualYards ? (suggestClub(_manualYards)?.name || null) : null);
     _selectedApproachClub = null; _manualYards = null;
     if (_dadHoleIdx === _dadHoles.length - 1) {
       _clearDraftRound();
@@ -4894,6 +4898,9 @@
 
   function dadLiveBack() {
     dadHoleSave();
+    // Save any approach data entered before going back
+    _dadHoles[_dadHoleIdx].approach_yds  = _manualYards || _dadHoles[_dadHoleIdx].approach_yds || null;
+    _dadHoles[_dadHoleIdx].approach_club = _selectedApproachClub || _dadHoles[_dadHoleIdx].approach_club || null;
     _manualYards = null; _selectedApproachClub = null;
     if (_dadHoleIdx > 0) { _dadHoleIdx--; _saveDraftRound(); renderDadLiveHole(); }
   }
@@ -4911,10 +4918,13 @@
       const dStr = d === 0 ? 'E' : (d > 0 ? '+' + d : '' + d);
       const cls  = d <= -2 ? 'fam-eagle' : d === -1 ? 'fam-birdie' : d === 0 ? 'fam-par' : d === 1 ? 'fam-bogey' : 'fam-double';
       const cur  = i === _dadHoleIdx ? 'background:rgba(201,168,76,0.1);' : '';
+      const appr = h.approach_club
+        ? `<div style="font-size:0.65rem;color:var(--gold);margin-top:1px;">${h.approach_club}${h.approach_yds ? ' · ' + h.approach_yds + 'y' : ''}</div>`
+        : '';
       return `<tr style="${cur}">
         <td style="padding:5px 8px;color:var(--muted);font-size:0.78rem;">${i === _dadHoleIdx ? '▶ ' : ''}H${h.hole}</td>
         <td style="padding:5px 8px;text-align:center;font-size:0.78rem;color:var(--muted);">${h.par}</td>
-        <td style="padding:5px 8px;text-align:center;"><span class="${cls}" style="font-size:0.85rem;">${h.score}</span></td>
+        <td style="padding:5px 8px;text-align:center;"><span class="${cls}" style="font-size:0.85rem;">${h.score}</span>${appr}</td>
         <td style="padding:5px 8px;text-align:center;font-size:0.78rem;color:var(--muted);">${dStr}</td>
       </tr>`;
     }).join('');
@@ -5197,11 +5207,19 @@
       const diff = r.score_vs_par >= 0 ? '+' + r.score_vs_par : r.score_vs_par;
       const badgeClass = r.total_score < 90 ? 'green' : r.total_score <= 99 ? 'gold' : 'red';
       const holes = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]');
-      const holeGrid = holes.map(h => `<div class="hole-cell"><div class="h-num">${h.hole}</div><div class="h-score">${h.score}</div><div class="h-par">p${h.par}</div></div>`).join('');
+      const holeGrid = holes.map(h => {
+        const apprTip = h.approach_club ? ` title="${h.approach_club}${h.approach_yds ? ' · ' + h.approach_yds + 'y' : ''}"` : '';
+        const apprDot = h.approach_club ? `<div style="font-size:0.55rem;color:var(--gold);line-height:1;margin-top:1px;">${h.approach_club.replace(' ','')}</div>` : '';
+        return `<div class="hole-cell"${apprTip}><div class="h-num">${h.hole}</div><div class="h-score">${h.score}</div><div class="h-par">p${h.par}</div>${apprDot}</div>`;
+      }).join('');
       const ref = r.reflection ? (typeof r.reflection === 'string' ? JSON.parse(r.reflection) : r.reflection) : {};
       const fairways = holes.filter(h => h.fairway === 'yes').length;
       const gir = holes.filter(h => h.gir).length;
       const totalPutts = holes.reduce((a,h) => a + (h.putts||0), 0);
+      const approachHoles = holes.filter(h => h.approach_club);
+      const approachLine = approachHoles.length
+        ? `<div style="margin-bottom:8px;">🏌️‍♂️ <strong>Approaches:</strong> ${approachHoles.map(h => `H${h.hole} ${h.approach_club}${h.approach_yds ? ' · ' + h.approach_yds + 'y' : ''}`).join(' &nbsp; ')}</div>`
+        : '';
       const stars = '⭐'.repeat(r.stars || 0);
       return `
         <div class="round-card" id="dad-round-${idx}">
@@ -5217,6 +5235,7 @@
           <div class="round-card-expand" id="dad-round-${idx}-expand">
             <div class="hole-grid">${holeGrid}</div>
             <div style="margin-bottom:8px;">🏌️ <strong>Putts:</strong> ${totalPutts} &nbsp; ⛳ <strong>Fairways:</strong> ${fairways} &nbsp; 🎯 <strong>GIR:</strong> ${gir}</div>
+            ${approachLine}
             ${r.stars ? '<div style="margin-bottom:8px;">' + stars + '</div>' : ''}
             ${ref.milestone ? '<div style="margin-bottom:8px;color:#4ade80;font-weight:700;">🎉 ' + ref.milestone + '</div>' : ''}
             ${ref.swing_thought ? '<div style="margin-bottom:6px;font-style:italic;color:var(--muted);">"' + ref.swing_thought + '"</div>' : ''}
