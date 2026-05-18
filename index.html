@@ -5340,11 +5340,28 @@
     const overallAvg = totalApproachVsPar / totalApproachHoles;
     const overallStr = overallAvg >= 0 ? '+' + overallAvg.toFixed(1) : overallAvg.toFixed(1);
     const overallColor = overallAvg <= 0.5 ? '#4ade80' : overallAvg <= 1.2 ? 'var(--gold)' : 'var(--red)';
-    const roundsWithData = rounds.filter(r => {
-      const holes = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]');
-      return holes.some(h => h.approach_club);
-    }).length;
 
+    // Per-round trend data (newest first, max 6 rounds with approach data)
+    const roundTrend = rounds
+      .map(r => {
+        const holes = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]');
+        const aHoles = holes.filter(h => h.approach_club);
+        if (!aHoles.length) return null;
+        const avg = aHoles.reduce((a, h) => a + ((h.score || 0) - (h.par || 0)), 0) / aHoles.length;
+        return { date: r.date_played, course: r.course_name || r.course || '', count: aHoles.length, avg };
+      })
+      .filter(Boolean)
+      .slice(0, 6);
+
+    const roundsWithData = roundTrend.length;
+
+    // Best club (min 2 uses, best avg vs par)
+    const eligibleClubs = clubs.filter(c => clubData[c].count >= 2);
+    const bestClub = eligibleClubs.length
+      ? eligibleClubs.slice().sort((a,b) => (clubData[a].totalVsPar/clubData[a].count) - (clubData[b].totalVsPar/clubData[b].count))[0]
+      : null;
+
+    // Per-club table rows
     const rows = clubs.map(club => {
       const d = clubData[club];
       const avgYds = d.ydsCount ? Math.round(d.totalYds / d.ydsCount) + 'y' : '—';
@@ -5359,6 +5376,53 @@
       </tr>`;
     }).join('');
 
+    // Best club callout
+    const bestClubHtml = bestClub ? (() => {
+      const bc = clubData[bestClub];
+      const avg = bc.totalVsPar / bc.count;
+      const avgStr = avg >= 0 ? '+' + avg.toFixed(1) : avg.toFixed(1);
+      return `<div style="margin-bottom:12px;padding:8px 12px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:8px;font-size:0.8rem;line-height:1.4;">
+        🏆 <strong style="color:#4ade80;">Best club:</strong> ${bestClub} — avg <strong style="color:#4ade80;">${avgStr}</strong> vs par over ${bc.count} approach${bc.count !== 1 ? 'es' : ''}
+      </div>`;
+    })() : '';
+
+    // Round-by-round trend section
+    let trendHtml = '';
+    if (roundTrend.length >= 2) {
+      const trendRows = roundTrend.map(r => {
+        const avgStr = r.avg >= 0 ? '+' + r.avg.toFixed(1) : r.avg.toFixed(1);
+        const color = r.avg <= 0.5 ? '#4ade80' : r.avg <= 1.2 ? 'var(--gold)' : 'var(--red)';
+        const d = new Date(r.date + 'T12:00:00');
+        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const course = r.course ? r.course.replace(/\s*\(.*\)/, '').substring(0, 22) : '—';
+        return `<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+          <td style="padding:5px 6px 5px 0;font-size:0.74rem;color:var(--muted);white-space:nowrap;">${dateStr}</td>
+          <td style="padding:5px 4px;font-size:0.74rem;color:var(--cream);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${course}</td>
+          <td style="padding:5px 4px;text-align:center;font-size:0.74rem;color:var(--muted);">${r.count}</td>
+          <td style="padding:5px 0 5px 4px;text-align:right;font-size:0.77rem;font-weight:700;color:${color};">${avgStr}</td>
+        </tr>`;
+      }).join('');
+      // Trend direction: compare most recent vs previous round
+      const delta = roundTrend[0].avg - roundTrend[1].avg;
+      const trendLabel = delta < -0.15 ? '📈 Improving' : delta > 0.15 ? '📉 Trending worse' : '➡️ Steady';
+      trendHtml = `
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);">
+          <div style="font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:8px;">Round by Round</div>
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="border-bottom:1px solid rgba(201,168,76,0.2);">
+                <th style="text-align:left;font-size:0.65rem;color:var(--muted);font-weight:600;padding-bottom:5px;text-transform:uppercase;letter-spacing:0.4px;">Date</th>
+                <th style="text-align:left;font-size:0.65rem;color:var(--muted);font-weight:600;padding-bottom:5px;text-transform:uppercase;letter-spacing:0.4px;">Course</th>
+                <th style="text-align:center;font-size:0.65rem;color:var(--muted);font-weight:600;padding-bottom:5px;text-transform:uppercase;letter-spacing:0.4px;">Shots</th>
+                <th style="text-align:right;font-size:0.65rem;color:var(--muted);font-weight:600;padding-bottom:5px;text-transform:uppercase;letter-spacing:0.4px;">Avg ±Par</th>
+              </tr>
+            </thead>
+            <tbody>${trendRows}</tbody>
+          </table>
+          <div style="margin-top:8px;font-size:0.75rem;color:var(--muted);">${trendLabel}</div>
+        </div>`;
+    }
+
     el.style.display = '';
     el.innerHTML = `
       <button onclick="var p=this.nextElementSibling;p.style.display=p.style.display==='none'?'block':'none';this.querySelector('.arrow').textContent=p.style.display==='none'?'▼':'▲';"
@@ -5371,6 +5435,7 @@
           ${totalApproachHoles} approach${totalApproachHoles !== 1 ? 'es' : ''} tracked across ${roundsWithData} round${roundsWithData !== 1 ? 's' : ''}
           &nbsp;·&nbsp; avg <span style="color:${overallColor};font-weight:700;">${overallStr}</span> vs par on approach holes
         </div>
+        ${bestClubHtml}
         <table style="width:100%;border-collapse:collapse;">
           <thead>
             <tr style="border-bottom:1px solid rgba(201,168,76,0.25);">
@@ -5385,6 +5450,7 @@
         <div style="margin-top:12px;font-size:0.72rem;color:var(--muted);line-height:1.5;">
           ✅ Green = avg ≤ +0.5 &nbsp; 🟡 Gold = ≤ +1.2 &nbsp; 🔴 Red = > +1.2
         </div>
+        ${trendHtml}
       </div>`;
   }
 
