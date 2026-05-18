@@ -956,6 +956,91 @@
       text-align: center;
       opacity: 0.6;
     }
+    /* ── LANDING FAMILY HIERARCHY ── */
+    #landing-family-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 4px;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 16px;
+      opacity: 0.85;
+    }
+    .landing-owner-badge {
+      font-size: 0.58rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(201,168,76,0.12);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 20px;
+      padding: 3px 8px;
+      white-space: nowrap;
+    }
+    .landing-family-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 380px;
+      margin-bottom: 10px;
+    }
+    .landing-family-divider::before,
+    .landing-family-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+    .landing-family-divider span {
+      font-size: 0.62rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .landing-family-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+      max-width: 380px;
+    }
+    .landing-card-sm {
+      padding: 12px 12px;
+      border-radius: 16px;
+    }
+    .landing-avatar-sm {
+      font-size: 1.8rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .landing-card-name-sm {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.25rem;
+      letter-spacing: 2px;
+      line-height: 1;
+      margin-bottom: 3px;
+    }
+    .landing-card-desc-sm {
+      font-size: 0.6rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .landing-card-arrow-sm {
+      font-size: 1rem;
+      opacity: 0.4;
+      flex-shrink: 0;
+      margin-left: auto;
+      transition: opacity 0.18s, transform 0.18s;
+    }
+    .landing-card-sm:hover .landing-card-arrow-sm {
+      opacity: 1;
+      transform: translateX(3px);
+    }
     /* Orbs / background decoration */
     .landing-orb {
       position: absolute;
@@ -1713,56 +1798,63 @@
   <div class="landing-orb landing-orb-1"></div>
   <div class="landing-orb landing-orb-2"></div>
 
-  <img src="spinvibes_profile.svg" alt="SpinVibes Golf" style="width:110px;height:110px;border-radius:50%;display:block;margin:0 auto 12px;box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 40px rgba(201,168,76,0.15);">
-  <div id="landing-sub" style="margin-bottom:20px;">⛳ Family pocket caddie</div>
+  <img src="spinvibes_profile.svg" alt="SpinVibes Golf" style="width:90px;height:90px;border-radius:50%;display:block;margin:0 auto 10px;box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 40px rgba(201,168,76,0.15);">
+  <div id="landing-sub" style="margin-bottom:8px;">⛳ Family pocket caddie</div>
+  <div id="landing-family-name">The Gelbaum Family</div>
 
-  <div id="landing-question">Who's Playing?</div>
-
-  <div class="landing-cards">
-
+  <!-- Primary / Owner card -->
+  <div class="landing-cards" style="margin-bottom:14px;">
     <div class="landing-card landing-card-dad" onclick="enterProfile('dad')">
       <div class="landing-avatar">👨</div>
       <div class="landing-card-info">
         <div class="landing-card-name">Dad</div>
         <div class="landing-card-desc">Lefty · Sub-90 Journey</div>
       </div>
-      <div class="landing-card-arrow">›</div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:8px;flex-shrink:0;">
+        <span class="landing-owner-badge">Owner 🔒</span>
+        <div class="landing-card-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Family section -->
+  <div class="landing-family-divider"><span>Family</span></div>
+  <div class="landing-family-grid">
+
+    <div class="landing-card landing-card-sm landing-card-son" onclick="enterProfile('son')">
+      <div class="landing-avatar-sm">👦</div>
+      <div class="landing-card-info">
+        <div class="landing-card-name-sm" style="color:#60a5fa;">Son</div>
+        <div class="landing-card-desc-sm">Righty · Junior</div>
+      </div>
+      <div class="landing-card-arrow-sm">›</div>
     </div>
 
-    <div class="landing-card landing-card-mom" onclick="enterProfile('mom')">
-      <div class="landing-avatar">👩</div>
+    <div class="landing-card landing-card-sm landing-card-girl" onclick="enterProfile('girl')">
+      <div class="landing-avatar-sm">👧</div>
       <div class="landing-card-info">
-        <div class="landing-card-name">Mom</div>
-        <div class="landing-card-desc">Righty · Beginner · Used Set</div>
+        <div class="landing-card-name-sm" style="color:#f472b6;">Daughter</div>
+        <div class="landing-card-desc-sm">Lefty · Age 5</div>
       </div>
-      <div class="landing-card-arrow">›</div>
+      <div class="landing-card-arrow-sm">›</div>
     </div>
 
-    <div class="landing-card landing-card-son" onclick="enterProfile('son')">
-      <div class="landing-avatar">👦</div>
+    <div class="landing-card landing-card-sm landing-card-mom" onclick="enterProfile('mom')">
+      <div class="landing-avatar-sm">👩</div>
       <div class="landing-card-info">
-        <div class="landing-card-name">Son</div>
-        <div class="landing-card-desc">Righty · Junior · Fun First</div>
+        <div class="landing-card-name-sm" style="color:#f2c879;">Mom</div>
+        <div class="landing-card-desc-sm">Righty · Beginner</div>
       </div>
-      <div class="landing-card-arrow">›</div>
+      <div class="landing-card-arrow-sm">›</div>
     </div>
 
-    <div class="landing-card landing-card-girl" onclick="enterProfile('girl')">
-      <div class="landing-avatar">👧</div>
+    <div class="landing-card landing-card-sm landing-card-grandma" onclick="enterProfile('grandma')">
+      <div class="landing-avatar-sm">👵</div>
       <div class="landing-card-info">
-        <div class="landing-card-name">Daughter</div>
-        <div class="landing-card-desc">Lefty · Age 5 · Pure Fun</div>
+        <div class="landing-card-name-sm" style="color:#d4af70;">Grandma</div>
+        <div class="landing-card-desc-sm">Righty · Welcome Back</div>
       </div>
-      <div class="landing-card-arrow">›</div>
-    </div>
-
-    <div class="landing-card landing-card-grandma" onclick="enterProfile('grandma')">
-      <div class="landing-avatar">👵</div>
-      <div class="landing-card-info">
-        <div class="landing-card-name">Grandma</div>
-        <div class="landing-card-desc">Righty · Welcome Back</div>
-      </div>
-      <div class="landing-card-arrow">›</div>
+      <div class="landing-card-arrow-sm">›</div>
     </div>
 
   </div>
