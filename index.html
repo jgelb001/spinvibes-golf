@@ -5185,18 +5185,19 @@
     const statsBar = document.getElementById('dad-stats-bar');
     if (!rounds || rounds.length === 0) { rounds = []; }
     statsBar.style.display = 'none';
-    // Stats
-    if (rounds.length >= 3) {
+    // Stats — scored rounds only
+    const scoredRounds = rounds.filter(r => !r.is_practice);
+    if (scoredRounds.length >= 3) {
       statsBar.style.display = '';
-      const avg = Math.round(rounds.reduce((a,r) => a + r.total_score, 0) / rounds.length);
-      const best = rounds.reduce((a,r) => r.total_score < a.total_score ? r : a);
-      const putts = rounds.filter(r => r.holes).map(r => {
+      const avg = Math.round(scoredRounds.reduce((a,r) => a + r.total_score, 0) / scoredRounds.length);
+      const best = scoredRounds.reduce((a,r) => r.total_score < a.total_score ? r : a);
+      const putts = scoredRounds.filter(r => r.holes).map(r => {
         const holes = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]');
         return holes.reduce((a,h) => a + (h.putts||0), 0);
       });
       const avgPutts = putts.length ? Math.round(putts.reduce((a,b)=>a+b,0)/putts.length) : '—';
       document.getElementById('dad-stats-row').innerHTML = `
-        <div class="stat"><div class="stat-num">${rounds.length}</div><div class="stat-lbl">Rounds</div></div>
+        <div class="stat"><div class="stat-num">${scoredRounds.length}</div><div class="stat-lbl">Rounds</div></div>
         <div class="stat"><div class="stat-num">${avg}</div><div class="stat-lbl">Avg Score</div></div>
         <div class="stat"><div class="stat-num">${best.total_score}</div><div class="stat-lbl">Best Round</div></div>
         <div class="stat"><div class="stat-num">${avgPutts}</div><div class="stat-lbl">Avg Putts</div></div>
@@ -5204,7 +5205,7 @@
     } else {
       statsBar.style.display = 'none';
     }
-    renderApproachStats(rounds);
+    renderApproachStats(scoredRounds);
     const legacyCards = `
       <div class="round-card" id="dad-round-legacy-apr26">
         <div class="round-card-header" onclick="toggleRoundExpand('dad-round-legacy-apr26')">
@@ -5270,11 +5271,14 @@
         ? `<div style="margin-bottom:8px;">🏌️‍♂️ <strong>Approaches:</strong> ${approachHoles.map(h => `H${h.hole} ${h.approach_club}${h.approach_yds ? ' · ' + h.approach_yds + 'y' : ''}`).join(' &nbsp; ')}</div>`
         : '';
       const stars = '⭐'.repeat(r.stars || 0);
+      const practiceBadge = r.is_practice
+        ? `<span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);border:1px solid var(--muted);border-radius:4px;padding:1px 5px;margin-left:6px;">Practice</span>`
+        : '';
       return `
         <div class="round-card" id="dad-round-${idx}">
           <div class="round-card-header" onclick="toggleRoundExpand('dad-round-${idx}')">
             <div class="round-card-left">
-              <div class="round-card-date">${dateStr}</div>
+              <div class="round-card-date">${dateStr}${practiceBadge}</div>
               <div class="round-card-course">${r.course_name}</div>
             </div>
             <div class="round-card-right">
@@ -5582,6 +5586,13 @@
         <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="Resort">Resort</div>
       </div>
       <button class="btn-ghost" style="width:100%;margin-top:8px;font-size:0.8rem;" onclick="openAddCourseOverlay('dad')">+ Add New Course</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:10px;">
+        <span style="font-size:0.87rem;color:var(--cream);font-weight:600;">Round type</span>
+        <div class="pill-row" id="dm-type-pills" style="margin:0;gap:6px;">
+          <div class="pill active" onclick="selectPill(this,'dm-type-pills')" data-val="scored">⛳ Scored</div>
+          <div class="pill" onclick="selectPill(this,'dm-type-pills')" data-val="practice">🏌️ Practice</div>
+        </div>
+      </div>
       <button class="btn-primary" style="width:100%;margin-top:10px;" onclick="dadStartRound()">Start Round →</button>
     `;
     dadCourseChange(document.getElementById('dm-course').value);
@@ -5625,6 +5636,7 @@
       numHoles = parseInt(document.getElementById('dm-custom-holes').value) || 18;
     }
     const tee = document.querySelector('#dm-tee-pills .pill.active')?.dataset.val || 'White';
+    const isPractice = document.querySelector('#dm-type-pills .pill.active')?.dataset.val === 'practice';
     _dadRound = {
       date_played: document.getElementById('dm-date').value,
       course_name: courseName,
@@ -5632,6 +5644,7 @@
       tee_color: tee,
       total_score: 0,
       score_vs_par: 0,
+      is_practice: isPractice,
     };
     _dadHoles = [];
     _dadHoleIdx = 0;
@@ -5767,8 +5780,26 @@
       <textarea id="dr-worked" class="modal-input" rows="2" placeholder="What clicked..."></textarea>
       <label class="modal-label">🔧 One thing to fix next time</label>
       <textarea id="dr-fix" class="modal-input" rows="2" placeholder="Focus for next round..."></textarea>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:10px;">
+        <span style="font-size:0.87rem;color:var(--muted);">Save this round</span>
+        <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;">
+          <input type="checkbox" id="dr-do-save" checked style="opacity:0;width:0;height:0;">
+          <span style="position:absolute;inset:0;background:var(--green);border-radius:24px;transition:background 0.2s;" id="dr-save-track"></span>
+          <span style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform 0.2s;" id="dr-save-thumb"></span>
+        </label>
+      </div>
       <button class="btn-primary" style="width:100%;margin-top:8px;" onclick="saveDadRoundFull()">Save Round</button>
     `;
+    // wire toggle visuals
+    const cb = document.getElementById('dr-do-save');
+    const track = document.getElementById('dr-save-track');
+    const thumb = document.getElementById('dr-save-thumb');
+    if (cb) cb.addEventListener('change', () => {
+      track.style.background = cb.checked ? 'var(--green)' : 'rgba(255,255,255,0.15)';
+      thumb.style.transform = cb.checked ? 'translateX(20px)' : 'translateX(0)';
+    });
+    // init thumb position
+    if (thumb) thumb.style.transform = 'translateX(20px)';
   }
   function dadSetStar(n) {
     _dadStars = n;
@@ -5778,7 +5809,17 @@
     }
   }
   async function saveDadRoundFull() {
+    const doSave = document.getElementById('dr-do-save')?.checked !== false;
     const total = _dadHoles.reduce((a, h) => a + h.score, 0);
+
+    // Skip Save mode — just close, no DB write
+    if (!doSave) {
+      showToast('Test round — not saved');
+      _clearDraftRound();
+      closeDadModal();
+      return;
+    }
+
     const roundObj = {
       date_played: _dadRound.date_played,
       course_name: _dadRound.course_name,
@@ -5787,6 +5828,7 @@
       total_score: total,
       score_vs_par: total - _dadRound.course_par,
       holes: _dadHoles,
+      is_practice: _dadRound.is_practice || false,
       reflection: {
         best: document.getElementById('dr-best').value.trim(),
         worst: document.getElementById('dr-worst').value.trim(),
@@ -5801,7 +5843,7 @@
     try {
       await saveDadRound(roundObj);
       _clearDraftRound();
-      showToast('Round saved! ✓');
+      showToast(_dadRound.is_practice ? 'Practice round saved! 🏌️' : 'Round saved! ✓');
       closeDadModal();
       loadDadRoundsAndRender();
     } catch(e) {
@@ -6231,6 +6273,13 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
           <span class="fam-cb-name">Grandma</span>
         </div>
       </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:10px;">
+        <span style="font-size:0.87rem;color:var(--cream);font-weight:600;">Round type</span>
+        <div class="pill-row" id="fm-type-pills" style="margin:0;gap:6px;">
+          <div class="pill active" onclick="selectPill(this,'fm-type-pills')" data-val="scored">\u26f3 Scored</div>
+          <div class="pill" onclick="selectPill(this,'fm-type-pills')" data-val="practice">\ud83c\udfcc\ufe0f Practice</div>
+        </div>
+      </div>
       <button class="btn-primary" style="width:100%;margin-top:6px;" onclick="startFamRound()">Start Round \u2192</button>
       <div id="fam-history-section" style="margin-top:20px;">
         <div style="font-size:0.75rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Past Family Rounds</div>
@@ -6325,7 +6374,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       numHoles   = parseInt(document.getElementById('fm-custom-holes').value) || 18;
     }
 
-    _famRound = { date_played: document.getElementById('fm-date').value, course_name: courseName, course_par: coursePar, players };
+    const famIsPractice = document.querySelector('#fm-type-pills .pill.active')?.dataset.val === 'practice';
+    _famRound = { date_played: document.getElementById('fm-date').value, course_name: courseName, course_par: coursePar, players, is_practice: famIsPractice };
     _famHoleIdx       = 0;
     _famCaddieHistory = [];
     _famCaddieOpen    = false;
@@ -6714,6 +6764,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         total_score:  total,
         score_vs_par: total - _famRound.course_par,
         holes:        holeData,
+        is_practice:  _famRound.is_practice || false,
         reflection:   { best:'', worked:'', worst:'', fix:'', stars:1 },
         stars:        1,
       };
@@ -6742,6 +6793,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         players:     players,
         holes:       safeFamHoles,
         totals:      totals,
+        is_practice: _famRound.is_practice || false,
       });
     } catch(e) { /* non-fatal \u2014 individual saves already done */ }
 
