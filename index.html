@@ -626,8 +626,8 @@
       text-transform: uppercase;
     }
     .sss-rule {
-      background: rgba(201,168,76,0.1);
-      border: 1px solid rgba(201,168,76,0.4);
+      background: rgba(184,149,48,0.07);
+      border: 0.5px solid rgba(184,149,48,0.3);
       border-radius: 10px;
       padding: 14px 16px;
       text-align: center;
@@ -669,11 +669,11 @@
       cursor:pointer; user-select:none; -webkit-user-select:none;
       margin-top:12px; padding:10px 12px;
       border-radius: 8px;
-      background: rgba(201,168,76,0.07);
-      border:1px solid rgba(201,168,76,0.2);
+      background: var(--surface2);
+      border:0.5px solid var(--border);
       font-size:0.75rem; color:var(--gold); font-weight:600;
       letter-spacing:0.5px; text-transform:uppercase;
-      min-height: 44px; /* comfortable tap target on mobile */
+      min-height: 44px;
     }
     .exp-trigger:active { background: rgba(201,168,76,0.15); }
     .exp-trigger svg { width:13px; height:13px; stroke:var(--gold); fill:none; stroke-width:2.5; transition:transform 0.25s; flex-shrink:0; }
@@ -689,12 +689,12 @@
     .exp-mistake { background:rgba(214,79,58,0.08); border-left:2px solid var(--red); border-radius:0 6px 6px 0; padding:8px 10px; }
     .exp-mistake .em-lbl { font-size:0.65rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--red); margin-bottom:2px; }
     .exp-mistake p { font-size:0.79rem; color:var(--muted); line-height:1.5; margin:0; }
-    .diagram { background:rgba(0,0,0,0.22); border-radius:10px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:6px; }
+    .diagram { background:var(--surface2); border-radius:10px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:6px; }
     .diagram-lbl { font-size:0.63rem; color:var(--gold); font-weight:600; text-transform:uppercase; letter-spacing:1.5px; }
     .exp-close {
       display:flex; align-items:center; justify-content:center; gap:6px;
       width:100%; padding:8px 0; margin-top:2px;
-      background:none; border:1px solid rgba(255,255,255,0.09); border-radius:8px;
+      background:none; border:0.5px solid var(--border); border-radius:8px;
       color:var(--muted); font-family:'Outfit',sans-serif; font-size:0.75rem; cursor:pointer;
     }
     .exp-close:active { opacity:0.7; }
@@ -839,12 +839,12 @@
     }
     #landing-logo span { color: var(--cream); }
     #landing-sub {
-      font-size: 0.72rem;
-      letter-spacing: 3px;
+      font-size: 0.68rem;
+      letter-spacing: 2.5px;
       text-transform: uppercase;
       color: var(--muted);
       margin-top: 4px;
-      margin-bottom: 40px;
+      margin-bottom: 20px;
       text-align: center;
     }
     #landing-question {
@@ -876,26 +876,18 @@
     }
     .landing-card:active { transform: scale(0.97); }
     .landing-card-dad {
-      background: linear-gradient(135deg, #0f2614 0%, #162b1a 100%);
-      border-color: rgba(201,168,76,0.4);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(201,168,76,0.12);
+      background: #EEECEA;
+      border-color: #B89530;
     }
-    .landing-card-dad:hover {
-      border-color: var(--gold);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 24px rgba(201,168,76,0.18);
-    }
-    .landing-card-son {
-      background: linear-gradient(135deg, #071428 0%, #0d1f40 100%);
-      border-color: rgba(59,130,246,0.4);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(59,130,246,0.12);
-    }
-    .landing-card-son:hover {
-      border-color: #3b82f6;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 24px rgba(59,130,246,0.22);
-    }
+    .landing-card-son  { background: var(--surface); border-color: var(--border); }
+    .landing-card-girl { background: var(--surface); border-color: var(--border); }
+    .landing-card-mom  { background: var(--surface); border-color: var(--border); }
+    .landing-card-grandma { background: var(--surface); border-color: var(--border); }
     .landing-avatar {
-      font-size: 3.2rem;
-      line-height: 1;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(184,149,48,0.12);
+      display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
     .landing-card-info { flex: 1; }
@@ -906,16 +898,14 @@
       line-height: 1;
       margin-bottom: 4px;
     }
-    .landing-card-dad .landing-card-name { color: var(--gold); }
-    .landing-card-son .landing-card-name { color: #60a5fa; }
+    .landing-card-dad .landing-card-name { color: #B89530; }
     .landing-card-desc {
       font-size: 0.72rem;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       font-weight: 600;
+      color: var(--muted);
     }
-    .landing-card-dad .landing-card-desc { color: var(--muted); }
-    .landing-card-son .landing-card-desc { color: #64a0dc; }
     .landing-card-arrow {
       font-size: 1.4rem;
       opacity: 0.5;
@@ -968,8 +958,8 @@
     .landing-family-divider::after {
       content: '';
       flex: 1;
-      height: 1px;
-      background: rgba(255,255,255,0.1);
+      height: 0.5px;
+      background: var(--border);
     }
     .landing-family-divider span {
       font-size: 0.62rem;
@@ -990,8 +980,11 @@
       border-radius: 16px;
     }
     .landing-avatar-sm {
-      font-size: 1.8rem;
-      line-height: 1;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
       flex-shrink: 0;
     }
     .landing-card-name-sm {
@@ -1019,23 +1012,9 @@
       opacity: 1;
       transform: translateX(3px);
     }
-    /* Orbs / background decoration */
+    /* Orbs removed — clean light-mode landing */
     .landing-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      pointer-events: none;
-      opacity: 0.18;
-    }
-    .landing-orb-1 {
-      width: 320px; height: 320px;
-      background: radial-gradient(circle, #2d6a3f, transparent);
-      top: -80px; right: -80px;
-    }
-    .landing-orb-2 {
-      width: 280px; height: 280px;
-      background: radial-gradient(circle, #1a56c4, transparent);
-      bottom: -60px; left: -60px;
+      display: none;
     }
 
 
@@ -1448,7 +1427,7 @@
       border-radius: 10px;
       line-height: 1.1;
     }
-    .round-badge.green { background: rgba(45,106,63,0.35); color: #4ade80; }
+    .round-badge.green { background: rgba(30,61,43,0.1); color: #1E3D2B; }
     .round-badge.gold  { background: rgba(201,168,76,0.2);  color: var(--gold); }
     .round-badge.red   { background: rgba(214,79,58,0.2);   color: #f87171; }
     .round-card-expand { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; padding: 0 16px; }
@@ -1490,7 +1469,7 @@
 
     /* Score summary card */
     .score-summary-card {
-      background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(45,106,63,0.08));
+      background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(30,61,43,0.05));
       border: 1px solid rgba(201,168,76,0.3);
       border-radius: 14px;
       padding: 20px;
@@ -1548,35 +1527,35 @@
       white-space: nowrap; flex-shrink: 0; transition: all 0.15s;
     }
     .mark-ball-btn.marked {
-      background: rgba(45,106,63,0.35); border-color: var(--green-b); color: #4ade80;
+      background: rgba(30,61,43,0.1); border-color: var(--green-b); color: var(--green);
     }
     .live-club-card {
-      background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(45,106,63,0.08));
-      border: 1px solid rgba(201,168,76,0.35); border-radius: 14px;
+      background: var(--surface2);
+      border: 0.5px solid var(--border); border-radius: 14px;
       padding: 14px 16px; margin-bottom: 14px; text-align: center;
     }
     .live-club-name {
-      font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; color: var(--gold-l);
+      font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; color: var(--cream);
       letter-spacing: 1px; line-height: 1; margin-bottom: 5px;
     }
     .live-club-note { font-size: 0.73rem; color: var(--muted); line-height: 1.4; }
     .club-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
     .club-chip {
-      padding: 8px 12px; background: var(--surface3);
-      border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;
+      padding: 8px 12px; background: var(--surface2);
+      border: 0.5px solid var(--border); border-radius: 8px;
       color: var(--muted); font-size: 0.72rem; font-weight: 600;
       cursor: pointer; transition: all 0.15s;
       touch-action: manipulation; -webkit-tap-highlight-color: transparent;
       user-select: none; -webkit-user-select: none;
     }
     .club-chip.used {
-      background: rgba(45,106,63,0.35); border-color: var(--green-b); color: #4ade80;
+      background: rgba(30,61,43,0.1); border-color: var(--green); color: var(--green);
     }
     .gps-dot {
       display: inline-block; width: 7px; height: 7px; border-radius: 50%;
       background: var(--muted); margin-right: 4px; vertical-align: middle;
     }
-    .gps-dot.ready  { background: #4ade80; }
+    .gps-dot.ready  { background: var(--green); }
     .gps-dot.marked { background: var(--gold); }
 
     /* ── PIN PAD ── */
@@ -1598,8 +1577,8 @@
     .pin-key {
       height: 72px;
       border-radius: 50%;
-      border: 1px solid rgba(201,168,76,0.3);
-      background: var(--surface2);
+      border: 0.5px solid var(--border);
+      background: var(--surface);
       color: var(--cream);
       font-family: 'Outfit', sans-serif;
       font-size: 1.6rem;
@@ -1645,7 +1624,7 @@
       -webkit-tap-highlight-color: transparent;
     }
     .fam-checkbox-card.selected {
-      border-color: #4ade80;
+      border-color: var(--green);
       background: rgba(74,222,128,0.1);
     }
     .fam-checkbox-card .fam-cb-emoji { font-size: 1.8rem; display: block; margin-bottom: 4px; }
@@ -1689,7 +1668,7 @@
     .fam-sc-table tr.total-row td:first-child { color: var(--gold); }
     .fam-eagle  { background: linear-gradient(135deg,#7c3aed,#4c1d95); color:#fff; border-radius:4px; padding:1px 4px; }
     .fam-birdie { background: linear-gradient(135deg,#2563eb,#1e40af); color:#fff; border-radius:4px; padding:1px 4px; }
-    .fam-par    { color:#4ade80; font-weight:700; }
+    .fam-par    { color:var(--green); font-weight:700; }
     .fam-bogey  { color:var(--cream); }
     .fam-double { color:var(--red); font-weight:700; }
     .fam-triple { color:#ff4444; font-weight:800; }
@@ -1715,23 +1694,21 @@
 <body>
 
 <div id="landing">
-  <div class="landing-orb landing-orb-1"></div>
-  <div class="landing-orb landing-orb-2"></div>
 
-  <img src="spinvibes_profile.svg" alt="SpinVibes Golf" style="width:90px;height:90px;border-radius:50%;display:block;margin:0 auto 10px;box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 40px rgba(201,168,76,0.15);">
-  <div id="landing-sub" style="margin-bottom:8px;">⛳ Family pocket caddie</div>
+  <img src="spinvibes_profile.svg" alt="SpinVibes Golf" style="width:80px;height:80px;border-radius:50%;display:block;margin:0 auto 10px;border:0.5px solid var(--border);">
+  <div id="landing-sub" style="margin-bottom:8px;">Family Pocket Caddie</div>
   <div id="landing-family-name">The Gelbaum Family</div>
 
   <!-- Primary / Owner card -->
   <div class="landing-cards" style="margin-bottom:14px;">
     <div class="landing-card landing-card-dad" onclick="enterProfile('dad')">
-      <div class="landing-avatar">👨</div>
+      <div class="landing-avatar"><i class="ti ti-golf" style="font-size:1.6rem;color:#B89530;"></i></div>
       <div class="landing-card-info">
         <div class="landing-card-name">Dad</div>
         <div class="landing-card-desc">Lefty · Sub-90 Journey</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:8px;flex-shrink:0;">
-        <span class="landing-owner-badge">Owner 🔒</span>
+        <span class="landing-owner-badge">Owner</span>
         <div class="landing-card-arrow">›</div>
       </div>
     </div>
@@ -1742,36 +1719,36 @@
   <div class="landing-family-grid">
 
     <div class="landing-card landing-card-sm landing-card-son" onclick="enterProfile('son')">
-      <div class="landing-avatar-sm">👦</div>
+      <div class="landing-avatar-sm" style="background:#EBF0F5;color:#3B7CB8;">S</div>
       <div class="landing-card-info">
-        <div class="landing-card-name-sm" style="color:#60a5fa;">Son</div>
+        <div class="landing-card-name-sm" style="color:#3B7CB8;">Son</div>
         <div class="landing-card-desc-sm">Righty · Junior</div>
       </div>
       <div class="landing-card-arrow-sm">›</div>
     </div>
 
     <div class="landing-card landing-card-sm landing-card-girl" onclick="enterProfile('girl')">
-      <div class="landing-avatar-sm">👧</div>
+      <div class="landing-avatar-sm" style="background:#F5EBF2;color:#B85490;">D</div>
       <div class="landing-card-info">
-        <div class="landing-card-name-sm" style="color:#f472b6;">Daughter</div>
+        <div class="landing-card-name-sm" style="color:#B85490;">Daughter</div>
         <div class="landing-card-desc-sm">Lefty · Age 5</div>
       </div>
       <div class="landing-card-arrow-sm">›</div>
     </div>
 
     <div class="landing-card landing-card-sm landing-card-mom" onclick="enterProfile('mom')">
-      <div class="landing-avatar-sm">👩</div>
+      <div class="landing-avatar-sm" style="background:#F5F0E8;color:#C49A30;">M</div>
       <div class="landing-card-info">
-        <div class="landing-card-name-sm" style="color:#f2c879;">Mom</div>
+        <div class="landing-card-name-sm" style="color:#C49A30;">Mom</div>
         <div class="landing-card-desc-sm">Righty · Beginner</div>
       </div>
       <div class="landing-card-arrow-sm">›</div>
     </div>
 
     <div class="landing-card landing-card-sm landing-card-grandma" onclick="enterProfile('grandma')">
-      <div class="landing-avatar-sm">👵</div>
+      <div class="landing-avatar-sm" style="background:#EEECE8;color:#9A8050;">G</div>
       <div class="landing-card-info">
-        <div class="landing-card-name-sm" style="color:#d4af70;">Grandma</div>
+        <div class="landing-card-name-sm" style="color:#9A8050;">Grandma</div>
         <div class="landing-card-desc-sm">Righty · Welcome Back</div>
       </div>
       <div class="landing-card-arrow-sm">›</div>
@@ -1779,7 +1756,7 @@
 
   </div>
 
-  <div class="landing-footer">SpinVibes Golf · Built with ❤️</div>
+  <div class="landing-footer">SpinVibes Golf</div>
 </div>
 
 <div id="app" style="display:none">
@@ -1788,23 +1765,23 @@
   <div id="topbar">
     <div onclick="goToLanding()" style="cursor:pointer;" title="Back to player select">
       <div class="topbar-logo">Spin<span>Vibes</span> Golf</div>
-      <div class="topbar-sub" id="topbarSub">⛳ Lefty · Sub-90 Journey</div>
+      <div class="topbar-sub" id="topbarSub">Lefty · Sub-90 Journey</div>
     </div>
     <div id="profileSwitch">
-      <button id="btnDad" class="profile-pill active" onclick="switchProfile('dad')">👨 Dad</button>
-      <button id="btnMom" class="profile-pill" onclick="switchProfile('mom')">👩 Mom</button>
-      <button id="btnSon" class="profile-pill" onclick="switchProfile('son')">👦 Son</button>
-      <button id="btnGirl" class="profile-pill" onclick="switchProfile('girl')">👧 Daughter</button>
-      <button id="btnGrandma" class="profile-pill" onclick="switchProfile('grandma')">👵 Grandma</button>
+      <button id="btnDad" class="profile-pill active" onclick="switchProfile('dad')">Dad</button>
+      <button id="btnMom" class="profile-pill" onclick="switchProfile('mom')">Mom</button>
+      <button id="btnSon" class="profile-pill" onclick="switchProfile('son')">Son</button>
+      <button id="btnGirl" class="profile-pill" onclick="switchProfile('girl')">Daughter</button>
+      <button id="btnGrandma" class="profile-pill" onclick="switchProfile('grandma')">Grandma</button>
     </div>
     <div style="display:flex;align-items:center;">
-      <button id="modeToggle" onclick="toggleMode()" title="Toggle light/dark mode">☀️</button>
+      <button id="modeToggle" onclick="toggleMode()" title="Toggle light/dark mode"><i class="ti ti-moon" style="font-size:1.1rem;"></i></button>
       <div class="offline-badge" id="offlineBadge">● Offline Ready</div>
     </div>
   </div>
 
   <!-- Floating mode toggle for portrait mobile -->
-  <button id="floatToggle" onclick="toggleMode()" title="Toggle light/dark mode">☀️</button>
+  <button id="floatToggle" onclick="toggleMode()" title="Toggle light/dark mode"><i class="ti ti-moon" style="font-size:1.1rem;"></i></button>
 
   <!-- PAGES -->
   <div id="pages">
@@ -1824,11 +1801,11 @@
             <div style="font-size:0.75rem;">Lefty beginner · Full bag ✅ May 2026</div>
           </div>
         </div>
-        <div class="home-goal" style="margin-top:8px;border-color:rgba(74,222,128,0.5);background:rgba(74,222,128,0.08);">
-          <div class="home-goal-num" style="color:#4ade80;font-size:1.6rem;">&lt;90</div>
+        <div class="home-goal" style="margin-top:8px;border-color:rgba(30,61,43,0.25);background:rgba(30,61,43,0.06);">
+          <div class="home-goal-num" style="color:#1E3D2B;font-size:1.6rem;">&lt;90</div>
           <div>
-            <div style="font-weight:700;color:#4ade80;font-size:0.85rem;">Next Target</div>
-            <div style="font-size:0.75rem;">✅ Shot 95 — May 5, 2026 · New best</div>
+            <div style="font-weight:700;color:#1E3D2B;font-size:0.85rem;">Next Target</div>
+            <div style="font-size:0.75rem;">Best: 95 — May 5, 2026</div>
           </div>
         </div>
       </div>
@@ -1896,9 +1873,9 @@
         <div class="section-title">Quick Reminders</div>
         <div class="card">
           <div class="card-body">
-            🎯 <strong>One swing thought per session</strong> — never change mid-session<br><br>
-            🏥 <strong>Pro lesson:</strong> Local course – book at 4–6 weeks<br><br>
-            🛒 <strong>Left-handed gear:</strong> leftiesonlygolf.com · 2ndswing.com
+            <strong>One swing thought per session</strong> — never change mid-session<br><br>
+            <strong>Pro lesson:</strong> Local course — book every 4–6 weeks<br><br>
+            <strong>Left-handed gear:</strong> leftiesonlygolf.com · 2ndswing.com
           </div>
         </div>
       </div>
@@ -1910,38 +1887,38 @@
         <div class="home-hero">
           <div class="home-greeting">Son</div>
           <div class="home-title" style="font-size:2.4rem;">Your Golf<br><span>Pocket Guide</span></div>
-          <div class="home-goal" style="border-color:rgba(59,130,246,0.4);background:rgba(59,130,246,0.1);">
-            <div class="home-goal-num" style="color:#3b82f6;">8</div>
+          <div class="home-goal" style="border-color:rgba(59,124,184,0.3);background:rgba(59,124,184,0.07);">
+            <div class="home-goal-num" style="color:#3B7CB8;">8</div>
             <div>
               <div style="font-weight:700;color:var(--cream);font-size:0.85rem;">The Goal</div>
-              <div style="font-size:0.75rem;">Have Fun. Learn Right. Make Dad Nervous. 😈</div>
+              <div style="font-size:0.75rem;">Have fun. Learn right. Beat Dad eventually.</div>
             </div>
           </div>
         </div>
 
         <div class="guide-grid">
           <a class="guide-card" onclick="showPage('range')">
-            <span class="guide-card-icon">🏌️</span>
+            <span class="guide-card-icon"><i class="ti ti-flag-2"></i></span>
             <div class="guide-card-title">Range Session</div>
             <div class="guide-card-sub">30 balls · 3 phases</div>
           </a>
           <a class="guide-card" onclick="showPage('stretches')">
-            <span class="guide-card-icon">🧘</span>
+            <span class="guide-card-icon"><i class="ti ti-heart-rate"></i></span>
             <div class="guide-card-title">Warm Up Moves</div>
-            <div class="guide-card-sub">6 fun stretches</div>
+            <div class="guide-card-sub">6 stretches</div>
           </a>
         </div>
 
         <div class="section">
-          <div class="section-title">My Bag — Vice Jr. Set 🎒</div>
+          <div class="section-title">My Bag — Vice Jr. Set</div>
           <div class="stat-row">
-            <div class="stat"><div class="stat-num" style="color:#3b82f6;">17°</div><div class="stat-lbl">Driver</div></div>
-            <div class="stat"><div class="stat-num" style="color:#3b82f6;">23°</div><div class="stat-lbl">FW Wood</div></div>
-            <div class="stat"><div class="stat-num" style="color:#3b82f6;">5·7·9</div><div class="stat-lbl">Irons</div></div>
-            <div class="stat"><div class="stat-num" style="color:#3b82f6;">54°</div><div class="stat-lbl">Sand Wed.</div></div>
+            <div class="stat"><div class="stat-num">17°</div><div class="stat-lbl">Driver</div></div>
+            <div class="stat"><div class="stat-num">23°</div><div class="stat-lbl">FW Wood</div></div>
+            <div class="stat"><div class="stat-num">5·7·9</div><div class="stat-lbl">Irons</div></div>
+            <div class="stat"><div class="stat-num">54°</div><div class="stat-lbl">Sand Wed.</div></div>
           </div>
           <div class="card">
-            <div class="card-title">Full Set — 8 Pieces 🔥</div>
+            <div class="card-title">Full Set — 8 Pieces</div>
             <div class="card-body">
               <strong>Driver</strong> 17° · <strong>Fairway Wood</strong> 23° · <strong>5-Iron</strong> 27° · <strong>7-Iron</strong> 34° · <strong>9-Iron</strong> 44° · <strong>Sand Wedge</strong> 54° · <strong>Blade Putter</strong> · <strong>Junior Carry Bag</strong><br><br>
               Right-handed · Ages 9–12 · Vice Golf Pro Jr. Set
@@ -1950,13 +1927,13 @@
         </div>
 
         <div class="section">
-          <div class="section-title">Quick Rules 💡</div>
+          <div class="section-title">Quick Rules</div>
           <div class="card">
             <div class="card-body">
-              💥 <strong>Swing your hardest on the range</strong> — no holding back<br><br>
-              😂 <strong>Miss one? Shake it off</strong> — even pros hit bad shots<br><br>
-              🎯 <strong>One swing thought max:</strong> "TURN and FIRE!"<br><br>
-              🧠 <strong>Start with 7-iron</strong> before trying driver
+              <strong>Swing your hardest on the range</strong> — no holding back<br><br>
+              <strong>Miss one? Shake it off</strong> — even pros hit bad shots<br><br>
+              <strong>One swing thought max:</strong> "TURN and FIRE!"<br><br>
+              <strong>Start with 7-iron</strong> before trying driver
             </div>
           </div>
         </div>
@@ -2394,7 +2371,7 @@
         <div class="section-title">🏁 Phase 4 — Short Game Finish</div>
           <div class="card">
             <span class="fun-badge" style="background:linear-gradient(135deg,#2d6a3f,#1a3a20);">Short Game</span>
-            <div class="card-title">Head to the Short Game Green 🎯</div>
+            <div class="card-title">Head to the Short Game Green</div>
             <div class="pill-row"><span class="pill">Chipping</span><span class="pill">Putting</span><span class="pill">Practice Green</span></div>
             <div class="card-body">Wrap up your range session at the short game green. Bump-and-run chips, 3-footers, distance control — the full routine is in the <strong>Short Game</strong> tab.</div>
             <div class="cue-box">💬 Finish every range session here. This is where scores are made.</div>
@@ -2413,17 +2390,17 @@
               </tr>
             </thead>
             <tbody>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">Driver (10.5°)</td><td style="text-align:center;padding:5px 4px;">190–200 yds</td><td style="text-align:right;padding:5px 4px;color:#4ade80;">✅ Confirmed</td></tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">7-Wood (21°)</td><td style="text-align:center;padding:5px 4px;">180–195 yds</td><td style="text-align:right;padding:5px 4px;color:#4ade80;">✅ In bag</td></tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">4-Hybrid (22°)</td><td style="text-align:center;padding:5px 4px;">170–180 yds</td><td style="text-align:right;padding:5px 4px;color:#4ade80;">✅ Confirmed</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">Driver (10.5°)</td><td style="text-align:center;padding:5px 4px;">190–200 yds</td><td style="text-align:right;padding:5px 4px;color:var(--green);">✅ Confirmed</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">7-Wood (21°)</td><td style="text-align:center;padding:5px 4px;">180–195 yds</td><td style="text-align:right;padding:5px 4px;color:var(--green);">✅ In bag</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">4-Hybrid (22°)</td><td style="text-align:center;padding:5px 4px;">170–180 yds</td><td style="text-align:right;padding:5px 4px;color:var(--green);">✅ Confirmed</td></tr>
               <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">4-Iron</td><td style="text-align:center;padding:5px 4px;">~165 yds</td><td style="text-align:right;padding:5px 4px;color:var(--muted);">Estimated</td></tr>
               <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">5-Iron</td><td style="text-align:center;padding:5px 4px;">~155 yds</td><td style="text-align:right;padding:5px 4px;color:var(--muted);">Estimated</td></tr>
               <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">6-Iron</td><td style="text-align:center;padding:5px 4px;">145–155 yds</td><td style="text-align:right;padding:5px 4px;color:var(--muted);">Estimated</td></tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">7-Iron</td><td style="text-align:center;padding:5px 4px;">130–140 yds</td><td style="text-align:right;padding:5px 4px;color:#4ade80;">✅ Confirmed</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">7-Iron</td><td style="text-align:center;padding:5px 4px;">130–140 yds</td><td style="text-align:right;padding:5px 4px;color:var(--green);">✅ Confirmed</td></tr>
               <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">8-Iron</td><td style="text-align:center;padding:5px 4px;">120–130 yds</td><td style="text-align:right;padding:5px 4px;color:var(--muted);">Estimated</td></tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">9-Iron</td><td style="text-align:center;padding:5px 4px;">110–120 yds</td><td style="text-align:right;padding:5px 4px;color:#4ade80;">✅ Confirmed</td></tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">PW (45°)</td><td style="text-align:center;padding:5px 4px;">90–110 yds</td><td style="text-align:right;padding:5px 4px;color:#4ade80;">✅ Confirmed</td></tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">GW (50°)</td><td style="text-align:center;padding:5px 4px;">85–105 yds</td><td style="text-align:right;padding:5px 4px;color:#4ade80;">✅ Confirmed</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">9-Iron</td><td style="text-align:center;padding:5px 4px;">110–120 yds</td><td style="text-align:right;padding:5px 4px;color:var(--green);">✅ Confirmed</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">PW (45°)</td><td style="text-align:center;padding:5px 4px;">90–110 yds</td><td style="text-align:right;padding:5px 4px;color:var(--green);">✅ Confirmed</td></tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">GW (50°)</td><td style="text-align:center;padding:5px 4px;">85–105 yds</td><td style="text-align:right;padding:5px 4px;color:var(--green);">✅ Confirmed</td></tr>
               <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">SW (56°)</td><td style="text-align:center;padding:5px 4px;">80–90 yds</td><td style="text-align:right;padding:5px 4px;color:var(--muted);">Estimated</td></tr>
               <tr style="border-bottom:1px solid rgba(255,255,255,0.05);"><td style="padding:5px 4px;">LW (60°)</td><td style="text-align:center;padding:5px 4px;">60–75 yds</td><td style="text-align:right;padding:5px 4px;color:var(--muted);">Estimated</td></tr>
               <tr><td style="padding:5px 4px;">Putter</td><td style="text-align:center;padding:5px 4px;">Green only</td><td style="text-align:right;padding:5px 4px;color:var(--muted);">Calibrate each round</td></tr>
@@ -2480,7 +2457,7 @@
 
           <div class="card">
             <span class="fun-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);">Phase 1</span>
-            <div class="card-title">Contact Challenge 🎯</div>
+            <div class="card-title">Contact Challenge</div>
             <div class="pill-row"><span class="pill">9-Iron or 7-Iron</span><span class="pill">~10 balls</span></div>
             <div class="card-body">
               <strong>The Game:</strong> Hit 7 out of 10 in the air. Count every airborne shot out loud. Celebrate every one that flies! Focus on <strong>making contact</strong> — not how far it goes.
@@ -2534,7 +2511,7 @@
           <div class="section-title">🏁 Phase 4 — Putting Game</div>
           <div class="card">
             <span class="fun-badge" style="background:linear-gradient(135deg,#10b981,#059669);">Putting</span>
-            <div class="card-title">Ring of Fire 🔥</div>
+            <div class="card-title">Ring of Fire</div>
             <div class="pill-row"><span class="pill">Putter</span><span class="pill">5 balls</span><span class="pill">Practice green</span></div>
             <div class="card-body">
               Place 5 balls in a circle around the hole, all exactly <strong>3 feet away</strong>. You have to make ALL 5 in a row. Miss one? Start over. This is the same drill tour pros use every day.
@@ -2602,7 +2579,7 @@
 
           <div class="card">
             <span class="girl-badge" style="background:linear-gradient(135deg,#ec4899,#f97316);">Phase 1</span>
-            <div class="card-title">Make It Move! 🎯</div>
+            <div class="card-title">Make It Move</div>
             <div class="pill-row"><span class="pill">7-Iron</span><span class="pill">~8 balls</span><span class="pill">Just make contact</span></div>
             <div class="card-body">
               <strong>The only goal:</strong> hit the ball and make it go forward. ANY forward movement = success! Count every ball that moves and cheer out loud for each one.
@@ -3652,15 +3629,15 @@
           <div class="round-card" style="border-color:rgba(74,222,128,0.4);margin-bottom:10px;">
             <div class="round-card-header" onclick="toggleRoundExpand('milestone-bag-complete')">
               <div class="round-card-left">
-                <div class="round-card-date" style="color:#4ade80;">May 2026</div>
-                <div class="round-card-course" style="color:#4ade80;">✅ Full Bag Upgrade Complete</div>
+                <div class="round-card-date" style="color:var(--green);">May 2026</div>
+                <div class="round-card-course" style="color:var(--green);">✅ Full Bag Upgrade Complete</div>
               </div>
               <div class="round-card-right">
-                <div class="round-badge" style="background:rgba(74,222,128,0.2);color:#4ade80;border:1px solid rgba(74,222,128,0.4);">🎒</div>
+                <div class="round-badge" style="background:rgba(74,222,128,0.2);color:var(--green);border:1px solid rgba(74,222,128,0.4);">🎒</div>
               </div>
             </div>
             <div class="round-card-expand" id="milestone-bag-complete-expand">
-              <div style="margin-bottom:6px;color:#4ade80;font-weight:700;">All clubs in hand.</div>
+              <div style="margin-bottom:6px;color:var(--green);font-weight:700;">All clubs in hand.</div>
               <div style="margin-bottom:6px;">7-Wood · Callaway Opus SW 56° · Callaway Opus LW 60° · Callaway Fairway 14 bag</div>
               <div style="color:var(--muted);font-style:italic;">Takomo 201 MKII irons arriving soon — restocking ~3-4 weeks from May 2026.</div>
             </div>
@@ -3688,15 +3665,15 @@
           <div class="round-card" style="border-color:rgba(74,222,128,0.4);">
             <div class="round-card-header" onclick="toggleRoundExpand('milestone-broke100')">
               <div class="round-card-left">
-                <div class="round-card-date" style="color:#4ade80;">Apr 28, 2026</div>
-                <div class="round-card-course" style="color:#4ade80;">✅ Broke 100</div>
+                <div class="round-card-date" style="color:var(--green);">Apr 28, 2026</div>
+                <div class="round-card-course" style="color:var(--green);">✅ Broke 100</div>
               </div>
               <div class="round-card-right">
                 <div class="round-badge gold">98</div>
               </div>
             </div>
             <div class="round-card-expand" id="milestone-broke100-expand">
-              <div style="margin-bottom:8px;color:#4ade80;font-weight:700;">🎉 First time shooting under 100!</div>
+              <div style="margin-bottom:8px;color:var(--green);font-weight:700;">First time shooting under 100</div>
               <div style="margin-bottom:6px;">Creek + Oaks · Sage tees · Temecula Creek Inn</div>
               <div style="margin-bottom:6px;">Front 9 (Creek): 51 · Back 9 (Oaks): 47</div>
               <div style="margin-bottom:6px;font-style:italic;color:var(--muted);">"Loose as a silly goose"</div>
@@ -4578,19 +4555,19 @@
   function toggleMode() {
     const isDark = document.body.classList.toggle('dark-mode');
     localStorage.setItem('svgolf-theme', isDark ? 'dark' : 'light');
-    const icon = isDark ? '☀️' : '🌙';
-    document.getElementById('modeToggle').textContent = icon;
+    const iconClass = isDark ? 'ti ti-sun' : 'ti ti-moon';
+    document.getElementById('modeToggle').innerHTML = `<i class="${iconClass}" style="font-size:1.1rem;"></i>`;
     const f = document.getElementById('floatToggle');
-    if (f) f.textContent = icon;
+    if (f) f.innerHTML = `<i class="${iconClass}" style="font-size:1.1rem;"></i>`;
   }
 
   function initTheme() {
     const saved = localStorage.getItem('svgolf-theme');
     if (saved === 'dark') {
       document.body.classList.add('dark-mode');
-      document.getElementById('modeToggle').textContent = '☀️';
+      document.getElementById('modeToggle').innerHTML = '<i class="ti ti-sun" style="font-size:1.1rem;"></i>';
       const f = document.getElementById('floatToggle');
-      if (f) f.textContent = '☀️';
+      if (f) f.innerHTML = '<i class="ti ti-sun" style="font-size:1.1rem;"></i>';
     }
   }
 
@@ -5121,7 +5098,7 @@
       const nameCell = c.wedge ? `<strong>${c.display}</strong>` : c.display;
       const loftStyle = c.wedge ? 'color:var(--gold-l);' : '';
       const carryBadge = hits > 0
-        ? `<span style="color:#4ade80;">●</span> <span style="font-size:0.68rem;color:var(--muted);">${hits} hit${hits>1?'s':''}</span>`
+        ? `<span style="color:var(--green);">●</span> <span style="font-size:0.68rem;color:var(--muted);">${hits} hit${hits>1?'s':''}</span>`
         : `<span style="font-size:0.68rem;color:var(--muted);">est.</span>`;
       const noteCell = c.note ? `<div style="font-size:0.65rem;color:var(--muted);line-height:1.3;margin-top:2px;">${c.note}</div>` : '';
       return `<tr${isLast ? '' : ' style="border-bottom:1px solid rgba(255,255,255,0.04);"'}>
@@ -5226,12 +5203,12 @@
         <div class="round-card-expand" id="dad-round-legacy-apr26-expand">
           <div class="hole-grid">
             <div class="hole-cell"><div class="h-num">1</div><div class="h-score">6</div><div class="h-par">p4</div></div>
-            <div class="hole-cell"><div class="h-num">2</div><div class="h-score" style="color:#4ade80;">4</div><div class="h-par">p4</div></div>
+            <div class="hole-cell"><div class="h-num">2</div><div class="h-score" style="color:var(--green);">4</div><div class="h-par">p4</div></div>
             <div class="hole-cell"><div class="h-num">3</div><div class="h-score">6</div><div class="h-par">p4</div></div>
-            <div class="hole-cell"><div class="h-num">4</div><div class="h-score" style="color:#4ade80;">4</div><div class="h-par">p4</div></div>
-            <div class="hole-cell"><div class="h-num">5</div><div class="h-score" style="color:#4ade80;">4</div><div class="h-par">p3</div></div>
+            <div class="hole-cell"><div class="h-num">4</div><div class="h-score" style="color:var(--green);">4</div><div class="h-par">p4</div></div>
+            <div class="hole-cell"><div class="h-num">5</div><div class="h-score" style="color:var(--green);">4</div><div class="h-par">p3</div></div>
             <div class="hole-cell"><div class="h-num">6</div><div class="h-score">7</div><div class="h-par">p4</div></div>
-            <div class="hole-cell"><div class="h-num">7</div><div class="h-score" style="color:#4ade80;">5</div><div class="h-par">p4</div></div>
+            <div class="hole-cell"><div class="h-num">7</div><div class="h-score" style="color:var(--green);">5</div><div class="h-par">p4</div></div>
             <div class="hole-cell"><div class="h-num">8</div><div class="h-score">5</div><div class="h-par">p3</div></div>
             <div class="hole-cell"><div class="h-num">9</div><div class="h-score">7</div><div class="h-par">p5</div></div>
           </div>
@@ -5296,7 +5273,7 @@
             <div style="margin-bottom:8px;">🏌️ <strong>Putts:</strong> ${totalPutts} &nbsp; ⛳ <strong>Fairways:</strong> ${fairways} &nbsp; 🎯 <strong>GIR:</strong> ${gir}</div>
             ${approachLine}
             ${r.stars ? '<div style="margin-bottom:8px;">' + stars + '</div>' : ''}
-            ${ref.milestone ? '<div style="margin-bottom:8px;color:#4ade80;font-weight:700;">🎉 ' + ref.milestone + '</div>' : ''}
+            ${ref.milestone ? '<div style="margin-bottom:8px;color:var(--green);font-weight:700;">🎉 ' + ref.milestone + '</div>' : ''}
             ${ref.swing_thought ? '<div style="margin-bottom:6px;font-style:italic;color:var(--muted);">"' + ref.swing_thought + '"</div>' : ''}
             ${ref.wins ? '<div style="margin-bottom:6px;">✅ <em>' + ref.wins + '</em></div>' : ''}
             ${ref.learnings ? '<div style="margin-bottom:6px;">🔧 <em>' + ref.learnings + '</em></div>' : ''}
@@ -5345,7 +5322,7 @@
 
     const overallAvg = totalApproachVsPar / totalApproachHoles;
     const overallStr = overallAvg >= 0 ? '+' + overallAvg.toFixed(1) : overallAvg.toFixed(1);
-    const overallColor = overallAvg <= 0.5 ? '#4ade80' : overallAvg <= 1.2 ? 'var(--gold)' : 'var(--red)';
+    const overallColor = overallAvg <= 0.5 ? 'var(--green)' : overallAvg <= 1.2 ? 'var(--gold)' : 'var(--red)';
 
     // Per-round trend data (newest first, max 6 rounds with approach data)
     const roundTrend = rounds
@@ -5373,7 +5350,7 @@
       const avgYds = d.ydsCount ? Math.round(d.totalYds / d.ydsCount) + 'y' : '—';
       const avg = d.totalVsPar / d.count;
       const avgStr = avg >= 0 ? '+' + avg.toFixed(1) : avg.toFixed(1);
-      const color = avg <= 0.5 ? '#4ade80' : avg <= 1.2 ? 'var(--gold)' : 'var(--red)';
+      const color = avg <= 0.5 ? 'var(--green)' : avg <= 1.2 ? 'var(--gold)' : 'var(--red)';
       return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
         <td style="padding:7px 8px 7px 0;font-weight:600;font-size:0.82rem;color:var(--cream);">${club}</td>
         <td style="padding:7px 4px;text-align:center;font-size:0.8rem;color:var(--muted);">${d.count}</td>
@@ -5388,7 +5365,7 @@
       const avg = bc.totalVsPar / bc.count;
       const avgStr = avg >= 0 ? '+' + avg.toFixed(1) : avg.toFixed(1);
       return `<div style="margin-bottom:12px;padding:8px 12px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:8px;font-size:0.8rem;line-height:1.4;">
-        🏆 <strong style="color:#4ade80;">Best club:</strong> ${bestClub} — avg <strong style="color:#4ade80;">${avgStr}</strong> vs par over ${bc.count} approach${bc.count !== 1 ? 'es' : ''}
+        🏆 <strong style="color:var(--green);">Best club:</strong> ${bestClub} — avg <strong style="color:var(--green);">${avgStr}</strong> vs par over ${bc.count} approach${bc.count !== 1 ? 'es' : ''}
       </div>`;
     })() : '';
 
@@ -5397,7 +5374,7 @@
     if (roundTrend.length >= 2) {
       const trendRows = roundTrend.map(r => {
         const avgStr = r.avg >= 0 ? '+' + r.avg.toFixed(1) : r.avg.toFixed(1);
-        const color = r.avg <= 0.5 ? '#4ade80' : r.avg <= 1.2 ? 'var(--gold)' : 'var(--red)';
+        const color = r.avg <= 0.5 ? 'var(--green)' : r.avg <= 1.2 ? 'var(--gold)' : 'var(--red)';
         const d = new Date(r.date + 'T12:00:00');
         const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         const course = r.course ? r.course.replace(/\s*\(.*\)/, '').substring(0, 22) : '—';
@@ -6467,7 +6444,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   function famScoreColor(diff) {
     if (diff <= -2) return '#a78bfa';
     if (diff === -1) return '#60a5fa';
-    if (diff === 0)  return '#4ade80';
+    if (diff === 0)  return 'var(--green)';
     if (diff === 1)  return 'var(--cream)';
     if (diff === 2)  return 'var(--red)';
     return '#ff4444';
@@ -6872,7 +6849,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     statusEl.innerHTML = '';
     if (saved.length) {
       const savedNames = saved.map(pk => FAM_PLAYERS[pk]?.name || pk).join(', ');
-      statusEl.innerHTML += `<div style="color:#4ade80;font-size:0.85rem;margin-bottom:6px;">\u2713 Saved for ${savedNames}</div>`;
+      statusEl.innerHTML += `<div style="color:var(--green);font-size:0.85rem;margin-bottom:6px;">\u2713 Saved for ${savedNames}</div>`;
     }
     if (failed.length) {
       const failedNames = failed.map(pk => FAM_PLAYERS[pk]?.name || pk).join(', ');
@@ -7126,7 +7103,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     }
 
     statusEl.innerHTML = '';
-    if (nowSaved.length) statusEl.innerHTML += `<div style="color:#4ade80;font-size:0.85rem;margin-bottom:6px;">\u2713 Saved for ${nowSaved.join(', ')}</div>`;
+    if (nowSaved.length) statusEl.innerHTML += `<div style="color:var(--green);font-size:0.85rem;margin-bottom:6px;">\u2713 Saved for ${nowSaved.join(', ')}</div>`;
     if (stillFailed.length) {
       statusEl.innerHTML += `<div style="color:var(--red);font-size:0.85rem;margin-bottom:8px;">\u2717 Still failing for ${stillFailed.join(', ')} \u2014 try again when you have signal</div>`;
       statusEl.innerHTML += `<button onclick="retryFailedFamSaves(this)" style="background:var(--red);border:none;border-radius:8px;padding:9px 18px;color:#fff;font-weight:700;font-size:0.82rem;cursor:pointer;width:100%;">\u21ba Retry Again</button>`;
