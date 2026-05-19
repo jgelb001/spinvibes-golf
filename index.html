@@ -4410,6 +4410,11 @@
       }
     }
     if (id === 'caddie') {
+      if (sessionStorage.getItem('sv-dad-unlocked') !== '1') {
+        _pendingAfterPin = '_openCaddie';
+        document.getElementById('dad-pin-overlay').style.display = 'flex';
+        return;
+      }
       renderCaddieMessages(false);
     }
     if (id === 'girl-progress') {
@@ -4680,6 +4685,19 @@
     );
   }
 
+  // ── WAKE LOCK (keeps screen on during round, does NOT affect audio/Spotify) ──
+  let _wakeLock = null;
+  async function _acquireWakeLock() {
+    if (!('wakeLock' in navigator)) return;
+    try {
+      _wakeLock = await navigator.wakeLock.request('screen');
+      _wakeLock.addEventListener('release', () => { _wakeLock = null; });
+    } catch(e) { /* silently ignore — not critical */ }
+  }
+  function _releaseWakeLock() {
+    if (_wakeLock) { _wakeLock.release(); _wakeLock = null; }
+  }
+
   function stopGPS() {
     if (_gpsWatchId !== null) {
       navigator.geolocation.clearWatch(_gpsWatchId); _gpsWatchId = null;
@@ -4877,8 +4895,22 @@
           <div class="club-chip-row">${chips}</div>
         </div>
       </div>
+      <!-- Quick distances panel (hidden by default) -->
+      <div id="dad-dist-panel" style="display:none;background:var(--surface2);border:0.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--gold);margin-bottom:8px;">Carry Distances</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;">
+          ${CLUBS.map(c => {
+            const d = getClubDist(c.name);
+            return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:0.5px solid var(--border);font-size:0.85rem;">
+              <span style="color:var(--cream);">${c.display}</span>
+              <span style="color:var(--gold);font-weight:600;">${d} yds</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
       <div class="modal-nav-row">
         <button class="btn-ghost" onclick="dadLiveBack()" ${backAttr}>← Back</button>
+        <button class="btn-ghost" onclick="dadToggleDistPanel()" style="font-size:0.78rem;padding:10px 12px;" id="dad-dist-btn">📏</button>
         <button class="btn-ghost" onclick="dadMidRoundScorecard()" style="font-size:0.78rem;padding:10px 12px;">📋 Card</button>
         <button class="btn-gold" onclick="dadLiveNext()">${nextLabel}</button>
       </div>
@@ -4926,6 +4958,15 @@
       _saveDraftRound();
       renderDadLiveHole();
     }
+  }
+
+  function dadToggleDistPanel() {
+    const panel = document.getElementById('dad-dist-panel');
+    const btn   = document.getElementById('dad-dist-btn');
+    if (!panel) return;
+    const open = panel.style.display !== 'none';
+    panel.style.display = open ? 'none' : 'block';
+    if (btn) btn.style.color = open ? '' : 'var(--gold)';
   }
 
   function dadLiveBack() {
@@ -5047,6 +5088,7 @@
             const fn = _pendingAfterPin;
             _pendingAfterPin = null;
             if (fn === '_openFamilyModalUnlocked') { _openFamilyModalUnlocked(); return; }
+            if (fn === '_openCaddie') { renderCaddieMessages(false); return; }
           }
           loadDadRoundsAndRender();
         }, 300);
@@ -5599,6 +5641,7 @@
   }
   function closeDadModal() {
     document.getElementById('dad-modal').style.display = 'none';
+    _releaseWakeLock();
     stopGPS();
     // Draft is intentionally kept — user may want to resume later.
     // It is cleared automatically on successful save or when they start a fresh round.
@@ -5704,6 +5747,7 @@
       _dadHoles.push({ hole: i, par: holePar, score: holePar, fairway: 'no', gir: false, putts: 2, yds });
     }
     document.getElementById('dad-running-total').style.display = '';
+    _acquireWakeLock();
     startGPS();
     renderDadLiveHole();
   }
