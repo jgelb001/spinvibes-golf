@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0a1a0e">
+  <meta name="theme-color" content="#F5F4F2">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="SpinVibes Golf">
@@ -12,6 +12,7 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <title>SpinVibes Golf</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <script>
     // Runs before body renders — only restore profile if same browser session
     // sessionStorage clears when tab is closed, so fresh tabs always show landing
@@ -37,17 +38,18 @@
     html.pre-mom .mom-sect { display: block !important; }
 
     :root {
-      --bg:        #0a1a0e;
-      --surface:   #111f15;
-      --surface2:  #1a2f1e;
-      --surface3:  #223828;
-      --green:     #2d6a3f;
-      --green-b:   #3d8a52;
-      --gold:      #c9a84c;
-      --gold-l:    #e8cc7a;
-      --cream:     #f0ead8;
-      --muted:     #6a8a6e;
-      --red:       #d64f3a;
+      --bg:        #F5F4F2;
+      --surface:   #FFFFFF;
+      --surface2:  #EEECEA;
+      --surface3:  #E4E2DE;
+      --green:     #1E3D2B;
+      --green-b:   #2A5238;
+      --gold:      #B89530;
+      --gold-l:    #8A6E22;
+      --cream:     #1C1A17;
+      --muted:     #888077;
+      --border:    #E0DEDB;
+      --red:       #c0392b;
       --nav-h:     64px;
       --safe-b:    env(safe-area-inset-bottom, 0px);
     }
@@ -73,7 +75,7 @@
     #topbar {
       flex-shrink: 0;
       background: var(--surface);
-      border-bottom: 1px solid rgba(201,168,76,0.25);
+      border-bottom: 0.5px solid var(--border);
       padding: 12px 20px 10px;
       padding-top: calc(16px + env(safe-area-inset-top, 0px));
       display: flex;
@@ -84,10 +86,10 @@
       font-family: 'Bebas Neue', sans-serif;
       font-size: 1.5rem;
       letter-spacing: 2px;
-      color: var(--gold);
+      color: var(--cream);
       line-height: 1;
     }
-    .topbar-logo span { color: var(--cream); }
+    .topbar-logo span { color: var(--gold); }
     .topbar-sub {
       font-size: 0.7rem;
       color: var(--muted);
@@ -134,7 +136,7 @@
     #nav {
       flex-shrink: 0;
       background: var(--surface);
-      border-top: 1px solid rgba(201,168,76,0.2);
+      border-top: 0.5px solid var(--border);
       display: flex;
       height: calc(var(--nav-h) + var(--safe-b));
       padding-bottom: var(--safe-b);
@@ -168,14 +170,34 @@
       padding-top: 6px;
     }
     .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    .nav-btn.active { color: var(--gold); }
-    .nav-btn.active svg { stroke: var(--gold); }
+    .nav-btn.active { color: var(--green); }
+    .nav-btn.active svg { stroke: var(--green); }
+    /* Profile-specific active nav color */
+    body.son-mode     .nav-btn.active { color: #3B7CB8; }
+    body.son-mode     .nav-btn.active svg { stroke: #3B7CB8; }
+    body.girl-mode    .nav-btn.active { color: #B85490; }
+    body.girl-mode    .nav-btn.active svg { stroke: #B85490; }
+    body.mom-mode     .nav-btn.active { color: #C49A30; }
+    body.mom-mode     .nav-btn.active svg { stroke: #C49A30; }
+    body.grandma-mode .nav-btn.active { color: #9A8050; }
+    body.grandma-mode .nav-btn.active svg { stroke: #9A8050; }
+    /* Dark mode: use gold for all profiles */
+    body.dark-mode .nav-btn.active,
+    body.dark-mode.son-mode .nav-btn.active,
+    body.dark-mode.girl-mode .nav-btn.active,
+    body.dark-mode.mom-mode .nav-btn.active,
+    body.dark-mode.grandma-mode .nav-btn.active { color: var(--gold); }
+    body.dark-mode .nav-btn.active svg,
+    body.dark-mode.son-mode .nav-btn.active svg,
+    body.dark-mode.girl-mode .nav-btn.active svg,
+    body.dark-mode.mom-mode .nav-btn.active svg,
+    body.dark-mode.grandma-mode .nav-btn.active svg { stroke: var(--gold); }
 
     /* ── SHARED COMPONENTS ── */
     .page-header {
-      background: linear-gradient(160deg, var(--surface2) 0%, var(--bg) 100%);
+      background: var(--surface2);
       padding: 24px 20px 20px;
-      border-bottom: 2px solid rgba(201,168,76,0.3);
+      border-bottom: 0.5px solid var(--border);
       position: relative;
       overflow: hidden;
     }
@@ -186,7 +208,7 @@
       top: 50%;
       transform: translateY(-50%);
       font-size: 3.5rem;
-      opacity: 0.12;
+      opacity: 0.08;
     }
     .page-tag {
       font-size: 0.65rem;
@@ -209,7 +231,7 @@
       margin-top: 6px;
     }
 
-    .section { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .section { padding: 16px 20px; border-bottom: 0.5px solid var(--border); }
     .section:last-child { border-bottom: none; }
 
     .section-title {
@@ -222,10 +244,10 @@
     }
 
     .card {
-      background: var(--surface2);
+      background: var(--surface);
       border-radius: 12px;
       padding: 14px 16px;
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 0.5px solid var(--border);
       margin-bottom: 10px;
     }
     .card:last-child { margin-bottom: 0; }
@@ -254,17 +276,17 @@
     /* static label pills (range phases, club labels) */
     .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
     .pill {
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: var(--surface2);
+      border: 0.5px solid var(--border);
       border-radius: 20px;
       padding: 3px 10px;
       font-size: 0.75rem;
-      color: var(--gold-l);
+      color: var(--muted);
       font-weight: 500;
     }
 
     .cue-box {
-      background: rgba(201,168,76,0.08);
+      background: rgba(184,149,48,0.07);
       border-left: 3px solid var(--gold);
       border-radius: 0 8px 8px 0;
       padding: 8px 12px;
@@ -279,7 +301,7 @@
       align-items: flex-start;
       gap: 10px;
       padding: 8px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 0.5px solid var(--border);
       font-size: 0.83rem;
       color: var(--muted);
       line-height: 1.5;
@@ -301,42 +323,56 @@
     .stat-row {
       display: flex;
       justify-content: space-around;
-      background: var(--surface2);
+      background: var(--surface);
       border-radius: 12px;
       padding: 16px 12px;
       margin-bottom: 14px;
+      border: 0.5px solid var(--border);
     }
     .stat { text-align: center; flex: 1; }
     .stat-num {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 1.8rem;
-      color: var(--gold);
+      color: var(--cream);
       line-height: 1;
     }
     .stat-lbl { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
 
     /* ── HOME PAGE ── */
+    /* Default hero (Dad — gold) */
     .home-hero {
-      background: linear-gradient(160deg, #0f2a16 0%, var(--bg) 100%);
+      background: #EEECEA;
       padding: 28px 20px 24px;
-      border-bottom: 2px solid rgba(201,168,76,0.3);
+      border-bottom: 2.5px solid #B89530;
       position: relative;
       overflow: hidden;
     }
-    .home-hero::before {
-      content: '⛳';
-      position: absolute;
-      right: -10px; top: -10px;
-      font-size: 8rem;
-      opacity: 0.06;
-    }
+    /* Profile-specific hero tints */
+    body.son-mode     .home-hero { background: #EBF0F5; border-bottom-color: #3B7CB8; }
+    body.girl-mode    .home-hero { background: #F5EBF2; border-bottom-color: #B85490; }
+    body.mom-mode     .home-hero { background: #F5F0E8; border-bottom-color: #C49A30; }
+    body.grandma-mode .home-hero { background: #EEECE8; border-bottom-color: #9A8050; }
+    /* Dark mode hero overrides */
+    body.dark-mode              .home-hero { background: linear-gradient(160deg, #0f2a16 0%, var(--bg) 100%); border-bottom-color: rgba(201,168,76,0.3); }
+    body.dark-mode.son-mode     .home-hero { background: linear-gradient(160deg, #0d2a5e 0%, var(--bg) 100%); }
+    body.dark-mode.girl-mode    .home-hero { background: linear-gradient(160deg, #2d0a3d 0%, var(--bg) 100%); }
+    body.dark-mode.mom-mode     .home-hero { background: linear-gradient(160deg, #2f1811 0%, var(--bg) 100%); }
+    body.dark-mode.grandma-mode .home-hero { background: linear-gradient(160deg, #1e0840 0%, var(--bg) 100%); }
+
     .home-greeting {
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 0.75rem;
-      color: var(--muted);
+      letter-spacing: 3px;
       text-transform: uppercase;
-      letter-spacing: 2px;
       margin-bottom: 6px;
+      /* Color set per profile below */
+      color: var(--gold);
     }
+    body.son-mode     .home-greeting { color: #3B7CB8; }
+    body.girl-mode    .home-greeting { color: #B85490; }
+    body.mom-mode     .home-greeting { color: #C49A30; }
+    body.grandma-mode .home-greeting { color: #9A8050; }
+
     .home-title {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 2.6rem;
@@ -347,8 +383,8 @@
     .home-title span { color: var(--gold); }
     .home-goal {
       margin-top: 12px;
-      background: rgba(201,168,76,0.1);
-      border: 1px solid rgba(201,168,76,0.3);
+      background: rgba(184,149,48,0.08);
+      border: 0.5px solid rgba(184,149,48,0.3);
       border-radius: 10px;
       padding: 10px 14px;
       font-size: 0.83rem;
@@ -371,18 +407,18 @@
       padding: 16px 20px;
     }
     .guide-card {
-      background: var(--surface2);
+      background: var(--surface);
       border-radius: 14px;
       padding: 16px 14px;
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 0.5px solid var(--border);
       cursor: pointer;
       transition: background 0.15s, transform 0.1s;
-      text-align: center;
+      text-align: left;
       text-decoration: none;
     }
-    .guide-card:active { background: var(--surface3); transform: scale(0.97); }
-    .guide-card-icon { font-size: 2rem; margin-bottom: 8px; display: block; }
-    .guide-card-title { font-weight: 700; font-size: 0.85rem; color: var(--cream); margin-bottom: 3px; }
+    .guide-card:active { background: var(--surface2); transform: scale(0.97); }
+    .guide-card-icon { font-size: 1.4rem; margin-bottom: 8px; display: block; color: var(--green); }
+    .guide-card-title { font-weight: 600; font-size: 0.85rem; color: var(--cream); margin-bottom: 3px; }
     .guide-card-sub { font-size: 0.7rem; color: var(--muted); }
 
     /* ── PROGRESS PAGE ── */
@@ -495,48 +531,40 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
 
-    /* ── LIGHT MODE ── */
-    body.light-mode {
-      --bg:       #f5f0e8;
-      --surface:  #ffffff;
-      --surface2: #ede8df;
-      --surface3: #ddd7cc;
-      --green:    #2d6a3f;
-      --green-b:  #3d8a52;
-      --gold:     #a8782e;
-      --gold-l:   #7a5418;
-      --cream:    #1a2e1d;
-      --muted:    #5a7a5e;
+    /* ── DARK MODE (opt-in toggle) ── */
+    body.dark-mode {
+      --bg:        #0a1a0e;
+      --surface:   #111f15;
+      --surface2:  #1a2f1e;
+      --surface3:  #223828;
+      --green:     #2d6a3f;
+      --green-b:   #3d8a52;
+      --gold:      #c9a84c;
+      --gold-l:    #e8cc7a;
+      --cream:     #f0ead8;
+      --muted:     #6a8a6e;
+      --border:    rgba(255,255,255,0.08);
     }
-    body.light-mode .card,
-    body.light-mode .guide-card,
-    body.light-mode .stat-row,
-    body.light-mode .session-log-item,
-    body.light-mode .notes-area,
-    body.light-mode input[type="text"],
-    body.light-mode input[type="date"],
-    body.light-mode select {
-      border-color: rgba(0,0,0,0.1);
+    body.dark-mode .card,
+    body.dark-mode .guide-card,
+    body.dark-mode .stat-row,
+    body.dark-mode .session-log-item,
+    body.dark-mode .notes-area,
+    body.dark-mode input[type="text"],
+    body.dark-mode input[type="date"],
+    body.dark-mode select {
+      border-color: rgba(255,255,255,0.08);
     }
-    body.light-mode .pill {
-      background: rgba(0,0,0,0.05);
-      border-color: rgba(0,0,0,0.1);
-      color: var(--gold);
+    body.dark-mode .pill {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.12);
+      color: var(--gold-l);
     }
-    body.light-mode .cue-box {
-      background: rgba(168,120,46,0.08);
+    body.dark-mode .check-row {
+      border-bottom-color: rgba(255,255,255,0.04);
     }
-    body.light-mode .check-row {
-      border-bottom-color: rgba(0,0,0,0.06);
-    }
-    body.light-mode .section {
-      border-bottom-color: rgba(0,0,0,0.07);
-    }
-    body.light-mode .page-header {
-      background: linear-gradient(160deg, var(--surface2) 0%, var(--bg) 100%);
-    }
-    body.light-mode .home-hero {
-      background: linear-gradient(160deg, #dceade 0%, var(--bg) 100%);
+    body.dark-mode .section {
+      border-bottom-color: rgba(255,255,255,0.05);
     }
 
     /* ── STEP LAYOUT ── */
@@ -670,68 +698,18 @@
       color:var(--muted); font-family:'Outfit',sans-serif; font-size:0.75rem; cursor:pointer;
     }
     .exp-close:active { opacity:0.7; }
-    body.light-mode .exp-trigger { border-top-color:rgba(0,0,0,0.08); }
-    body.light-mode .diagram { background:rgba(0,0,0,0.04); }
-    body.light-mode .exp-mistake { background:rgba(214,79,58,0.06); }
+    .exp-trigger { border-top-color:rgba(0,0,0,0.08); }
+    .diagram { background:rgba(0,0,0,0.04); }
+    .exp-mistake { background:rgba(214,79,58,0.06); }
+    body.dark-mode .exp-trigger { border-top-color:rgba(255,255,255,0.08); }
+    body.dark-mode .diagram { background:rgba(255,255,255,0.04); }
+    body.dark-mode .exp-mistake { background:rgba(214,79,58,0.12); }
 
-    /* ── SON MODE COLORS (Electric Blue / Amber) ── */
-    body.son-mode {
-      --bg:       #030d1c;
-      --surface:  #071428;
-      --surface2: #0d1f40;
-      --surface3: #142852;
-      --green:    #1a56c4;
-      --green-b:  #3b82f6;
-      --gold:     #f59e0b;
-      --gold-l:   #fcd34d;
-      --cream:    #dbeafe;
-      --muted:    #64a0dc;
-      --red:      #ef4444;
-      --nav-h:    64px;
-    }
-    body.light-mode.son-mode {
-      --bg:      #eff6ff;
-      --surface: #ffffff;
-      --surface2:#dbeafe;
-      --surface3:#bfdbfe;
-      --gold:    #d97706;
-      --gold-l:  #92400e;
-      --cream:   #1e3a5f;
-      --muted:   #3b82f6;
-    }
-    body.son-mode .home-hero { background: linear-gradient(160deg, #0d2a5e 0%, var(--bg) 100%); }
-    body.son-mode .topbar-logo span { color: #3b82f6; }
-
-    body.light-mode.girl-mode {
-      --bg:      #fdf2f8;
-      --surface: #ffffff;
-      --surface2:#fce7f3;
-      --surface3:#fbcfe8;
-      --gold:    #be185d;
-      --gold-l:  #9d174d;
-      --cream:   #1f0a14;
-      --muted:   #9d174d;
-      --green:   #0f766e;
-      --green-b: #0d9488;
-    }
-    body.light-mode.girl-mode .home-hero { background: linear-gradient(160deg, #fce7f3 0%, var(--bg) 100%); }
-
-    /* ── GIRL MODE THEME ── */
-    body.girl-mode {
-      --bg:       #120818;
-      --surface:  #1e0d28;
-      --surface2: #2a1238;
-      --surface3: #361848;
-      --green:    #0d9488;
-      --green-b:  #14b8a6;
-      --gold:     #ec4899;
-      --gold-l:   #f472b6;
-      --cream:    #fdf4ff;
-      --muted:    #a78bbd;
-      --red:      #f43f5e;
-    }
-    body.girl-mode .topbar-logo span { color: #14b8a6; }
-    body.girl-mode .home-hero { background: linear-gradient(160deg, #2d0a3d 0%, var(--bg) 100%); }
+    /* Profile-specific topbar logo accents */
+    body.son-mode     .topbar-logo span { color: #3B7CB8; }
+    body.girl-mode    .topbar-logo span { color: #B85490; }
+    body.mom-mode     .topbar-logo span { color: #C49A30; }
+    body.grandma-mode .topbar-logo span { color: #9A8050; }
 
     /* ── GIRL SECTION ── */
     .dad-sect, .son-sect, .girl-sect { width: 100%; }
@@ -1060,37 +1038,6 @@
       bottom: -60px; left: -60px;
     }
 
-    /* ── GRANDMA MODE THEME (Deep Purple / Champagne) ── */
-    body.grandma-mode {
-      --bg:       #0d0812;
-      --surface:  #160e20;
-      --surface2: #1f1430;
-      --surface3: #2a1a40;
-      --green:    #6d28d9;
-      --green-b:  #8b5cf6;
-      --gold:     #d4af70;
-      --gold-l:   #e8cc8a;
-      --cream:    #faf5ff;
-      --muted:    #9d7dc2;
-      --red:      #e05c8a;
-      --nav-h:    64px;
-    }
-    body.grandma-mode .home-hero { background: linear-gradient(160deg, #1e0840 0%, var(--bg) 100%); }
-    body.grandma-mode .topbar-logo span { color: #8b5cf6; }
-
-    body.light-mode.grandma-mode {
-      --bg:       #faf5ff;
-      --surface:  #ffffff;
-      --surface2: #f3e8ff;
-      --surface3: #e9d5ff;
-      --gold:     #7c3aed;
-      --gold-l:   #5b21b6;
-      --cream:    #1e0840;
-      --muted:    #7c3aed;
-      --green:    #6d28d9;
-      --green-b:  #8b5cf6;
-    }
-    body.light-mode.grandma-mode .home-hero { background: linear-gradient(160deg, #ede9fe 0%, var(--bg) 100%); }
 
     /* ── GRANDMA SECTION ── */
     .grandma-sect { display: none; width: 100%; }
@@ -1122,37 +1069,6 @@
     .landing-card-grandma .landing-card-name { color: #d4af70; }
     .landing-card-grandma .landing-card-desc { color: #a78bca; }
 
-    /* ── MOM MODE THEME (Warm Coral / Honey) ── */
-    body.mom-mode {
-      --bg:       #1a0e09;
-      --surface:  #25150f;
-      --surface2: #2f1d17;
-      --surface3: #3d261e;
-      --green:    #d97757;
-      --green-b:  #e88868;
-      --gold:     #f2c879;
-      --gold-l:   #f6d89a;
-      --cream:    #fbeee2;
-      --muted:    #a6877a;
-      --red:      #c94f2e;
-      --nav-h:    64px;
-    }
-    body.mom-mode .home-hero { background: linear-gradient(160deg, #2f1811 0%, var(--bg) 100%); }
-    body.mom-mode .topbar-logo span { color: #e88868; }
-
-    body.light-mode.mom-mode {
-      --bg:       #fcf5ed;
-      --surface:  #ffffff;
-      --surface2: #fce8d9;
-      --surface3: #f6d4c0;
-      --gold:     #9a5a10;
-      --gold-l:   #7a4008;
-      --cream:    #2f1811;
-      --muted:    #8a5c4a;
-      --green:    #7a2f19;
-      --green-b:  #d97757;
-    }
-    body.light-mode.mom-mode .home-hero { background: linear-gradient(160deg, #fce8d9 0%, var(--bg) 100%); }
 
     /* ── MOM SECTION ── */
     .mom-sect { display: none; width: 100%; }
@@ -1211,12 +1127,16 @@
 
     /* ── RESPONSIVE — DESKTOP / TABLET ── */
     @media (min-width: 600px) {
-      body { background: #000; }
+      body { background: #E8E6E2; }
+      body.dark-mode { background: #000; }
 
       /* Center the app shell in a phone-sized column */
       #app {
         max-width: 500px;
         margin: 0 auto;
+        box-shadow: 0 4px 40px rgba(0,0,0,0.15), 0 0 0 0.5px rgba(0,0,0,0.08);
+      }
+      body.dark-mode #app {
         box-shadow: 0 0 80px rgba(0,0,0,0.7), 0 0 1px rgba(255,255,255,0.06);
       }
 
@@ -1895,7 +1815,7 @@
     <div class="page active" id="page-home">
       <div class="dad-sect">
       <div class="home-hero">
-        <div class="home-greeting">Welcome back, Jeremy</div>
+        <div class="home-greeting">Dad</div>
         <div class="home-title">Your Golf<br><span>Pocket Guide</span></div>
         <div class="home-goal">
           <div class="home-goal-num">&lt;90</div>
@@ -1915,24 +1835,24 @@
 
       <div class="guide-grid">
         <a class="guide-card" onclick="showPage('range')">
-          <span class="guide-card-icon">🏌️</span>
+          <span class="guide-card-icon"><i class="ti ti-flag-2"></i></span>
           <div class="guide-card-title">Range Session</div>
           <div class="guide-card-sub">65-ball plan</div>
         </a>
         <a class="guide-card" onclick="showPage('stretches')">
-          <span class="guide-card-icon">🧘</span>
+          <span class="guide-card-icon"><i class="ti ti-heart-rate"></i></span>
           <div class="guide-card-title">Pre-Range Stretches</div>
           <div class="guide-card-sub">5–7 min warmup</div>
         </a>
         <a class="guide-card" onclick="showPage('shortgame')">
-          <span class="guide-card-icon">🎯</span>
+          <span class="guide-card-icon"><i class="ti ti-target"></i></span>
           <div class="guide-card-title">Short Game</div>
           <div class="guide-card-sub">Chipping &amp; putting</div>
         </a>
         <a class="guide-card dad-sect" onclick="showPage('strategy')">
-          <span class="guide-card-icon">🧠</span>
+          <span class="guide-card-icon"><i class="ti ti-brain"></i></span>
           <div class="guide-card-title">Course Strategy</div>
-          <div class="guide-card-sub">Break 90 checklist — your on-course game plan</div>
+          <div class="guide-card-sub">Break 90 checklist</div>
         </a>
       </div>
 
@@ -1996,7 +1916,7 @@
       <div class="son-sect">
 
         <div class="home-hero">
-          <div class="home-greeting">Let's Go! 🤙 You've Got This</div>
+          <div class="home-greeting">Son</div>
           <div class="home-title" style="font-size:2.4rem;">Your Golf<br><span>Pocket Guide</span></div>
           <div class="home-goal" style="border-color:rgba(59,130,246,0.4);background:rgba(59,130,246,0.1);">
             <div class="home-goal-num" style="color:#3b82f6;">8</div>
@@ -2054,8 +1974,8 @@
       <div class="girl-sect">
 
         <div class="home-hero">
-          <div class="home-greeting">⛳ Lefty · Age 5 · Top Flite Girls Set</div>
-          <div class="home-title">Let's Play<br><span style="color:#ec4899;">Golf! 🌈</span></div>
+          <div class="home-greeting">Daughter</div>
+          <div class="home-title">Let's Play<br><span>Golf!</span></div>
           <div class="home-goal" style="border-color:rgba(236,72,153,0.4);background:rgba(236,72,153,0.08);">
             <div class="home-goal-num" style="color:#ec4899;">5</div>
             <div>
@@ -2121,8 +2041,8 @@
       <div class="grandma-sect">
 
         <div class="home-hero">
-          <div class="home-greeting">⛳ Righty · Lynx Lady Regalia · Welcome Back</div>
-          <div class="home-title">Back on<br><span style="color:#d4af70;">the Course 💜</span></div>
+          <div class="home-greeting">Grandma</div>
+          <div class="home-title">Back on<br><span>the Course</span></div>
           <div class="home-goal" style="border-color:rgba(212,175,112,0.4);background:rgba(212,175,112,0.08);">
             <div class="home-goal-num" style="color:#d4af70;">💜</div>
             <div>
@@ -2192,8 +2112,8 @@
       <div class="mom-sect">
 
         <div class="home-hero">
-          <div class="home-greeting">⛳ Righty · Beginner · Welcome Home 🌺</div>
-          <div class="home-title">Welcome to<br><span style="color:#f2c879;">the Range 🌺</span></div>
+          <div class="home-greeting">Mom</div>
+          <div class="home-title">Welcome to<br><span>the Range</span></div>
           <div class="home-goal" style="border-color:rgba(242,200,121,0.4);background:rgba(242,200,121,0.08);">
             <div class="home-goal-num" style="color:#f2c879;">🌺</div>
             <div>
@@ -4662,10 +4582,11 @@
   window.addEventListener('offline', updateOfflineBadge);
 
   // ── LIGHT / DARK MODE ────────────────────────────────────────
+  // Light mode is default. Toggle adds dark-mode class.
   function toggleMode() {
-    const isLight = document.body.classList.toggle('light-mode');
-    localStorage.setItem('svgolf-theme', isLight ? 'light' : 'dark');
-    const icon = isLight ? '🌙' : '☀️';
+    const isDark = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('svgolf-theme', isDark ? 'dark' : 'light');
+    const icon = isDark ? '☀️' : '🌙';
     document.getElementById('modeToggle').textContent = icon;
     const f = document.getElementById('floatToggle');
     if (f) f.textContent = icon;
@@ -4673,11 +4594,11 @@
 
   function initTheme() {
     const saved = localStorage.getItem('svgolf-theme');
-    if (saved === 'light') {
-      document.body.classList.add('light-mode');
-      document.getElementById('modeToggle').textContent = '🌙';
+    if (saved === 'dark') {
+      document.body.classList.add('dark-mode');
+      document.getElementById('modeToggle').textContent = '☀️';
       const f = document.getElementById('floatToggle');
-      if (f) f.textContent = '🌙';
+      if (f) f.textContent = '☀️';
     }
   }
 
