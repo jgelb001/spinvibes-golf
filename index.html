@@ -170,23 +170,28 @@
       padding-top: 6px;
     }
     .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    .nav-btn.active { color: var(--green); }
+    /* Active nav: pill background + accent color */
+    .nav-btn.active {
+      color: var(--green);
+      background: rgba(30,61,43,0.08);
+      border-radius: 10px;
+    }
     .nav-btn.active svg { stroke: var(--green); }
-    /* Profile-specific active nav color */
-    body.son-mode     .nav-btn.active { color: #3B7CB8; }
+    /* Profile-specific active nav color + pill tint */
+    body.son-mode     .nav-btn.active { color: #3B7CB8; background: rgba(59,124,184,0.1); }
     body.son-mode     .nav-btn.active svg { stroke: #3B7CB8; }
-    body.girl-mode    .nav-btn.active { color: #B85490; }
+    body.girl-mode    .nav-btn.active { color: #B85490; background: rgba(184,84,144,0.1); }
     body.girl-mode    .nav-btn.active svg { stroke: #B85490; }
-    body.mom-mode     .nav-btn.active { color: #C49A30; }
+    body.mom-mode     .nav-btn.active { color: #C49A30; background: rgba(196,154,48,0.1); }
     body.mom-mode     .nav-btn.active svg { stroke: #C49A30; }
-    body.grandma-mode .nav-btn.active { color: #9A8050; }
+    body.grandma-mode .nav-btn.active { color: #9A8050; background: rgba(154,128,80,0.1); }
     body.grandma-mode .nav-btn.active svg { stroke: #9A8050; }
-    /* Dark mode: use gold for all profiles */
+    /* Dark mode */
     body.dark-mode .nav-btn.active,
     body.dark-mode.son-mode .nav-btn.active,
     body.dark-mode.girl-mode .nav-btn.active,
     body.dark-mode.mom-mode .nav-btn.active,
-    body.dark-mode.grandma-mode .nav-btn.active { color: var(--gold); }
+    body.dark-mode.grandma-mode .nav-btn.active { color: var(--gold); background: rgba(201,168,76,0.12); }
     body.dark-mode .nav-btn.active svg,
     body.dark-mode.son-mode .nav-btn.active svg,
     body.dark-mode.girl-mode .nav-btn.active svg,
@@ -1077,6 +1082,41 @@
     .landing-card-mom .landing-card-name { color: #C49A30; }
     .landing-card-mom .landing-card-desc { color: #8a6a20; }
 
+    /* ── ACHIEVEMENT BADGE SYSTEM ───────────────────────────────── */
+    .badge-shelf {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 4px 0 8px;
+    }
+    .badge-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 68px;
+    }
+    .badge-svg-wrap {
+      width: 56px;
+      height: 56px;
+      position: relative;
+    }
+    .badge-svg-wrap svg {
+      width: 100%;
+      height: 100%;
+    }
+    .badge-svg-wrap.locked svg { opacity: 0.22; filter: grayscale(1); }
+    .badge-name {
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-align: center;
+      color: var(--muted);
+      text-transform: uppercase;
+      line-height: 1.3;
+    }
+    .badge-item.earned .badge-name { color: var(--cream); }
+
     /* ── PORTRAIT MOBILE FIXES ── */
     @media (max-width: 599px) {
       /* Keep topbar toggle visible on portrait — but slim it down to icon-only */
@@ -1664,12 +1704,60 @@
       border-top: 1px solid rgba(201,168,76,0.35); font-size: 0.85rem;
     }
     .fam-sc-table tr.total-row td:first-child { color: var(--gold); }
-    .fam-eagle  { background: linear-gradient(135deg,#7c3aed,#4c1d95); color:#fff; border-radius:4px; padding:1px 4px; }
-    .fam-birdie { background: linear-gradient(135deg,#2563eb,#1e40af); color:#fff; border-radius:4px; padding:1px 4px; }
-    .fam-par    { color:var(--green); font-weight:700; }
-    .fam-bogey  { color:var(--cream); }
-    .fam-double { color:var(--red); font-weight:700; }
-    .fam-triple { color:#ff4444; font-weight:800; }
+    /* ── GOLF SCORE CHIPS (industry standard) ──────────────────────
+       Eagle:  double gold ring (two concentric circles)
+       Birdie: single green circle
+       Par:    no border, muted text
+       Bogey:  single red/orange square
+       Double+: filled red square
+    ──────────────────────────────────────────────────────────────── */
+    .sc-chip {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 50%;
+      font-size: 0.8rem; font-weight: 700; font-variant-numeric: tabular-nums;
+      line-height: 1; position: relative;
+    }
+    .sc-eagle {
+      color: #B89530;
+      border: 2px solid #B89530;
+      outline: 2px solid #B89530;
+      outline-offset: 3px;
+      border-radius: 50%;
+    }
+    .sc-birdie {
+      color: #1E7A3A;
+      border: 2px solid #1E7A3A;
+      border-radius: 50%;
+    }
+    .sc-par {
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+    }
+    .sc-bogey {
+      color: #c0392b;
+      border: 2px solid #c0392b;
+      border-radius: 3px;
+    }
+    .sc-double {
+      color: #fff;
+      background: #c0392b;
+      border-radius: 3px;
+    }
+    .sc-triple {
+      color: #fff;
+      background: #8B0000;
+      border-radius: 3px;
+      outline: 2px solid #8B0000;
+      outline-offset: 2px;
+    }
+    /* Legacy aliases for family scorecard */
+    .fam-eagle  { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:0.78rem;font-weight:700;color:#B89530;border:2px solid #B89530;outline:2px solid #B89530;outline-offset:2px; }
+    .fam-birdie { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:0.78rem;font-weight:700;color:#1E7A3A;border:2px solid #1E7A3A; }
+    .fam-par    { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:0.78rem;font-weight:600;color:var(--muted);border:1px solid var(--border); }
+    .fam-bogey  { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:3px;font-size:0.78rem;font-weight:700;color:#c0392b;border:2px solid #c0392b; }
+    .fam-double { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:3px;font-size:0.78rem;font-weight:700;color:#fff;background:#c0392b; }
+    .fam-triple { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:3px;font-size:0.78rem;font-weight:800;color:#fff;background:#8B0000; }
     .family-cta {
       margin: 0 16px 14px;
       background: linear-gradient(135deg, #1a2f1e, #1e2d3a);
@@ -3555,7 +3643,7 @@
         </div>
 
         <div id="dad-stats-bar" style="display:none;" class="section">
-          <div class="stat-row" id="dad-stats-row"></div>
+          <div id="dad-stats-row"></div>
         </div>
 
         <div id="dad-approach-stats" style="display:none;margin-bottom:12px;"></div>
@@ -3733,7 +3821,10 @@
         <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(201,168,76,0.2);">
           <div id="dad-modal-step-label" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);">Round Setup</div>
           <div style="display:flex;align-items:center;gap:12px;">
-            <div id="dad-running-total" style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--cream);display:none;">0</div>
+            <div id="dad-running-total" style="display:none;text-align:right;line-height:1;">
+              <div id="dad-rt-score" style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--cream);">0</div>
+              <div id="dad-rt-diff" style="font-size:0.6rem;font-weight:700;letter-spacing:0.5px;color:var(--muted);">E</div>
+            </div>
             <button onclick="closeDadModal()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">✕</button>
           </div>
         </div>
@@ -4629,6 +4720,159 @@
     { name: 'LW (60°)',  dist: 68,  loft: '60°',   display: 'LW · Lob',      wedge: true, note: 'Callaway Opus · 60–75 yds estimated · specialty/flops ✅ May 2026' },
   ];
 
+  // ── ACHIEVEMENT BADGE SYSTEM ──────────────────────────────────
+  const BADGES = [
+    {
+      id: 'first_tee',
+      name: 'First Tee',
+      desc: 'Played your first round',
+      color: '#3B7CB8',
+      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="28,4 34,20 52,20 38,31 44,48 28,38 12,48 18,31 4,20 22,20" fill="{{c}}" opacity="0.15"/>
+        <polygon points="28,4 34,20 52,20 38,31 44,48 28,38 12,48 18,31 4,20 22,20" fill="none" stroke="{{c}}" stroke-width="2"/>
+        <circle cx="28" cy="32" r="5" fill="{{c}}" opacity="0.9"/>
+        <line x1="28" y1="20" x2="28" y2="27" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>`,
+      check: (rounds) => rounds.length >= 1
+    },
+    {
+      id: 'first_birdie',
+      name: 'Birdie!',
+      desc: 'First birdie on any hole',
+      color: '#1E7A3A',
+      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.1"/>
+        <circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/>
+        <circle cx="28" cy="28" r="18" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.4"/>
+        <text x="28" y="33" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="16" fill="{{c}}">−1</text>
+      </svg>`,
+      check: (rounds) => rounds.some(r => {
+        const hs = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes||'[]');
+        return hs.some(h => (h.score - h.par) === -1);
+      })
+    },
+    {
+      id: 'par_round',
+      name: 'Par Round',
+      desc: 'Shot even par or better',
+      color: '#B89530',
+      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="48" height="48" rx="8" fill="{{c}}" opacity="0.1"/>
+        <rect x="4" y="4" width="48" height="48" rx="8" fill="none" stroke="{{c}}" stroke-width="2.5"/>
+        <text x="28" y="24" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="11" fill="{{c}}" opacity="0.7">EVEN</text>
+        <text x="28" y="38" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="18" fill="{{c}}">PAR</text>
+      </svg>`,
+      check: (rounds) => rounds.some(r => r.score_vs_par !== undefined ? r.score_vs_par <= 0 : false)
+    },
+    {
+      id: 'five_rounds',
+      name: '5 Rounds',
+      desc: 'Played 5 rounds',
+      color: '#7C5CBF',
+      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.12"/>
+        <polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2"/>
+        <text x="28" y="33" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="20" fill="{{c}}">5</text>
+      </svg>`,
+      check: (rounds) => rounds.length >= 5
+    },
+    {
+      id: 'hat_trick',
+      name: 'Hat Trick',
+      desc: '3 birdies in one round',
+      color: '#C0392B',
+      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/>
+        <circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/>
+        <circle cx="28" cy="28" r="17" fill="none" stroke="{{c}}" stroke-width="1.5" opacity="0.5"/>
+        <circle cx="28" cy="28" r="10" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.3"/>
+        <text x="28" y="22" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="8" fill="{{c}}" opacity="0.8">HAT</text>
+        <text x="28" y="34" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" fill="{{c}}">3×</text>
+        <text x="28" y="43" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="8" fill="{{c}}" opacity="0.8">BIRDIE</text>
+      </svg>`,
+      check: (rounds) => rounds.some(r => {
+        const hs = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes||'[]');
+        return hs.filter(h => (h.score - h.par) <= -1).length >= 3;
+      })
+    },
+    {
+      id: 'new_course',
+      name: 'Explorer',
+      desc: 'Played 2 different courses',
+      color: '#C49A30',
+      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/>
+        <circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/>
+        <line x1="28" y1="5" x2="28" y2="51" stroke="{{c}}" stroke-width="1" opacity="0.3"/>
+        <line x1="5" y1="28" x2="51" y2="28" stroke="{{c}}" stroke-width="1" opacity="0.3"/>
+        <ellipse cx="28" cy="28" rx="12" ry="24" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.3"/>
+        <circle cx="28" cy="20" r="5" fill="{{c}}" opacity="0.9"/>
+        <line x1="28" y1="25" x2="28" y2="36" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/>
+      </svg>`,
+      check: (rounds) => new Set(rounds.map(r => r.course_name)).size >= 2
+    },
+    {
+      id: 'putting_pro',
+      name: 'Putt Pro',
+      desc: '1-putt 3 holes in a round',
+      color: '#2A7EA8',
+      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="48" height="48" rx="8" fill="{{c}}" opacity="0.08"/>
+        <rect x="4" y="4" width="48" height="48" rx="8" fill="none" stroke="{{c}}" stroke-width="2"/>
+        <circle cx="28" cy="25" r="9" fill="none" stroke="{{c}}" stroke-width="2.5"/>
+        <circle cx="28" cy="25" r="4" fill="{{c}}" opacity="0.7"/>
+        <line x1="16" y1="40" x2="40" y2="40" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="28" y1="34" x2="28" y2="40" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/>
+        <text x="43" y="18" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="10" fill="{{c}}">1</text>
+      </svg>`,
+      check: (rounds) => rounds.some(r => {
+        const hs = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes||'[]');
+        return hs.filter(h => h.putts === 1).length >= 3;
+      })
+    },
+    {
+      id: 'ten_rounds',
+      name: '10 Rounds',
+      desc: 'Played 10 rounds',
+      color: '#B89530',
+      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.15"/>
+        <polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.08"/>
+        <polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2.5"/>
+        <text x="28" y="34" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="18" fill="{{c}}">10</text>
+      </svg>`,
+      check: (rounds) => rounds.length >= 10
+    },
+  ];
+
+  function renderBadges(rounds, accentColor) {
+    const color = accentColor || '#3B7CB8';
+    return `<div class="badge-shelf">
+      ${BADGES.map(b => {
+        const earned = b.check(rounds);
+        const c = earned ? (b.color || color) : '#888';
+        const svgHtml = b.svg.replace(/\{\{c\}\}/g, c);
+        return `<div class="badge-item ${earned ? 'earned' : 'locked'}" title="${b.desc}">
+          <div class="badge-svg-wrap ${earned ? '' : 'locked'}">${svgHtml}</div>
+          <div class="badge-name">${b.name}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  // Returns a score chip span using golf-standard color coding
+  function scoreChip(score, par) {
+    const d = score - par;
+    let cls;
+    if (d <= -2)     cls = 'sc-chip sc-eagle';
+    else if (d === -1) cls = 'sc-chip sc-birdie';
+    else if (d === 0)  cls = 'sc-chip sc-par';
+    else if (d === 1)  cls = 'sc-chip sc-bogey';
+    else if (d === 2)  cls = 'sc-chip sc-double';
+    else               cls = 'sc-chip sc-triple';
+    return `<span class="${cls}">${score}</span>`;
+  }
+
   function getClubDist(name) {
     const saved = JSON.parse(localStorage.getItem('sv-clubs') || '{}');
     const def   = CLUBS.find(c => c.name === name);
@@ -4806,7 +5050,13 @@
     const isLast = _dadHoleIdx === _dadHoles.length - 1;
 
     document.getElementById('dad-modal-step-label').textContent = `Hole ${h.hole} / ${_dadHoles.length}`;
-    document.getElementById('dad-running-total').textContent    = `${total} (${vsStr})`;
+    document.getElementById('dad-rt-score').textContent = total;
+    const _rtDiffEl = document.getElementById('dad-rt-diff');
+    if (_rtDiffEl) {
+      const rtStr = vsRaw === 0 ? 'E' : (vsRaw > 0 ? '+' + vsRaw : String(vsRaw));
+      _rtDiffEl.textContent = rtStr;
+      _rtDiffEl.style.color = vsRaw < 0 ? '#1E7A3A' : vsRaw === 0 ? 'var(--muted)' : '#c0392b';
+    }
     document.getElementById('dad-running-total').style.display  = '';
 
     const fw  = h.fairway === 'yes' ? 'active' : '';
@@ -4981,45 +5231,127 @@
     const total    = _dadHoles.reduce((a, h) => a + h.score, 0);
     const totalPar = _dadHoles.reduce((a, h) => a + h.par, 0);
     const diff     = total - totalPar;
-    const diffStr  = diff === 0 ? 'E' : (diff > 0 ? '+' + diff : '' + diff);
+    const diffStr  = diff === 0 ? 'E' : (diff > 0 ? '+' + diff : String(diff));
     const thru     = _dadHoleIdx + 1;
+    const diffColor = diff < 0 ? '#1E7A3A' : diff === 0 ? 'var(--muted)' : '#c0392b';
 
-    const rows = _dadHoles.map((h, i) => {
-      const d    = h.score - h.par;
-      const dStr = d === 0 ? 'E' : (d > 0 ? '+' + d : '' + d);
-      const cls  = d <= -2 ? 'fam-eagle' : d === -1 ? 'fam-birdie' : d === 0 ? 'fam-par' : d === 1 ? 'fam-bogey' : 'fam-double';
-      const cur  = i === _dadHoleIdx ? 'background:rgba(201,168,76,0.1);' : '';
-      const appr = h.approach_club
-        ? `<div style="font-size:0.65rem;color:var(--gold);margin-top:1px;">${h.approach_club}${h.approach_yds ? ' · ' + h.approach_yds + 'y' : ''}</div>`
-        : '';
-      return `<tr style="${cur}">
-        <td style="padding:5px 8px;color:var(--muted);font-size:0.78rem;">${i === _dadHoleIdx ? '▶ ' : ''}H${h.hole}</td>
-        <td style="padding:5px 8px;text-align:center;font-size:0.78rem;color:var(--muted);">${h.par}</td>
-        <td style="padding:5px 8px;text-align:center;"><span class="${cls}" style="font-size:0.85rem;">${h.score}</span>${appr}</td>
-        <td style="padding:5px 8px;text-align:center;font-size:0.78rem;color:var(--muted);">${dStr}</td>
-      </tr>`;
-    }).join('');
+    // Split into front/back nines
+    const front = _dadHoles.slice(0, 9);
+    const back  = _dadHoles.slice(9);
 
-    document.getElementById('dad-modal-step-label').textContent = 'Scorecard · In Progress';
+    function buildGrid(holes, label) {
+      if (!holes.length) return '';
+      const holeNums  = holes.map(h => `<td style="text-align:center;font-size:0.62rem;font-weight:700;color:var(--muted);padding:5px 4px;letter-spacing:0.5px;">${h.hole}</td>`).join('');
+      const pars      = holes.map(h => `<td style="text-align:center;font-size:0.72rem;color:var(--muted);padding:4px;">${h.par}</td>`).join('');
+      const yds       = holes.map(h => `<td style="text-align:center;font-size:0.6rem;color:var(--muted);padding:3px;opacity:0.7;">${h.yds || '—'}</td>`).join('');
+      let running = 0;
+      holes.forEach(h => { running += h.score - h.par; });
+      const scores = holes.map((h, idx) => {
+        const isThru = _dadHoles.indexOf(h) < thru;
+        const isCur  = _dadHoles.indexOf(h) === _dadHoleIdx;
+        const chip   = isThru ? scoreChip(h.score, h.par) : `<span style="font-size:0.72rem;color:var(--border);font-weight:600;">·</span>`;
+        const cur    = isCur ? `style="background:rgba(184,149,48,0.08);border-radius:4px;"` : '';
+        return `<td ${cur} style="text-align:center;padding:4px 2px;">${chip}</td>`;
+      }).join('');
+
+      // Subtotal column
+      const nineScore = holes.filter((_,i) => _dadHoles.indexOf(holes[i]) < thru).reduce((a,h) => a + h.score, 0);
+      const ninePar   = holes.filter((_,i) => _dadHoles.indexOf(holes[i]) < thru).reduce((a,h) => a + h.par, 0);
+      const nineDiff  = nineScore - ninePar;
+      const nineDiffStr = nineScore === 0 ? '' : (nineDiff === 0 ? 'E' : (nineDiff > 0 ? '+'+nineDiff : String(nineDiff)));
+      const nineColor = nineDiff < 0 ? '#1E7A3A' : nineDiff === 0 ? 'var(--muted)' : '#c0392b';
+
+      return `
+        <div style="margin-bottom:10px;">
+          <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+            <colgroup><col style="width:38px;"><col span="${holes.length}" style="width:auto;"><col style="width:38px;"></colgroup>
+            <thead>
+              <tr style="background:var(--green);">
+                <td style="padding:5px 6px;font-size:0.6rem;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:1px;">${label}</td>
+                ${holeNums}
+                <td style="text-align:center;font-size:0.6rem;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:1px;">TOT</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background:var(--surface2);border-bottom:0.5px solid var(--border);">
+                <td style="padding:3px 6px;font-size:0.6rem;font-weight:700;color:var(--muted);letter-spacing:0.5px;">YDS</td>
+                ${yds}
+                <td></td>
+              </tr>
+              <tr style="background:var(--surface2);border-bottom:0.5px solid var(--border);">
+                <td style="padding:3px 6px;font-size:0.6rem;font-weight:700;color:var(--muted);letter-spacing:0.5px;">PAR</td>
+                ${pars}
+                <td style="text-align:center;font-size:0.72rem;color:var(--muted);padding:4px;">${holes.reduce((a,h)=>a+h.par,0)}</td>
+              </tr>
+              <tr style="background:var(--surface);">
+                <td style="padding:4px 6px;font-size:0.6rem;font-weight:700;color:var(--gold);letter-spacing:0.5px;">DAD</td>
+                ${scores}
+                <td style="text-align:center;padding:4px 2px;">
+                  ${nineScore > 0 ? `<div style="font-size:0.78rem;font-weight:700;color:var(--cream);">${nineScore}</div><div style="font-size:0.58rem;color:${nineColor};font-weight:700;">${nineDiffStr}</div>` : '<span style="color:var(--border);">·</span>'}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    // Photo thumbnails for holes with photos
+    const photoHoles = _dadHoles.filter(h => h.photo);
+    const photoRow = photoHoles.length ? `
+      <div style="margin-bottom:14px;">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;">PHOTOS</div>
+        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;">
+          ${photoHoles.map(h => `
+            <div style="flex:0 0 auto;text-align:center;">
+              <img src="${h.photo}" style="width:60px;height:60px;object-fit:cover;border-radius:6px;border:0.5px solid var(--border);">
+              <div style="font-size:0.58rem;color:var(--muted);margin-top:2px;">H${h.hole}</div>
+            </div>`).join('')}
+        </div>
+      </div>` : '';
+
+    document.getElementById('dad-modal-step-label').textContent = `${_dadRound?.course_name || 'Round'} · Card`;
     document.getElementById('dad-modal-body').innerHTML = `
-      <div style="text-align:center;margin-bottom:14px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:2.8rem;color:var(--cream);line-height:1;">${total}</div>
-        <div style="font-size:0.82rem;color:var(--muted);margin-top:4px;">${diffStr} &middot; Thru H${thru} of ${_dadHoles.length}</div>
+      <!-- Hero running total -->
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:4px 0 14px;">
+        <div>
+          <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:2px;">TOTAL</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:3.2rem;color:var(--cream);line-height:1;">${total}</div>
+          <div style="font-size:0.82rem;font-weight:700;color:${diffColor};margin-top:2px;">${diffStr} thru ${thru}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px;">PACE</div>
+          ${(() => {
+            const parSoFar = _dadHoles.slice(0, thru).reduce((a,h)=>a+h.par, 0);
+            const projDiff = parSoFar > 0 ? Math.round((diff / parSoFar) * totalPar) : null;
+            const proj = projDiff !== null ? totalPar + projDiff : null;
+            return proj ? `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--muted);line-height:1;">${proj}</div><div style="font-size:0.6rem;color:var(--muted);">projected</div>` : '<div style="font-size:0.75rem;color:var(--border);">—</div>';
+          })()}
+        </div>
       </div>
+
+      <!-- Scorecard grids -->
       <div style="overflow-x:auto;">
-        <table style="width:100%;border-collapse:collapse;">
-          <thead>
-            <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
-              <th style="padding:5px 8px;text-align:left;font-size:0.68rem;color:var(--muted);font-weight:600;">HOLE</th>
-              <th style="padding:5px 8px;text-align:center;font-size:0.68rem;color:var(--muted);font-weight:600;">PAR</th>
-              <th style="padding:5px 8px;text-align:center;font-size:0.68rem;color:var(--muted);font-weight:600;">SCORE</th>
-              <th style="padding:5px 8px;text-align:center;font-size:0.68rem;color:var(--muted);font-weight:600;">+/−</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
+        ${buildGrid(front.length ? front : _dadHoles.slice(0, Math.ceil(_dadHoles.length/2)), _dadHoles.length > 9 ? 'OUT' : 'HOLE')}
+        ${back.length ? buildGrid(back, 'IN') : ''}
       </div>
-      <button class="btn-ghost" style="width:100%;margin-top:16px;" onclick="renderDadLiveHole()">← Back to Hole ${thru}</button>
+
+      ${photoRow}
+
+      <!-- Approach log -->
+      ${_dadHoles.some(h => h.approach_club) ? `
+        <div style="margin-bottom:14px;">
+          <div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;">APPROACH LOG</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;">
+            ${_dadHoles.filter(h => h.approach_club && _dadHoles.indexOf(h) < thru).map(h =>
+              `<div style="background:var(--surface2);border:0.5px solid var(--border);border-radius:6px;padding:3px 8px;font-size:0.68rem;">
+                <span style="color:var(--muted);">H${h.hole}</span>
+                <span style="color:var(--cream);margin-left:4px;">${h.approach_club}</span>
+                ${h.approach_yds ? `<span style="color:var(--gold);margin-left:3px;">${h.approach_yds}y</span>` : ''}
+              </div>`).join('')}
+          </div>
+        </div>` : ''}
+
+      <button class="btn-ghost" style="width:100%;margin-top:4px;" onclick="renderDadLiveHole()"><i class="ti ti-chevron-left" style="font-size:0.85rem;"></i> Back to Hole ${thru}</button>
     `;
   }
 
@@ -5210,20 +5542,91 @@
     statsBar.style.display = 'none';
     // Stats — scored rounds only
     const scoredRounds = rounds.filter(r => !r.is_practice);
-    if (scoredRounds.length >= 3) {
+    if (scoredRounds.length >= 1) {
       statsBar.style.display = '';
-      const avg = Math.round(scoredRounds.reduce((a,r) => a + r.total_score, 0) / scoredRounds.length);
-      const best = scoredRounds.reduce((a,r) => r.total_score < a.total_score ? r : a);
-      const putts = scoredRounds.filter(r => r.holes).map(r => {
-        const holes = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]');
-        return holes.reduce((a,h) => a + (h.putts||0), 0);
-      });
-      const avgPutts = putts.length ? Math.round(putts.reduce((a,b)=>a+b,0)/putts.length) : '—';
+      const sorted    = [...scoredRounds].sort((a,b) => new Date(a.date_played) - new Date(b.date_played));
+      const last      = sorted[sorted.length - 1];
+      const prev      = sorted.length >= 2 ? sorted[sorted.length - 2] : null;
+      const scoreDelta = prev ? last.total_score - prev.total_score : null;
+      const best      = scoredRounds.reduce((a,r) => r.total_score < a.total_score ? r : a);
+      const avg       = Math.round(scoredRounds.reduce((a,r) => a + r.total_score, 0) / scoredRounds.length);
+
+      // Per-round hole stats
+      const allHolesData = scoredRounds.map(r => Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]'));
+      const firhits = allHolesData.map(hs => {
+        const par4plus = hs.filter(h => h.par >= 4);
+        if (!par4plus.length) return null;
+        return par4plus.filter(h => h.fairway === 'yes').length / par4plus.length;
+      }).filter(v => v !== null);
+      const girHits = allHolesData.map(hs => {
+        if (!hs.length) return null;
+        return hs.filter(h => h.gir).length / hs.length;
+      }).filter(v => v !== null);
+      const puttTotals = allHolesData.map(hs => hs.length ? hs.reduce((a,h)=>a+(h.putts||0),0) : null).filter(v=>v!==null);
+
+      const firPct  = firhits.length ? Math.round(firhits.reduce((a,b)=>a+b,0)/firhits.length*100) : null;
+      const girPct  = girHits.length ? Math.round(girHits.reduce((a,b)=>a+b,0)/girHits.length*100) : null;
+      const avgPutts = puttTotals.length ? (puttTotals.reduce((a,b)=>a+b,0)/puttTotals.length).toFixed(1) : null;
+
+      // Sparkline bars (last 8 scored rounds)
+      const sparkRounds = sorted.slice(-8);
+      const sparkMin = Math.min(...sparkRounds.map(r=>r.total_score));
+      const sparkMax = Math.max(...sparkRounds.map(r=>r.total_score));
+      const sparkRange = sparkMax - sparkMin || 1;
+      const sparkBars = sparkRounds.map((r,i) => {
+        const pct = 100 - Math.round(((r.total_score - sparkMin) / sparkRange) * 70);
+        const isLast = i === sparkRounds.length - 1;
+        return `<div style="flex:1;height:${pct}%;min-height:15%;background:${isLast ? '#B89530' : 'var(--border)'};border-radius:2px 2px 0 0;"></div>`;
+      }).join('');
+
+      const deltaColor = scoreDelta === null ? 'var(--muted)' : scoreDelta < 0 ? '#1E7A3A' : scoreDelta > 0 ? '#c0392b' : 'var(--muted)';
+      const deltaStr   = scoreDelta === null ? '' : scoreDelta < 0 ? `↓ ${Math.abs(scoreDelta)} from last` : scoreDelta > 0 ? `↑ ${scoreDelta} from last` : '= Same as last';
+
       document.getElementById('dad-stats-row').innerHTML = `
-        <div class="stat"><div class="stat-num">${scoredRounds.length}</div><div class="stat-lbl">Rounds</div></div>
-        <div class="stat"><div class="stat-num">${avg}</div><div class="stat-lbl">Avg Score</div></div>
-        <div class="stat"><div class="stat-num">${best.total_score}</div><div class="stat-lbl">Best Round</div></div>
-        <div class="stat"><div class="stat-num">${avgPutts}</div><div class="stat-lbl">Avg Putts</div></div>
+        <!-- Hero stat + sparkline -->
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+            <div>
+              <div style="font-size:0.58rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:4px;">LAST ROUND</div>
+              <div style="display:flex;align-items:baseline;gap:8px;">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--cream);line-height:1;">${last.total_score}</div>
+                ${scoreDelta !== null ? `<div style="font-size:0.75rem;font-weight:700;color:${deltaColor};">${deltaStr}</div>` : ''}
+              </div>
+              <div style="font-size:0.68rem;color:var(--muted);margin-top:3px;">${last.course_name || '—'}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:0.58rem;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px;">BEST</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--gold);line-height:1;">${best.total_score}</div>
+              <div style="font-size:0.6rem;color:var(--muted);">${scoredRounds.length} rounds · avg ${avg}</div>
+            </div>
+          </div>
+          <!-- Sparkline -->
+          <div style="display:flex;align-items:flex-end;gap:3px;height:32px;margin-top:10px;">
+            ${sparkBars}
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:3px;">
+            <div style="font-size:0.55rem;color:var(--muted);">${sparkRounds[0]?.date_played?.slice(5) || ''}</div>
+            <div style="font-size:0.55rem;color:var(--gold);font-weight:600;">← recent</div>
+          </div>
+        </div>
+        <!-- Secondary stats row -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+          ${firPct !== null ? `
+            <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--cream);line-height:1;">${firPct}%</div>
+              <div style="font-size:0.58rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-top:2px;">FIR</div>
+            </div>` : ''}
+          ${girPct !== null ? `
+            <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--cream);line-height:1;">${girPct}%</div>
+              <div style="font-size:0.58rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-top:2px;">GIR</div>
+            </div>` : ''}
+          ${avgPutts !== null ? `
+            <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--cream);line-height:1;">${avgPutts}</div>
+              <div style="font-size:0.58rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-top:2px;">PUTTS</div>
+            </div>` : ''}
+        </div>
       `;
     } else {
       statsBar.style.display = 'none';
@@ -5511,7 +5914,13 @@
       listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet. Tap \u2018Start New Round\u2019 after your next game. \uD83C\uDFCC\uFE0F</div>';
       return;
     }
-    listEl.innerHTML = rounds.map((r, idx) => {
+    // Badges section at top
+    const badgesHtml = `
+      <div style="margin-bottom:16px;">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#3B7CB8;margin-bottom:8px;">ACHIEVEMENTS</div>
+        ${renderBadges(rounds, '#3B7CB8')}
+      </div>`;
+    listEl.innerHTML = badgesHtml + rounds.map((r, idx) => {
       const d = new Date(r.date_played + 'T12:00:00');
       const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       const diff = r.score_vs_par >= 0 ? '+' + r.score_vs_par : r.score_vs_par;
@@ -5562,7 +5971,12 @@
         el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet — join a Family Round to get started! 🌸</div>';
         return;
       }
-      el.innerHTML = rounds.map((r, idx) => {
+      const girlBadgesHtml = `
+        <div style="margin-bottom:16px;">
+          <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#B85490;margin-bottom:8px;">ACHIEVEMENTS</div>
+          ${renderBadges(rounds, '#B85490')}
+        </div>`;
+      el.innerHTML = girlBadgesHtml + rounds.map((r, idx) => {
         const d = new Date(r.date_played + 'T12:00:00');
         const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         const diff = r.score_vs_par >= 0 ? '+' + r.score_vs_par : r.score_vs_par;
@@ -5750,10 +6164,22 @@
     renderDadLiveHole();
   }
 
+  function _updateDadRT() {
+    const total  = _dadHoles.reduce((a, x) => a + x.score, 0);
+    const vs     = _dadHoles.reduce((a, x) => a + x.score - x.par, 0);
+    const rtScEl = document.getElementById('dad-rt-score');
+    const rtDfEl = document.getElementById('dad-rt-diff');
+    if (rtScEl) rtScEl.textContent = total;
+    if (rtDfEl) {
+      rtDfEl.textContent = vs === 0 ? 'E' : (vs > 0 ? '+' + vs : String(vs));
+      rtDfEl.style.color = vs < 0 ? '#1E7A3A' : vs === 0 ? 'var(--muted)' : '#c0392b';
+    }
+    document.getElementById('dad-running-total').style.display = '';
+  }
+
   function renderDadHole() {
     const h = _dadHoles[_dadHoleIdx];
-    const total = _dadHoles.slice(0, _dadHoleIdx).reduce((a, x) => a + x.score, 0) + h.score;
-    document.getElementById('dad-running-total').textContent = total;
+    _updateDadRT();
     document.getElementById('dad-modal-step-label').textContent = `Hole ${_dadHoleIdx + 1} of ${_dadHoles.length}`;
     const isLast = _dadHoleIdx === _dadHoles.length - 1;
     document.getElementById('dad-modal-body').innerHTML = `
@@ -5801,8 +6227,7 @@
     const h = _dadHoles[_dadHoleIdx];
     h.score = Math.max(1, h.score + delta);
     document.getElementById('dh-score').textContent = h.score;
-    const total = _dadHoles.slice(0, _dadHoleIdx).reduce((a, x) => a + x.score, 0) + h.score;
-    document.getElementById('dad-running-total').textContent = total;
+    _updateDadRT();
   }
   function dadHolePar(delta) {
     const h = _dadHoles[_dadHoleIdx];
