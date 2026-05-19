@@ -2379,7 +2379,7 @@
       </div>
 
       <div class="section">
-        <div class="section-title">📏 Stock Yardage Card</div>
+        <div class="section-title"><i class="ti ti-ruler-2" style="font-size:0.95rem;vertical-align:-1px;margin-right:5px;"></i>Stock Yardage Card</div>
         <div class="card" style="padding:12px 14px;">
           <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
             <thead>
@@ -4832,7 +4832,7 @@
           <button class="stepper-btn" onclick="dadHolePar(1)">+</button>
         </div>
       </div>
-      ${h.yds ? `<div style="text-align:center;font-size:0.72rem;color:var(--muted);margin-bottom:6px;letter-spacing:0.5px;">📋 SCORECARD: <strong style="color:var(--gold);">${h.yds} yds</strong></div>` : ''}
+      ${h.yds ? `<div style="text-align:center;font-size:0.72rem;color:var(--muted);margin-bottom:6px;letter-spacing:0.5px;"><i class="ti ti-clipboard-list" style="font-size:0.8rem;vertical-align:-1px;margin-right:3px;"></i>SCORECARD: <strong style="color:var(--gold);">${h.yds} yds</strong></div>` : ''}
       <div class="live-distance-card" style="padding:8px 12px 8px;margin-bottom:10px;">
         <div style="display:flex;align-items:baseline;justify-content:center;gap:4px;">
           <div class="live-yards" id="live-yards" style="font-size:2.8rem;">—</div>
@@ -4908,11 +4908,11 @@
           }).join('')}
         </div>
       </div>
-      <div class="modal-nav-row">
-        <button class="btn-ghost" onclick="dadLiveBack()" ${backAttr}>← Back</button>
-        <button class="btn-ghost" onclick="dadToggleDistPanel()" style="font-size:0.78rem;padding:10px 12px;" id="dad-dist-btn">📏</button>
-        <button class="btn-ghost" onclick="dadMidRoundScorecard()" style="font-size:0.78rem;padding:10px 12px;">📋 Card</button>
-        <button class="btn-gold" onclick="dadLiveNext()">${nextLabel}</button>
+      <div class="modal-nav-row" style="gap:8px;">
+        <button class="btn-ghost" onclick="dadLiveBack()" ${backAttr} style="padding:10px 14px;font-size:0.8rem;"><i class="ti ti-chevron-left"></i> Back</button>
+        <button class="btn-ghost" onclick="dadToggleDistPanel()" style="padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1;" id="dad-dist-btn"><i class="ti ti-ruler-2" style="font-size:1rem;"></i><span style="font-size:0.6rem;letter-spacing:0.5px;">DIST</span></button>
+        <button class="btn-ghost" onclick="dadMidRoundScorecard()" style="padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1;"><i class="ti ti-clipboard-list" style="font-size:1rem;"></i><span style="font-size:0.6rem;letter-spacing:0.5px;">CARD</span></button>
+        <button class="btn-gold" onclick="dadLiveNext()" style="flex:1;">${nextLabel}</button>
       </div>
     `;
     if (_manualYards !== null) {
