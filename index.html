@@ -451,7 +451,7 @@
     .notes-area {
       width: 100%;
       background: var(--surface2);
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
       border-radius: 10px;
       padding: 12px;
       color: var(--cream);
@@ -518,7 +518,7 @@
     input[type="text"], input[type="date"], select {
       width: 100%;
       background: var(--surface2);
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
       border-radius: 8px;
       padding: 10px 12px;
       color: var(--cream);
@@ -749,8 +749,8 @@
     /* ── PROFILE SWITCHER ── */
     #profileSwitch {
       display: flex;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: var(--surface2);
+      border: 1px solid var(--border);
       border-radius: 20px;
       padding: 3px;
       gap: 2px;
@@ -1388,7 +1388,7 @@
       height: 64px;
       border-radius: 50%;
       background: var(--surface3);
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid var(--border);
       color: var(--cream);
       font-size: 2rem;
       font-weight: 300;
@@ -1544,7 +1544,7 @@
     }
     .yardage-pill {
       padding: 7px 11px; background: var(--surface3);
-      border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
+      border: 1px solid var(--border); border-radius: 20px;
       color: var(--cream); font-size: 0.8rem; font-weight: 600;
       cursor: pointer; transition: all 0.15s;
     }
@@ -3594,7 +3594,7 @@
     <div class="page" id="page-dad-progress">
       <!-- PIN Overlay -->
       <div id="dad-pin-overlay" style="position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;padding-top:calc(32px + env(safe-area-inset-top,0px));overflow-y:auto;">
-        <div style="font-size:2.5rem;margin-bottom:12px;">🔒</div>
+        <div style="margin-bottom:16px;"><i class="ti ti-lock" style="font-size:2.5rem;color:var(--gold);"></i></div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);letter-spacing:2px;margin-bottom:6px;">Dad's Progress</div>
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:28px;">Enter PIN to continue</div>
         <div id="dad-pin-dots" style="display:flex;gap:12px;margin-bottom:28px;">
@@ -3623,14 +3623,13 @@
       <!-- Page Content -->
       <div id="dad-progress-content">
         <div class="page-header">
-          <div class="page-tag">DAD · PRIVATE 🔒</div>
+          <div class="page-tag">DAD · MY GAME</div>
           <div class="page-title">My Progress</div>
-          <div class="page-icon">📊</div>
         </div>
 
         <div class="section" style="display:flex;gap:10px;">
-          <button class="btn-primary" onclick="openDadModal()" style="flex:1;">⛳ Start New Round</button>
-          <button onclick="lockDadProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(201,168,76,0.35);border-radius:10px;padding:0 14px;color:var(--gold-l);font-size:1.1rem;font-weight:600;cursor:pointer;">🔒</button>
+          <button class="btn-primary" onclick="openDadModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;"><i class="ti ti-flag-2" style="font-size:1rem;"></i> Start New Round</button>
+          <button onclick="lockDadProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(201,168,76,0.35);border-radius:10px;padding:0 14px;color:var(--gold-l);font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;"><i class="ti ti-lock" style="font-size:1.1rem;"></i></button>
         </div>
 
         <div id="dad-stats-bar" style="display:none;" class="section">
@@ -3644,35 +3643,35 @@
           <button
             onclick="var panel = this.nextElementSibling; panel.style.display = panel.style.display === 'none' ? 'block' : 'none'; this.querySelector('.arrow').textContent = panel.style.display === 'none' ? '▼' : '▲';"
             style="width:100%; background:var(--green); color:#fff; border:none; border-radius:10px; padding:14px 18px; font-size:16px; font-weight:700; text-align:left; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
-            <span>🧠 Game Plan</span>
+            <span style="display:flex;align-items:center;gap:8px;"><i class="ti ti-chess-knight" style="font-size:1rem;opacity:0.8;"></i> Game Plan</span>
             <span class="arrow">▼</span>
           </button>
           <div style="display:none; background:var(--surface2); border:1px solid rgba(201,168,76,0.2); border-radius:0 0 10px 10px; padding:16px;">
 
             <p style="font-size:13px; color:var(--muted); margin:0 0 12px;">Pre-round mental checklist. One thought per shot. Trust the process.</p>
 
-            <div style="font-size:13px; font-weight:700; color:var(--gold); margin-bottom:8px;">⛳ Tee Box</div>
+            <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:6px;"><i class="ti ti-flag-2" style="font-size:0.85rem;"></i> Tee Box</div>
             <div class="check-row" style="margin-bottom:6px;"><span>Pick a specific target — a tree, bush, or edge of fairway. Never aim at "out there."</span></div>
             <div class="check-row" style="margin-bottom:6px;"><span>Driver: tee low, ball forward, sweep up. One swing thought max.</span></div>
             <div class="check-row" style="margin-bottom:6px;"><span>If driver isn't working → 4H or 7W off the tee. Take your medicine early.</span></div>
 
-            <div style="font-size:13px; font-weight:700; color:var(--gold); margin:12px 0 8px;">🌿 Fairway / Approach</div>
+            <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:12px 0 8px;display:flex;align-items:center;gap:6px;"><i class="ti ti-arrows-right" style="font-size:0.85rem;"></i> Fairway · Approach</div>
             <div class="check-row" style="margin-bottom:6px;"><span>From 150+ yds: play for the middle of the green. No hero shots.</span></div>
             <div class="check-row" style="margin-bottom:6px;"><span>From 100 yds and in: pick a specific landing spot, not just the hole.</span></div>
             <div class="check-row" style="margin-bottom:6px;"><span>Trouble left? Aim right. Trouble right? Aim left. Always have an out.</span></div>
             <div class="check-row" style="margin-bottom:6px;"><span>Uneven lie: choke down 1–2 inches. Smooth and balanced beats hard and tall.</span></div>
 
-            <div style="font-size:13px; font-weight:700; color:var(--gold); margin:12px 0 8px;">🎯 Around the Green</div>
+            <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:12px 0 8px;display:flex;align-items:center;gap:6px;"><i class="ti ti-circle-dashed" style="font-size:0.85rem;"></i> Around the Green</div>
             <div class="check-row" style="margin-bottom:6px;"><span>Bump-and-run first. Use 7i, PW, or GW — land it on the green and let it run.</span></div>
             <div class="check-row" style="margin-bottom:6px;"><span>Only use SW when you need to carry something (bunker, fringe, tight lie).</span></div>
             <div class="check-row" style="margin-bottom:6px;"><span>Weight forward, hands ahead, brush the grass. It's a long putt with a lofted club.</span></div>
 
-            <div style="font-size:13px; font-weight:700; color:var(--gold); margin:12px 0 8px;">🕳️ Putting</div>
+            <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:12px 0 8px;display:flex;align-items:center;gap:6px;"><i class="ti ti-tournament" style="font-size:0.85rem;"></i> Putting</div>
             <div class="check-row" style="margin-bottom:6px;"><span>3-footers: eyes over ball, pendulum, listen for the rattle.</span></div>
             <div class="check-row" style="margin-bottom:6px;"><span>Long putts: focus on speed first. Get it within 3 feet — avoid 3-putts.</span></div>
             <div class="check-row" style="margin-bottom:6px;"><span>Read break from below the hole. Aim for a spot 6 inches in front of the ball.</span></div>
 
-            <div style="font-size:13px; font-weight:700; color:var(--gold); margin:12px 0 8px;">🧘 Mental</div>
+            <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:12px 0 8px;display:flex;align-items:center;gap:6px;"><i class="ti ti-brain" style="font-size:0.85rem;"></i> Mental</div>
             <div class="check-row" style="margin-bottom:6px;"><span>One shot at a time. Bad shot → deep breath → let it go before the next swing.</span></div>
             <div class="check-row" style="margin-bottom:6px;"><span>Bogey is fine. Double bogey happens. Move on — the round isn't over.</span></div>
             <div class="check-row" style="margin-bottom:6px;"><span>Never change your swing mid-round. Practice range is for experimenting. Course is for committing.</span></div>
@@ -3682,79 +3681,81 @@
         <!-- END GAME PLAN -->
 
         <div class="section">
-          <div class="section-title">🏆 Milestones</div>
+          <div class="section-title"><i class="ti ti-trophy" style="font-size:0.9rem;vertical-align:-1px;margin-right:6px;"></i>Milestones</div>
 
           <!-- First Birdie -->
-          <div class="round-card" style="border-color:rgba(201,168,76,0.8);margin-bottom:10px;">
+          <div class="round-card" style="border-color:var(--gold);margin-bottom:10px;">
             <div class="round-card-header" onclick="toggleRoundExpand('milestone-birdie')">
               <div class="round-card-left">
-                <div class="round-card-date" style="color:var(--gold);">May 11, 2026</div>
-                <div class="round-card-course" style="color:var(--gold);">🐦 First Birdie</div>
+                <div class="round-card-date">May 11, 2026</div>
+                <div class="round-card-course" style="color:var(--gold);font-weight:600;">First Birdie</div>
               </div>
               <div class="round-card-right">
-                <div class="round-badge gold">-1</div>
+                <span class="sc-chip sc-birdie" style="width:34px;height:34px;font-size:0.85rem;">−1</span>
               </div>
             </div>
             <div class="round-card-expand" id="milestone-birdie-expand">
-              <div style="margin-bottom:8px;color:var(--gold);font-weight:700;">🎉 First birdie ever!</div>
-              <div style="margin-bottom:6px;">Welk Resort Oaks (par-3) — Hole 5 · 92 yards · Blue Tees</div>
-              <div style="color:var(--muted);font-style:italic;">Round score: 67 (+13). 5 pars on the day. Personal best at Welk.</div>
+              <div style="margin-bottom:6px;font-weight:600;color:var(--cream);">Birdie on Hole 5 — 92 yards · Welk Resort Oaks (par-3) · Blue Tees</div>
+              <div style="color:var(--muted);font-style:italic;">Round score: 67 (+13) · 5 pars on the day · Personal best at Welk.</div>
             </div>
           </div>
 
           <!-- Full Bag Upgrade -->
-          <div class="round-card" style="border-color:rgba(74,222,128,0.4);margin-bottom:10px;">
+          <div class="round-card" style="margin-bottom:10px;">
             <div class="round-card-header" onclick="toggleRoundExpand('milestone-bag-complete')">
               <div class="round-card-left">
-                <div class="round-card-date" style="color:var(--green);">May 2026</div>
-                <div class="round-card-course" style="color:var(--green);">✅ Full Bag Upgrade Complete</div>
+                <div class="round-card-date">May 2026</div>
+                <div class="round-card-course" style="color:var(--green);font-weight:600;">Full Bag Upgrade</div>
               </div>
               <div class="round-card-right">
-                <div class="round-badge" style="background:rgba(74,222,128,0.2);color:var(--green);border:1px solid rgba(74,222,128,0.4);">🎒</div>
+                <div style="width:34px;height:34px;border-radius:50%;border:2px solid var(--green);display:flex;align-items:center;justify-content:center;">
+                  <i class="ti ti-check" style="font-size:1rem;color:var(--green);"></i>
+                </div>
               </div>
             </div>
             <div class="round-card-expand" id="milestone-bag-complete-expand">
-              <div style="margin-bottom:6px;color:var(--green);font-weight:700;">All clubs in hand.</div>
-              <div style="margin-bottom:6px;">7-Wood · Callaway Opus SW 56° · Callaway Opus LW 60° · Callaway Fairway 14 bag</div>
+              <div style="margin-bottom:6px;font-weight:600;color:var(--cream);">All clubs in hand.</div>
+              <div style="margin-bottom:6px;color:var(--muted);">7-Wood · Callaway Opus SW 56° · Callaway Opus LW 60° · Callaway Fairway 14 bag</div>
               <div style="color:var(--muted);font-style:italic;">Takomo 201 MKII irons arriving soon — restocking ~3-4 weeks from May 2026.</div>
             </div>
           </div>
 
-          <div class="round-card" style="border-color:rgba(201,168,76,0.6);margin-bottom:10px;">
+          <!-- Personal Best 95 -->
+          <div class="round-card" style="margin-bottom:10px;">
             <div class="round-card-header" onclick="toggleRoundExpand('milestone-pb95')">
               <div class="round-card-left">
-                <div class="round-card-date" style="color:var(--gold);">May 5, 2026</div>
-                <div class="round-card-course" style="color:var(--gold);">⭐ New Personal Best</div>
+                <div class="round-card-date">May 5, 2026</div>
+                <div class="round-card-course" style="color:var(--gold);font-weight:600;">Personal Best</div>
               </div>
               <div class="round-card-right">
                 <div class="round-badge gold">95</div>
               </div>
             </div>
             <div class="round-card-expand" id="milestone-pb95-expand">
-              <div style="margin-bottom:8px;color:var(--gold);font-weight:700;">🏆 Shot 95 — new best round!</div>
-              <div style="margin-bottom:6px;">Creek (Sage) + Stonehouse (White) · Temecula Creek Inn</div>
-              <div style="margin-bottom:6px;">Front 9 (Creek): 47 · Back 9 (Stonehouse): 48</div>
-              <div style="margin-bottom:6px;">Scorecard — Creek: 5·5·8·6·6·4·4·5·4 | Stonehouse: 5·5·5·6·4·7·6·3·7</div>
-              <div style="margin-bottom:6px;">✅ <em>7-wood debut (laser beam on H6). 4 pars total. 3 closing pars on Creek.</em></div>
+              <div style="margin-bottom:6px;font-weight:600;color:var(--cream);">Shot 95 · Creek (Sage) + Stonehouse (White) · TCI</div>
+              <div style="margin-bottom:6px;color:var(--muted);">Front 9 (Creek): 47 · Back 9 (Stonehouse): 48</div>
+              <div style="margin-bottom:6px;color:var(--muted);">Creek: 5·5·8·6·6·4·4·5·4 · Stonehouse: 5·5·5·6·4·7·6·3·7</div>
+              <div style="margin-bottom:4px;color:var(--muted);font-style:italic;">7-wood debut on H6 · 4 pars total · 3 closing pars on Creek.</div>
               <div style="color:var(--muted);font-style:italic;">Key lesson: Lost balls = #1 score killer. Pre-shot routine needed.</div>
             </div>
           </div>
-          <div class="round-card" style="border-color:rgba(74,222,128,0.4);">
+
+          <!-- Broke 100 -->
+          <div class="round-card">
             <div class="round-card-header" onclick="toggleRoundExpand('milestone-broke100')">
               <div class="round-card-left">
-                <div class="round-card-date" style="color:var(--green);">Apr 28, 2026</div>
-                <div class="round-card-course" style="color:var(--green);">✅ Broke 100</div>
+                <div class="round-card-date">Apr 28, 2026</div>
+                <div class="round-card-course" style="color:var(--green);font-weight:600;">Broke 100</div>
               </div>
               <div class="round-card-right">
                 <div class="round-badge gold">98</div>
               </div>
             </div>
             <div class="round-card-expand" id="milestone-broke100-expand">
-              <div style="margin-bottom:8px;color:var(--green);font-weight:700;">First time shooting under 100</div>
-              <div style="margin-bottom:6px;">Creek + Oaks · Sage tees · Temecula Creek Inn</div>
-              <div style="margin-bottom:6px;">Front 9 (Creek): 51 · Back 9 (Oaks): 47</div>
-              <div style="margin-bottom:6px;font-style:italic;color:var(--muted);">"Loose as a silly goose"</div>
-              <div style="margin-bottom:6px;">✅ <em>7 straight bogeys on back 9 — very consistent. Driver solid all day. Chipping was a strength.</em></div>
+              <div style="margin-bottom:6px;font-weight:600;color:var(--cream);">First time shooting under 100 · Creek + Oaks · TCI</div>
+              <div style="margin-bottom:6px;color:var(--muted);">Front 9 (Creek): 51 · Back 9 (Oaks): 47</div>
+              <div style="margin-bottom:4px;color:var(--muted);font-style:italic;">"Loose as a silly goose"</div>
+              <div style="color:var(--muted);font-style:italic;">7 straight bogeys on back 9 — very consistent. Driver solid all day. Chipping was a strength.</div>
             </div>
           </div>
         </div>
@@ -3774,7 +3775,7 @@
               </div>
             </div>
             <div class="round-card-expand" id="round-may11-welk-expand">
-              <div style="margin-bottom:8px;color:var(--gold);font-weight:700;">🐦 BIRDIE on Hole 5 (92 yds)</div>
+              <div style="margin-bottom:8px;color:var(--green);font-weight:700;"><span class="sc-chip sc-birdie" style="width:20px;height:20px;font-size:0.65rem;margin-right:4px;vertical-align:-2px;">B</span> BIRDIE on Hole 5 (92 yds)</div>
               <div style="margin-bottom:6px;">Score: 67 (+13 over par 54)</div>
               <div style="margin-bottom:6px;">5 pars: H1, H2, H6, H7, H8, H10</div>
               <div style="margin-bottom:6px;">Front 9: 29 · Back 9: 38</div>
@@ -3801,7 +3802,7 @@
 
           <div id="dad-history-list">
             <div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">
-              <div id="dad-loading-spinner">Loading your rounds... ⏳</div>
+              <div id="dad-loading-spinner"><i class="ti ti-loader-2" style="font-size:1.1rem;vertical-align:-2px;"></i> Loading your rounds…</div>
             </div>
           </div>
         </div>
@@ -3830,7 +3831,7 @@
       <div class="page-header">
         <div class="page-tag">AI CADDIE</div>
         <div class="page-title">On The Bag</div>
-        <div class="page-icon">🎙️</div>
+        <div class="page-icon"><i class="ti ti-microphone"></i></div>
       </div>
 
       <!-- API Key Setup -->
@@ -3842,13 +3843,13 @@
           <div id="caddie-messages" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;max-height:55vh;overflow-y:auto;padding-right:2px;"></div>
           <div style="display:flex;gap:8px;align-items:flex-end;">
             <textarea id="caddie-input"
-              style="flex:1;background:var(--surface2);border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:var(--cream);font-size:0.9rem;padding:10px 14px;resize:none;font-family:inherit;line-height:1.5;overflow-y:auto;"
+              style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--cream);font-size:0.9rem;padding:10px 14px;resize:none;font-family:inherit;line-height:1.5;overflow-y:auto;"
               placeholder="e.g. 'About 140 out, into the wind'" rows="2"
               onkeydown="caddieInputKeydown(event)"></textarea>
             <button id="caddie-mic-btn" onclick="toggleCaddieMic()"
-              style="flex-shrink:0;background:var(--surface2);border:1px solid rgba(255,255,255,0.12);border-radius:12px;width:44px;height:44px;color:var(--muted);font-size:1.2rem;cursor:pointer;align-self:flex-end;">🏙️</button>
+              style="flex-shrink:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;width:44px;height:44px;color:var(--muted);font-size:1.1rem;cursor:pointer;align-self:flex-end;display:flex;align-items:center;justify-content:center;"><i class="ti ti-microphone"></i></button>
             <button id="caddie-send-btn" onclick="sendCaddieMessage()"
-              style="flex-shrink:0;background:var(--gold);border:none;border-radius:12px;width:44px;height:44px;color:var(--bg);font-weight:700;font-size:1.1rem;cursor:pointer;align-self:flex-end;">➤</button>
+              style="flex-shrink:0;background:var(--gold);border:none;border-radius:12px;width:44px;height:44px;color:var(--bg);font-weight:700;font-size:1.1rem;cursor:pointer;align-self:flex-end;display:flex;align-items:center;justify-content:center;"><i class="ti ti-send-2"></i></button>
           </div>
           <div style="display:flex;justify-content:space-between;margin-top:6px;align-items:center;">
             <div style="font-size:0.66rem;color:var(--muted);">Powered by Claude Haiku · ~$0.01/round</div>
@@ -3932,7 +3933,7 @@
           <div class="section-title">Round History</div>
           <div id="son-history-list">
             <div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">
-              <div id="son-loading-spinner">Loading your rounds... ⏳</div>
+              <div id="son-loading-spinner"><i class="ti ti-loader-2" style="font-size:1.1rem;vertical-align:-2px;"></i> Loading your rounds…</div>
             </div>
           </div>
         </div>
@@ -3954,7 +3955,7 @@
     <!-- ══════════════════════════════════════
          GIRL PROGRESS PAGE
     ══════════════════════════════════════ -->
-    <div class="page" id="page-girl-progress" style="display:none;overflow-y:auto;">
+    <div class="page" id="page-girl-progress">
       <div class="page-header" data-icon="🌸" style="background:linear-gradient(160deg,rgba(236,72,153,0.18) 0%,var(--bg) 100%);border-bottom-color:rgba(236,72,153,0.3);">
         <div class="page-tag" style="color:#ec4899;">My Game</div>
         <div class="page-title" style="color:#f9a8d4;">Daughter's Rounds 🌸</div>
@@ -5517,7 +5518,7 @@
   // ── DAD ROUND RENDER ─────────────────────────────────────────
   async function loadDadRoundsAndRender() {
     const listEl = document.getElementById('dad-history-list');
-    listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">Loading your rounds... ⏳</div>';
+    listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;"><i class="ti ti-loader-2" style="font-size:1.1rem;vertical-align:-2px;"></i> Loading your rounds…</div>';
     try {
       const rounds = await loadDadRounds();
       renderDadHistory(rounds);
@@ -5646,9 +5647,9 @@
             <div class="hole-cell"><div class="h-num">8</div><div class="h-score">5</div><div class="h-par">p3</div></div>
             <div class="hole-cell"><div class="h-num">9</div><div class="h-score">7</div><div class="h-par">p5</div></div>
           </div>
-          <div style="margin-bottom:8px;">🏆 <strong>Pars:</strong> H2, H4, H5, H7 &nbsp; 📉 <strong>12-stroke improvement</strong> on Stonehouse</div>
-          <div style="margin-bottom:6px;">✅ <em>Driver comfort 7/10 — working confidently all day</em></div>
-          <div style="margin-bottom:6px;">🔧 <em>Lag putts on Bermuda · commit fully on water holes · downhill = one club less</em></div>
+          <div style="margin-bottom:8px;"><i class="ti ti-flag-2" style="color:var(--green);vertical-align:-1px;"></i> <strong>Pars:</strong> H2, H4, H5, H7 &nbsp; <span style="color:var(--green);font-weight:600;">↓ 12-stroke improvement</span> on Stonehouse</div>
+          <div style="margin-bottom:6px;"><i class="ti ti-check" style="color:var(--green);vertical-align:-1px;"></i> <em>Driver comfort 7/10 — working confidently all day</em></div>
+          <div style="margin-bottom:6px;"><i class="ti ti-tool" style="color:var(--muted);vertical-align:-1px;"></i> <em>Lag putts on Bermuda · commit fully on water holes · downhill = one club less</em></div>
           <div style="margin-bottom:6px;font-size:0.75rem;color:var(--muted);">Called after H10 (Oaks) due to rain</div>
         </div>
       </div>
@@ -5664,7 +5665,7 @@
         </div>
         <div class="round-card-expand" id="dad-round-legacy-dec25-expand">
           <div style="margin-bottom:8px;">56 Creek · 60 Stonehouse</div>
-          <div style="margin-bottom:6px;color:var(--gold);font-weight:600;">⛳ First ever round on a golf course</div>
+          <div style="margin-bottom:6px;color:var(--gold);font-weight:600;"><i class="ti ti-flag-2"></i> First ever round on a golf course</div>
         </div>
       </div>`;
 
@@ -5685,9 +5686,9 @@
       const totalPutts = holes.reduce((a,h) => a + (h.putts||0), 0);
       const approachHoles = holes.filter(h => h.approach_club);
       const approachLine = approachHoles.length
-        ? `<div style="margin-bottom:8px;">🏌️‍♂️ <strong>Approaches:</strong> ${approachHoles.map(h => `H${h.hole} ${h.approach_club}${h.approach_yds ? ' · ' + h.approach_yds + 'y' : ''}`).join(' &nbsp; ')}</div>`
+        ? `<div style="margin-bottom:8px;"><i class="ti ti-arrows-up-right" style="color:var(--gold);vertical-align:-1px;"></i> <strong>Approaches:</strong> ${approachHoles.map(h => `H${h.hole} ${h.approach_club}${h.approach_yds ? ' · ' + h.approach_yds + 'y' : ''}`).join(' &nbsp; ')}</div>`
         : '';
-      const stars = '⭐'.repeat(r.stars || 0);
+      const stars = '★'.repeat(r.stars || 0);
       const practiceBadge = r.is_practice
         ? `<span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);border:1px solid var(--muted);border-radius:4px;padding:1px 5px;margin-left:6px;">Practice</span>`
         : '';
@@ -5704,17 +5705,17 @@
           </div>
           <div class="round-card-expand" id="dad-round-${idx}-expand">
             <div class="hole-grid">${holeGrid}</div>
-            <div style="margin-bottom:8px;">🏌️ <strong>Putts:</strong> ${totalPutts} &nbsp; ⛳ <strong>Fairways:</strong> ${fairways} &nbsp; 🎯 <strong>GIR:</strong> ${gir}</div>
+            <div style="margin-bottom:8px;"><i class="ti ti-tournament" style="color:var(--muted);vertical-align:-1px;"></i> <strong>Putts:</strong> ${totalPutts} &nbsp; <i class="ti ti-flag-2" style="color:var(--muted);vertical-align:-1px;"></i> <strong>Fairways:</strong> ${fairways} &nbsp; <i class="ti ti-target" style="color:var(--muted);vertical-align:-1px;"></i> <strong>GIR:</strong> ${gir}</div>
             ${approachLine}
-            ${r.stars ? '<div style="margin-bottom:8px;">' + stars + '</div>' : ''}
-            ${ref.milestone ? '<div style="margin-bottom:8px;color:var(--green);font-weight:700;">🎉 ' + ref.milestone + '</div>' : ''}
+            ${r.stars ? '<div style="margin-bottom:8px;color:var(--gold);">' + stars + '</div>' : ''}
+            ${ref.milestone ? '<div style="margin-bottom:8px;color:var(--green);font-weight:700;"><i class="ti ti-rosette" style="vertical-align:-1px;"></i> ' + ref.milestone + '</div>' : ''}
             ${ref.swing_thought ? '<div style="margin-bottom:6px;font-style:italic;color:var(--muted);">"' + ref.swing_thought + '"</div>' : ''}
-            ${ref.wins ? '<div style="margin-bottom:6px;">✅ <em>' + ref.wins + '</em></div>' : ''}
-            ${ref.learnings ? '<div style="margin-bottom:6px;">🔧 <em>' + ref.learnings + '</em></div>' : ''}
-            ${ref.worked ? '<div style="margin-bottom:6px;">✅ <em>' + ref.worked + '</em></div>' : ''}
-            ${ref.fix ? '<div style="margin-bottom:6px;">🔧 <em>' + ref.fix + '</em></div>' : ''}
-            ${ref.best ? '<div style="margin-bottom:6px;">🏆 <em>' + ref.best + '</em></div>' : ''}
-            ${ref.worst ? '<div style="margin-bottom:6px;">❌ <em>' + ref.worst + '</em></div>' : ''}
+            ${ref.wins ? '<div style="margin-bottom:6px;"><i class="ti ti-check" style="color:var(--green);vertical-align:-1px;"></i> <em>' + ref.wins + '</em></div>' : ''}
+            ${ref.learnings ? '<div style="margin-bottom:6px;"><i class="ti ti-tool" style="color:var(--muted);vertical-align:-1px;"></i> <em>' + ref.learnings + '</em></div>' : ''}
+            ${ref.worked ? '<div style="margin-bottom:6px;"><i class="ti ti-check" style="color:var(--green);vertical-align:-1px;"></i> <em>' + ref.worked + '</em></div>' : ''}
+            ${ref.fix ? '<div style="margin-bottom:6px;"><i class="ti ti-tool" style="color:var(--muted);vertical-align:-1px;"></i> <em>' + ref.fix + '</em></div>' : ''}
+            ${ref.best ? '<div style="margin-bottom:6px;"><i class="ti ti-trophy" style="color:var(--gold);vertical-align:-1px;"></i> <em>' + ref.best + '</em></div>' : ''}
+            ${ref.worst ? '<div style="margin-bottom:6px;"><i class="ti ti-x" style="color:var(--red,#c0392b);vertical-align:-1px;"></i> <em>' + ref.worst + '</em></div>' : ''}
             <button class="round-delete-btn" onclick="confirmDeleteDadRound('${r.id}')">Delete Round</button>
           </div>
         </div>`;
@@ -5799,7 +5800,7 @@
       const avg = bc.totalVsPar / bc.count;
       const avgStr = avg >= 0 ? '+' + avg.toFixed(1) : avg.toFixed(1);
       return `<div style="margin-bottom:12px;padding:8px 12px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:8px;font-size:0.8rem;line-height:1.4;">
-        🏆 <strong style="color:var(--green);">Best club:</strong> ${bestClub} — avg <strong style="color:var(--green);">${avgStr}</strong> vs par over ${bc.count} approach${bc.count !== 1 ? 'es' : ''}
+        <i class="ti ti-trophy" style="color:var(--green);font-size:0.9rem;vertical-align:-1px;"></i> <strong style="color:var(--green);">Best club:</strong> ${bestClub} — avg <strong style="color:var(--green);">${avgStr}</strong> vs par over ${bc.count} approach${bc.count !== 1 ? 'es' : ''}
       </div>`;
     })() : '';
 
@@ -5821,7 +5822,7 @@
       }).join('');
       // Trend direction: compare most recent vs previous round
       const delta = roundTrend[0].avg - roundTrend[1].avg;
-      const trendLabel = delta < -0.15 ? '📈 Improving' : delta > 0.15 ? '📉 Trending worse' : '➡️ Steady';
+      const trendLabel = delta < -0.15 ? '↑ Improving' : delta > 0.15 ? '↓ Trending worse' : '→ Steady';
       trendHtml = `
         <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);">
           <div style="font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:8px;">Round by Round</div>
@@ -5890,7 +5891,7 @@
   // ── SON ROUND RENDER ─────────────────────────────────────────
   async function loadSonRoundsAndRender() {
     const listEl = document.getElementById('son-history-list');
-    listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">Loading your rounds... ⏳</div>';
+    listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;"><i class="ti ti-loader-2" style="font-size:1.1rem;vertical-align:-2px;"></i> Loading your rounds…</div>';
     try {
       const rounds = await loadSonRounds();
       renderSonHistory(rounds);
@@ -5955,7 +5956,7 @@
   async function loadGirlRoundsAndRender() {
     const el = document.getElementById('girl-rounds-content');
     if (!el) return;
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">Loading rounds... ⏳</div>';
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;"><i class="ti ti-loader-2" style="font-size:1.1rem;vertical-align:-2px;"></i> Loading rounds…</div>';
     try {
       const rounds = await loadGirlRounds();
       if (!rounds || rounds.length === 0) {
@@ -6589,20 +6590,20 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   function renderCaddieMessages(showTyping) {
     const el = document.getElementById('caddie-messages');
     if (!el) return;
-    const welcome = `<div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:14px 16px;font-size:0.85rem;color:var(--cream);line-height:1.6;">🎙️ <strong>On the bag.</strong> Just say your distance and situation — I'll pick the club. Try: <em>"About 140 out, slight headwind"</em> or <em>"Tee shot, tight fairway."</em></div>`;
+    const welcome = `<div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:14px 16px;font-size:0.85rem;color:var(--cream);line-height:1.6;"><i class="ti ti-microphone" style="color:var(--gold);vertical-align:-1px;"></i> <strong>On the bag.</strong> Just say your distance and situation — I'll pick the club. Try: <em>"About 140 out, slight headwind"</em> or <em>"Tee shot, tight fairway."</em></div>`;
     const msgs = _caddieHistory.map(m => {
       const isUser = m.role === 'user';
       return `<div style="
         align-self:${isUser ? 'flex-end' : 'flex-start'};
         max-width:88%;
         background:${isUser ? 'rgba(201,168,76,0.15)' : 'var(--surface2)'};
-        border:1px solid ${isUser ? 'rgba(201,168,76,0.3)' : 'rgba(255,255,255,0.08)'};
+        border:1px solid ${isUser ? 'rgba(201,168,76,0.3)' : 'var(--border)'};
         border-radius:${isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
         padding:10px 14px;font-size:0.87rem;color:var(--cream);line-height:1.55;white-space:pre-wrap;word-break:break-word;
       ">${m.content}</div>`;
     }).join('');
     const typing = showTyping
-      ? `<div style="align-self:flex-start;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-radius:16px 16px 16px 4px;padding:10px 16px;font-size:1rem;color:var(--muted);letter-spacing:3px;">⛳ ···</div>`
+      ? `<div style="align-self:flex-start;background:var(--surface2);border:1px solid var(--border);border-radius:16px 16px 16px 4px;padding:10px 16px;font-size:1rem;color:var(--muted);letter-spacing:3px;">···</div>`
       : '';
     el.innerHTML = (_caddieHistory.length === 0 ? welcome : '') + msgs + typing;
     el.scrollTop = el.scrollHeight;
@@ -6631,7 +6632,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     _caddieRecognition.onstart = () => {
       _caddieListening = true;
-      if (micBtn) { micBtn.textContent = '🔴'; micBtn.style.color = '#ef4444'; micBtn.style.borderColor = '#ef4444'; }
+      if (micBtn) { micBtn.innerHTML = '<i class="ti ti-microphone" style="color:#ef4444;"></i>'; micBtn.style.color = '#ef4444'; micBtn.style.borderColor = '#ef4444'; }
     };
     _caddieRecognition.onresult = (e) => {
       const transcript = e.results[0][0].transcript;
@@ -6642,14 +6643,14 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     };
     _caddieRecognition.onend = () => {
       _caddieListening = false;
-      if (micBtn) { micBtn.textContent = '🎙️'; micBtn.style.color = ''; micBtn.style.borderColor = ''; }
+      if (micBtn) { micBtn.innerHTML = '<i class="ti ti-microphone"></i>'; micBtn.style.color = ''; micBtn.style.borderColor = ''; }
       // Auto-send if there's content
       const inp = document.getElementById('caddie-input');
       if (inp && inp.value.trim()) sendCaddieMessage();
     };
     _caddieRecognition.onerror = (e) => {
       _caddieListening = false;
-      if (micBtn) { micBtn.textContent = '🎙️'; micBtn.style.color = ''; micBtn.style.borderColor = ''; }
+      if (micBtn) { micBtn.innerHTML = '<i class="ti ti-microphone"></i>'; micBtn.style.color = ''; micBtn.style.borderColor = ''; }
       if (e.error !== 'no-speech') showToast('Mic error: ' + e.error, 'error');
     };
 
@@ -7156,20 +7157,20 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     if (!el) return;
     const h = _famHoles[_famHoleIdx];
     const holeCtx = h ? `Hole ${h.hole}, Par ${h.par}` : '';
-    const welcome = `<div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px 14px;font-size:0.82rem;color:var(--cream);line-height:1.55;">🎙️ <strong>Caddie ready.</strong> ${holeCtx ? 'You\'re on ' + holeCtx + '.' : ''} Ask anything — club, layup vs. go, wind adjustments.</div>`;
+    const welcome = `<div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px 14px;font-size:0.82rem;color:var(--cream);line-height:1.55;"><i class="ti ti-microphone" style="color:var(--gold);vertical-align:-1px;"></i> <strong>Caddie ready.</strong> ${holeCtx ? 'You\'re on ' + holeCtx + '.' : ''} Ask anything — club, layup vs. go, wind adjustments.</div>`;
     const msgs = _famCaddieHistory.map(m => {
       const isUser = m.role === 'user';
       return `<div style="
         align-self:${isUser ? 'flex-end' : 'flex-start'};
         max-width:90%;
         background:${isUser ? 'rgba(201,168,76,0.15)' : 'var(--surface2)'};
-        border:1px solid ${isUser ? 'rgba(201,168,76,0.3)' : 'rgba(255,255,255,0.08)'};
+        border:1px solid ${isUser ? 'rgba(201,168,76,0.3)' : 'var(--border)'};
         border-radius:${isUser ? '14px 14px 4px 14px' : '14px 14px 14px 4px'};
         padding:9px 13px;font-size:0.83rem;color:var(--cream);line-height:1.5;white-space:pre-wrap;word-break:break-word;
       ">${m.content}</div>`;
     }).join('');
     const typing = showTyping
-      ? `<div style="align-self:flex-start;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-radius:14px 14px 14px 4px;padding:9px 14px;font-size:1rem;color:var(--muted);letter-spacing:3px;">⛳ ···</div>`
+      ? `<div style="align-self:flex-start;background:var(--surface2);border:1px solid var(--border);border-radius:14px 14px 14px 4px;padding:9px 14px;font-size:1rem;color:var(--muted);letter-spacing:3px;">···</div>`
       : '';
     el.innerHTML = (_famCaddieHistory.length === 0 ? welcome : '') + msgs + typing;
     el.scrollTop = el.scrollHeight;
