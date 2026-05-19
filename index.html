@@ -182,8 +182,8 @@
     body.son-mode     .nav-btn.active svg { stroke: #3B7CB8; }
     body.girl-mode    .nav-btn.active { color: #B85490; background: rgba(184,84,144,0.1); }
     body.girl-mode    .nav-btn.active svg { stroke: #B85490; }
-    body.mom-mode     .nav-btn.active { color: #C49A30; background: rgba(196,154,48,0.1); }
-    body.mom-mode     .nav-btn.active svg { stroke: #C49A30; }
+    body.mom-mode     .nav-btn.active { color: #B86530; background: rgba(184,101,48,0.1); }
+    body.mom-mode     .nav-btn.active svg { stroke: #B86530; }
     body.grandma-mode .nav-btn.active { color: #9A8050; background: rgba(154,128,80,0.1); }
     body.grandma-mode .nav-btn.active svg { stroke: #9A8050; }
     /* Dark mode */
@@ -355,7 +355,7 @@
     /* Profile-specific hero tints */
     body.son-mode     .home-hero { background: #EBF0F5; border-bottom-color: #3B7CB8; }
     body.girl-mode    .home-hero { background: #F5EBF2; border-bottom-color: #B85490; }
-    body.mom-mode     .home-hero { background: #F5F0E8; border-bottom-color: #C49A30; }
+    body.mom-mode     .home-hero { background: #F5EDE8; border-bottom-color: #B86530; }
     body.grandma-mode .home-hero { background: #EEECE8; border-bottom-color: #9A8050; }
     /* Dark mode hero overrides */
     body.dark-mode              .home-hero { background: linear-gradient(160deg, #0f2a16 0%, var(--bg) 100%); border-bottom-color: rgba(201,168,76,0.3); }
@@ -375,7 +375,7 @@
     }
     body.son-mode     .home-greeting { color: #3B7CB8; }
     body.girl-mode    .home-greeting { color: #B85490; }
-    body.mom-mode     .home-greeting { color: #C49A30; }
+    body.mom-mode     .home-greeting { color: #B86530; }
     body.grandma-mode .home-greeting { color: #9A8050; }
 
     .home-title {
@@ -713,7 +713,7 @@
     /* Profile-specific topbar logo accents */
     body.son-mode     .topbar-logo span { color: #3B7CB8; }
     body.girl-mode    .topbar-logo span { color: #B85490; }
-    body.mom-mode     .topbar-logo span { color: #C49A30; }
+    body.mom-mode     .topbar-logo span { color: #B86530; }
     body.grandma-mode .topbar-logo span { color: #9A8050; }
 
     /* ── GIRL SECTION ── */
@@ -744,18 +744,7 @@
       margin-bottom: 8px;
     }
 
-    /* ── LANDING CARD GIRL ── */
-    .landing-card-girl {
-      background: linear-gradient(135deg, #1e0830 0%, #2d0a3d 100%);
-      border-color: rgba(236,72,153,0.4);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(236,72,153,0.12);
-    }
-    .landing-card-girl:hover {
-      border-color: #ec4899;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 24px rgba(236,72,153,0.22);
-    }
-    .landing-card-girl .landing-card-name { color: #f472b6; }
-    .landing-card-girl .landing-card-desc { color: #c084fc; }
+    /* .landing-card-girl dark block removed — replaced below with light palette */
 
     /* ── PROFILE SWITCHER ── */
     #profileSwitch {
@@ -884,10 +873,28 @@
       background: #EEECEA;
       border-color: #B89530;
     }
-    .landing-card-son  { background: var(--surface); border-color: var(--border); }
-    .landing-card-girl { background: var(--surface); border-color: var(--border); }
-    .landing-card-mom  { background: var(--surface); border-color: var(--border); }
-    .landing-card-grandma { background: var(--surface); border-color: var(--border); }
+    /* Family grid cards — uniform base, accent border + name only */
+    .landing-card-son,
+    .landing-card-girl,
+    .landing-card-mom,
+    .landing-card-grandma {
+      background: var(--surface);
+      box-shadow: none;
+    }
+    .landing-card-son      { border-color: #3B7CB8; }
+    .landing-card-son      .landing-card-name-sm { color: #3B7CB8; }
+    .landing-card-girl     { border-color: #B85490; }
+    .landing-card-girl     .landing-card-name-sm { color: #B85490; }
+    .landing-card-girl     .landing-card-name    { color: #B85490; }
+    .landing-card-mom      { border-color: #B86530; }  /* copper — clearly different from dad's gold */
+    .landing-card-mom      .landing-card-name-sm { color: #B86530; }
+    .landing-card-grandma  { border-color: #9A8050; }
+    .landing-card-grandma  .landing-card-name-sm { color: #9A8050; }
+    /* Hover: subtle lift only — no glow */
+    .landing-card-son:hover,
+    .landing-card-girl:hover,
+    .landing-card-mom:hover,
+    .landing-card-grandma:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.08); }
     .landing-avatar {
       width: 44px; height: 44px;
       border-radius: 50%;
@@ -1041,14 +1048,6 @@
     }
 
     /* ── LANDING CARD GRANDMA ── */
-    .landing-card-grandma {
-      background: #EEECE8;
-      border-color: #9A8050;
-    }
-    .landing-card-grandma:hover {
-      border-color: #7a6440;
-      box-shadow: 0 4px 16px rgba(154,128,80,0.15);
-    }
     .landing-card-grandma .landing-card-name { color: #9A8050; }
     .landing-card-grandma .landing-card-desc { color: #6a5a40; }
 
@@ -1070,17 +1069,9 @@
       margin-bottom: 8px;
     }
 
-    /* ── LANDING CARD MOM ── */
-    .landing-card-mom {
-      background: #F5F0E8;
-      border-color: #C49A30;
-    }
-    .landing-card-mom:hover {
-      border-color: #a07a20;
-      box-shadow: 0 4px 16px rgba(196,154,48,0.15);
-    }
-    .landing-card-mom .landing-card-name { color: #C49A30; }
-    .landing-card-mom .landing-card-desc { color: #8a6a20; }
+    /* ── LANDING CARD MOM ── (copper — distinct from dad's gold) */
+    .landing-card-mom .landing-card-name { color: #B86530; }
+    .landing-card-mom .landing-card-desc { color: #8a4a20; }
 
     /* ── ACHIEVEMENT BADGE SYSTEM ───────────────────────────────── */
     .badge-shelf {
@@ -1823,9 +1814,9 @@
     </div>
 
     <div class="landing-card landing-card-sm landing-card-mom" onclick="enterProfile('mom')">
-      <div class="landing-avatar-sm" style="background:#F5F0E8;color:#C49A30;">M</div>
+      <div class="landing-avatar-sm" style="background:#F5EDE8;color:#B86530;">M</div>
       <div class="landing-card-info">
-        <div class="landing-card-name-sm" style="color:#C49A30;">Mom</div>
+        <div class="landing-card-name-sm" style="color:#B86530;">Mom</div>
         <div class="landing-card-desc-sm">Righty · Beginner</div>
       </div>
       <div class="landing-card-arrow-sm">›</div>
@@ -4799,7 +4790,7 @@
       id: 'new_course',
       name: 'Explorer',
       desc: 'Played 2 different courses',
-      color: '#C49A30',
+      color: '#B86530',
       svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
         <circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/>
         <circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/>
