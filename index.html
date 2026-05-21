@@ -2234,16 +2234,6 @@
 
       </div><!-- /mom-sect home -->
 
-    <!-- Family Round CTA — visible all profiles -->
-    <div class="family-cta" onclick="openFamilyModal()">
-      <div class="family-cta-icon">👨‍👧‍👦</div>
-      <div class="family-cta-text">
-        <div class="family-cta-title">Family Round</div>
-        <div class="family-cta-sub">Live scorecard for the whole crew</div>
-      </div>
-      <div class="family-cta-arrow">›</div>
-    </div>
-
     </div><!-- /page-home -->
 
 
@@ -3630,6 +3620,9 @@
           <button class="btn-primary" onclick="openDadModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;"><i class="ti ti-flag-2" style="font-size:1rem;"></i> Start New Round</button>
           <button onclick="lockDadProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(138,96,16,0.35);border-radius:10px;padding:0 14px;color:var(--gold-l);font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;"><i class="ti ti-lock" style="font-size:1.1rem;"></i></button>
         </div>
+        <div class="section" style="margin-top:-4px;">
+          <button onclick="openFamilyModal()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--cream);font-size:0.9rem;font-weight:600;cursor:pointer;box-shadow:var(--c-shadow);"><i class="ti ti-users" style="font-size:1rem;color:var(--gold);"></i> Family Round</button>
+        </div>
 
         <div id="dad-stats-bar" style="display:none;" class="section">
           <div id="dad-stats-row"></div>
@@ -4237,15 +4230,6 @@
     landing.classList.add('hidden');
     setTimeout(() => { landing.style.display = 'none'; }, 380);
     showPage('home');
-    // PIN gate — require unlock before seeing any content
-    if (who === 'dad' && sessionStorage.getItem('sv-dad-unlocked') !== '1') {
-      _pendingAfterPin = '_stayHome';
-      document.getElementById('dad-pin-overlay').style.display = 'flex';
-    }
-    if (who === 'son' && sessionStorage.getItem('sv-son-unlocked') !== '1') {
-      _pendingSonAfterPin = '_stayHome';
-      document.getElementById('son-pin-overlay').style.display = 'flex';
-    }
   }
 
   function switchProfile(who) {
