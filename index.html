@@ -5039,6 +5039,7 @@
     ).join('');
 
     document.getElementById('dad-modal-body').innerHTML = `
+      <!-- SCROLLABLE CONTENT -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <div style="font-size:0.75rem;color:var(--muted);">${parLabel}</div>
         <div style="display:flex;align-items:center;gap:6px;">
@@ -5057,35 +5058,40 @@
           <span class="gps-dot"></span>finding GPS…
         </div>
         <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-bottom:7px;">
-          <button class="yardage-pill" onclick="tapYardage(50)" style="padding:5px 9px;font-size:0.75rem;">50</button>
-          <button class="yardage-pill" onclick="tapYardage(75)" style="padding:5px 9px;font-size:0.75rem;">75</button>
-          <button class="yardage-pill" onclick="tapYardage(100)" style="padding:5px 9px;font-size:0.75rem;">100</button>
-          <button class="yardage-pill" onclick="tapYardage(125)" style="padding:5px 9px;font-size:0.75rem;">125</button>
-          <button class="yardage-pill" onclick="tapYardage(150)" style="padding:5px 9px;font-size:0.75rem;">150</button>
-          <button class="yardage-pill" onclick="tapYardage(175)" style="padding:5px 9px;font-size:0.75rem;">175</button>
-          <button class="yardage-pill" onclick="tapYardage(200)" style="padding:5px 9px;font-size:0.75rem;">200</button>
-          <button class="yardage-pill" onclick="tapYardage(225)" style="padding:5px 9px;font-size:0.75rem;">225</button>
+          <button class="yardage-pill" onclick="tapYardage(50)" style="padding:7px 11px;font-size:0.8rem;">50</button>
+          <button class="yardage-pill" onclick="tapYardage(75)" style="padding:7px 11px;font-size:0.8rem;">75</button>
+          <button class="yardage-pill" onclick="tapYardage(100)" style="padding:7px 11px;font-size:0.8rem;">100</button>
+          <button class="yardage-pill" onclick="tapYardage(125)" style="padding:7px 11px;font-size:0.8rem;">125</button>
+          <button class="yardage-pill" onclick="tapYardage(150)" style="padding:7px 11px;font-size:0.8rem;">150</button>
+          <button class="yardage-pill" onclick="tapYardage(175)" style="padding:7px 11px;font-size:0.8rem;">175</button>
+          <button class="yardage-pill" onclick="tapYardage(200)" style="padding:7px 11px;font-size:0.8rem;">200</button>
+          <button class="yardage-pill" onclick="tapYardage(225)" style="padding:7px 11px;font-size:0.8rem;">225</button>
         </div>
         <div style="display:flex;gap:6px;align-items:center;">
           <input type="text" id="live-yardage-input" class="modal-input"
             placeholder="Type exact yardage…" inputmode="numeric" pattern="[0-9]*"
-            style="margin-bottom:0;flex:1;text-align:center;font-size:1rem;font-weight:700;padding:8px 10px;"
+            style="margin-bottom:0;flex:1;text-align:center;font-size:1rem;font-weight:700;padding:10px;"
             oninput="setManualYards(this.value)">
-          <button class="mark-ball-btn" onclick="markBall()" style="padding:8px 10px;font-size:0.78rem;">📍 Mark</button>
+          <button class="mark-ball-btn" onclick="markBall()" style="padding:10px 12px;font-size:0.78rem;">📍 Mark</button>
         </div>
       </div>
       <div class="live-club-card" id="live-club-suggest" style="display:none;"></div>
-      <div style="margin:4px 0 10px;display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-radius:12px;padding:8px 16px;">
-        <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">Score</div>
-        <div class="score-stepper" style="margin:0;">
-          <button class="stepper-btn" onclick="dadHoleScore(-1)">−</button>
-          <div class="score-val" id="dh-score">${h.score}</div>
-          <button class="stepper-btn" onclick="dadHoleScore(1)">+</button>
+      <!-- Quick distances panel (hidden by default) -->
+      <div id="dad-dist-panel" style="display:none;background:var(--surface2);border:0.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--gold);margin-bottom:8px;">Carry Distances</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;">
+          ${CLUBS.map(c => {
+            const d = getClubDist(c.name);
+            return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:0.5px solid var(--border);font-size:0.85rem;">
+              <span style="color:var(--cream);">${c.display}</span>
+              <span style="color:var(--gold);font-weight:600;">${d} yds</span>
+            </div>`;
+          }).join('')}
         </div>
       </div>
       <div style="margin-bottom:10px;">
         <button id="details-toggle-btn" onclick="toggleHoleDetails()"
-          style="background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;display:block;margin:0 auto;text-decoration:underline;">
+          style="background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;display:block;margin:0 auto;text-decoration:underline;padding:8px 0;">
           + Details (fairway · GIR · putts · approach club)
         </button>
         <div id="hole-details-wrap" style="display:none;margin-top:12px;">
@@ -5101,38 +5107,19 @@
             <div class="pill ${gn}" onclick="selectPill(this,'dh-gir-pills')" data-val="no">No</div>
           </div>
           <label class="modal-label">Putts: <span id="dh-putts-val">${h.putts}</span></label>
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-            <button class="stepper-btn" onclick="dadHolePutts(-1)">−</button>
-            <div style="font-size:1.3rem;font-weight:700;color:var(--cream);" id="dh-putts-big">${h.putts}</div>
-            <button class="stepper-btn" onclick="dadHolePutts(1)">+</button>
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;">
+            <button class="stepper-btn" onclick="dadHolePutts(-1)" style="width:48px;height:48px;font-size:1.4rem;">−</button>
+            <div style="font-size:1.6rem;font-weight:700;color:var(--cream);" id="dh-putts-big">${h.putts}</div>
+            <button class="stepper-btn" onclick="dadHolePutts(1)" style="width:48px;height:48px;font-size:1.4rem;">+</button>
           </div>
           <label class="modal-label">Approach club used?</label>
           <div class="club-chip-row">${chips}</div>
         </div>
       </div>
-      <!-- Quick distances panel (hidden by default) -->
-      <div id="dad-dist-panel" style="display:none;background:var(--surface2);border:0.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:12px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--gold);margin-bottom:8px;">Carry Distances</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;">
-          ${CLUBS.map(c => {
-            const d = getClubDist(c.name);
-            return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:0.5px solid var(--border);font-size:0.85rem;">
-              <span style="color:var(--cream);">${c.display}</span>
-              <span style="color:var(--gold);font-weight:600;">${d} yds</span>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>
-      <div class="modal-nav-row" style="gap:8px;">
-        <button class="btn-ghost" onclick="dadLiveBack()" ${backAttr} style="padding:10px 14px;font-size:0.8rem;"><i class="ti ti-chevron-left"></i> Back</button>
-        <button class="btn-ghost" onclick="dadToggleDistPanel()" style="padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1;" id="dad-dist-btn"><i class="ti ti-ruler-2" style="font-size:1rem;"></i><span style="font-size:0.6rem;letter-spacing:0.5px;">DIST</span></button>
-        <button class="btn-ghost" onclick="dadMidRoundScorecard()" style="padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1;"><i class="ti ti-clipboard-list" style="font-size:1rem;"></i><span style="font-size:0.6rem;letter-spacing:0.5px;">CARD</span></button>
-        <button class="btn-gold" onclick="dadLiveNext()" style="flex:1;">${nextLabel}</button>
-      </div>
-      <!-- CADDIE PANEL (Dad Live Round) -->
-      <div style="margin-top:14px;">
+      <!-- CADDIE PANEL -->
+      <div style="margin-bottom:16px;">
         <button onclick="toggleDadLiveCaddie()" id="dad-live-caddie-toggle"
-          style="width:100%;background:var(--surface2);border:1px solid rgba(138,96,16,0.25);border-radius:10px;padding:11px 16px;color:var(--gold-l);font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;">
+          style="width:100%;background:var(--surface2);border:1px solid rgba(138,96,16,0.25);border-radius:10px;padding:12px 16px;color:var(--gold-l);font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;">
           <span><i class="ti ti-message-circle" style="font-size:0.9rem;vertical-align:-1px;margin-right:6px;"></i>Ask Caddie — Hole ${h.hole}, Par ${h.par}</span>
           <span id="dad-live-caddie-caret">${_dadLiveCaddieOpen ? '▲' : '▼'}</span>
         </button>
@@ -5146,6 +5133,24 @@
             <button onclick="sendDadLiveCaddieMsg()" id="dad-live-caddie-send"
               style="background:var(--green);border:none;border-radius:8px;padding:10px 14px;color:var(--cream);font-weight:700;font-size:0.85rem;cursor:pointer;flex-shrink:0;">Send</button>
           </div>
+        </div>
+      </div>
+
+      <!-- STICKY FOOTER: score + nav -->
+      <div style="position:sticky;bottom:0;z-index:5;background:var(--bg);border-top:1px solid var(--border);margin:0 -20px;padding:14px 20px calc(14px + env(safe-area-inset-bottom,0px));">
+        <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:12px;">
+          <button onclick="dadHoleScore(-1)" style="width:76px;height:68px;border-radius:18px;background:var(--surface);border:1px solid var(--border);font-size:2.4rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:var(--c-shadow);">−</button>
+          <div style="text-align:center;min-width:80px;">
+            <div class="score-val" id="dh-score" style="font-family:'Bebas Neue',sans-serif;font-size:4rem;line-height:1;">${h.score}</div>
+            <div style="font-size:0.6rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Score</div>
+          </div>
+          <button onclick="dadHoleScore(1)" style="width:76px;height:68px;border-radius:18px;background:var(--surface);border:1px solid var(--border);font-size:2.4rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:var(--c-shadow);">+</button>
+        </div>
+        <div class="modal-nav-row" style="gap:8px;">
+          <button class="btn-ghost" onclick="dadLiveBack()" ${backAttr} style="padding:10px 14px;font-size:0.8rem;"><i class="ti ti-chevron-left"></i> Back</button>
+          <button class="btn-ghost" onclick="dadToggleDistPanel()" style="padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1;" id="dad-dist-btn"><i class="ti ti-ruler-2" style="font-size:1rem;"></i><span style="font-size:0.6rem;letter-spacing:0.5px;">DIST</span></button>
+          <button class="btn-ghost" onclick="dadMidRoundScorecard()" style="padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1;"><i class="ti ti-clipboard-list" style="font-size:1rem;"></i><span style="font-size:0.6rem;letter-spacing:0.5px;">CARD</span></button>
+          <button class="btn-gold" onclick="dadLiveNext()" style="flex:1;">${nextLabel}</button>
         </div>
       </div>
     `;
