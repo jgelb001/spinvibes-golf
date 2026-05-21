@@ -4237,6 +4237,15 @@
     landing.classList.add('hidden');
     setTimeout(() => { landing.style.display = 'none'; }, 380);
     showPage('home');
+    // PIN gate — require unlock before seeing any content
+    if (who === 'dad' && sessionStorage.getItem('sv-dad-unlocked') !== '1') {
+      _pendingAfterPin = '_stayHome';
+      document.getElementById('dad-pin-overlay').style.display = 'flex';
+    }
+    if (who === 'son' && sessionStorage.getItem('sv-son-unlocked') !== '1') {
+      _pendingSonAfterPin = '_stayHome';
+      document.getElementById('son-pin-overlay').style.display = 'flex';
+    }
   }
 
   function switchProfile(who) {
@@ -5408,6 +5417,7 @@
           if (_pendingAfterPin) {
             const fn = _pendingAfterPin;
             _pendingAfterPin = null;
+            if (fn === '_stayHome') { return; }
             if (fn === '_openFamilyModalUnlocked') { _openFamilyModalUnlocked(); return; }
             if (fn === '_openCaddie') { renderCaddieMessages(false); return; }
           }
@@ -5484,6 +5494,7 @@
 
   // ── SON PIN ───────────────────────────────────────────────────
   let _sonPin = '';
+  let _pendingSonAfterPin = null;
   function sonPinKey(d) {
     if (_sonPin.length >= 4) return;
     _sonPin += d;
@@ -5495,6 +5506,11 @@
         setTimeout(() => {
           document.getElementById('son-pin-overlay').style.display = 'none';
           document.getElementById('son-pin-overlay').style.opacity = '1';
+          if (_pendingSonAfterPin) {
+            const fn = _pendingSonAfterPin;
+            _pendingSonAfterPin = null;
+            if (fn === '_stayHome') { return; }
+          }
           loadSonRoundsAndRender();
         }, 300);
       } else {
