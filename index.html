@@ -5129,7 +5129,27 @@
         <button class="btn-ghost" onclick="dadMidRoundScorecard()" style="padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1;"><i class="ti ti-clipboard-list" style="font-size:1rem;"></i><span style="font-size:0.6rem;letter-spacing:0.5px;">CARD</span></button>
         <button class="btn-gold" onclick="dadLiveNext()" style="flex:1;">${nextLabel}</button>
       </div>
+      <!-- CADDIE PANEL (Dad Live Round) -->
+      <div style="margin-top:14px;">
+        <button onclick="toggleDadLiveCaddie()" id="dad-live-caddie-toggle"
+          style="width:100%;background:var(--surface2);border:1px solid rgba(138,96,16,0.25);border-radius:10px;padding:11px 16px;color:var(--gold-l);font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;">
+          <span><i class="ti ti-message-circle" style="font-size:0.9rem;vertical-align:-1px;margin-right:6px;"></i>Ask Caddie — Hole ${h.hole}, Par ${h.par}</span>
+          <span id="dad-live-caddie-caret">${_dadLiveCaddieOpen ? '▲' : '▼'}</span>
+        </button>
+        <div id="dad-live-caddie-panel" style="display:${_dadLiveCaddieOpen ? 'block' : 'none'};background:var(--surface);border:1px solid rgba(138,96,16,0.15);border-top:none;border-radius:0 0 10px 10px;padding:12px 14px;">
+          <div id="dad-live-caddie-msgs" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;font-size:0.83rem;line-height:1.5;"></div>
+          <div style="display:flex;gap:8px;align-items:flex-end;">
+            <textarea id="dad-live-caddie-input" rows="2"
+              style="flex:1;background:var(--surface2);border:1px solid rgba(138,96,16,0.25);border-radius:8px;padding:8px 10px;color:var(--cream);font-family:'Outfit',sans-serif;font-size:0.85rem;resize:none;"
+              placeholder="How far to the pin? What's your lie?"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDadLiveCaddieMsg();}"></textarea>
+            <button onclick="sendDadLiveCaddieMsg()" id="dad-live-caddie-send"
+              style="background:var(--green);border:none;border-radius:8px;padding:10px 14px;color:var(--cream);font-weight:700;font-size:0.85rem;cursor:pointer;flex-shrink:0;">Send</button>
+          </div>
+        </div>
+      </div>
     `;
+    renderDadLiveCaddieMessages();
     if (_manualYards !== null) {
       document.getElementById('live-yardage-input').value = _manualYards;
       document.getElementById('live-club-suggest').style.display = '';
@@ -6126,6 +6146,8 @@
     };
     _dadHoles = [];
     _dadHoleIdx = 0;
+    _dadLiveCaddieHistory = [];
+    _dadLiveCaddieOpen    = false;
     const defaultPar = course.blankPars ? 3 : Math.round(coursePar / numHoles);
     for (let i = 1; i <= numHoles; i++) {
       const holePar = (course.holePars && course.holePars[i-1]) ? course.holePars[i-1] : defaultPar;
@@ -6689,6 +6711,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   let _famHoleIdx       = 0;
   let _famCaddieHistory = [];   // persists across hole navigation
   let _famCaddieOpen    = false;
+  let _dadLiveCaddieHistory = [];
+  let _dadLiveCaddieOpen    = false;
 
   function openFamilyModal() {
     // Require dad's PIN — same session lock used by My Game
@@ -7156,6 +7180,61 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       : '';
     el.innerHTML = (_famCaddieHistory.length === 0 ? welcome : '') + msgs + typing;
     el.scrollTop = el.scrollHeight;
+  }
+
+  // ── DAD LIVE ROUND CADDIE ─────────────────────────────────────
+  function renderDadLiveCaddieMessages(showTyping) {
+    const el = document.getElementById('dad-live-caddie-msgs');
+    if (!el) return;
+    const welcome = `<div style="color:var(--muted);font-size:0.8rem;">Tell me the yardage and I'll pick your club.</div>`;
+    const msgs = _dadLiveCaddieHistory.map(m => {
+      const bg = m.role === 'user' ? 'var(--surface2)' : 'rgba(26,92,46,0.1)';
+      const align = m.role === 'user' ? 'flex-end' : 'flex-start';
+      return `<div style="display:flex;justify-content:${align};"><div style="background:${bg};border-radius:10px;padding:7px 11px;max-width:90%;color:var(--cream);">${m.content}</div></div>`;
+    }).join('');
+    const typing = showTyping ? `<div style="color:var(--muted);font-size:0.8rem;font-style:italic;">On it…</div>` : '';
+    el.innerHTML = (_dadLiveCaddieHistory.length === 0 ? welcome : '') + msgs + typing;
+    el.scrollTop = el.scrollHeight;
+  }
+  function toggleDadLiveCaddie() {
+    _dadLiveCaddieOpen = !_dadLiveCaddieOpen;
+    const panel = document.getElementById('dad-live-caddie-panel');
+    const caret = document.getElementById('dad-live-caddie-caret');
+    if (panel) panel.style.display = _dadLiveCaddieOpen ? 'block' : 'none';
+    if (caret) caret.textContent   = _dadLiveCaddieOpen ? '▲' : '▼';
+    if (_dadLiveCaddieOpen) renderDadLiveCaddieMessages(false);
+  }
+  async function sendDadLiveCaddieMsg() {
+    const inp = document.getElementById('dad-live-caddie-input');
+    const msg = inp ? inp.value.trim() : '';
+    if (!msg) return;
+    inp.value = '';
+    const h = _dadHoles[_dadHoleIdx];
+    const holeCtx = `\nCurrent hole: ${h.hole}, Par ${h.par}${h.yds ? ', ' + h.yds + ' yds (scorecard)' : ''}.`;
+    _dadLiveCaddieHistory.push({ role: 'user', content: msg });
+    renderDadLiveCaddieMessages(true);
+    const sendBtn = document.getElementById('dad-live-caddie-send');
+    if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = '…'; }
+    try {
+      const resp = await fetch('https://golf.spinvibes.com/.netlify/functions/caddie', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: _dadLiveCaddieHistory.slice(-6),
+          systemPrompt: _CADDIE_SYSTEM + holeCtx
+        })
+      });
+      if (!resp.ok) throw new Error('Network error');
+      const data = await resp.json();
+      const reply = data.content?.[0]?.text || data.reply || '…';
+      _dadLiveCaddieHistory.push({ role: 'assistant', content: reply });
+      renderDadLiveCaddieMessages(false);
+    } catch (e) {
+      _dadLiveCaddieHistory.pop();
+      renderDadLiveCaddieMessages(false);
+    } finally {
+      if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Send'; }
+    }
   }
 
   function toggleFamCaddie() {
