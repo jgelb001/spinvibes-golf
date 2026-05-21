@@ -6560,7 +6560,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     btn.textContent = '…';
 
     try {
-      const resp = await fetch('https://golf.spinvibes.com/.netlify/functions/caddie', {
+      const resp = await fetch('https://spinvibes-golf.netlify.app/.netlify/functions/caddie', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -7216,7 +7216,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const sendBtn = document.getElementById('dad-live-caddie-send');
     if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = '…'; }
     try {
-      const resp = await fetch('https://golf.spinvibes.com/.netlify/functions/caddie', {
+      const resp = await fetch('https://spinvibes-golf.netlify.app/.netlify/functions/caddie', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -7264,7 +7264,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const systemPrompt = _famCaddieSystem() + holeCtx;
 
     try {
-      const resp = await fetch('https://golf.spinvibes.com/.netlify/functions/caddie', {
+      const resp = await fetch('https://spinvibes-golf.netlify.app/.netlify/functions/caddie', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
