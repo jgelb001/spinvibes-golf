@@ -50,7 +50,7 @@
       --muted:     #64748b;
       --border:    rgba(0,0,0,0.08);
       --red:       #c0392b;
-      --nav-h:     50px;
+      --nav-h:     44px;
       --safe-b:    env(safe-area-inset-bottom, 0px);
     }
 
@@ -5155,19 +5155,19 @@
       </div>
 
       <!-- STICKY FOOTER: score + nav -->
-      <div style="position:sticky;bottom:0;z-index:5;background:var(--bg);border-top:1px solid var(--border);margin:0 -20px;padding:10px 20px calc(10px + env(safe-area-inset-bottom,0px));">
-        <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:8px;">
-          <button onclick="dadHoleScore(-1)" style="width:56px;height:52px;border-radius:14px;background:var(--surface);border:1px solid var(--border);font-size:1.8rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:var(--c-shadow);">−</button>
-          <div style="text-align:center;min-width:60px;">
-            <div class="score-val" id="dh-score" style="font-family:'Bebas Neue',sans-serif;font-size:3rem;line-height:1;">${h.score}</div>
-            <div style="font-size:0.6rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px;">Score</div>
+      <div style="position:sticky;bottom:0;z-index:5;background:var(--bg);border-top:1px solid var(--border);margin:0 -20px;padding:6px 20px calc(6px + env(safe-area-inset-bottom,0px));">
+        <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:4px;">
+          <button onclick="dadHoleScore(-1)" style="width:44px;height:40px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:1.5rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:var(--c-shadow);">−</button>
+          <div style="text-align:center;min-width:52px;">
+            <div class="score-val" id="dh-score" style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;line-height:1;">${h.score}</div>
+            <div style="font-size:0.55rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px;">Score</div>
           </div>
-          <button onclick="dadHoleScore(1)" style="width:56px;height:52px;border-radius:14px;background:var(--surface);border:1px solid var(--border);font-size:1.8rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:var(--c-shadow);">+</button>
+          <button onclick="dadHoleScore(1)" style="width:44px;height:40px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:1.5rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:var(--c-shadow);">+</button>
         </div>
-        <div class="modal-nav-row" style="gap:8px;">
-          <button class="btn-ghost" onclick="dadLiveBack()" ${backAttr} style="padding:10px 14px;font-size:0.8rem;"><i class="ti ti-chevron-left"></i> Back</button>
-          <button class="btn-ghost" onclick="dadToggleDistPanel()" style="padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1;" id="dad-dist-btn"><i class="ti ti-ruler-2" style="font-size:1rem;"></i><span style="font-size:0.6rem;letter-spacing:0.5px;">DIST</span></button>
-          <button class="btn-ghost" onclick="dadMidRoundScorecard()" style="padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1;"><i class="ti ti-clipboard-list" style="font-size:1rem;"></i><span style="font-size:0.6rem;letter-spacing:0.5px;">CARD</span></button>
+        <div class="modal-nav-row" style="gap:6px;">
+          <button class="btn-ghost" onclick="dadLiveBack()" ${backAttr} style="padding:6px 12px;font-size:0.78rem;"><i class="ti ti-chevron-left"></i> Back</button>
+          <button class="btn-ghost" onclick="dadToggleDistPanel()" style="padding:6px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1;" id="dad-dist-btn"><i class="ti ti-ruler-2" style="font-size:0.9rem;"></i><span style="font-size:0.55rem;letter-spacing:0.5px;">DIST</span></button>
+          <button class="btn-ghost" onclick="dadMidRoundScorecard()" style="padding:6px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1;"><i class="ti ti-clipboard-list" style="font-size:0.9rem;"></i><span style="font-size:0.55rem;letter-spacing:0.5px;">CARD</span></button>
           <button class="btn-gold" onclick="dadLiveNext()" style="flex:1;">${nextLabel}</button>
         </div>
       </div>
