@@ -1219,6 +1219,7 @@
 
       /* Sidebar nav — second row, left */
       #nav {
+        position: static; /* override mobile fixed */
         order: 2;
         flex: 0 0 180px;
         width: 180px;
@@ -1226,6 +1227,7 @@
         border-top: none;
         border-right: 1px solid rgba(138,96,16,0.15);
         padding: 12px 8px 24px;
+        padding-bottom: 24px; /* no safe-area needed on desktop */
         overflow-y: auto;
         flex-direction: column;
         align-items: stretch;
