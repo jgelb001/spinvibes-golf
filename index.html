@@ -50,7 +50,7 @@
       --muted:     #64748b;
       --border:    rgba(0,0,0,0.08);
       --red:       #c0392b;
-      --nav-h:     64px;
+      --nav-h:     50px;
       --safe-b:    env(safe-area-inset-bottom, 0px);
     }
 
@@ -76,8 +76,8 @@
       flex-shrink: 0;
       background: var(--surface);
       border-bottom: 0.5px solid var(--border);
-      padding: 12px 20px 10px;
-      padding-top: calc(16px + env(safe-area-inset-top, 0px));
+      padding: 8px 20px 8px;
+      padding-top: calc(10px + env(safe-area-inset-top, 0px));
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -98,13 +98,7 @@
       margin-top: 1px;
     }
     .offline-badge {
-      font-size: 0.65rem;
-      background: var(--green);
-      color: var(--gold-l);
-      padding: 3px 8px;
-      border-radius: 20px;
-      border: 1px solid var(--green-b);
-      letter-spacing: 0.5px;
+      display: none;
     }
 
     /* ── PAGES ── */
@@ -112,6 +106,8 @@
       flex: 1;
       overflow: hidden;
       position: relative;
+      /* nav is now fixed — give pages room so content doesn't hide under it */
+      margin-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
     }
 
     .page {
@@ -134,12 +130,15 @@
 
     /* ── BOTTOM NAV ── */
     #nav {
-      flex-shrink: 0;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
       background: var(--surface);
       border-top: 0.5px solid var(--border);
       display: flex;
-      height: calc(var(--nav-h) + var(--safe-b));
-      padding-bottom: var(--safe-b);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;  /* Firefox */
@@ -149,7 +148,6 @@
       flex: 1 1 0;
       min-width: 0;
       height: var(--nav-h);
-      align-self: flex-start;
       padding-left: 2px;
       padding-right: 2px;
       display: flex;
@@ -3698,23 +3696,43 @@
             </div>
           </div>
 
-          <!-- Personal Best 95 -->
+          <!-- Personal Best 92 -->
+          <div class="round-card" style="margin-bottom:10px;">
+            <div class="round-card-header" onclick="toggleRoundExpand('milestone-pb92')">
+              <div class="round-card-left">
+                <div class="round-card-date">May 22, 2026</div>
+                <div class="round-card-course" style="color:var(--gold);font-weight:600;">Personal Best</div>
+              </div>
+              <div class="round-card-right">
+                <div class="round-badge gold">92</div>
+              </div>
+            </div>
+            <div class="round-card-expand" id="milestone-pb92-expand">
+              <div style="margin-bottom:6px;font-weight:600;color:var(--cream);">Shot 92 · Creek (Sage) + Stonehouse (Sage) · TCI</div>
+              <div style="margin-bottom:6px;color:var(--muted);">Front 9 (Creek): 47 · Back 9 (Stonehouse): 45</div>
+              <div style="margin-bottom:6px;color:var(--muted);">Creek: 5·5·5·6·5·4·5·6·6 · Stonehouse: 6·6·5·5·4·4·5·5·5</div>
+              <div style="margin-bottom:4px;color:var(--muted);font-style:italic;">Driver at 60% = fairways = scoring. Pars: Creek H6, Stonehouse H6 + H9.</div>
+              <div style="color:var(--muted);font-style:italic;">Key lesson: Lighter swing off the tee is the game-changer. Putting next to fix.</div>
+            </div>
+          </div>
+
+          <!-- Former Best 95 -->
           <div class="round-card" style="margin-bottom:10px;">
             <div class="round-card-header" onclick="toggleRoundExpand('milestone-pb95')">
               <div class="round-card-left">
                 <div class="round-card-date">May 5, 2026</div>
-                <div class="round-card-course" style="color:var(--gold);font-weight:600;">Personal Best</div>
+                <div class="round-card-course" style="color:var(--muted);font-weight:600;">Former Best</div>
               </div>
               <div class="round-card-right">
-                <div class="round-badge gold">95</div>
+                <div class="round-badge">95</div>
               </div>
             </div>
             <div class="round-card-expand" id="milestone-pb95-expand">
               <div style="margin-bottom:6px;font-weight:600;color:var(--cream);">Shot 95 · Creek (Sage) + Stonehouse (White) · TCI</div>
               <div style="margin-bottom:6px;color:var(--muted);">Front 9 (Creek): 47 · Back 9 (Stonehouse): 48</div>
               <div style="margin-bottom:6px;color:var(--muted);">Creek: 5·5·8·6·6·4·4·5·4 · Stonehouse: 5·5·5·6·4·7·6·3·7</div>
-              <div style="margin-bottom:4px;color:var(--muted);font-style:italic;">7-wood debut on H6 · 4 pars total · 3 closing pars on Creek.</div>
-              <div style="color:var(--muted);font-style:italic;">Key lesson: Lost balls = #1 score killer. Pre-shot routine needed.</div>
+              <div style="margin-bottom:4px;color:var(--muted);font-style:italic;">7-wood debut on H6 · 4 pars total.</div>
+              <div style="color:var(--muted);font-style:italic;">Key lesson: Lost balls = #1 score killer.</div>
             </div>
           </div>
 
@@ -5137,14 +5155,14 @@
       </div>
 
       <!-- STICKY FOOTER: score + nav -->
-      <div style="position:sticky;bottom:0;z-index:5;background:var(--bg);border-top:1px solid var(--border);margin:0 -20px;padding:14px 20px calc(14px + env(safe-area-inset-bottom,0px));">
-        <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:12px;">
-          <button onclick="dadHoleScore(-1)" style="width:76px;height:68px;border-radius:18px;background:var(--surface);border:1px solid var(--border);font-size:2.4rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:var(--c-shadow);">−</button>
-          <div style="text-align:center;min-width:80px;">
-            <div class="score-val" id="dh-score" style="font-family:'Bebas Neue',sans-serif;font-size:4rem;line-height:1;">${h.score}</div>
-            <div style="font-size:0.6rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Score</div>
+      <div style="position:sticky;bottom:0;z-index:5;background:var(--bg);border-top:1px solid var(--border);margin:0 -20px;padding:10px 20px calc(10px + env(safe-area-inset-bottom,0px));">
+        <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:8px;">
+          <button onclick="dadHoleScore(-1)" style="width:56px;height:52px;border-radius:14px;background:var(--surface);border:1px solid var(--border);font-size:1.8rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:var(--c-shadow);">−</button>
+          <div style="text-align:center;min-width:60px;">
+            <div class="score-val" id="dh-score" style="font-family:'Bebas Neue',sans-serif;font-size:3rem;line-height:1;">${h.score}</div>
+            <div style="font-size:0.6rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px;">Score</div>
           </div>
-          <button onclick="dadHoleScore(1)" style="width:76px;height:68px;border-radius:18px;background:var(--surface);border:1px solid var(--border);font-size:2.4rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:var(--c-shadow);">+</button>
+          <button onclick="dadHoleScore(1)" style="width:56px;height:52px;border-radius:14px;background:var(--surface);border:1px solid var(--border);font-size:1.8rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:var(--c-shadow);">+</button>
         </div>
         <div class="modal-nav-row" style="gap:8px;">
           <button class="btn-ghost" onclick="dadLiveBack()" ${backAttr} style="padding:10px 14px;font-size:0.8rem;"><i class="ti ti-chevron-left"></i> Back</button>
