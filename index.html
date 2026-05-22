@@ -1557,7 +1557,7 @@
     .live-club-card {
       background: var(--surface2);
       border: 0.5px solid var(--border); border-radius: 14px;
-      padding: 14px 16px; margin-bottom: 14px; text-align: center;
+      padding: 12px 14px; margin-bottom: 14px;
     }
     .live-club-name {
       font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; color: var(--cream);
@@ -1566,7 +1566,7 @@
     .live-club-note { font-size: 0.73rem; color: var(--muted); line-height: 1.4; }
     .club-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
     .club-chip {
-      padding: 8px 12px; background: var(--surface2);
+      padding: 7px 10px; background: var(--surface2);
       border: 0.5px solid var(--border); border-radius: 8px;
       color: var(--muted); font-size: 0.72rem; font-weight: 600;
       cursor: pointer; transition: all 0.15s;
@@ -1575,6 +1575,9 @@
     }
     .club-chip.used {
       background: rgba(26,92,46,0.1); border-color: var(--green); color: var(--green);
+    }
+    .club-chip.suggested {
+      border-color: var(--gold); color: var(--gold-l); background: rgba(138,96,16,0.07);
     }
     .gps-dot {
       display: inline-block; width: 7px; height: 7px; border-radius: 50%;
@@ -4877,14 +4880,18 @@
 
   function suggestClub(yards) {
     if (!yards || yards < 1) return null;
-    const ranked = CLUBS.map(c => ({ ...c, avg: getClubDist(c.name) }))
-                        .sort((a, b) => a.avg - b.avg);
-    // Prefer: can reach AND within 50 yards of target (avoids grotesque overkill like 7-wood at 50 yds)
+    // Driver never used on approach — exclude it from all suggestions
+    const approachClubs = CLUBS.filter(c => c.name !== 'Driver');
+    const ranked = approachClubs.map(c => ({ ...c, avg: getClubDist(c.name) }))
+                                .sort((a, b) => a.avg - b.avg);
+    // Best fit: can reach AND not more than 50 yds overkill
     const goodFit = ranked.filter(c => c.avg >= yards && c.avg <= yards + 50);
     if (goodFit.length) return goodFit[0];
-    // Fallback: shortest club that can still reach
+    // Can reach but is overkill (e.g. 50 yds → only 7-wood available)
     const canReach = ranked.filter(c => c.avg >= yards);
-    return canReach.length ? canReach[0] : ranked[ranked.length - 1];
+    if (canReach.length) return canReach[0];
+    // Nothing can reach — return the longest club (7-Wood) with a "you're short" note
+    return ranked[ranked.length - 1];
   }
 
   function clubNote(club, yards) {
@@ -4892,8 +4899,9 @@
     const avg  = getClubDist(club.name);
     const n    = JSON.parse(localStorage.getItem('sv-clubs') || '{}')[club.name + '_n'] || 0;
     const diff = avg - yards;
+    if (avg < yards) return `max club — ${yards - avg} yds short · aim at front edge, let it run`;
     if (n === 0)   return 'default estimate · no hits logged yet';
-    if (diff <= 4) return `tight fit — consider one more club · ${n} hit${n !== 1 ? 's' : ''} logged`;
+    if (diff <= 5) return `tight fit — consider playing one more club · ${n} hit${n !== 1 ? 's' : ''} logged`;
     return `avg ${avg} yds · ${diff} yds buffer · ${n} hit${n !== 1 ? 's' : ''} logged`;
   }
 
@@ -5009,13 +5017,26 @@
   function refreshClubSuggestion(yards) {
     const el = document.getElementById('live-club-suggest');
     if (!el) return;
-    const club = suggestClub(yards);
-    if (!club) return;
-    const note = clubNote(club, yards);
-    el.innerHTML = `<div class="live-club-name">${club.name}</div>
-      <div class="live-club-note">${note} · aim fat side of green · boring golf 🧠</div>`;
-    document.querySelectorAll('.club-chip').forEach(c =>
-      c.classList.toggle('used', c.dataset.club === club.name && !_selectedApproachClub));
+    const suggested = suggestClub(yards);
+    const note = suggested ? clubNote(suggested, yards) : '';
+    // All clubs except Driver, in ascending distance order
+    const approachClubs = CLUBS.filter(c => c.name !== 'Driver');
+
+    el.innerHTML = `
+      ${suggested ? `<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--gold);line-height:1;">✦ ${suggested.name}</div>
+        <div class="live-club-note">${note}</div>
+      </div>` : ''}
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">
+        ${approachClubs.map(c => {
+          const avg = getClubDist(c.name);
+          const isSuggested = suggested && c.name === suggested.name;
+          const isSelected = _selectedApproachClub === c.name;
+          const cls = isSelected ? ' used' : (isSuggested ? ' suggested' : '');
+          return `<button class="club-chip${cls}" data-club="${c.name}" onclick="selectApproachClub(this,'${c.name}')">${c.name} <span style="font-size:0.6rem;opacity:0.6;">${avg}</span></button>`;
+        }).join('')}
+      </div>
+    `;
   }
 
   function toggleHoleDetails() {
@@ -5031,8 +5052,13 @@
 
   function selectApproachClub(el, clubName) {
     _selectedApproachClub = clubName;
-    document.querySelectorAll('.club-chip').forEach(c => c.classList.remove('used'));
-    el.classList.add('used');
+    // Re-render the club grid to reflect selection + remove suggested highlight
+    if (_manualYards !== null) {
+      refreshClubSuggestion(_manualYards);
+    } else {
+      document.querySelectorAll('.club-chip').forEach(c => c.classList.remove('used', 'suggested'));
+      el.classList.add('used');
+    }
   }
 
   function renderDadLiveHole() {
@@ -5061,9 +5087,6 @@
     const parLabel  = h.par === 3 ? 'Par 3 🏹' : h.par === 5 ? 'Par 5 💪' : 'Par 4 ⛳';
     const nextLabel = isLast ? 'Finish Round →' : 'Next Hole →';
     const backAttr  = _dadHoleIdx === 0 ? 'disabled style="opacity:0.3;"' : '';
-    const chips = CLUBS.map(c =>
-      `<button class="club-chip${_selectedApproachClub === c.name ? ' used' : ''}" data-club="${c.name}" onclick="selectApproachClub(this,'${c.name}')">${c.name}</button>`
-    ).join('');
 
     document.getElementById('dad-modal-body').innerHTML = `
       <!-- SCROLLABLE CONTENT -->
@@ -5077,6 +5100,9 @@
       </div>
       ${h.yds ? `<div style="text-align:center;font-size:0.72rem;color:var(--muted);margin-bottom:6px;letter-spacing:0.5px;"><i class="ti ti-clipboard-list" style="font-size:0.8rem;vertical-align:-1px;margin-right:3px;"></i>SCORECARD: <strong style="color:var(--gold);">${h.yds} yds</strong></div>` : ''}
       <div class="live-distance-card" style="padding:8px 12px 8px;margin-bottom:10px;">
+        <div style="font-size:0.6rem;color:var(--muted);text-align:center;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px;">
+          ${h.par === 3 ? '🏹 Par 3 — Shot 1 is your approach' : 'Distance to pin'}
+        </div>
         <div style="display:flex;align-items:baseline;justify-content:center;gap:4px;">
           <div class="live-yards" id="live-yards" style="font-size:2.8rem;">—</div>
           <div style="font-size:0.85rem;color:var(--muted);padding-bottom:2px;">yds</div>
@@ -5115,28 +5141,21 @@
       <div style="margin-bottom:10px;">
         <button id="details-toggle-btn" onclick="toggleHoleDetails()"
           style="background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;display:block;margin:0 auto;text-decoration:underline;padding:8px 0;">
-          + Details (fairway · GIR · putts · approach club)
+          + Details (${h.par > 3 ? 'fairway · ' : ''}putts)
         </button>
         <div id="hole-details-wrap" style="display:none;margin-top:12px;">
-          <label class="modal-label">Fairway Hit?</label>
+          ${h.par > 3 ? `
+          <label class="modal-label">Fairway Hit? <span style="font-size:0.65rem;opacity:0.6;">(tee shot)</span></label>
           <div class="pill-row" id="dh-fairway-pills">
             <div class="pill ${fw}" onclick="selectPill(this,'dh-fairway-pills')" data-val="yes">Yes</div>
             <div class="pill ${fno}" onclick="selectPill(this,'dh-fairway-pills')" data-val="no">No</div>
-            <div class="pill ${fp3}" onclick="selectPill(this,'dh-fairway-pills')" data-val="par3">N/A</div>
-          </div>
-          <label class="modal-label">Green in Regulation?</label>
-          <div class="pill-row" id="dh-gir-pills">
-            <div class="pill ${gy}" onclick="selectPill(this,'dh-gir-pills')" data-val="yes">Yes</div>
-            <div class="pill ${gn}" onclick="selectPill(this,'dh-gir-pills')" data-val="no">No</div>
-          </div>
+          </div>` : '<div id="dh-fairway-pills" style="display:none;"></div>'}
           <label class="modal-label">Putts: <span id="dh-putts-val">${h.putts}</span></label>
           <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;">
             <button class="stepper-btn" onclick="dadHolePutts(-1)" style="width:48px;height:48px;font-size:1.4rem;">−</button>
             <div style="font-size:1.6rem;font-weight:700;color:var(--cream);" id="dh-putts-big">${h.putts}</div>
             <button class="stepper-btn" onclick="dadHolePutts(1)" style="width:48px;height:48px;font-size:1.4rem;">+</button>
           </div>
-          <label class="modal-label">Approach club used?</label>
-          <div class="club-chip-row">${chips}</div>
         </div>
       </div>
       <!-- CADDIE PANEL -->
@@ -5168,7 +5187,10 @@
       footer.innerHTML = `
         <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:4px;">
           <button onclick="dadHoleScore(-1)" style="width:38px;height:34px;border-radius:8px;background:var(--surface);border:1px solid var(--border);font-size:1.3rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;">−</button>
-          <div class="score-val" id="dh-score" style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;line-height:1;min-width:36px;text-align:center;">${h.score}</div>
+          <div style="text-align:center;min-width:52px;">
+            <div style="font-size:0.45rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1px;">Shot</div>
+            <div class="score-val" id="dh-score" style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;line-height:1;">${h.score}</div>
+          </div>
           <button onclick="dadHoleScore(1)" style="width:38px;height:34px;border-radius:8px;background:var(--surface);border:1px solid var(--border);font-size:1.3rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;">+</button>
         </div>
         <div class="modal-nav-row" style="gap:5px;">
@@ -6192,7 +6214,7 @@
     for (let i = 1; i <= numHoles; i++) {
       const holePar = (course.holePars && course.holePars[i-1]) ? course.holePars[i-1] : defaultPar;
       const yds = course.yardages ? course.yardages[i - 1] : null;
-      _dadHoles.push({ hole: i, par: holePar, score: holePar, fairway: 'no', gir: false, putts: 2, yds });
+      _dadHoles.push({ hole: i, par: holePar, score: 1, fairway: 'no', gir: false, putts: 2, yds });
     }
     document.getElementById('dad-running-total').style.display = '';
     _acquireWakeLock();
