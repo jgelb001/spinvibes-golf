@@ -1866,7 +1866,7 @@
           <div class="home-goal-num" style="color:#1a5c2e;font-size:1.6rem;">&lt;90</div>
           <div>
             <div style="font-weight:700;color:#1a5c2e;font-size:0.85rem;">Next Target</div>
-            <div style="font-size:0.75rem;">Best: 95 — May 5, 2026</div>
+            <div id="dad-home-best" style="font-size:0.75rem;">Best: 92 — May 22, 2026</div>
           </div>
         </div>
       </div>
@@ -5549,6 +5549,13 @@
       const scoreDelta = prev ? last.total_score - prev.total_score : null;
       const best      = scoredRounds.reduce((a,r) => r.total_score < a.total_score ? r : a);
       const avg       = Math.round(scoredRounds.reduce((a,r) => a + r.total_score, 0) / scoredRounds.length);
+      // Update home screen best score dynamically
+      const homeBestEl = document.getElementById('dad-home-best');
+      if (homeBestEl) {
+        const bd = new Date(best.date_played + 'T12:00:00');
+        const bLabel = bd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        homeBestEl.textContent = `Best: ${best.total_score} — ${bLabel}`;
+      }
 
       // Per-round hole stats
       const allHolesData = scoredRounds.map(r => Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]'));
