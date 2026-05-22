@@ -104,6 +104,7 @@
     /* ── PAGES ── */
     #pages {
       flex: 1;
+      min-height: 0; /* allow flex shrink so nav stays at physical bottom */
       overflow: hidden;
       position: relative;
     }
@@ -118,7 +119,7 @@
       pointer-events: none;
       transform: translateY(12px);
       transition: opacity 0.22s ease, transform 0.22s ease;
-      padding-bottom: calc(var(--nav-h) + var(--safe-b) + 16px);
+      padding-bottom: 16px; /* nav is now a flex sibling — no overlap */
     }
     .page.active {
       opacity: 1;
@@ -128,10 +129,7 @@
 
     /* ── BOTTOM NAV ── */
     #nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      flex-shrink: 0;
       z-index: 100;
       background: var(--surface);
       border-top: 0.5px solid var(--border);
@@ -3805,8 +3803,8 @@
       </div>
 
       <!-- Dad Round Entry Modal -->
-      <div id="dad-modal" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);overflow-y:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(80px + env(safe-area-inset-bottom,0px));">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(138,96,16,0.2);">
+      <div id="dad-modal" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);">
+        <div style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(138,96,16,0.2);">
           <div id="dad-modal-step-label" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);">Round Setup</div>
           <div style="display:flex;align-items:center;gap:12px;">
             <div id="dad-running-total" style="display:none;text-align:right;line-height:1;">
@@ -3816,7 +3814,8 @@
             <button onclick="closeDadModal()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">✕</button>
           </div>
         </div>
-        <div id="dad-modal-body" style="padding:20px;"></div>
+        <div id="dad-modal-body" style="flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:20px;padding-bottom:12px;"></div>
+        <div id="dad-modal-footer" style="flex-shrink:0;display:none;background:var(--bg);border-top:1px solid var(--border);padding:6px 20px calc(6px + env(safe-area-inset-bottom,0px));"></div>
       </div>
     </div><!-- /page-dad-progress -->
 
@@ -4880,6 +4879,10 @@
     if (!yards || yards < 1) return null;
     const ranked = CLUBS.map(c => ({ ...c, avg: getClubDist(c.name) }))
                         .sort((a, b) => a.avg - b.avg);
+    // Prefer: can reach AND within 50 yards of target (avoids grotesque overkill like 7-wood at 50 yds)
+    const goodFit = ranked.filter(c => c.avg >= yards && c.avg <= yards + 50);
+    if (goodFit.length) return goodFit[0];
+    // Fallback: shortest club that can still reach
     const canReach = ranked.filter(c => c.avg >= yards);
     return canReach.length ? canReach[0] : ranked[ranked.length - 1];
   }
@@ -4977,11 +4980,15 @@
   function setManualYards(val) {
     const n = parseInt(val);
     if (!val || isNaN(n) || n < 1) {
-      _manualYards = null; refreshGPSDisplay();
+      _manualYards = null;
+      const yEl = document.getElementById('live-yards');
+      if (yEl) yEl.textContent = '—';
       const s = document.getElementById('live-club-suggest');
       if (s) s.style.display = 'none'; return;
     }
-    _manualYards = n; refreshGPSDisplay();
+    _manualYards = n;
+    const yEl = document.getElementById('live-yards');
+    if (yEl) yEl.textContent = n;
     const s = document.getElementById('live-club-suggest');
     if (s) s.style.display = '';
   }
@@ -4992,9 +4999,11 @@
     if (inp) inp.value = y;
     document.querySelectorAll('.yardage-pill').forEach(p =>
       p.classList.toggle('sv-active', parseInt(p.textContent) === y));
-    refreshGPSDisplay();
+    const yEl = document.getElementById('live-yards');
+    if (yEl) yEl.textContent = y;
     const s = document.getElementById('live-club-suggest');
     if (s) s.style.display = '';
+    refreshClubSuggestion(y);
   }
 
   function refreshClubSuggestion(yards) {
@@ -5072,9 +5081,6 @@
           <div class="live-yards" id="live-yards" style="font-size:2.8rem;">—</div>
           <div style="font-size:0.85rem;color:var(--muted);padding-bottom:2px;">yds</div>
         </div>
-        <div id="live-gps-acc" style="font-size:0.65rem;color:var(--muted);text-align:center;margin-bottom:7px;">
-          <span class="gps-dot"></span>finding GPS…
-        </div>
         <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-bottom:7px;">
           <button class="yardage-pill" onclick="tapYardage(50)" style="padding:7px 11px;font-size:0.8rem;">50</button>
           <button class="yardage-pill" onclick="tapYardage(75)" style="padding:7px 11px;font-size:0.8rem;">75</button>
@@ -5090,7 +5096,6 @@
             placeholder="Type exact yardage…" inputmode="numeric" pattern="[0-9]*"
             style="margin-bottom:0;flex:1;text-align:center;font-size:1rem;font-weight:700;padding:10px;"
             oninput="setManualYards(this.value)">
-          <button class="mark-ball-btn" onclick="markBall()" style="padding:10px 12px;font-size:0.78rem;">📍 Mark</button>
         </div>
       </div>
       <div class="live-club-card" id="live-club-suggest" style="display:none;"></div>
@@ -5154,31 +5159,36 @@
         </div>
       </div>
 
-      <!-- STICKY FOOTER: score + nav -->
-      <div style="position:sticky;bottom:0;z-index:5;background:var(--bg);border-top:1px solid var(--border);margin:0 -20px;padding:6px 20px calc(6px + env(safe-area-inset-bottom,0px));">
-        <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:4px;">
-          <button onclick="dadHoleScore(-1)" style="width:44px;height:40px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:1.5rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:var(--c-shadow);">−</button>
-          <div style="text-align:center;min-width:52px;">
-            <div class="score-val" id="dh-score" style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;line-height:1;">${h.score}</div>
-            <div style="font-size:0.55rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px;">Score</div>
-          </div>
-          <button onclick="dadHoleScore(1)" style="width:44px;height:40px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:1.5rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:var(--c-shadow);">+</button>
-        </div>
-        <div class="modal-nav-row" style="gap:6px;">
-          <button class="btn-ghost" onclick="dadLiveBack()" ${backAttr} style="padding:6px 12px;font-size:0.78rem;"><i class="ti ti-chevron-left"></i> Back</button>
-          <button class="btn-ghost" onclick="dadToggleDistPanel()" style="padding:6px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1;" id="dad-dist-btn"><i class="ti ti-ruler-2" style="font-size:0.9rem;"></i><span style="font-size:0.55rem;letter-spacing:0.5px;">DIST</span></button>
-          <button class="btn-ghost" onclick="dadMidRoundScorecard()" style="padding:6px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1;"><i class="ti ti-clipboard-list" style="font-size:0.9rem;"></i><span style="font-size:0.55rem;letter-spacing:0.5px;">CARD</span></button>
-          <button class="btn-gold" onclick="dadLiveNext()" style="flex:1;">${nextLabel}</button>
-        </div>
-      </div>
     `;
+
+    // Populate the fixed footer (outside scroll area)
+    const footer = document.getElementById('dad-modal-footer');
+    if (footer) {
+      footer.style.display = '';
+      footer.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:4px;">
+          <button onclick="dadHoleScore(-1)" style="width:38px;height:34px;border-radius:8px;background:var(--surface);border:1px solid var(--border);font-size:1.3rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;">−</button>
+          <div class="score-val" id="dh-score" style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;line-height:1;min-width:36px;text-align:center;">${h.score}</div>
+          <button onclick="dadHoleScore(1)" style="width:38px;height:34px;border-radius:8px;background:var(--surface);border:1px solid var(--border);font-size:1.3rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;">+</button>
+        </div>
+        <div class="modal-nav-row" style="gap:5px;">
+          <button class="btn-ghost" onclick="dadLiveBack()" ${backAttr} style="padding:5px 8px;font-size:0.75rem;"><i class="ti ti-chevron-left"></i> Back</button>
+          <button class="btn-ghost" onclick="dadToggleDistPanel()" style="padding:5px 8px;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1;" id="dad-dist-btn"><i class="ti ti-ruler-2" style="font-size:0.85rem;"></i><span style="font-size:0.5rem;letter-spacing:0.5px;">DIST</span></button>
+          <button class="btn-ghost" onclick="dadMidRoundScorecard()" style="padding:5px 8px;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1;"><i class="ti ti-clipboard-list" style="font-size:0.85rem;"></i><span style="font-size:0.5rem;letter-spacing:0.5px;">CARD</span></button>
+          <button class="btn-gold" onclick="dadLiveNext()" style="flex:1;font-size:0.82rem;padding:7px 8px;">${nextLabel}</button>
+        </div>
+      `;
+    }
+
     renderDadLiveCaddieMessages();
     if (_manualYards !== null) {
       document.getElementById('live-yardage-input').value = _manualYards;
       document.getElementById('live-club-suggest').style.display = '';
       refreshClubSuggestion(_manualYards);
     }
-    refreshGPSDisplay();
+    // Update yardage display
+    const yEl = document.getElementById('live-yards');
+    if (yEl) yEl.textContent = _manualYards !== null ? _manualYards : '—';
   }
 
   // ── IN-PROGRESS ROUND PERSISTENCE ────────────────────────────
@@ -6060,7 +6070,6 @@
         _dadStep = 'holes';
         document.getElementById('dad-modal').style.display = 'block';
         document.getElementById('dad-running-total').style.display = '';
-        startGPS();
         renderDadLiveHole();
         return;
       } else {
@@ -6077,8 +6086,9 @@
   }
   function closeDadModal() {
     document.getElementById('dad-modal').style.display = 'none';
+    const f = document.getElementById('dad-modal-footer');
+    if (f) f.style.display = 'none';
     _releaseWakeLock();
-    stopGPS();
     // Draft is intentionally kept — user may want to resume later.
     // It is cleared automatically on successful save or when they start a fresh round.
   }
@@ -6186,7 +6196,6 @@
     }
     document.getElementById('dad-running-total').style.display = '';
     _acquireWakeLock();
-    startGPS();
     renderDadLiveHole();
   }
 
