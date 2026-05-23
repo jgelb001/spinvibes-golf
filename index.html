@@ -30,7 +30,7 @@
     html.has-profile #app {
       display: flex !important;
       flex-direction: column;
-      height: 100dvh;
+      height: 100%;
       overflow: hidden;
     }
     html.pre-girl .son-sect, html.pre-girl .dad-sect { display: none !important; }
@@ -78,7 +78,8 @@
     #app {
       display: flex;
       flex-direction: column;
-      height: 100dvh;
+      height: 100%;
+      overflow: hidden;
     }
 
     /* ── TOP BAR ── */
@@ -3878,107 +3879,17 @@
         </div>
         <!-- END GAME PLAN -->
 
-        <!-- Milestones removed — tracked in Supabase -->
-        <div style="display:none">
-          <!-- First Birdie -->
-          <div class="round-card" style="border-color:var(--gold);margin-bottom:10px;">
-            <div class="round-card-header" onclick="toggleRoundExpand('milestone-birdie')">
-              <div class="round-card-left">
-                <div class="round-card-date">May 11, 2026</div>
-                <div class="round-card-course" style="color:var(--gold);font-weight:600;">First Birdie</div>
-              </div>
-              <div class="round-card-right">
-                <span class="sc-chip sc-birdie" style="width:34px;height:34px;font-size:0.85rem;">−1</span>
-              </div>
-            </div>
-            <div class="round-card-expand" id="milestone-birdie-expand">
-              <div style="margin-bottom:6px;font-weight:600;color:var(--cream);">Birdie on Hole 5 — 92 yards · Welk Resort Oaks (par-3) · Blue Tees</div>
-              <div style="color:var(--muted);font-style:italic;">Round score: 67 (+13) · 5 pars on the day · Personal best at Welk.</div>
-            </div>
+        <!-- Round History — dynamic, loaded from Supabase -->
+        <div class="section" style="padding-top:4px;">
+          <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+            <i class="ti ti-history" style="font-size:0.85rem;"></i> Round History
           </div>
-
-          <!-- Full Bag Upgrade -->
-          <div class="round-card" style="margin-bottom:10px;">
-            <div class="round-card-header" onclick="toggleRoundExpand('milestone-bag-complete')">
-              <div class="round-card-left">
-                <div class="round-card-date">May 2026</div>
-                <div class="round-card-course" style="color:var(--green);font-weight:600;">Full Bag Upgrade</div>
-              </div>
-              <div class="round-card-right">
-                <div style="width:34px;height:34px;border-radius:50%;border:2px solid var(--green);display:flex;align-items:center;justify-content:center;">
-                  <i class="ti ti-check" style="font-size:1rem;color:var(--green);"></i>
-                </div>
-              </div>
-            </div>
-            <div class="round-card-expand" id="milestone-bag-complete-expand">
-              <div style="margin-bottom:6px;font-weight:600;color:var(--cream);">All clubs in hand.</div>
-              <div style="margin-bottom:6px;color:var(--muted);">7-Wood · Callaway Opus SW 56° · Callaway Opus LW 60° · Callaway Fairway 14 bag</div>
-              <div style="color:var(--muted);font-style:italic;">Vice Boost irons in play. Takomo 201 MKII on order.</div>
-            </div>
-          </div>
-
-          <!-- Personal Best 92 -->
-          <div class="round-card" style="margin-bottom:10px;">
-            <div class="round-card-header" onclick="toggleRoundExpand('milestone-pb92')">
-              <div class="round-card-left">
-                <div class="round-card-date">May 22, 2026</div>
-                <div class="round-card-course" style="color:var(--gold);font-weight:600;">Personal Best</div>
-              </div>
-              <div class="round-card-right">
-                <div class="round-badge gold">92</div>
-              </div>
-            </div>
-            <div class="round-card-expand" id="milestone-pb92-expand">
-              <div style="margin-bottom:6px;font-weight:600;color:var(--cream);">Shot 92 · Creek (Sage) + Stonehouse (Sage) · TCI</div>
-              <div style="margin-bottom:6px;color:var(--muted);">Front 9 (Creek): 47 · Back 9 (Stonehouse): 45</div>
-              <div style="margin-bottom:6px;color:var(--muted);">Creek: 5·5·5·6·5·4·5·6·6 · Stonehouse: 6·6·5·5·4·4·5·5·5</div>
-              <div style="margin-bottom:4px;color:var(--muted);font-style:italic;">Driver at 60% = fairways = scoring. Pars: Creek H6, Stonehouse H6 + H9.</div>
-              <div style="color:var(--muted);font-style:italic;">Key lesson: Lighter swing off the tee is the game-changer. Putting next to fix.</div>
-            </div>
-          </div>
-
-          <!-- Former Best 95 -->
-          <div class="round-card" style="margin-bottom:10px;">
-            <div class="round-card-header" onclick="toggleRoundExpand('milestone-pb95')">
-              <div class="round-card-left">
-                <div class="round-card-date">May 5, 2026</div>
-                <div class="round-card-course" style="color:var(--muted);font-weight:600;">Former Best</div>
-              </div>
-              <div class="round-card-right">
-                <div class="round-badge">95</div>
-              </div>
-            </div>
-            <div class="round-card-expand" id="milestone-pb95-expand">
-              <div style="margin-bottom:6px;font-weight:600;color:var(--cream);">Shot 95 · Creek (Sage) + Stonehouse (White) · TCI</div>
-              <div style="margin-bottom:6px;color:var(--muted);">Front 9 (Creek): 47 · Back 9 (Stonehouse): 48</div>
-              <div style="margin-bottom:6px;color:var(--muted);">Creek: 5·5·8·6·6·4·4·5·4 · Stonehouse: 5·5·5·6·4·7·6·3·7</div>
-              <div style="margin-bottom:4px;color:var(--muted);font-style:italic;">7-wood debut on H6 · 4 pars total.</div>
-              <div style="color:var(--muted);font-style:italic;">Key lesson: Lost balls = #1 score killer.</div>
-            </div>
-          </div>
-
-          <!-- Broke 100 -->
-          <div class="round-card">
-            <div class="round-card-header" onclick="toggleRoundExpand('milestone-broke100')">
-              <div class="round-card-left">
-                <div class="round-card-date">Apr 28, 2026</div>
-                <div class="round-card-course" style="color:var(--green);font-weight:600;">Broke 100</div>
-              </div>
-              <div class="round-card-right">
-                <div class="round-badge gold">98</div>
-              </div>
-            </div>
-            <div class="round-card-expand" id="milestone-broke100-expand">
-              <div style="margin-bottom:6px;font-weight:600;color:var(--cream);">First time shooting under 100 · Creek + Oaks · TCI</div>
-              <div style="margin-bottom:6px;color:var(--muted);">Front 9 (Creek): 51 · Back 9 (Oaks): 47</div>
-              <div style="margin-bottom:4px;color:var(--muted);font-style:italic;">"Loose as a silly goose"</div>
-              <div style="color:var(--muted);font-style:italic;">7 straight bogeys on back 9 — very consistent. Driver solid all day. Chipping was a strength.</div>
-            </div>
-          </div>
+          <div id="dad-history-list"></div>
         </div>
-      </div>
 
-      <!-- Dad Round Entry Modal -->
+      </div><!-- /dad-progress-content -->
+
+            <!-- Dad Round Entry Modal -->
       <div id="dad-modal" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);flex-direction:column;padding-top:env(safe-area-inset-top,0px);">
         <div style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(138,96,16,0.2);">
           <div id="dad-modal-step-label" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);">Round Setup</div>
