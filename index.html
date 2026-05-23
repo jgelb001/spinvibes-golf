@@ -27,7 +27,12 @@
   <style>
     /* Pre-render profile state — set by inline <script> in <head> */
     html.has-profile #landing { display: none !important; }
-    html.has-profile #app     { display: flex !important; }
+    html.has-profile #app {
+      display: flex !important;
+      flex-direction: column;
+      height: 100dvh;
+      overflow: hidden;
+    }
     html.pre-girl .son-sect, html.pre-girl .dad-sect { display: none !important; }
     html.pre-girl .girl-sect { display: block !important; }
     html.pre-son  .girl-sect, html.pre-son  .dad-sect { display: none !important; }
@@ -3473,7 +3478,6 @@
           </div>
 
         </div>
-      </div>
       </div><!-- /dad-sect golf yoga -->
       <!-- END GOLF YOGA SECTION -->
 
