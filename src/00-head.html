@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SpinVibes Golf">
+  <meta name="description" content="Jeremy's Golf Pocket Guide — Sub-90 Journey">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>SpinVibes Golf</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <script>
+    // Runs before body renders — only restore profile if same browser session
+    // sessionStorage clears when tab is closed, so fresh tabs always show landing
+    const _p = localStorage.getItem('sv-profile');
+    const _s = sessionStorage.getItem('sv-session');
+    if (_p && _s) document.documentElement.classList.add('has-profile');
+    if (_p === 'girl'    && _s) document.documentElement.classList.add('pre-girl');
+    if (_p === 'son'     && _s) document.documentElement.classList.add('pre-son');
+    if (_p === 'grandma' && _s) document.documentElement.classList.add('pre-grandma');
+    if (_p === 'mom'     && _s) document.documentElement.classList.add('pre-mom');
+</script>
+  <style>
+    /* Pre-render profile state — set by inline <script> in <head> */
+    html.has-profile #landing { display: none !important; }
+    html.has-profile #app {
+      display: flex !important;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+    html.pre-girl .son-sect, html.pre-girl .dad-sect { display: none !important; }
+    html.pre-girl .girl-sect { display: block !important; }
+    html.pre-son  .girl-sect, html.pre-son  .dad-sect { display: none !important; }
+    html.pre-son  .son-sect  { display: block !important; }
+    html.pre-grandma .son-sect, html.pre-grandma .dad-sect, html.pre-grandma .girl-sect { display: none !important; }
+    html.pre-grandma .grandma-sect { display: block !important; }
+    html.pre-mom .son-sect, html.pre-mom .dad-sect, html.pre-mom .girl-sect, html.pre-mom .grandma-sect { display: none !important; }
+    html.pre-mom .mom-sect { display: block !important; }
+
+    :root {
+      --bg:        #ffffff;
+      --surface:   #f8f9fa;
+      --surface2:  #f0f0f0;
+      --surface3:  #e5e5e5;
+      --green:     #1a5c2e;
+      --green-b:   #2d7a40;
+      --gold:      #8a6010;
+      --gold-l:    #6b4a0c;
+      --cream:     #0f172a;
+      --muted:     #64748b;
+      --border:    rgba(0,0,0,0.08);
+      --red:       #c0392b;
+      --nav-h:     44px;
+      --safe-b:    env(safe-area-inset-bottom, 0px);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html {
+      height: 100%;
+      overflow: hidden;
+      background: var(--surface); /* fills safe-area zone at bottom with nav color */
+    }
+    body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* ── APP SHELL ── */
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* ── TOP BAR ── */
+    #topbar {
+      flex-shrink: 0;
+      background: var(--surface);
+      border-bottom: 0.5px solid var(--border);
+      padding: 8px 20px 8px;
+      padding-top: calc(10px + env(safe-area-inset-top, 0px));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .topbar-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .topbar-logo span { color: var(--gold); }
+    .topbar-sub {
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+    .offline-badge {
+      display: none;
+    }
+
+    /* ── PAGES ── */
+    #pages {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .page {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px);
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      padding-bottom: calc(var(--nav-h) + var(--safe-b) + 16px);
+    }
+    .page.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0);
+    }
+
+    /* ── BOTTOM NAV ── */
+    #nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: var(--nav-h);
+      background: var(--surface);
+      border-top: 0.5px solid var(--border);
+      display: flex;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;  /* Firefox */
+    }
+    #nav::-webkit-scrollbar { display: none; }  /* Chrome/Safari */
+    .nav-btn {
+      flex: 1 1 0;
+      min-width: 0;
+      height: var(--nav-h);
+      padding-left: 2px;
+      padding-right: 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      border: none;
+      background: none;
+      color: var(--muted);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.5rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.15s;
+      padding-top: 6px;
+    }
+    .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    /* Active nav: pill background + accent color */
+    .nav-btn.active {
+      color: var(--green);
+      background: rgba(26,92,46,0.08);
+      border-radius: 10px;
+    }
+    .nav-btn.active svg { stroke: var(--green); }
+    /* Profile-specific active nav color + pill tint */
+    body.son-mode     .nav-btn.active { color: #3B7CB8; background: rgba(59,124,184,0.1); }
+    body.son-mode     .nav-btn.active svg { stroke: #3B7CB8; }
+    body.girl-mode    .nav-btn.active { color: #B85490; background: rgba(184,84,144,0.1); }
+    body.girl-mode    .nav-btn.active svg { stroke: #B85490; }
+    body.mom-mode     .nav-btn.active { color: #B86530; background: rgba(184,101,48,0.1); }
+    body.mom-mode     .nav-btn.active svg { stroke: #B86530; }
+    body.grandma-mode .nav-btn.active { color: #9A8050; background: rgba(154,128,80,0.1); }
+    body.grandma-mode .nav-btn.active svg { stroke: #9A8050; }
+    /* Dark mode */
+    body.dark-mode .nav-btn.active,
+    body.dark-mode.son-mode .nav-btn.active,
+    body.dark-mode.girl-mode .nav-btn.active,
+    body.dark-mode.mom-mode .nav-btn.active,
+    body.dark-mode.grandma-mode .nav-btn.active { color: var(--gold); background: rgba(201,168,76,0.12); }
+    body.dark-mode .nav-btn.active svg,
+    body.dark-mode.son-mode .nav-btn.active svg,
+    body.dark-mode.girl-mode .nav-btn.active svg,
+    body.dark-mode.mom-mode .nav-btn.active svg,
+    body.dark-mode.grandma-mode .nav-btn.active svg { stroke: var(--gold); }
+
+    /* ── SHARED COMPONENTS ── */
+    .page-header {
+      background: var(--surface2);
+      padding: 24px 20px 20px;
+      border-bottom: 0.5px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::after {
+      content: attr(data-icon);
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 3.5rem;
+      opacity: 0.08;
+    }
+    .page-tag {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .page-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .section { padding: 16px 20px; border-bottom: 0.5px solid var(--border); }
+    .section:last-child { border-bottom: none; }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 14px 16px;
+      border: 0.5px solid var(--border);
+      margin-bottom: 10px;
+    }
+    .card:last-child { margin-bottom: 0; }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 6px;
+    }
+    .tag-gold  { background: var(--gold);   color: #000; }
+    .tag-green { background: var(--green-b); color: #fff; }
+    .tag-red   { background: var(--red);    color: #fff; }
+    .tag-purple{ background: #7a4ab0;       color: #fff; }
+    .tag-blue  { background: #4a6ab0;       color: #fff; }
+    .tag-orange{ background: #c8784a;       color: #fff; }
+
+    .card-title { font-weight: 700; font-size: 0.95rem; color: var(--cream); margin-bottom: 4px; }
+    .card-body  { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+    .card-body strong { color: var(--cream); }
+
+    /* static label pills (range phases, club labels) */
+    .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+    .pill {
+      background: var(--surface2);
+      border: 0.5px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .cue-box {
+      background: rgba(138,96,16,0.07);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 8px 8px 0;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      color: var(--gold-l);
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 0.5px solid var(--border);
+      font-size: 0.83rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .check-row:last-child { border-bottom: none; }
+    .check-box {
+      width: 20px; height: 20px;
+      border: 2px solid var(--green-b);
+      border-radius: 5px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .check-box.checked { background: var(--green-b); border-color: var(--green-b); }
+    .check-box.checked::after { content: '✓'; color: white; font-size: 12px; font-weight: 700; }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-around;
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 16px 12px;
+      margin-bottom: 14px;
+      border: 0.5px solid var(--border);
+    }
+    .stat { text-align: center; flex: 1; }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .stat-lbl { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+    /* ── HOME PAGE ── */
+    /* Default hero (Dad — gold) */
+    .home-hero {
+      background: #f5f1e8;
+      padding: 28px 20px 24px;
+      border-bottom: 2.5px solid #8a6010;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Profile-specific hero tints */
+    body.son-mode     .home-hero { background: #EBF0F5; border-bottom-color: #3B7CB8; }
+    body.girl-mode    .home-hero { background: #F5EBF2; border-bottom-color: #B85490; }
+    body.mom-mode     .home-hero { background: #F5EDE8; border-bottom-color: #B86530; }
+    body.grandma-mode .home-hero { background: #EEECE8; border-bottom-color: #9A8050; }
+    /* Dark mode hero overrides */
+    body.dark-mode              .home-hero { background: linear-gradient(160deg, #0f2a16 0%, var(--bg) 100%); border-bottom-color: rgba(201,168,76,0.3); }
+    body.dark-mode.son-mode     .home-hero { background: linear-gradient(160deg, #0d2a5e 0%, var(--bg) 100%); }
+    body.dark-mode.girl-mode    .home-hero { background: linear-gradient(160deg, #2d0a3d 0%, var(--bg) 100%); }
+    body.dark-mode.mom-mode     .home-hero { background: linear-gradient(160deg, #2f1811 0%, var(--bg) 100%); }
+    body.dark-mode.grandma-mode .home-hero { background: linear-gradient(160deg, #1e0840 0%, var(--bg) 100%); }
+
+    .home-greeting {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      /* Color set per profile below */
+      color: var(--gold);
+    }
+    body.son-mode     .home-greeting { color: #3B7CB8; }
+    body.girl-mode    .home-greeting { color: #B85490; }
+    body.mom-mode     .home-greeting { color: #B86530; }
+    body.grandma-mode .home-greeting { color: #9A8050; }
+
+    .home-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.6rem;
+      letter-spacing: 2px;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .home-title span { color: var(--gold); }
+    .home-goal {
+      margin-top: 12px;
+      background: rgba(138,96,16,0.08);
+      border: 0.5px solid rgba(138,96,16,0.3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.83rem;
+      color: var(--gold-l);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .home-goal-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .guide-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 16px 20px;
+    }
+    .guide-card {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 16px 14px;
+      border: 0.5px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      text-align: left;
+      text-decoration: none;
+    }
+    .guide-card:active { background: var(--surface2); transform: scale(0.97); }
+    .guide-card-icon { font-size: 1.4rem; margin-bottom: 8px; display: block; color: var(--green); }
+    .guide-card-title { font-weight: 600; font-size: 0.85rem; color: var(--cream); margin-bottom: 3px; }
+    .guide-card-sub { font-size: 0.7rem; color: var(--muted); }
+
+    /* ── PROGRESS PAGE ── */
+    .progress-bar-wrap {
+      background: var(--surface3);
+      border-radius: 20px;
+      height: 10px;
+      overflow: hidden;
+      margin: 8px 0 4px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--green-b));
+      border-radius: 20px;
+      transition: width 0.5s ease;
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .notes-area {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      color: var(--cream);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      resize: none;
+      min-height: 120px;
+    }
+    .notes-area:focus { outline: none; border-color: var(--gold); }
+    .notes-area::placeholder { color: var(--muted); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.97); opacity: 0.85; }
+    .btn-gold  { background: var(--gold); color: #000; }
+    .btn-green { background: var(--green-b); color: #fff; }
+    .btn-outline { background: transparent; border: 1px solid var(--muted); color: var(--cream); }
+
+    .session-log-item {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .session-date {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem;
+      color: var(--gold);
+      white-space: nowrap;
+      min-width: 60px;
+      line-height: 1.3;
+      text-align: center;
+    }
+    .session-note { font-size: 0.8rem; color: var(--muted); line-height: 1.5; flex: 1; }
+    .session-note strong { color: var(--cream); display: block; margin-bottom: 2px; }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+    .delete-btn:hover { color: var(--red); }
+
+    /* ── INPUT ── */
+    input[type="text"], input[type="date"], select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--cream);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--gold); }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); }
+
+    label { font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+
+    /* ── DARK MODE (opt-in toggle) ── */
+    body.dark-mode {
+      --bg:        #0a1a0e;
+      --surface:   #111f15;
+      --surface2:  #1a2f1e;
+      --surface3:  #223828;
+      --green:     #2d6a3f;
+      --green-b:   #3d8a52;
+      --gold:      #c9a84c;
+      --gold-l:    #e8cc7a;
+      --cream:     #f0ead8;
+      --muted:     #6a8a6e;
+      --border:    rgba(255,255,255,0.08);
+    }
+    body.dark-mode .card,
+    body.dark-mode .guide-card,
+    body.dark-mode .stat-row,
+    body.dark-mode .session-log-item,
+    body.dark-mode .notes-area,
+    body.dark-mode input[type="text"],
+    body.dark-mode input[type="date"],
+    body.dark-mode select {
+      border-color: rgba(255,255,255,0.08);
+    }
+    body.dark-mode .pill {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.12);
+      color: var(--gold-l);
+    }
+    body.dark-mode .check-row {
+      border-bottom-color: rgba(255,255,255,0.04);
+    }
+    body.dark-mode .section {
+      border-bottom-color: rgba(255,255,255,0.05);
+    }
+
+    /* ── STEP LAYOUT ── */
+    .sss-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 2px;
+    }
+    .step-num {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      color: #fff;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step-content { flex: 1; }
+    .step-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--cream);
+      line-height: 1.2;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .step-bullets {
+      list-style: none;
+      padding: 0; margin: 0;
+    }
+    .step-bullets li {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+      padding: 2px 0 2px 14px;
+      position: relative;
+    }
+    .step-bullets li::before {
+      content: '›';
+      position: absolute; left: 2px;
+      color: var(--gold);
+      font-weight: 700;
+    }
+    .step-bullets li strong { color: var(--cream); }
+    .critical-badge {
+      display: inline-block;
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: var(--gold);
+      color: #000;
+      padding: 2px 7px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+    .sss-rule {
+      background: rgba(138,96,16,0.07);
+      border: 0.5px solid rgba(138,96,16,0.3);
+      border-radius: 10px;
+      padding: 14px 16px;
+      text-align: center;
+    }
+    .sss-rule-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .sss-rule-body {
+      font-size: 0.78rem;
+      color: var(--gold-l);
+      line-height: 1.5;
+    }
+
+    /* ── MODE TOGGLE BUTTON ── */
+    #modeToggle {
+      background: none;
+      border: 1px solid rgba(138,96,16,0.35);
+      border-radius: 20px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      line-height: 1;
+      color: var(--muted);
+      transition: border-color 0.2s, background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-right: 8px;
+    }
+    #modeToggle:active { opacity: 0.7; }
+
+    /* ── EXPANDABLE CARDS ── */
+    .exp-trigger {
+      display:flex; align-items:center; justify-content:space-between;
+      cursor:pointer; user-select:none; -webkit-user-select:none;
+      margin-top:12px; padding:10px 12px;
+      border-radius: 8px;
+      background: var(--surface2);
+      border:0.5px solid var(--border);
+      font-size:0.75rem; color:var(--gold); font-weight:600;
+      letter-spacing:0.5px; text-transform:uppercase;
+      min-height: 44px;
+    }
+    .exp-trigger:active { background: rgba(138,96,16,0.15); }
+    .exp-trigger svg { width:13px; height:13px; stroke:var(--gold); fill:none; stroke-width:2.5; transition:transform 0.25s; flex-shrink:0; }
+    .exp-trigger.open svg { transform:rotate(180deg); }
+    .exp-body { max-height:0; overflow:hidden; transition:max-height 0.45s ease; }
+    .exp-body.open { max-height:1600px; }
+    .exp-inner { padding-top:14px; display:flex; flex-direction:column; gap:10px; }
+    .exp-detail { font-size:0.8rem; color:var(--muted); line-height:1.65; }
+    .exp-detail strong { color:var(--cream); }
+    .exp-list { list-style:none; padding:0; margin:0; }
+    .exp-list li { font-size:0.8rem; color:var(--muted); line-height:1.65; padding-left:14px; position:relative; }
+    .exp-list li::before { content:'›'; color:var(--gold); position:absolute; left:0; font-weight:700; }
+    .exp-mistake { background:rgba(214,79,58,0.08); border-left:2px solid var(--red); border-radius:0 6px 6px 0; padding:8px 10px; }
+    .exp-mistake .em-lbl { font-size:0.65rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--red); margin-bottom:2px; }
+    .exp-mistake p { font-size:0.79rem; color:var(--muted); line-height:1.5; margin:0; }
+    .diagram { background:var(--surface2); border-radius:10px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:6px; }
+    .diagram-lbl { font-size:0.63rem; color:var(--gold); font-weight:600; text-transform:uppercase; letter-spacing:1.5px; }
+    .exp-close {
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      width:100%; padding:8px 0; margin-top:2px;
+      background:none; border:0.5px solid var(--border); border-radius:8px;
+      color:var(--muted); font-family:'Outfit',sans-serif; font-size:0.75rem; cursor:pointer;
+    }
+    .exp-close:active { opacity:0.7; }
+    .exp-trigger { border-top-color:rgba(0,0,0,0.08); }
+    .diagram { background:rgba(0,0,0,0.04); }
+    .exp-mistake { background:rgba(214,79,58,0.06); }
+    body.dark-mode .exp-trigger { border-top-color:rgba(255,255,255,0.08); }
+    body.dark-mode .diagram { background:rgba(255,255,255,0.04); }
+    body.dark-mode .exp-mistake { background:rgba(214,79,58,0.12); }
+
+    /* Profile-specific topbar logo accents */
+    body.son-mode     .topbar-logo span { color: #3B7CB8; }
+    body.girl-mode    .topbar-logo span { color: #B85490; }
+    body.mom-mode     .topbar-logo span { color: #B86530; }
+    body.grandma-mode .topbar-logo span { color: #9A8050; }
+
+    /* ── GIRL SECTION ── */
+    .dad-sect, .son-sect, .girl-sect { width: 100%; }
+    .girl-sect { display: none; }
+
+    /* ── GIRL STEP BADGE ── */
+    .girl-step-badge {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    /* ── GIRL FUN BADGE ── */
+    .girl-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    /* .landing-card-girl dark block removed — replaced below with light palette */
+
+    /* ── PROFILE SWITCHER ── */
+    #profileSwitch {
+      display: flex;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .profile-pill {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      border: none;
+      background: none;
+      color: var(--muted);
+      padding: 4px 12px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    .profile-pill.active {
+      background: var(--gold);
+      color: #000;
+    }
+    .profile-pill:not(.active):active { opacity: 0.7; }
+
+    /* ── PROFILE SECTIONS ── */
+    .dad-sect, .son-sect, .girl-sect { width: 100%; }
+    .son-sect { display: none; }
+    .girl-sect { display: none; }
+
+    /* ── SON BADGE ── */
+    .fun-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 6px;
+    }
+    .son-step-badge {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════════
+       LANDING PAGE
+    ══════════════════════════════════ */
+    #landing {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 24px 20px;
+      padding-top: calc(24px + env(safe-area-inset-top, 0px));
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    #landing.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.04);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    #landing-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.8rem;
+      letter-spacing: 4px;
+      color: var(--gold);
+      line-height: 1;
+      text-align: center;
+    }
+    #landing-logo span { color: var(--cream); }
+    #landing-sub {
+      font-size: 0.68rem;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 4px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    #landing-question {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 3px;
+      color: var(--cream);
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .landing-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 380px;
+    }
+    .landing-card {
+      border-radius: 20px;
+      padding: 18px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border: 2px solid transparent;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .landing-card:active { transform: scale(0.97); }
+    .landing-card-dad {
+      background: #f5f1e8;
+      border-color: #8a6010;
+    }
+    /* Family grid cards — uniform base, accent border + name only */
+    .landing-card-son,
+    .landing-card-girl,
+    .landing-card-mom,
+    .landing-card-grandma {
+      background: var(--surface);
+      box-shadow: none;
+    }
+    .landing-card-son      { border-color: #3B7CB8; }
+    .landing-card-son      .landing-card-name-sm { color: #3B7CB8; }
+    .landing-card-girl     { border-color: #B85490; }
+    .landing-card-girl     .landing-card-name-sm { color: #B85490; }
+    .landing-card-girl     .landing-card-name    { color: #B85490; }
+    .landing-card-mom      { border-color: #B86530; }  /* copper — clearly different from dad's gold */
+    .landing-card-mom      .landing-card-name-sm { color: #B86530; }
+    .landing-card-grandma  { border-color: #9A8050; }
+    .landing-card-grandma  .landing-card-name-sm { color: #9A8050; }
+    /* Hover: subtle lift only — no glow */
+    .landing-card-son:hover,
+    .landing-card-girl:hover,
+    .landing-card-mom:hover,
+    .landing-card-grandma:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.08); }
+    .landing-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(138,96,16,0.12);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .landing-card-info { flex: 1; }
+    .landing-card-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 3px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .landing-card-dad .landing-card-name { color: #8a6010; }
+    .landing-card-desc {
+      font-size: 0.72rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .landing-card-arrow {
+      font-size: 1.4rem;
+      opacity: 0.5;
+      flex-shrink: 0;
+      transition: opacity 0.18s, transform 0.18s;
+    }
+    .landing-card:hover .landing-card-arrow {
+      opacity: 1;
+      transform: translateX(4px);
+    }
+    .landing-footer {
+      margin-top: 32px;
+      font-size: 0.68rem;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-align: center;
+      opacity: 0.6;
+    }
+    /* ── LANDING FAMILY HIERARCHY ── */
+    #landing-family-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 4px;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 16px;
+      opacity: 0.85;
+    }
+    .landing-owner-badge {
+      font-size: 0.58rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(138,96,16,0.12);
+      border: 1px solid rgba(138,96,16,0.3);
+      border-radius: 20px;
+      padding: 3px 8px;
+      white-space: nowrap;
+    }
+    .landing-family-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 380px;
+      margin-bottom: 10px;
+    }
+    .landing-family-divider::before,
+    .landing-family-divider::after {
+      content: '';
+      flex: 1;
+      height: 0.5px;
+      background: var(--border);
+    }
+    .landing-family-divider span {
+      font-size: 0.62rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .landing-family-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+      max-width: 380px;
+    }
+    .landing-card-sm {
+      padding: 12px 12px;
+      border-radius: 16px;
+    }
+    .landing-avatar-sm {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .landing-card-name-sm {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.25rem;
+      letter-spacing: 2px;
+      line-height: 1;
+      margin-bottom: 3px;
+    }
+    .landing-card-desc-sm {
+      font-size: 0.6rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .landing-card-arrow-sm {
+      font-size: 1rem;
+      opacity: 0.4;
+      flex-shrink: 0;
+      margin-left: auto;
+      transition: opacity 0.18s, transform 0.18s;
+    }
+    .landing-card-sm:hover .landing-card-arrow-sm {
+      opacity: 1;
+      transform: translateX(3px);
+    }
+    /* Orbs removed — clean light-mode landing */
+    .landing-orb {
+      display: none;
+    }
+
+
+    /* ── GRANDMA SECTION ── */
+    .grandma-sect { display: none; width: 100%; }
+
+    /* ── GRANDMA BADGE ── */
+    .grandma-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #7c3aed, #d4af70);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    /* ── LANDING CARD GRANDMA ── */
+    .landing-card-grandma .landing-card-name { color: #9A8050; }
+    .landing-card-grandma .landing-card-desc { color: #6a5a40; }
+
+
+    /* ── MOM SECTION ── */
+    .mom-sect { display: none; width: 100%; }
+
+    /* ── MOM BADGE ── */
+    .mom-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #d97757, #f2c879);
+      color: #1a0e09;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    /* ── LANDING CARD MOM ── (copper — distinct from dad's gold) */
+    .landing-card-mom .landing-card-name { color: #B86530; }
+    .landing-card-mom .landing-card-desc { color: #8a4a20; }
+
+    /* ── ACHIEVEMENT BADGE SYSTEM ───────────────────────────────── */
+    .badge-shelf {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 4px 0 8px;
+    }
+    .badge-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 68px;
+    }
+    .badge-svg-wrap {
+      width: 56px;
+      height: 56px;
+      position: relative;
+    }
+    .badge-svg-wrap svg {
+      width: 100%;
+      height: 100%;
+    }
+    .badge-svg-wrap.locked svg { opacity: 0.22; filter: grayscale(1); }
+    .badge-name {
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-align: center;
+      color: var(--muted);
+      text-transform: uppercase;
+      line-height: 1.3;
+    }
+    .badge-item.earned .badge-name { color: var(--cream); }
+
+    /* ── PORTRAIT MOBILE FIXES ── */
+    @media (max-width: 599px) {
+      /* Keep topbar toggle visible on portrait — but slim it down to icon-only */
+      #modeToggle {
+        padding: 6px 8px;
+        margin-right: 0;
+        font-size: 1.1rem;
+        border-radius: 50%;
+        width: 34px; height: 34px;
+        justify-content: center;
+        gap: 0;
+      }
+      /* Compact profile pills on small screens */
+      .profile-pill {
+        font-size: 0.58rem;
+        padding: 4px 5px;
+        letter-spacing: 0;
+      }
+
+      /* Nav scrolls horizontally — all tabs visible, no hiding needed */
+    }
+
+    /* Float toggle never shown — mode toggle stays in topbar */
+    #floatToggle { display: none; }
+
+    /* ── RESPONSIVE — DESKTOP / TABLET ── */
+    @media (min-width: 600px) {
+      body { background: #E8E6E2; }
+      body.dark-mode { background: #000; }
+
+      /* Center the app shell in a phone-sized column */
+      #app {
+        max-width: 500px;
+        margin: 0 auto;
+        box-shadow: 0 4px 40px rgba(0,0,0,0.15), 0 0 0 0.5px rgba(0,0,0,0.08);
+      }
+      body.dark-mode #app {
+        box-shadow: 0 0 80px rgba(0,0,0,0.7), 0 0 1px rgba(255,255,255,0.06);
+      }
+
+      /* Center landing content, same max-width */
+      #landing {
+        align-items: center;
+      }
+      #landing > *:not(.landing-orb) {
+        width: 100%;
+        max-width: 500px;
+      }
+
+      /* Slightly more breathing room */
+      .section { padding: 20px 24px; }
+      .page-header { padding: 28px 24px 22px; }
+      .home-hero { padding: 32px 24px 28px; }
+      .guide-grid { padding: 18px 24px; gap: 12px; }
+
+      /* Nav — bigger tap targets and labels */
+      .nav-btn { font-size: 0.65rem; gap: 5px; }
+      .nav-btn svg { width: 22px; height: 22px; }
+
+      /* Topbar — prevent logo wrapping, slim down crowded right side */
+      #topbar { padding-left: 24px; padding-right: 24px; gap: 8px; }
+      .topbar-logo { white-space: nowrap; font-size: 1.2rem; }
+      .topbar-sub { display: none; }
+      #offlineBadge { display: none; }
+      .profile-pill { font-size: 0.62rem; padding: 4px 7px; }
+
+      /* Cards — slightly more padding */
+      .card { padding: 16px 18px; }
+
+      /* Landing cards — comfortable on wider screens */
+      .landing-cards { max-width: 460px; }
+      .landing-card { padding: 20px 22px; }
+      .landing-avatar { font-size: 3.6rem; }
+    }
+
+    /* ── FULL DESKTOP LAYOUT (≥ 960px) ── */
+    /* Uses flex-wrap so #app stays display:flex (JS sets this) but wraps into a
+       topbar row + sidebar+pages row, filling the full viewport. */
+    @media (min-width: 960px) {
+      :root { --desktop-topbar-h: 60px; }
+      body { background: var(--bg); }
+
+      /* Undo phone-column, switch to row+wrap */
+      #app {
+        max-width: 100%;
+        margin: 0;
+        box-shadow: none;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-content: flex-start; /* prevent topbar from swallowing vertical space */
+      }
+
+      /* Topbar — full width, fixed height, first row */
+      #topbar {
+        order: 1;
+        width: 100%;
+        flex-shrink: 0;
+        height: var(--desktop-topbar-h);
+        padding: 0 32px;
+        gap: 16px;
+      }
+      .topbar-logo { font-size: 1.4rem; }
+      .topbar-sub { display: none; }
+      #offlineBadge { display: none; }
+      .profile-pill { font-size: 0.68rem; padding: 5px 10px; }
+
+      /* Pages area — second row, fills remaining height */
+      #pages {
+        order: 3;
+        min-width: 0;
+        height: calc(100dvh - var(--desktop-topbar-h));
+      }
+
+      /* Sidebar nav — second row, left */
+      #nav {
+        position: static;
+        order: 2;
+        flex: 0 0 180px;
+        width: 180px;
+        height: calc(100dvh - var(--desktop-topbar-h));
+        border-top: none;
+        border-right: 1px solid rgba(138,96,16,0.15);
+        padding: 12px 8px 24px;
+        padding-bottom: 24px; /* no safe-area needed on desktop */
+        overflow-y: auto;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      /* Sidebar nav buttons — icon left, label right */
+      .nav-btn {
+        flex: none;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 11px 14px;
+        font-size: 0.78rem;
+        border-radius: 8px;
+        margin: 2px 0;
+        text-align: left;
+        letter-spacing: 0.3px;
+      }
+      .nav-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+      /* Pages — no bottom-nav offset needed */
+      .page { padding-bottom: 32px; }
+
+      /* Content breathing room */
+      .section { padding: 24px 40px; }
+      .page-header { padding: 32px 40px 26px; }
+      .home-hero { padding: 36px 40px 32px; }
+      .guide-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        padding: 20px 40px;
+      }
+      .card { padding: 18px 20px; }
+
+      /* Landing — center on wide screens */
+      #landing { align-items: center; }
+      #landing > *:not(.landing-orb) { width: 100%; max-width: 560px; }
+      .landing-cards { max-width: 520px; }
+    }
+
+    @media (min-width: 1280px) {
+      #nav { flex: 0 0 200px; width: 200px; }
+      .guide-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+
+    /* ══════════════════════════════════
+       MODAL / ROUND ENTRY UI
+    ══════════════════════════════════ */
+
+    /* Inputs & labels */
+    .modal-input {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--surface2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--cream);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.92rem;
+      margin-bottom: 10px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .modal-input:focus { outline: none; border-color: var(--gold); }
+    .modal-label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+      margin-top: 10px;
+    }
+
+    /* Primary action button */
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 16px 20px;
+      background: var(--green-b);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      transition: opacity 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      min-height: 52px;
+    }
+    .btn-primary:active { opacity: 0.82; transform: scale(0.98); }
+    .btn-primary:disabled { opacity: 0.4; }
+
+    /* Ghost (back) button */
+    .btn-ghost {
+      padding: 14px 20px;
+      background: var(--surface2);
+      color: var(--muted);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      min-height: 52px;
+      min-width: 90px;
+    }
+    .btn-ghost:active { opacity: 0.7; }
+    .btn-ghost:disabled { opacity: 0.3; pointer-events: none; }
+
+    /* Gold CTA button (Next Hole, Finish Round) */
+    .btn-gold {
+      padding: 16px 28px;
+      background: var(--gold);
+      color: #000;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      min-height: 52px;
+    }
+    .btn-gold:active { opacity: 0.85; transform: scale(0.98); }
+
+    /* Hole nav row (Back / Next) */
+    .modal-nav-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .modal-nav-row .btn-ghost { flex: 0 0 auto; }
+    .modal-nav-row .btn-gold  { flex: 1; }
+
+    /* Score stepper */
+    .score-stepper {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+    }
+    .stepper-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      color: var(--cream);
+      font-size: 2rem;
+      font-weight: 300;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: background 0.1s, transform 0.1s;
+      flex-shrink: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .stepper-btn:active  { background: rgba(138,96,16,0.25); transform: scale(0.92); }
+    .stepper-btn:disabled { opacity: 0.3; pointer-events: none; }
+    .score-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4.5rem;
+      color: var(--cream);
+      line-height: 1;
+      min-width: 72px;
+      text-align: center;
+    }
+    .hole-score-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .hole-number-big {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 4px;
+      color: var(--muted);
+    }
+
+    /* Round history cards */
+    .round-card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .round-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .round-card-header:active { background: rgba(255,255,255,0.03); }
+    .round-card-left { flex: 1; min-width: 0; }
+    .round-card-right { flex-shrink: 0; margin-left: 10px; }
+    .round-card-date { font-size: 0.7rem; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 2px; }
+    .round-card-course { font-size: 0.88rem; color: var(--cream); font-weight: 600; }
+    .round-badge {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      padding: 4px 14px;
+      border-radius: 10px;
+      line-height: 1.1;
+    }
+    .round-badge.green { background: rgba(26,92,46,0.1); color: #1a5c2e; }
+    .round-badge.gold  { background: rgba(138,96,16,0.2);  color: var(--gold); }
+    .round-badge.red   { background: rgba(214,79,58,0.2);   color: #f87171; }
+    .round-card-expand { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; padding: 0 16px; }
+    .round-card-expand.open { max-height: 800px; padding: 0 16px 14px; }
+    .round-delete-btn {
+      margin-top: 10px;
+      padding: 8px 14px;
+      background: none;
+      border: 1px solid rgba(214,79,58,0.35);
+      border-radius: 8px;
+      color: #f87171;
+      font-size: 0.78rem;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+    }
+
+    /* Hole grid */
+    .hole-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .hole-cell {
+      background: var(--surface2);
+      border-radius: 6px;
+      padding: 5px 2px;
+      text-align: center;
+    }
+    .h-num   { font-size: 0.55rem; color: var(--muted); margin-bottom: 2px; }
+    .h-score { font-size: 0.88rem; font-weight: 700; color: var(--cream); }
+    .h-par   { font-size: 0.52rem; color: var(--muted); margin-top: 1px; }
+
+    /* Star rating */
+    .star-row { display: flex; gap: 10px; margin-bottom: 14px; }
+    .star-btn  { font-size: 1.8rem; cursor: pointer; opacity: 0.4; transition: opacity 0.1s, transform 0.1s; }
+    .star-btn.active { opacity: 1; }
+    .star-btn:active { transform: scale(1.2); }
+
+    /* Score summary card */
+    .score-summary-card {
+      background: linear-gradient(135deg, rgba(138,96,16,0.12), rgba(26,92,46,0.05));
+      border: 1px solid rgba(138,96,16,0.3);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .score-summary-score {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5rem;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .score-summary-line { font-size: 0.85rem; color: var(--cream); margin: 4px 0 8px; }
+    .score-motivational { font-size: 0.8rem; color: var(--muted); font-style: italic; }
+
+    /* Interactive pill selectors (modal: tee, fairway, GIR) */
+    .pill.active {
+      background: rgba(138,96,16,0.2);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    /* Modal pills need bigger tap targets */
+    #dh-fairway-pills .pill,
+    #dh-gir-pills .pill,
+    #dm-tee-pills .pill {
+      padding: 10px 16px;
+      font-size: 0.88rem;
+      min-height: 44px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    /* ── LIVE GPS SCORECARD ── */
+    .live-distance-card {
+      background: var(--surface2);
+      border: 1px solid rgba(138,96,16,0.25);
+      border-radius: 14px; padding: 16px 14px 12px; margin-bottom: 14px;
+    }
+    .live-yards {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem; color: var(--gold); line-height: 1; text-align: center;
+    }
+    .yardage-pill {
+      padding: 7px 11px; background: var(--surface3);
+      border: 1px solid var(--border); border-radius: 20px;
+      color: var(--cream); font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .yardage-pill.sv-active { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+    .mark-ball-btn {
+      background: var(--surface3); border: 1px solid rgba(138,96,16,0.3);
+      border-radius: 10px; padding: 10px 12px; color: var(--gold-l);
+      font-size: 0.82rem; font-weight: 600; cursor: pointer;
+      white-space: nowrap; flex-shrink: 0; transition: all 0.15s;
+    }
+    .mark-ball-btn.marked {
+      background: rgba(26,92,46,0.1); border-color: var(--green-b); color: var(--green);
+    }
+    .live-club-card {
+      background: var(--surface2);
+      border: 0.5px solid var(--border); border-radius: 14px;
+      padding: 12px 14px; margin-bottom: 14px;
+    }
+    .live-club-name {
+      font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; color: var(--cream);
+      letter-spacing: 1px; line-height: 1; margin-bottom: 5px;
+    }
+    .live-club-note { font-size: 0.73rem; color: var(--muted); line-height: 1.4; }
+    .club-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .club-chip {
+      padding: 7px 10px; background: var(--surface2);
+      border: 0.5px solid var(--border); border-radius: 8px;
+      color: var(--muted); font-size: 0.72rem; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+      user-select: none; -webkit-user-select: none;
+    }
+    .club-chip.used {
+      background: rgba(26,92,46,0.1); border-color: var(--green); color: var(--green);
+    }
+    .club-chip.suggested {
+      border-color: var(--gold); color: var(--gold-l); background: rgba(138,96,16,0.07);
+    }
+    .gps-dot {
+      display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+      background: var(--muted); margin-right: 4px; vertical-align: middle;
+    }
+    .gps-dot.ready  { background: var(--green); }
+    .gps-dot.marked { background: var(--gold); }
+
+    /* ── PIN PAD ── */
+    .pin-dot {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid var(--muted);
+      background: transparent;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .pin-dot.filled {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+    .pin-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 72px);
+      gap: 14px;
+    }
+    .pin-key {
+      height: 72px;
+      border-radius: 50%;
+      border: 0.5px solid var(--border);
+      background: var(--surface);
+      color: var(--cream);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: background 0.1s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .pin-key:active {
+      background: rgba(138,96,16,0.25);
+      transform: scale(0.92);
+    }
+    .pin-key-empty {
+      background: transparent !important;
+      border: none !important;
+      pointer-events: none;
+    }
+    .pin-key-del { font-size: 1.2rem; }
+    @keyframes pinShake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-8px); }
+      40%      { transform: translateX(8px); }
+      60%      { transform: translateX(-5px); }
+      80%      { transform: translateX(5px); }
+    }
+    .pin-shake { animation: pinShake 0.4s ease; }
+
+    /* ── FAMILY SCORECARD ── */
+    .fam-checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 10px 0 16px;
+    }
+    .fam-checkbox-card {
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 14px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .fam-checkbox-card.selected {
+      border-color: var(--green);
+      background: rgba(74,222,128,0.1);
+    }
+    .fam-checkbox-card .fam-cb-emoji { font-size: 1.8rem; display: block; margin-bottom: 4px; }
+    .fam-checkbox-card .fam-cb-name  { font-size: 0.75rem; font-weight: 600; color: var(--cream); }
+    .fam-player-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .fam-player-row:last-child { border-bottom: none; }
+    .fam-player-badge {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; flex-shrink: 0;
+    }
+    .fam-player-label { flex: 1; }
+    .fam-player-name  { font-weight: 700; font-size: 0.9rem; line-height: 1.2; }
+    .fam-player-vpar  { font-size: 0.72rem; }
+    .fam-score-stepper { display: flex; align-items: center; gap: 10px; }
+    .fam-score-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; min-width: 40px; text-align: center; line-height: 1;
+    }
+    .fam-running-bar  { display: flex; gap: 8px; flex-wrap: wrap; }
+    .fam-running-chip { padding: 4px 11px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; }
+    .fam-scroll-wrap  { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .fam-sc-table     { border-collapse: collapse; font-size: 0.76rem; min-width: 100%; }
+    .fam-sc-table th  {
+      background: var(--surface3); padding: 7px 8px; text-align: center;
+      font-weight: 700; color: var(--gold-l); font-size: 0.7rem; white-space: nowrap;
+    }
+    .fam-sc-table th:first-child { text-align: left; }
+    .fam-sc-table td  { padding: 7px 8px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .fam-sc-table td:first-child { text-align: left; color: var(--muted); font-size: 0.7rem; }
+    .fam-sc-table tr.total-row td {
+      background: var(--surface3); font-weight: 700; color: var(--cream);
+      border-top: 1px solid rgba(138,96,16,0.35); font-size: 0.85rem;
+    }
+    .fam-sc-table tr.total-row td:first-child { color: var(--gold); }
+    /* ── GOLF SCORE CHIPS (industry standard) ──────────────────────
+       Eagle:  double gold ring (two concentric circles)
+       Birdie: single green circle
+       Par:    no border, muted text
+       Bogey:  single red/orange square
+       Double+: filled red square
+    ──────────────────────────────────────────────────────────────── */
+    .sc-chip {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 50%;
+      font-size: 0.8rem; font-weight: 700; font-variant-numeric: tabular-nums;
+      line-height: 1; position: relative;
+    }
+    .sc-eagle {
+      color: #8a6010;
+      border: 2px solid #8a6010;
+      outline: 2px solid #8a6010;
+      outline-offset: 3px;
+      border-radius: 50%;
+    }
+    .sc-birdie {
+      color: #1E7A3A;
+      border: 2px solid #1E7A3A;
+      border-radius: 50%;
+    }
+    .sc-par {
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+    }
+    .sc-bogey {
+      color: #c0392b;
+      border: 2px solid #c0392b;
+      border-radius: 3px;
+    }
+    .sc-double {
+      color: #fff;
+      background: #c0392b;
+      border-radius: 3px;
+    }
+    .sc-triple {
+      color: #fff;
+      background: #8B0000;
+      border-radius: 3px;
+      outline: 2px solid #8B0000;
+      outline-offset: 2px;
+    }
+    /* Legacy aliases for family scorecard */
+    .fam-eagle  { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:0.78rem;font-weight:700;color:#8a6010;border:2px solid #8a6010;outline:2px solid #8a6010;outline-offset:2px; }
+    .fam-birdie { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:0.78rem;font-weight:700;color:#1E7A3A;border:2px solid #1E7A3A; }
+    .fam-par    { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:0.78rem;font-weight:600;color:var(--muted);border:1px solid var(--border); }
+    .fam-bogey  { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:3px;font-size:0.78rem;font-weight:700;color:#c0392b;border:2px solid #c0392b; }
+    .fam-double { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:3px;font-size:0.78rem;font-weight:700;color:#fff;background:#c0392b; }
+    .fam-triple { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:3px;font-size:0.78rem;font-weight:800;color:#fff;background:#8B0000; }
+
+  </style>

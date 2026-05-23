@@ -1,0 +1,99 @@
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+
+<div id="landing">
+
+  <div id="landing-sub" style="margin-bottom:8px;">Family Pocket Caddie</div>
+  <div id="landing-family-name">The Gelbaum Family</div>
+
+  <!-- Primary / Owner card -->
+  <div class="landing-cards" style="margin-bottom:14px;">
+    <div class="landing-card landing-card-dad" onclick="enterProfile('dad')">
+      <div class="landing-avatar"><i class="ti ti-golf" style="font-size:1.6rem;color:#8a6010;"></i></div>
+      <div class="landing-card-info">
+        <div class="landing-card-name">Dad</div>
+        <div class="landing-card-desc">Lefty · Sub-90 Journey</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:8px;flex-shrink:0;">
+        <span class="landing-owner-badge">Owner</span>
+        <div class="landing-card-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Family section -->
+  <div class="landing-family-divider"><span>Family</span></div>
+  <div class="landing-family-grid">
+
+    <div class="landing-card landing-card-sm landing-card-son" onclick="enterProfile('son')">
+      <div class="landing-avatar-sm" style="background:#EBF0F5;color:#3B7CB8;">S</div>
+      <div class="landing-card-info">
+        <div class="landing-card-name-sm" style="color:#3B7CB8;">Son</div>
+        <div class="landing-card-desc-sm">Righty · Junior</div>
+      </div>
+      <div class="landing-card-arrow-sm">›</div>
+    </div>
+
+    <div class="landing-card landing-card-sm landing-card-girl" onclick="enterProfile('girl')">
+      <div class="landing-avatar-sm" style="background:#F5EBF2;color:#B85490;">D</div>
+      <div class="landing-card-info">
+        <div class="landing-card-name-sm" style="color:#B85490;">Daughter</div>
+        <div class="landing-card-desc-sm">Lefty · Age 5</div>
+      </div>
+      <div class="landing-card-arrow-sm">›</div>
+    </div>
+
+    <div class="landing-card landing-card-sm landing-card-mom" onclick="enterProfile('mom')">
+      <div class="landing-avatar-sm" style="background:#F5EDE8;color:#B86530;">M</div>
+      <div class="landing-card-info">
+        <div class="landing-card-name-sm" style="color:#B86530;">Mom</div>
+        <div class="landing-card-desc-sm">Righty · Beginner</div>
+      </div>
+      <div class="landing-card-arrow-sm">›</div>
+    </div>
+
+    <div class="landing-card landing-card-sm landing-card-grandma" onclick="enterProfile('grandma')">
+      <div class="landing-avatar-sm" style="background:#EEECE8;color:#9A8050;">G</div>
+      <div class="landing-card-info">
+        <div class="landing-card-name-sm" style="color:#9A8050;">Grandma</div>
+        <div class="landing-card-desc-sm">Righty · Welcome Back</div>
+      </div>
+      <div class="landing-card-arrow-sm">›</div>
+    </div>
+
+  </div>
+
+  <div class="landing-footer">SpinVibes Golf</div>
+</div>
+
+<div id="app" style="display:none">
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div onclick="goToLanding()" style="cursor:pointer;" title="Back to player select">
+      <div class="topbar-logo">Spin<span>Vibes</span> Golf</div>
+      <div class="topbar-sub" id="topbarSub">Lefty · Sub-90 Journey</div>
+    </div>
+    <div id="profileSwitch">
+      <button id="btnDad" class="profile-pill active" onclick="switchProfile('dad')">Dad</button>
+      <button id="btnMom" class="profile-pill" onclick="switchProfile('mom')">Mom</button>
+      <button id="btnSon" class="profile-pill" onclick="switchProfile('son')">Son</button>
+      <button id="btnGirl" class="profile-pill" onclick="switchProfile('girl')">Daughter</button>
+      <button id="btnGrandma" class="profile-pill" onclick="switchProfile('grandma')">Grandma</button>
+    </div>
+    <div style="display:flex;align-items:center;">
+      <button id="modeToggle" onclick="toggleMode()" title="Toggle light/dark mode"><i class="ti ti-moon" style="font-size:1.1rem;"></i></button>
+      <div class="offline-badge" id="offlineBadge">● Offline Ready</div>
+    </div>
+  </div>
+
+  <!-- Floating mode toggle for portrait mobile -->
+  <button id="floatToggle" onclick="toggleMode()" title="Toggle light/dark mode"><i class="ti ti-moon" style="font-size:1.1rem;"></i></button>
+
+  <!-- PAGES -->
+  <div id="pages">
+
+    <!-- ══════════════════════════════════════
+         PAGE: HOME
+    ══════════════════════════════════════ -->

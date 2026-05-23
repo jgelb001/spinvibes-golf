@@ -1,0 +1,38 @@
+    ══════════════════════════════════════ -->
+    <div class="page dad-sect" id="page-caddie">
+      <div class="page-header">
+        <button onclick="showPage('dad-progress')" style="background:none;border:none;color:var(--muted);font-size:0.8rem;font-weight:600;cursor:pointer;padding:0 0 8px;display:flex;align-items:center;gap:5px;letter-spacing:0.3px;"><i class="ti ti-arrow-left" style="font-size:0.9rem;"></i> My Game</button>
+        <div class="page-tag">AI CADDIE</div>
+        <div class="page-title">On The Bag</div>
+        <div class="page-icon"><i class="ti ti-microphone"></i></div>
+      </div>
+
+      <!-- API Key Setup -->
+      <!-- Main caddie UI -->
+      <div id="caddie-main">
+
+        <!-- Chat -->
+        <div class="section">
+          <div id="caddie-messages" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;max-height:55vh;overflow-y:auto;padding-right:2px;"></div>
+          <div style="display:flex;gap:8px;align-items:flex-end;">
+            <textarea id="caddie-input"
+              style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--cream);font-size:0.9rem;padding:10px 14px;resize:none;font-family:inherit;line-height:1.5;overflow-y:auto;"
+              placeholder="e.g. 'About 140 out, into the wind'" rows="2"
+              onkeydown="caddieInputKeydown(event)"></textarea>
+            <button id="caddie-mic-btn" onclick="toggleCaddieMic()"
+              style="flex-shrink:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;width:44px;height:44px;color:var(--muted);font-size:1.1rem;cursor:pointer;align-self:flex-end;display:flex;align-items:center;justify-content:center;"><i class="ti ti-microphone"></i></button>
+            <button id="caddie-send-btn" onclick="sendCaddieMessage()"
+              style="flex-shrink:0;background:var(--gold);border:none;border-radius:12px;width:44px;height:44px;color:var(--bg);font-weight:700;font-size:1.1rem;cursor:pointer;align-self:flex-end;display:flex;align-items:center;justify-content:center;"><i class="ti ti-send-2"></i></button>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;align-items:center;">
+            <div style="font-size:0.66rem;color:var(--muted);">Powered by Claude Haiku · ~$0.01/round</div>
+            <button onclick="clearCaddieChat()" style="background:none;border:none;color:var(--muted);font-size:0.7rem;cursor:pointer;text-decoration:underline;">Clear chat</button>
+          </div>
+        </div>
+
+
+      </div><!-- /caddie-main -->
+    </div><!-- /page-caddie -->
+
+    <!-- ══════════════════════════════════════
+         PAGE: COURSE STRATEGY (Dad)

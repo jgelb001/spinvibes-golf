@@ -1,0 +1,56 @@
+  <nav id="nav">
+    <button class="nav-btn active" onclick="showPage('home')" id="nav-home">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </button>
+    <button class="nav-btn" onclick="showPage('range')" id="nav-range">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      Range
+    </button>
+    <button class="nav-btn" onclick="showPage('stretches')" id="nav-stretches">
+      <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 100 10A5 5 0 0012 2zM6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+      Stretch
+    </button>
+    <button class="nav-btn" onclick="showPage('shortgame')" id="nav-shortgame">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="19" r="2"/><path d="M12 17V9"/><path d="M8 13l4-4 4 4"/></svg>
+      Short Game
+    </button>
+    <button class="nav-btn dad-sect" onclick="showPage('dad-progress')" id="nav-dad-progress">
+      <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      My Game
+    </button>
+    <button class="nav-btn son-sect" onclick="showPage('son-progress')" id="nav-son-progress">
+      <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      My Game
+    </button>
+    <button class="nav-btn girl-sect" onclick="showPage('girl-progress')" id="nav-girl-progress">
+      <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      My Game
+    </button>
+    <button class="nav-btn mom-sect" onclick="showPage('mom-progress')" id="nav-mom-progress">
+      <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      My Game
+    </button>
+    <button class="nav-btn grandma-sect" onclick="showPage('grandma-progress')" id="nav-grandma-progress">
+      <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      My Game
+    </button>
+
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       FAMILY SCORECARD MODAL
+  ══════════════════════════════════════ -->
+  <div id="family-modal" style="display:none;position:fixed;inset:0;z-index:400;background:var(--bg);overflow-y:auto;padding-bottom:calc(80px + env(safe-area-inset-bottom,0px));">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;padding-top:calc(16px + env(safe-area-inset-top,0px));border-bottom:1px solid rgba(99,179,255,0.2);position:sticky;top:0;background:var(--bg);z-index:1;">
+      <div id="fam-modal-label" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#93c5fd;">Family Round</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="fam-running-bar" class="fam-running-bar" style="display:none;"></div>
+        <button onclick="closeFamilyModal()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;padding:0 4px;">✕</button>
+      </div>
+    </div>
+    <div id="fam-modal-body" style="padding:20px;"></div>
+  </div>
+
+</div><!-- /app -->
+

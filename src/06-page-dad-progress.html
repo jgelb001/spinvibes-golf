@@ -1,0 +1,122 @@
+    <div class="page" id="page-dad-progress">
+      <!-- PIN Overlay -->
+      <div id="dad-pin-overlay" style="position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;padding-top:calc(32px + env(safe-area-inset-top,0px));overflow-y:auto;">
+        <div style="margin-bottom:16px;"><i class="ti ti-lock" style="font-size:2.5rem;color:var(--gold);"></i></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);letter-spacing:2px;margin-bottom:6px;">Dad's Progress</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:28px;">Enter PIN to continue</div>
+        <div id="dad-pin-dots" style="display:flex;gap:12px;margin-bottom:28px;">
+          <div class="pin-dot" id="dad-dot-0"></div>
+          <div class="pin-dot" id="dad-dot-1"></div>
+          <div class="pin-dot" id="dad-dot-2"></div>
+          <div class="pin-dot" id="dad-dot-3"></div>
+        </div>
+        <div id="dad-pin-error" style="font-size:0.75rem;color:var(--red);margin-bottom:12px;opacity:0;transition:opacity 0.3s;">Incorrect PIN</div>
+        <div class="pin-pad">
+          <button class="pin-key" onclick="dadPinKey('1')">1</button>
+          <button class="pin-key" onclick="dadPinKey('2')">2</button>
+          <button class="pin-key" onclick="dadPinKey('3')">3</button>
+          <button class="pin-key" onclick="dadPinKey('4')">4</button>
+          <button class="pin-key" onclick="dadPinKey('5')">5</button>
+          <button class="pin-key" onclick="dadPinKey('6')">6</button>
+          <button class="pin-key" onclick="dadPinKey('7')">7</button>
+          <button class="pin-key" onclick="dadPinKey('8')">8</button>
+          <button class="pin-key" onclick="dadPinKey('9')">9</button>
+          <button class="pin-key pin-key-empty"></button>
+          <button class="pin-key" onclick="dadPinKey('0')">0</button>
+          <button class="pin-key pin-key-del" onclick="dadPinBackspace()">⌫</button>
+        </div>
+      </div>
+
+      <!-- Page Content -->
+      <div id="dad-progress-content">
+        <div class="page-header">
+          <div class="page-tag">DAD · MY GAME</div>
+          <div class="page-title">My Progress</div>
+        </div>
+
+        <div class="section" style="display:flex;gap:10px;">
+          <button class="btn-primary" onclick="openDadModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;"><i class="ti ti-flag-2" style="font-size:1rem;"></i> Start New Round</button>
+          <button onclick="lockDadProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(138,96,16,0.35);border-radius:10px;padding:0 14px;color:var(--gold-l);font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;"><i class="ti ti-lock" style="font-size:1.1rem;"></i></button>
+        </div>
+        <div class="section" style="margin-top:-4px;display:flex;gap:10px;">
+          <button onclick="openFamilyModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--cream);font-size:0.9rem;font-weight:600;cursor:pointer;box-shadow:var(--c-shadow);"><i class="ti ti-users" style="font-size:1rem;color:var(--gold);"></i> Family Round</button>
+          <button onclick="showPage('caddie')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--cream);font-size:0.9rem;font-weight:600;cursor:pointer;box-shadow:var(--c-shadow);"><i class="ti ti-message-circle" style="font-size:1rem;color:var(--gold);"></i> Caddie</button>
+        </div>
+
+        <div id="dad-stats-bar" style="display:none;" class="section">
+          <div id="dad-stats-row"></div>
+        </div>
+
+        <div id="dad-approach-stats" style="display:none;margin-bottom:12px;"></div>
+
+        <!-- GAME PLAN SECTION -->
+        <div style="margin-bottom:12px;">
+          <button
+            onclick="var panel = this.nextElementSibling; panel.style.display = panel.style.display === 'none' ? 'block' : 'none'; this.querySelector('.arrow').textContent = panel.style.display === 'none' ? '▼' : '▲';"
+            style="width:100%; background:var(--green); color:#fff; border:none; border-radius:10px; padding:14px 18px; font-size:16px; font-weight:700; text-align:left; cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+            <span style="display:flex;align-items:center;gap:8px;"><i class="ti ti-chess-knight" style="font-size:1rem;opacity:0.8;"></i> Game Plan</span>
+            <span class="arrow">▼</span>
+          </button>
+          <div style="display:none; background:var(--surface2); border:1px solid rgba(138,96,16,0.2); border-radius:0 0 10px 10px; padding:16px;">
+
+            <p style="font-size:13px; color:var(--muted); margin:0 0 12px;">Pre-round mental checklist. One thought per shot. Trust the process.</p>
+
+            <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:6px;"><i class="ti ti-flag-2" style="font-size:0.85rem;"></i> Tee Box</div>
+            <div class="check-row" style="margin-bottom:6px;"><span>Pick a specific target — a tree, bush, or edge of fairway. Never aim at "out there."</span></div>
+            <div class="check-row" style="margin-bottom:6px;"><span>Driver: tee low, ball forward, sweep up. One swing thought max.</span></div>
+            <div class="check-row" style="margin-bottom:6px;"><span>If driver isn't working → 4H or 7W off the tee. Take your medicine early.</span></div>
+
+            <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:12px 0 8px;display:flex;align-items:center;gap:6px;"><i class="ti ti-arrows-right" style="font-size:0.85rem;"></i> Fairway · Approach</div>
+            <div class="check-row" style="margin-bottom:6px;"><span>From 150+ yds: play for the middle of the green. No hero shots.</span></div>
+            <div class="check-row" style="margin-bottom:6px;"><span>From 100 yds and in: pick a specific landing spot, not just the hole.</span></div>
+            <div class="check-row" style="margin-bottom:6px;"><span>Trouble left? Aim right. Trouble right? Aim left. Always have an out.</span></div>
+            <div class="check-row" style="margin-bottom:6px;"><span>Uneven lie: choke down 1–2 inches. Smooth and balanced beats hard and tall.</span></div>
+
+            <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:12px 0 8px;display:flex;align-items:center;gap:6px;"><i class="ti ti-circle-dashed" style="font-size:0.85rem;"></i> Around the Green</div>
+            <div class="check-row" style="margin-bottom:6px;"><span>Bump-and-run first. Use 7i, PW, or GW — land it on the green and let it run.</span></div>
+            <div class="check-row" style="margin-bottom:6px;"><span>Only use SW when you need to carry something (bunker, fringe, tight lie).</span></div>
+            <div class="check-row" style="margin-bottom:6px;"><span>Weight forward, hands ahead, brush the grass. It's a long putt with a lofted club.</span></div>
+
+            <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:12px 0 8px;display:flex;align-items:center;gap:6px;"><i class="ti ti-tournament" style="font-size:0.85rem;"></i> Putting</div>
+            <div class="check-row" style="margin-bottom:6px;"><span>3-footers: eyes over ball, pendulum, listen for the rattle.</span></div>
+            <div class="check-row" style="margin-bottom:6px;"><span>Long putts: focus on speed first. Get it within 3 feet — avoid 3-putts.</span></div>
+            <div class="check-row" style="margin-bottom:6px;"><span>Read break from below the hole. Aim for a spot 6 inches in front of the ball.</span></div>
+
+            <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin:12px 0 8px;display:flex;align-items:center;gap:6px;"><i class="ti ti-brain" style="font-size:0.85rem;"></i> Mental</div>
+            <div class="check-row" style="margin-bottom:6px;"><span>One shot at a time. Bad shot → deep breath → let it go before the next swing.</span></div>
+            <div class="check-row" style="margin-bottom:6px;"><span>Bogey is fine. Double bogey happens. Move on — the round isn't over.</span></div>
+            <div class="check-row" style="margin-bottom:6px;"><span>Never change your swing mid-round. Practice range is for experimenting. Course is for committing.</span></div>
+
+          </div>
+        </div>
+        <!-- END GAME PLAN -->
+
+        <!-- Round History — dynamic, loaded from Supabase -->
+        <div class="section" style="padding-top:4px;">
+          <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+            <i class="ti ti-history" style="font-size:0.85rem;"></i> Round History
+          </div>
+          <div id="dad-history-list"></div>
+        </div>
+
+      </div><!-- /dad-progress-content -->
+
+            <!-- Dad Round Entry Modal -->
+      <div id="dad-modal" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);flex-direction:column;padding-top:env(safe-area-inset-top,0px);">
+        <div style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(138,96,16,0.2);">
+          <div id="dad-modal-step-label" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);">Round Setup</div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div id="dad-running-total" style="display:none;text-align:right;line-height:1;">
+              <div id="dad-rt-score" style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--cream);">0</div>
+              <div id="dad-rt-diff" style="font-size:0.6rem;font-weight:700;letter-spacing:0.5px;color:var(--muted);">E</div>
+            </div>
+            <button onclick="confirmExitRound()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">✕</button>
+          </div>
+        </div>
+        <div id="dad-modal-body" style="flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:20px;padding-bottom:12px;"></div>
+        <div id="dad-modal-footer" style="flex-shrink:0;display:none;background:var(--bg);border-top:1px solid var(--border);padding:6px 20px calc(6px + env(safe-area-inset-bottom,0px));"></div>
+      </div>
+    </div><!-- /page-dad-progress -->
+
+    <!-- ══════════════════════════════════════
+         PAGE: AI CADDIE
