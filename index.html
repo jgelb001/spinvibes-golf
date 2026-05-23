@@ -6115,6 +6115,14 @@
       statsBar.style.display = 'none';
     }
     renderApproachStats(scoredRounds);
+
+    // Achievements badges
+    const dadBadgesHtml = scoredRounds.length >= 1 ? `
+      <div class="section" style="padding-top:4px;padding-bottom:4px;">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:var(--gold);margin-bottom:8px;">ACHIEVEMENTS</div>
+        ${renderBadges(scoredRounds, '#8a6010')}
+      </div>` : '';
+
     const legacyCards = `
       <div class="round-card" id="dad-round-legacy-apr26">
         <div class="round-card-header" onclick="toggleRoundExpand('dad-round-legacy-apr26')">
@@ -6160,7 +6168,7 @@
         </div>
       </div>`;
 
-    listEl.innerHTML = rounds.map((r, idx) => {
+    listEl.innerHTML = dadBadgesHtml + rounds.map((r, idx) => {
       const d = new Date(r.date_played + 'T12:00:00');
       const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       const diff = r.score_vs_par >= 0 ? '+' + r.score_vs_par : r.score_vs_par;
