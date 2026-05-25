@@ -3928,8 +3928,8 @@
             <button onclick="confirmExitRound()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">✕</button>
           </div>
         </div>
-        <div id="dad-modal-body" style="flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:20px;padding-bottom:12px;"></div>
-        <div id="dad-modal-footer" style="flex-shrink:0;display:none;background:var(--bg);border-top:1px solid var(--border);padding:6px 20px calc(6px + env(safe-area-inset-bottom,0px));"></div>
+        <div id="dad-modal-body" style="flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:20px;padding-bottom:12px;"></div>
+        <div id="dad-modal-footer" style="flex-shrink:0;display:none;background:var(--bg);border-top:1px solid var(--border);padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px));"></div>
       </div>
     </div><!-- /page-dad-progress -->
 
@@ -5553,24 +5553,27 @@
 
     `;
 
-    // Populate the fixed footer (outside scroll area)
+    // Populate the fixed footer — single row: CARD | − | score | + | NEXT HOLE
     const footer = document.getElementById('dad-modal-footer');
     if (footer) {
       footer.style.display = '';
       footer.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:4px;">
-          <button onclick="dadHoleScore(-1)" style="width:38px;height:34px;border-radius:8px;background:var(--surface);border:1px solid var(--border);font-size:1.3rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;">−</button>
-          <div style="text-align:center;min-width:52px;">
-            <div style="font-size:0.45rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1px;">Shot</div>
-            <div class="score-val" id="dh-score" style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;line-height:1;">${h.score}</div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button onclick="dadMidRoundScorecard()"
+            style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:7px 10px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;">
+            <i class="ti ti-clipboard-list" style="font-size:1rem;"></i>
+            <span style="font-size:0.5rem;letter-spacing:0.5px;font-weight:700;text-transform:uppercase;">Card</span>
+          </button>
+          <button onclick="dadHoleScore(-1)"
+            style="flex:0 0 auto;width:44px;height:50px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:1.6rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;">−</button>
+          <div style="flex:0 0 auto;text-align:center;min-width:48px;">
+            <div style="font-size:0.42rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1px;">STROKES</div>
+            <div class="score-val" id="dh-score" style="font-family:'Bebas Neue',sans-serif;font-size:2rem;line-height:1;">${h.score}</div>
           </div>
-          <button onclick="dadHoleScore(1)" style="width:38px;height:34px;border-radius:8px;background:var(--surface);border:1px solid var(--border);font-size:1.3rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;">+</button>
-        </div>
-        <div class="modal-nav-row" style="gap:5px;">
-          <button class="btn-ghost" onclick="dadLiveBack()" ${backAttr} style="padding:5px 8px;font-size:0.75rem;"><i class="ti ti-chevron-left"></i> Back</button>
-          <button class="btn-ghost" onclick="dadToggleDistPanel()" style="padding:5px 8px;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1;" id="dad-dist-btn"><i class="ti ti-ruler-2" style="font-size:0.85rem;"></i><span style="font-size:0.5rem;letter-spacing:0.5px;">DIST</span></button>
-          <button class="btn-ghost" onclick="dadMidRoundScorecard()" style="padding:5px 8px;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1;"><i class="ti ti-clipboard-list" style="font-size:0.85rem;"></i><span style="font-size:0.5rem;letter-spacing:0.5px;">CARD</span></button>
-          <button class="btn-gold" onclick="dadLiveNext()" style="flex:1;font-size:0.82rem;padding:7px 8px;">${nextLabel}</button>
+          <button onclick="dadHoleScore(1)"
+            style="flex:0 0 auto;width:44px;height:50px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:1.6rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;">+</button>
+          <button onclick="dadLiveNext()" class="btn-gold"
+            style="flex:1;font-size:0.82rem;padding:0;height:50px;border-radius:10px;">${nextLabel}</button>
         </div>
       `;
     }
@@ -6598,7 +6601,12 @@
   let _dadHoleIdx = 0;
   let _dadStep = 'setup'; // 'setup' | 'holes' | 'reflection'
 
+  // Lock/unlock background scroll when modal is open (prevents iOS scroll bleed-through)
+  function _lockBodyScroll()   { document.body.style.overflow = 'hidden'; document.body.style.position = 'fixed'; document.body.style.width = '100%'; }
+  function _unlockBodyScroll() { document.body.style.overflow = ''; document.body.style.position = ''; document.body.style.width = ''; }
+
   function openDadModal() {
+    _lockBodyScroll();
     // Check for an unfinished in-progress round saved to localStorage
     const draft = _loadDraftRound();
     if (draft && draft.holes && draft.holes.length > 0) {
@@ -6631,6 +6639,7 @@
     document.getElementById('dad-modal').style.display = 'none';
     const f = document.getElementById('dad-modal-footer');
     if (f) f.style.display = 'none';
+    _unlockBodyScroll();
     _releaseWakeLock();
     // Draft is intentionally kept — user may want to resume later.
     // It is cleared automatically on successful save or when they start a fresh round.
