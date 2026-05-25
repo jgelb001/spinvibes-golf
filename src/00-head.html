@@ -1649,6 +1649,27 @@
     }
     .pin-shake { animation: pinShake 0.4s ease; }
 
+    /* ── KIDS LEVELING ── */
+    @keyframes lvlBounce {
+      0%   { transform: scale(1) rotate(-4deg); }
+      100% { transform: scale(1.18) rotate(4deg); }
+    }
+    @keyframes confettiFall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0.9; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+    @keyframes lvlSlideUp {
+      0%   { transform: translateY(40px); opacity: 0; }
+      100% { transform: translateY(0);    opacity: 1; }
+    }
+    .level-card { animation: lvlSlideUp 0.4s ease forwards; }
+    .level-progress-bar {
+      height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden;
+    }
+    .level-progress-fill {
+      height: 100%; border-radius: 3px; transition: width 0.8s ease;
+    }
+
     /* ── FAMILY SCORECARD ── */
     .fam-checkbox-grid {
       display: grid;

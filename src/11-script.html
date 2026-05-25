@@ -542,7 +542,12 @@
       renderCaddieMessages(false);
     }
     if (id === 'girl-progress') {
+      renderKidLevelCard('girl', null); // show card immediately while loading
       loadGirlRoundsAndRender();
+    }
+    if (id === 'range') {
+      updateRangeLevelBadge('son');
+      updateRangeLevelBadge('girl');
     }
     if (id === 'mom-progress') {
       if (sessionStorage.getItem('sv-family-unlocked') !== '1') {
@@ -753,6 +758,10 @@
   setTodayDate();
   updateOfflineBadge();
   loadRangeFocus();
+  updateRangeLevelBadge('son');
+  updateRangeLevelBadge('girl');
+  renderKidLevelCard('son', null);   // show level card immediately (rounds fill in after PIN)
+  renderKidLevelCard('girl', null);  // show level card immediately
 
 
   // ── CLUB SYSTEM ──────────────────────────────────────────────
@@ -2192,8 +2201,11 @@
     listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;"><i class="ti ti-loader-2" style="font-size:1.1rem;vertical-align:-2px;"></i> Loading your rounds…</div>';
     try {
       const rounds = await loadSonRounds();
+      renderKidLevelCard('son', rounds);
+      checkAutoLevelUp('son', rounds);
       renderSonHistory(rounds);
     } catch(e) {
+      renderKidLevelCard('son', []);
       listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:0.85rem;">Could not connect — check your signal</div>';
     }
   }
@@ -2257,6 +2269,8 @@
     el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;"><i class="ti ti-loader-2" style="font-size:1.1rem;vertical-align:-2px;"></i> Loading rounds…</div>';
     try {
       const rounds = await loadGirlRounds();
+      renderKidLevelCard('girl', rounds);
+      checkAutoLevelUp('girl', rounds);
       if (!rounds || rounds.length === 0) {
         el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet — join a Family Round to get started! 🌸</div>';
         return;
@@ -2698,6 +2712,199 @@
       }
       showToast('Save failed — tap Retry Save when you have signal', 'error');
     }
+  }
+
+  // ══════════════════════════════════════════════════════════
+  //  KIDS LEVELING SYSTEM
+  // ══════════════════════════════════════════════════════════
+
+  const KID_LEVELS = {
+    1: {
+      name: 'Just for Fun',
+      emoji: '🌟',
+      color: '#ec4899',
+      desc: 'Make contact, celebrate every shot, no rules.',
+      nextLabel: 'Getting the Hang of It',
+      nextTrigger: '3 rounds played',
+      roundsNeeded: 3,
+    },
+    2: {
+      name: 'Getting the Hang of It',
+      emoji: '⚡',
+      color: '#3b82f6',
+      desc: 'Basic swing mechanics, count pars, intro to rules.',
+      nextLabel: 'Learning the Game',
+      nextTrigger: '5 rounds + first par',
+      roundsNeeded: 5,
+    },
+    3: {
+      name: 'Learning the Game',
+      emoji: '🎯',
+      color: '#22c55e',
+      desc: 'Full stats, approach tracking, strategy, real scoring.',
+      nextLabel: 'Getting Serious',
+      nextTrigger: '8 rounds + first birdie',
+      roundsNeeded: 8,
+    },
+    4: {
+      name: 'Getting Serious',
+      emoji: '🏆',
+      color: '#c8922a',
+      desc: 'Dad-level complexity. Tournament ready.',
+      nextLabel: null,
+      nextTrigger: null,
+      roundsNeeded: null,
+    },
+  };
+
+  function getKidLevel(who) {
+    const defaults = { son: 2, girl: 1 };
+    return parseInt(localStorage.getItem('sv-' + who + '-level') || defaults[who] || 1);
+  }
+  function setKidLevel(who, level) {
+    localStorage.setItem('sv-' + who + '-level', String(Math.min(4, Math.max(1, level))));
+  }
+
+  function renderKidLevelCard(who, rounds) {
+    const el = document.getElementById(who + '-level-card');
+    if (!el) return;
+    const level = getKidLevel(who);
+    const def   = KID_LEVELS[level];
+    const next  = KID_LEVELS[level + 1];
+    const color = def.color;
+    const roundCount = (rounds || []).length;
+
+    // Progress bar toward next level
+    let progressHtml = '';
+    if (next) {
+      const target = def.roundsNeeded;
+      const pct    = Math.min(100, Math.round((roundCount / target) * 100));
+      progressHtml = `
+        <div style="margin-top:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span style="font-size:0.7rem;color:var(--muted);">Next: ${def.nextTrigger}</span>
+            <span style="font-size:0.7rem;color:${color};font-weight:700;">${roundCount}/${target} rounds</span>
+          </div>
+          <div class="level-progress-bar">
+            <div class="level-progress-fill" style="width:${pct}%;background:${color};"></div>
+          </div>
+        </div>`;
+    }
+
+    el.innerHTML = `
+      <div class="section level-card" style="padding-bottom:4px;">
+        <div class="card" style="border-color:${color}50;background:${color}12;padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:1.6rem;line-height:1;">${def.emoji}</span>
+              <div>
+                <div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${color};margin-bottom:1px;">Level ${level}</div>
+                <div style="font-size:1rem;font-weight:700;color:var(--cream);line-height:1.1;">${def.name}</div>
+              </div>
+            </div>
+            ${level < 4 ? `<button onclick="adminLevelUp('${who}')" style="background:none;border:1px solid ${color}70;border-radius:8px;padding:5px 10px;color:${color};font-size:0.68rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;white-space:nowrap;">PROMOTE ▲</button>` : '<span style="font-size:0.75rem;color:var(--gold);font-weight:700;">MAX LEVEL 🏆</span>'}
+          </div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-top:6px;">${def.desc}</div>
+          ${progressHtml}
+        </div>
+      </div>`;
+  }
+
+  // Dad manually promotes a kid — requires confirmation
+  function adminLevelUp(who) {
+    const current = getKidLevel(who);
+    if (current >= 4) { showToast('Already at max level! 🏆'); return; }
+    const next = KID_LEVELS[current + 1];
+    const name = who === 'son' ? 'Son' : 'Daughter';
+    if (!confirm(`Promote ${name} to Level ${current + 1}: "${next.name}"?\n\nThis should be a real milestone moment — make sure they've earned it!`)) return;
+    setKidLevel(who, current + 1);
+    // Clear auto-flag for this level so it doesn't ping again
+    localStorage.removeItem('sv-' + who + '-autolvl-' + (current + 1));
+    triggerLevelUpCeremony(who, current + 1);
+  }
+
+  // Check if auto-flag should fire (does NOT auto-promote — just notifies Dad)
+  function checkAutoLevelUp(who, rounds) {
+    const current = getKidLevel(who);
+    if (current >= 4) return;
+    const def = KID_LEVELS[current];
+    if (!def.roundsNeeded) return;
+    const roundCount = (rounds || []).length;
+    const flagKey = 'sv-' + who + '-autolvl-' + (current + 1);
+    if (roundCount >= def.roundsNeeded && !localStorage.getItem(flagKey)) {
+      localStorage.setItem(flagKey, '1');
+      const name = who === 'son' ? 'Son' : 'Daughter';
+      setTimeout(() => showToast(`🌟 ${name} has enough rounds for Level ${current + 1}! Check their progress page.`, 'gold'), 800);
+    }
+  }
+
+  // Full-screen level up ceremony
+  function triggerLevelUpCeremony(who, newLevel) {
+    const def   = KID_LEVELS[newLevel];
+    const name  = who === 'son' ? 'Son' : 'Daughter';
+    const color = def.color;
+
+    // Remove any existing overlay
+    document.getElementById('levelup-overlay')?.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'levelup-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;text-align:center;overflow:hidden;';
+
+    overlay.innerHTML = `
+      <div id="levelup-confetti" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;"></div>
+      <div style="font-size:5rem;margin-bottom:14px;animation:lvlBounce 0.55s ease infinite alternate;">${def.emoji}</div>
+      <div style="font-size:0.75rem;font-weight:700;letter-spacing:3px;color:var(--muted);margin-bottom:4px;">LEVEL UP!</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:${color};letter-spacing:2px;line-height:1;margin-bottom:6px;">Level ${newLevel}</div>
+      <div style="font-size:1.25rem;font-weight:700;color:var(--cream);margin-bottom:10px;">${def.name}</div>
+      <div style="font-size:0.88rem;color:var(--muted);max-width:280px;line-height:1.6;margin-bottom:24px;">${def.desc}</div>
+      <div style="background:${color}18;border:1px solid ${color}50;border-radius:14px;padding:14px 20px;max-width:300px;margin-bottom:28px;">
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${color};margin-bottom:5px;">${name} unlocked</div>
+        <div style="font-size:0.85rem;color:var(--cream);">${next ? 'Next milestone: ' + (KID_LEVELS[newLevel].nextTrigger || 'Stay consistent!') : 'You\'ve reached the top — welcome to the big leagues!'}</div>
+      </div>
+      <button onclick="document.getElementById('levelup-overlay').remove();if(typeof loadSonRoundsAndRender==='function'&&'${who}'==='son')loadSonRoundsAndRender();if(typeof loadGirlRoundsAndRender==='function'&&'${who}'==='girl')loadGirlRoundsAndRender();"
+        style="background:${color};color:#fff;border:none;border-radius:14px;padding:14px 44px;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;-webkit-tap-highlight-color:transparent;">
+        Let's Go! 🎉
+      </button>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // Confetti burst
+    const confettiEl = document.getElementById('levelup-confetti');
+    const cfColors = [color, '#c8922a', '#22c55e', '#f472b6', '#3b82f6', '#fcd34d', '#fff'];
+    for (let i = 0; i < 70; i++) {
+      const piece = document.createElement('div');
+      const size  = 5 + Math.random() * 9;
+      piece.style.cssText = `
+        position:absolute;
+        width:${size}px;height:${size}px;
+        background:${cfColors[Math.floor(Math.random() * cfColors.length)]};
+        border-radius:${Math.random() > 0.5 ? '50%' : '2px'};
+        left:${Math.random() * 100}%;
+        top:-20px;
+        animation:confettiFall ${1.4 + Math.random() * 2}s ease-in ${Math.random() * 0.8}s forwards;
+        opacity:0.9;
+      `;
+      confettiEl.appendChild(piece);
+    }
+
+    // Re-render level card after closing
+    renderKidLevelCard(who, null);
+    updateRangeLevelBadge(who);
+  }
+
+  // Show level badge in range section header
+  function updateRangeLevelBadge(who) {
+    const el = document.getElementById(who + '-range-level-badge');
+    if (!el) return;
+    const level = getKidLevel(who);
+    const def   = KID_LEVELS[level];
+    el.innerHTML = `
+      <div style="display:inline-flex;align-items:center;gap:6px;background:${def.color}18;border:1px solid ${def.color}50;border-radius:20px;padding:3px 10px 3px 8px;margin-bottom:4px;">
+        <span style="font-size:0.85rem;">${def.emoji}</span>
+        <span style="font-size:0.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${def.color};">Level ${level} · ${def.name}</span>
+      </div>`;
   }
 
   // ── SON ROUND MODAL ─────────────────────────────────────────
