@@ -17,6 +17,28 @@
         </div>
       </div>
 
+      <!-- TODAY'S FOCUS CARD -->
+      <div class="section" id="range-focus-section">
+        <div class="card" style="border-color:rgba(138,96,16,0.4);background:rgba(138,96,16,0.06);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:6px;">
+              <i class="ti ti-target" style="font-size:0.9rem;"></i> Today's Focus
+            </div>
+            <button onclick="editRangeFocus()" style="background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;text-decoration:underline;">Edit</button>
+          </div>
+          <div id="range-focus-display"></div>
+          <div id="range-focus-edit" style="display:none;margin-top:8px;">
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">Pick 1–2 things to work on this session. Keep it specific.</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="range-focus-chips">
+              <!-- chips injected by JS -->
+            </div>
+            <input type="text" id="range-focus-custom" class="modal-input" placeholder="Or type your own focus…" style="margin-bottom:8px;font-size:0.85rem;padding:8px 10px;">
+            <button onclick="saveRangeFocus()" class="btn-primary" style="width:100%;padding:8px;">Save Focus</button>
+          </div>
+        </div>
+      </div>
+      <!-- END TODAY'S FOCUS -->
+
       <div class="section">
         <div class="card">
           <span class="tag tag-purple">Phase 0</span>

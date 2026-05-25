@@ -2280,6 +2280,28 @@
         </div>
       </div>
 
+      <!-- TODAY'S FOCUS CARD -->
+      <div class="section" id="range-focus-section">
+        <div class="card" style="border-color:rgba(138,96,16,0.4);background:rgba(138,96,16,0.06);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:6px;">
+              <i class="ti ti-target" style="font-size:0.9rem;"></i> Today's Focus
+            </div>
+            <button onclick="editRangeFocus()" style="background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;text-decoration:underline;">Edit</button>
+          </div>
+          <div id="range-focus-display"></div>
+          <div id="range-focus-edit" style="display:none;margin-top:8px;">
+            <div style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">Pick 1–2 things to work on this session. Keep it specific.</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="range-focus-chips">
+              <!-- chips injected by JS -->
+            </div>
+            <input type="text" id="range-focus-custom" class="modal-input" placeholder="Or type your own focus…" style="margin-bottom:8px;font-size:0.85rem;padding:8px 10px;">
+            <button onclick="saveRangeFocus()" class="btn-primary" style="width:100%;padding:8px;">Save Focus</button>
+          </div>
+        </div>
+      </div>
+      <!-- END TODAY'S FOCUS -->
+
       <div class="section">
         <div class="card">
           <span class="tag tag-purple">Phase 0</span>
@@ -4695,6 +4717,73 @@
     if (d) d.value = new Date().toISOString().split('T')[0];
   }
 
+  // ── RANGE SESSION FOCUS ──────────────────────────────────────
+  const _FOCUS_KEY = 'sv-range-focus';
+  const _FOCUS_SUGGESTIONS = [
+    'Hip fire before arms — initiate with hips',
+    'Ball-first contact — divot after the ball',
+    '70% tempo, full finish — don\'t muscle it',
+    'Keep head still through impact',
+    'Driver: sweep up off the tee',
+    'Grip pressure: light, no squeezing',
+    'Bump-and-run chipping — land and let it run',
+    'Lag putt speed control — 3-foot tap-in zone',
+    'One swing thought only — commit fully',
+    '4-Hybrid: 70% swing, let it release',
+  ];
+
+  function _rangeFocusData() {
+    try { return JSON.parse(localStorage.getItem(_FOCUS_KEY) || '{}'); } catch(e) { return {}; }
+  }
+  function loadRangeFocus() {
+    const data = _rangeFocusData();
+    const display = document.getElementById('range-focus-display');
+    if (!display) return;
+    if (!data.items || !data.items.length) {
+      display.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;font-style:italic;">No focus set — tap Edit to pick what to work on today.</div>`;
+      return;
+    }
+    display.innerHTML = data.items.map((item, i) => `
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:${i < data.items.length - 1 ? '8' : '0'}px;">
+        <div style="flex-shrink:0;width:18px;height:18px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:#1a1108;margin-top:1px;">${i+1}</div>
+        <div style="font-size:0.88rem;color:var(--cream);line-height:1.4;">${item}</div>
+      </div>`).join('');
+  }
+  function editRangeFocus() {
+    const edit = document.getElementById('range-focus-edit');
+    const chipsEl = document.getElementById('range-focus-chips');
+    const display = document.getElementById('range-focus-display');
+    const isOpen = edit.style.display !== 'none';
+    if (isOpen) { edit.style.display = 'none'; display.style.display = ''; return; }
+    display.style.display = 'none';
+    edit.style.display = '';
+    const data = _rangeFocusData();
+    const selected = data.items || [];
+    chipsEl.innerHTML = _FOCUS_SUGGESTIONS.map(s => {
+      const isOn = selected.includes(s);
+      return `<button onclick="toggleFocusChip(this,'${s.replace(/'/g,"\\'")}')" style="padding:5px 10px;border-radius:20px;border:1px solid ${isOn ? 'var(--gold)' : 'rgba(138,96,16,0.3)'};background:${isOn ? 'rgba(138,96,16,0.2)' : 'transparent'};color:${isOn ? 'var(--gold)' : 'var(--muted)'};font-size:0.75rem;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-focus="${s.replace(/"/g,'&quot;')}" data-on="${isOn ? '1' : '0'}">${s}</button>`;
+    }).join('');
+    document.getElementById('range-focus-custom').value = '';
+  }
+  function toggleFocusChip(btn, text) {
+    const isOn = btn.dataset.on === '1';
+    btn.dataset.on = isOn ? '0' : '1';
+    btn.style.borderColor = !isOn ? 'var(--gold)' : 'rgba(138,96,16,0.3)';
+    btn.style.background  = !isOn ? 'rgba(138,96,16,0.2)' : 'transparent';
+    btn.style.color       = !isOn ? 'var(--gold)' : 'var(--muted)';
+  }
+  function saveRangeFocus() {
+    const chips = [...document.querySelectorAll('#range-focus-chips button[data-on="1"]')].map(b => b.dataset.focus);
+    const custom = document.getElementById('range-focus-custom')?.value.trim();
+    const items = custom ? [...chips, custom] : chips;
+    if (items.length > 2) { showToast('Pick 1–2 focus areas', 'error'); return; }
+    localStorage.setItem(_FOCUS_KEY, JSON.stringify({ items, date: new Date().toISOString().slice(0,10) }));
+    document.getElementById('range-focus-edit').style.display = 'none';
+    document.getElementById('range-focus-display').style.display = '';
+    loadRangeFocus();
+    showToast('Focus saved! Go get it 🎯');
+  }
+
   // ── EXPANDABLE CARDS ─────────────────────────────────────────
   function toggleExp(el) {
     const body = el.nextElementSibling;
@@ -4961,6 +5050,7 @@
   loadNotes();
   setTodayDate();
   updateOfflineBadge();
+  loadRangeFocus();
 
 
   // ── CLUB SYSTEM ──────────────────────────────────────────────
@@ -5153,8 +5243,8 @@
 
   function suggestClub(yards) {
     if (!yards || yards < 1) return null;
-    // Driver and 7-Wood never used on approach — exclude from suggestions
-    const approachClubs = CLUBS.filter(c => c.name !== 'Driver' && c.name !== '7-Wood');
+    // Driver excluded from approach suggestions — 7-Wood IS available for long layups (170+ yds)
+    const approachClubs = CLUBS.filter(c => c.name !== 'Driver');
     const ranked = approachClubs.map(c => ({ ...c, avg: getClubDist(c.name) }))
                                 .sort((a, b) => a.avg - b.avg);
     // Best fit: can reach AND not more than 40 yds overkill
@@ -5164,7 +5254,7 @@
     // Can reach (might be significant overkill) — still pick shortest available
     const canReach = ranked.filter(c => c.avg >= yards);
     if (canReach.length) return canReach[0];
-    // Nothing can reach — return the longest iron/wedge (not woods)
+    // Nothing can reach — return the longest club available
     return ranked[ranked.length - 1];
   }
 
@@ -5173,10 +5263,29 @@
     const avg  = getClubDist(club.name);
     const n    = JSON.parse(localStorage.getItem('sv-clubs') || '{}')[club.name + '_n'] || 0;
     const diff = avg - yards;
-    if (avg < yards) return `max club — ${yards - avg} yds short · aim at front edge, let it run`;
-    if (n === 0)   return 'default estimate · no hits logged yet';
-    if (diff <= 5) return `tight fit — consider playing one more club · ${n} hit${n !== 1 ? 's' : ''} logged`;
-    return `avg ${avg} yds · ${diff} yds buffer · ${n} hit${n !== 1 ? 's' : ''} logged`;
+
+    // Swing tips by club type
+    const tips = {
+      'Driver':   'tee low, ball forward off lead instep, sweep up — 60–70% tempo',
+      '7-Wood':   'ball just inside lead instep, sweep through, 80% tempo — let it release',
+      '4-Hybrid': 'ball lead-of-center, sweep with hip fire — 70% swing, let it run',
+      '4-iron':   'ball slightly lead-of-center, compress down and through',
+      '5-iron':   'ball lead-of-center, weight forward, compress',
+      '6-iron':   'ball center-to-lead, divot after the ball, full finish',
+      '7-iron':   'ball center, weight shifts to lead side — divot right of ball',
+      '8-iron':   'ball center, hands forward, ball-first contact',
+      '9-iron':   'ball center, trust the loft — hit down, let it fly',
+      'PW':       'ball center, hands ahead, 80% swing — distance control over power',
+      'GW':       '70–90 yds zone — find your reliable carry, don\'t max it',
+      'SW':       'ball center-to-forward, light grip, accelerate through',
+      'LW':       'ball forward, open face slightly, hinge and hold — soft landing',
+    };
+    const swingTip = tips[club.name] || '';
+
+    if (avg < yards) return `max club — ${yards - avg} yds short · aim at front, let it run`;
+    if (n === 0)   return `default estimate · ${swingTip}`;
+    if (diff <= 5) return `tight fit — one more club? · ${swingTip}`;
+    return `avg ${avg} yds · ${diff > 0 ? diff + ' yds buffer' : 'right on'} · ${swingTip}`;
   }
 
   // ── GPS ───────────────────────────────────────────────────────
@@ -5297,8 +5406,9 @@
     if (!el) return;
     const suggested = suggestClub(yards);
     const note = suggested ? clubNote(suggested, yards) : '';
-    // All clubs except Driver, in ascending distance order
-    const approachClubs = CLUBS.filter(c => c.name !== 'Driver');
+    // All clubs except Driver — reversed so SHORT clubs are LEFT, LONG clubs RIGHT
+    // This matches the slider direction (30 yds = left, 250 yds = right)
+    const approachClubs = [...CLUBS.filter(c => c.name !== 'Driver')].reverse();
 
     el.innerHTML = `
       ${suggested ? `<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
@@ -6011,21 +6121,39 @@
     }
   }
 
+  // Helper: is this a regulation 18-hole round (par 68+)?
+  // Excludes par-3/executive courses (par 54 = 18 par-3s) and 9-hole rounds (par ~35-36)
+  function isRegulationRound(r) {
+    return (r.course_par || 0) >= 60;
+  }
+  // Visual tag for non-regulation rounds
+  function roundTypeTag(r) {
+    if (!r.course_par || r.course_par >= 60) return '';
+    if (r.course_par <= 36) return '<span style="font-size:0.6rem;background:rgba(100,116,139,0.2);color:var(--muted);border-radius:4px;padding:1px 5px;margin-left:6px;font-weight:700;letter-spacing:0.5px;">9 HOLES</span>';
+    return '<span style="font-size:0.6rem;background:rgba(100,116,139,0.2);color:var(--muted);border-radius:4px;padding:1px 5px;margin-left:6px;font-weight:700;letter-spacing:0.5px;">PAR-3</span>';
+  }
+
   function renderDadHistory(rounds) {
     const listEl = document.getElementById('dad-history-list');
     const statsBar = document.getElementById('dad-stats-bar');
     if (!rounds || rounds.length === 0) { rounds = []; }
     statsBar.style.display = 'none';
-    // Stats — scored rounds only
+    // Stats — scored rounds only (all non-practice for history display)
     const scoredRounds = rounds.filter(r => !r.is_practice);
+    // Best/avg only count regulation 18-hole rounds (par 60+)
+    const regulationRounds = scoredRounds.filter(r => isRegulationRound(r));
     if (scoredRounds.length >= 1) {
       statsBar.style.display = '';
-      const sorted    = [...scoredRounds].sort((a,b) => new Date(a.date_played) - new Date(b.date_played));
-      const last      = sorted[sorted.length - 1];
-      const prev      = sorted.length >= 2 ? sorted[sorted.length - 2] : null;
-      const scoreDelta = prev ? last.total_score - prev.total_score : null;
-      const best      = scoredRounds.reduce((a,r) => r.total_score < a.total_score ? r : a);
-      const avg       = Math.round(scoredRounds.reduce((a,r) => a + r.total_score, 0) / scoredRounds.length);
+      const regSorted  = [...regulationRounds].sort((a,b) => new Date(a.date_played) - new Date(b.date_played));
+      const allSorted  = [...scoredRounds].sort((a,b) => new Date(a.date_played) - new Date(b.date_played));
+      const last       = allSorted[allSorted.length - 1];
+      const prevReg    = regSorted.length >= 2 ? regSorted[regSorted.length - 2] : null;
+      const lastReg    = regSorted[regSorted.length - 1] || last;
+      const scoreDelta = prevReg ? lastReg.total_score - prevReg.total_score : null;
+      // Best and avg only from regulation rounds (fallback to all if no regulation rounds yet)
+      const statsPool  = regulationRounds.length >= 1 ? regulationRounds : scoredRounds;
+      const best       = statsPool.reduce((a,r) => r.total_score < a.total_score ? r : a);
+      const avg        = Math.round(statsPool.reduce((a,r) => a + r.total_score, 0) / statsPool.length);
       // Update home screen best score dynamically
       const homeBestEl = document.getElementById('dad-home-best');
       if (homeBestEl) {
@@ -6051,8 +6179,8 @@
       const girPct  = girHits.length ? Math.round(girHits.reduce((a,b)=>a+b,0)/girHits.length*100) : null;
       const avgPutts = puttTotals.length ? (puttTotals.reduce((a,b)=>a+b,0)/puttTotals.length).toFixed(1) : null;
 
-      // Sparkline bars (last 8 scored rounds)
-      const sparkRounds = sorted.slice(-8);
+      // Sparkline bars (last 8 regulation rounds)
+      const sparkRounds = (regSorted.length >= 2 ? regSorted : allSorted).slice(-8);
       const sparkMin = Math.min(...sparkRounds.map(r=>r.total_score));
       const sparkMax = Math.max(...sparkRounds.map(r=>r.total_score));
       const sparkRange = sparkMax - sparkMin || 1;
@@ -6080,7 +6208,7 @@
             <div style="text-align:right;">
               <div style="font-size:0.58rem;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px;">BEST</div>
               <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--gold);line-height:1;">${best.total_score}</div>
-              <div style="font-size:0.6rem;color:var(--muted);">${scoredRounds.length} rounds · avg ${avg}</div>
+              <div style="font-size:0.6rem;color:var(--muted);">${statsPool.length} reg rounds · avg ${avg}</div>
             </div>
           </div>
           <!-- Sparkline -->
@@ -6123,50 +6251,8 @@
         ${renderBadges(scoredRounds, '#8a6010')}
       </div>` : '';
 
-    const legacyCards = `
-      <div class="round-card" id="dad-round-legacy-apr26">
-        <div class="round-card-header" onclick="toggleRoundExpand('dad-round-legacy-apr26')">
-          <div class="round-card-left">
-            <div class="round-card-date">Apr 2026</div>
-            <div class="round-card-course">Stonehouse + Oaks · Autumn · Rain-shortened</div>
-          </div>
-          <div class="round-card-right">
-            <div class="round-badge gold">48 <span style="font-size:0.75rem;opacity:0.7;">(9 holes)</span></div>
-          </div>
-        </div>
-        <div class="round-card-expand" id="dad-round-legacy-apr26-expand">
-          <div class="hole-grid">
-            <div class="hole-cell"><div class="h-num">1</div><div class="h-score">6</div><div class="h-par">p4</div></div>
-            <div class="hole-cell"><div class="h-num">2</div><div class="h-score" style="color:var(--green);">4</div><div class="h-par">p4</div></div>
-            <div class="hole-cell"><div class="h-num">3</div><div class="h-score">6</div><div class="h-par">p4</div></div>
-            <div class="hole-cell"><div class="h-num">4</div><div class="h-score" style="color:var(--green);">4</div><div class="h-par">p4</div></div>
-            <div class="hole-cell"><div class="h-num">5</div><div class="h-score" style="color:var(--green);">4</div><div class="h-par">p3</div></div>
-            <div class="hole-cell"><div class="h-num">6</div><div class="h-score">7</div><div class="h-par">p4</div></div>
-            <div class="hole-cell"><div class="h-num">7</div><div class="h-score" style="color:var(--green);">5</div><div class="h-par">p4</div></div>
-            <div class="hole-cell"><div class="h-num">8</div><div class="h-score">5</div><div class="h-par">p3</div></div>
-            <div class="hole-cell"><div class="h-num">9</div><div class="h-score">7</div><div class="h-par">p5</div></div>
-          </div>
-          <div style="margin-bottom:8px;"><i class="ti ti-flag-2" style="color:var(--green);vertical-align:-1px;"></i> <strong>Pars:</strong> H2, H4, H5, H7 &nbsp; <span style="color:var(--green);font-weight:600;">↓ 12-stroke improvement</span> on Stonehouse</div>
-          <div style="margin-bottom:6px;"><i class="ti ti-check" style="color:var(--green);vertical-align:-1px;"></i> <em>Driver comfort 7/10 — working confidently all day</em></div>
-          <div style="margin-bottom:6px;"><i class="ti ti-tool" style="color:var(--muted);vertical-align:-1px;"></i> <em>Lag putts on Bermuda · commit fully on water holes · downhill = one club less</em></div>
-          <div style="margin-bottom:6px;font-size:0.75rem;color:var(--muted);">Called after H10 (Oaks) due to rain</div>
-        </div>
-      </div>
-      <div class="round-card" id="dad-round-legacy-dec25">
-        <div class="round-card-header" onclick="toggleRoundExpand('dad-round-legacy-dec25')">
-          <div class="round-card-left">
-            <div class="round-card-date">Dec 2025</div>
-            <div class="round-card-course">Creek + Stonehouse · Sage tees</div>
-          </div>
-          <div class="round-card-right">
-            <div class="round-badge red">118</div>
-          </div>
-        </div>
-        <div class="round-card-expand" id="dad-round-legacy-dec25-expand">
-          <div style="margin-bottom:8px;">56 Creek · 60 Stonehouse</div>
-          <div style="margin-bottom:6px;color:var(--gold);font-weight:600;"><i class="ti ti-flag-2"></i> First ever round on a golf course</div>
-        </div>
-      </div>`;
+    // Legacy hardcoded cards removed — all rounds now loaded from Supabase
+    const legacyCards = '';
 
     listEl.innerHTML = dadBadgesHtml + rounds.map((r, idx) => {
       const d = new Date(r.date_played + 'T12:00:00');
@@ -6195,7 +6281,7 @@
         <div class="round-card" id="dad-round-${idx}">
           <div class="round-card-header" onclick="toggleRoundExpand('dad-round-${idx}')">
             <div class="round-card-left">
-              <div class="round-card-date">${dateStr}${practiceBadge}</div>
+              <div class="round-card-date">${dateStr}${practiceBadge}${roundTypeTag(r)}</div>
               <div class="round-card-course">${r.course_name}</div>
             </div>
             <div class="round-card-right">
