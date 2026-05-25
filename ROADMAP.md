@@ -89,7 +89,7 @@ Every major competitor (18Birdies, Arccos, Golfshot, SwingU, Hole19, The Grint) 
 
 ## 4. Upcoming Sprints
 
-### Sprint 3B — Round Type + Mobile Fixes (Next)
+### Sprint 3B — Round Type + Mobile Fixes ✅ COMPLETE (2026-05-25)
 Priority items:
 
 **Round type differentiation:**
@@ -319,6 +319,13 @@ create table courses (
 ## 8. Changelog
 
 **Keep this updated.** Every meaningful web-app change gets a one-line entry here with date.
+
+### 2026-05-25 — Sprint 3B
+- Added `round_type text DEFAULT 'regulation_18'` column to `dad_rounds` in Supabase
+- Added Format pill row to round entry modal (⛳ 18-Hole / 🏌️ 9-Hole / 📍 Par-3); auto-selects on course change
+- `dadStartRound()` captures format; `saveDadRoundFull()` writes `round_type` to Supabase
+- `isRegulationRound()` and `roundTypeTag()` use explicit `round_type` with legacy `course_par` fallback
+- SW bumped: v66 / cache v112
 
 ### 2026-05-25 — Sprint 3A
 - Fixed 7-Wood suggestion: removed from exclusion list in `suggestClub()`; now available for 170+ yd approaches

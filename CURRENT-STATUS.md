@@ -1,7 +1,7 @@
 # SpinVibes Golf — Current Status
 > **Update this at the end of every Cowork session.** This is the first thing to read when starting a new session. It answers: where are we, what's broken, what's next.
 
-*Last updated: 2026-05-25 (session 13 — Sprint 3A complete)*
+*Last updated: 2026-05-25 (session 15 — Sprint 4 complete)*
 
 ---
 
@@ -11,9 +11,9 @@
 |------|--------|
 | spinvibes.com (PWA) | ✅ Live — GitHub Pages |
 | golf.spinvibes.com (guide builder) | ✅ Live — GitHub Pages |
-| Service worker | **v64 / cache v110** |
+| Service worker | **v67 / cache v113** |
 | Stable checkpoint | **`v1.0-stable`** tag on GitHub — safe rollback before file split |
-| Last commit | Sprint 3A: 7-Wood fix, slider direction, best score, legacy cards removed, Range focus, swing tips |
+| Last commit | Sprint 4: kids leveling system — level cards, progress bars, confetti ceremony, range badges |
 | Supabase | ✅ Operational |
 | Caddie proxy | ✅ Live at `spinvibes-golf.netlify.app/.netlify/functions/caddie` |
 | Netlify | ⚠️ Credit limit resets ~June 1. Caddie function still live |
@@ -31,11 +31,43 @@
 
 ---
 
+## What Was Just Finished (Session 15 — May 25, 2026)
+
+### Sprint 4 — Kids Leveling System — COMPLETE ✅
+
+| Feature | What changed |
+|---------|-------------|
+| Level cards | Son (default L2) + Daughter (default L1) pages show level badge, name, description, progress bar toward next level |
+| PROMOTE button | Dad-only promote button with confirm dialog — deliberate moment, not accidental |
+| Auto-flag | Toast fires once when round threshold is hit ("Son is ready for Level 2!") — Dad still approves |
+| Level Up ceremony | Full-screen confetti burst, bouncing emoji, new level name, "Let's Go!" dismiss |
+| Range level badges | Son + Daughter range headers show current level pill, updates live |
+| Level thresholds | L1→2: 3 rounds · L2→3: 5 rounds · L3→4: 8 rounds |
+| SW bumped | v67 / cache v113 |
+
+---
+
+## What Was Just Finished (Session 14 — May 25, 2026)
+
+### Sprint 3B — COMPLETE ✅
+
+**Code changes shipped:**
+
+| Fix | What changed |
+|-----|-------------|
+| Format pills in round entry modal | New "Format" pill row: ⛳ 18-Hole / 🏌️ 9-Hole / 📍 Par-3. Auto-selects based on chosen course par (≤36 → 9-Hole, ≤58 → Par-3, else 18-Hole). |
+| `round_type` stored in Supabase | `dadStartRound()` captures selected format, `saveDadRoundFull()` includes `round_type` in saved object. Column `round_type text DEFAULT 'regulation_18'` added to `dad_rounds`. |
+| `isRegulationRound()` updated | Checks `round_type === 'regulation_18'` first; falls back to `course_par >= 60` for legacy rounds. |
+| `roundTypeTag()` updated | Uses explicit `round_type` field; falls back to par inference for legacy rounds without the field. |
+| Duplicate son round | Already deleted — son_rounds clean (only 2 Welk Oaks rounds remain). |
+| Investor overview PDF | 4-page dark-themed PDF: Strategy / Roadmap / Market / Investor View. Saved to Golf folder. |
+| SW bumped | v66 / cache v112 |
+
+---
+
 ## What Was Just Finished (Session 13 — May 25, 2026)
 
 ### Sprint 3A — COMPLETE ✅
-
-**Big strategy/product discussion:** family-first positioning, kids leveling, social sharing, new sprint roadmap.
 
 **Code changes shipped:**
 
@@ -73,15 +105,15 @@
 
 ---
 
-## Next Up — Sprint 3B: Round Type + Mobile Fixes
+## Next Up — Sprint 5: Family Memories + Social Sharing
 
-**Priority items:**
+**Goal:** capture real memories from rounds and make them shareable.
 
-1. **Round type dropdown in round entry modal** — "18 holes (regulation)" / "9 holes" / "Par-3 course" / "Range". Need to add `round_type` column to `dad_rounds` in Supabase SQL editor, then store on save.
-
-2. **Per-hole stroke counter mobile fix** — Clarify with Jeremy exactly what's broken. Current theory: modal footer (+/− buttons) may be hidden behind iPhone home bar or not rendering correctly. Fix before next round.
-
-3. **Delete duplicate "test" son round** — son_rounds table has a duplicate Apr 19 entry (course "test", score 110).
+**Key tasks:**
+1. Persist photos to Supabase Storage (image bucket with signed URLs) — currently stored in memory only
+2. Shareable round recap card — canvas-generated PNG with scorecard overlay, course, score vs par, SpinVibes branding
+3. Web Share API — native share sheet on mobile (Instagram, Messages, etc.)
+4. Family gallery view — all round photos by date on the family round history
 
 ---
 
@@ -92,9 +124,10 @@
 | 1 | Stable foundation — layout, file split | ✅ DONE |
 | 2 | Master Coach Reference (age × skill matrix) | ✅ DONE |
 | 3A | Round intelligence + Range polish | ✅ DONE |
-| 3B | Round type differentiation + mobile stroke fix | **← YOU ARE HERE** |
-| 4 | Kids leveling system (Level 1→4 progression) | Queued |
-| 5 | Family memories + social sharing (photos, recap cards) | Queued |
+| 3B | Round type differentiation + mobile stroke fix | ✅ DONE |
+| 4 | Kids leveling system (Level 1→4 progression) | ✅ DONE |
+| 4 | Kids leveling system (Level 1→4 progression) | ✅ DONE |
+| 5 | Family memories + social sharing (photos, recap cards) | **← YOU ARE HERE** |
 | 6 | Multi-user auth + real Supabase profiles + family onboarding | Queued |
 | 7 | App Store via Capacitor | Queued |
 
@@ -102,9 +135,6 @@
 
 ## Known Issues / Cleanup Items
 
-- **Per-hole stroke counter on mobile** — needs clarification from Jeremy. May be a footer visibility issue on iPhone.
-- **Round type column** — needs `round_type text` added to `dad_rounds` in Supabase SQL editor.
-- **Duplicate "test" son round** — delete from son_rounds table (Apr 19, course "test", score 110).
 - **Putter weights** — 60g total too heavy. Update when Jeremy confirms new config.
 - **Takomo irons** — arriving ~4–5 weeks from May 17. Update CLUBS when confirmed.
 - **7-wood carry** — 180–195 yds estimated, needs range confirmation.
