@@ -1826,13 +1826,21 @@
     }
   }
 
-  // Helper: is this a regulation 18-hole round (par 68+)?
-  // Excludes par-3/executive courses (par 54 = 18 par-3s) and 9-hole rounds (par ~35-36)
+  // Helper: is this a regulation 18-hole round?
+  // Checks explicit round_type first (new rounds), falls back to course_par inference (legacy)
   function isRegulationRound(r) {
+    if (r.round_type) return r.round_type === 'regulation_18';
     return (r.course_par || 0) >= 60;
   }
   // Visual tag for non-regulation rounds
   function roundTypeTag(r) {
+    if (r.round_type) {
+      if (r.round_type === 'regulation_18') return '';
+      if (r.round_type === 'nine_hole')     return '<span style="font-size:0.6rem;background:rgba(100,116,139,0.2);color:var(--muted);border-radius:4px;padding:1px 5px;margin-left:6px;font-weight:700;letter-spacing:0.5px;">9 HOLES</span>';
+      if (r.round_type === 'par3_exec')     return '<span style="font-size:0.6rem;background:rgba(100,116,139,0.2);color:var(--muted);border-radius:4px;padding:1px 5px;margin-left:6px;font-weight:700;letter-spacing:0.5px;">PAR-3</span>';
+      return '';
+    }
+    // Legacy fallback: infer from course_par
     if (!r.course_par || r.course_par >= 60) return '';
     if (r.course_par <= 36) return '<span style="font-size:0.6rem;background:rgba(100,116,139,0.2);color:var(--muted);border-radius:4px;padding:1px 5px;margin-left:6px;font-weight:700;letter-spacing:0.5px;">9 HOLES</span>';
     return '<span style="font-size:0.6rem;background:rgba(100,116,139,0.2);color:var(--muted);border-radius:4px;padding:1px 5px;margin-left:6px;font-weight:700;letter-spacing:0.5px;">PAR-3</span>';
@@ -2387,6 +2395,12 @@
         <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="Resort">Resort</div>
       </div>
       <button class="btn-ghost" style="width:100%;margin-top:8px;font-size:0.8rem;" onclick="openAddCourseOverlay('dad')">+ Add New Course</button>
+      <label class="modal-label">Format</label>
+      <div class="pill-row" id="dm-format-pills">
+        <div class="pill active" onclick="selectPill(this,'dm-format-pills')" data-val="regulation_18">⛳ 18-Hole</div>
+        <div class="pill" onclick="selectPill(this,'dm-format-pills')" data-val="nine_hole">🏌️ 9-Hole</div>
+        <div class="pill" onclick="selectPill(this,'dm-format-pills')" data-val="par3_exec">📍 Par-3</div>
+      </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:10px;">
         <span style="font-size:0.87rem;color:var(--cream);font-weight:600;">Round type</span>
         <div class="pill-row" id="dm-type-pills" style="margin:0;gap:6px;">
@@ -2403,8 +2417,21 @@
     const custom = document.getElementById('dm-custom-wrap');
     const idx = parseInt(val);
     custom.style.display = idx === getAllCourses().length - 1 ? 'block' : 'none';
-    // Auto-select tee color matching the course's stored tee
     const course = getAllCourses()[idx];
+
+    // Auto-select Format pill based on course par
+    if (course && course.par) {
+      let fmt = 'regulation_18';
+      if (course.par <= 36)  fmt = 'nine_hole';
+      else if (course.par <= 58) fmt = 'par3_exec';
+      const fmtPill = document.querySelector(`#dm-format-pills .pill[data-val="${fmt}"]`);
+      if (fmtPill) {
+        document.querySelectorAll('#dm-format-pills .pill').forEach(p => p.classList.remove('active'));
+        fmtPill.classList.add('active');
+      }
+    }
+
+    // Auto-select tee color matching the course's stored tee
     if (course && course.teeColor) {
       const pill = document.querySelector(`#dm-tee-pills .pill[data-val="${course.teeColor}"]`);
       if (pill) {
@@ -2438,6 +2465,7 @@
     }
     const tee = document.querySelector('#dm-tee-pills .pill.active')?.dataset.val || 'White';
     const isPractice = document.querySelector('#dm-type-pills .pill.active')?.dataset.val === 'practice';
+    const roundType = document.querySelector('#dm-format-pills .pill.active')?.dataset.val || 'regulation_18';
     _dadRound = {
       date_played: document.getElementById('dm-date').value,
       course_name: courseName,
@@ -2446,6 +2474,7 @@
       total_score: 0,
       score_vs_par: 0,
       is_practice: isPractice,
+      round_type: roundType,
     };
     _dadHoles = [];
     _dadHoleIdx = 0;
@@ -2643,6 +2672,7 @@
       score_vs_par: total - _dadRound.course_par,
       holes: _dadHoles,
       is_practice: _dadRound.is_practice || false,
+      round_type: _dadRound.round_type || 'regulation_18',
       reflection: {
         best: document.getElementById('dr-best').value.trim(),
         worst: document.getElementById('dr-worst').value.trim(),
