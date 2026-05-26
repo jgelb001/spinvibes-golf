@@ -1784,6 +1784,288 @@
     .fam-double { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:3px;font-size:0.78rem;font-weight:700;color:#fff;background:#c0392b; }
     .fam-triple { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:3px;font-size:0.78rem;font-weight:800;color:#fff;background:#8B0000; }
 
+
+    /* ══════════════════════════════════════════════
+       SETTINGS OVERLAY — Sprint 3
+    ══════════════════════════════════════════════ */
+
+    /* Topbar */
+    .settings-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      padding-top: calc(14px + env(safe-area-inset-top, 0px));
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 10;
+    }
+    .settings-back-btn {
+      background: none;
+      border: none;
+      color: var(--gold);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 4px;
+    }
+    .settings-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      color: var(--gold);
+      letter-spacing: 2px;
+    }
+
+    /* Section headers */
+    .settings-section-header {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 20px 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Card container */
+    .settings-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px 16px;
+      box-shadow: var(--c-shadow);
+      margin-bottom: 8px;
+    }
+
+    /* Row inside card */
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    .settings-label {
+      font-size: 0.85rem;
+      color: var(--cream);
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    /* Inputs */
+    .settings-input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--cream);
+      font-size: 0.9rem;
+      font-family: inherit;
+      padding: 8px 10px;
+      flex: 1;
+      min-width: 0;
+      outline: none;
+    }
+    .settings-input:focus {
+      border-color: var(--gold);
+    }
+    .settings-select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--cream);
+      font-size: 0.9rem;
+      font-family: inherit;
+      padding: 8px 10px;
+      outline: none;
+      cursor: pointer;
+    }
+    .settings-add-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--gold);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 10px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* Toggle pill */
+    .settings-toggle-wrap { display: flex; align-items: center; cursor: pointer; }
+    .settings-toggle-input { display: none; }
+    .settings-toggle-pill {
+      width: 42px; height: 24px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      position: relative;
+      transition: background 0.2s;
+    }
+    .settings-toggle-pill::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 16px; height: 16px;
+      background: var(--muted);
+      border-radius: 50%;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .settings-toggle-input:checked + .settings-toggle-pill {
+      background: var(--green);
+      border-color: var(--green);
+    }
+    .settings-toggle-input:checked + .settings-toggle-pill::after {
+      transform: translateX(18px);
+      background: #fff;
+    }
+
+    /* Bag list rows */
+    .settings-bag-row {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      gap: 10px;
+    }
+    .settings-bag-name {
+      flex: 1;
+      font-size: 0.85rem;
+      color: var(--cream);
+      font-weight: 500;
+    }
+    .settings-bag-dist-input {
+      width: 56px;
+      text-align: center;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--cream);
+      font-size: 0.85rem;
+      padding: 5px 6px;
+      font-family: inherit;
+      outline: none;
+    }
+    .settings-bag-dist-input:focus { border-color: var(--gold); }
+    .settings-bag-confirmed {
+      font-size: 0.65rem;
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .settings-bag-confirmed.is-confirmed {
+      background: rgba(34,197,94,0.12);
+      color: #22c55e;
+      border-color: rgba(34,197,94,0.3);
+    }
+    .settings-bag-confirmed.is-estimated {
+      background: var(--surface2);
+      color: var(--muted);
+      border-color: var(--border);
+    }
+    .settings-bag-remove {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+    .settings-bag-remove:hover { color: var(--red, #ef4444); }
+
+    /* Family cards */
+    .settings-family-card {
+      padding: 14px 16px !important;
+    }
+    .settings-family-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .settings-family-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .settings-family-name-input {
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      color: var(--cream);
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      padding: 2px 0;
+      outline: none;
+      width: 120px;
+    }
+    .settings-family-name-input:focus { border-bottom-color: var(--gold); }
+
+    /* Level control */
+    .settings-level-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .settings-level-btn {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--cream);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1;
+    }
+    .settings-level-badge {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem;
+      color: var(--gold);
+      letter-spacing: 1px;
+      min-width: 32px;
+      text-align: center;
+    }
+
+    /* Family distances */
+    .settings-family-dists {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+    }
+    .settings-family-dist-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .settings-family-dist-row .settings-label {
+      width: 90px;
+      flex-shrink: 0;
+    }
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
@@ -3883,6 +4165,7 @@
         <div class="section" style="margin-top:-4px;display:flex;gap:10px;">
           <button onclick="openFamilyModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--cream);font-size:0.9rem;font-weight:600;cursor:pointer;box-shadow:var(--c-shadow);"><i class="ti ti-users" style="font-size:1rem;color:var(--gold);"></i> Family Round</button>
           <button onclick="showPage('caddie')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--cream);font-size:0.9rem;font-weight:600;cursor:pointer;box-shadow:var(--c-shadow);"><i class="ti ti-message-circle" style="font-size:1rem;color:var(--gold);"></i> Caddie</button>
+          <button onclick="openSettings()" title="Settings" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(138,96,16,0.35);border-radius:10px;padding:0 14px;color:var(--gold-l);font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;"><i class="ti ti-settings" style="font-size:1.1rem;"></i></button>
         </div>
 
         <div id="dad-stats-bar" style="display:none;" class="section">
@@ -3962,6 +4245,335 @@
 
     <!-- ══════════════════════════════════════
          PAGE: AI CADDIE
+  <!-- ══════════════════════════════════════
+       SETTINGS OVERLAY (Dad Admin Panel)
+       Opened via openSettings() — full-screen overlay
+       Only accessible after Dad PIN unlock
+  ══════════════════════════════════════ -->
+  <div id="settings-overlay" style="display:none;position:fixed;inset:0;z-index:8000;background:var(--bg);overflow-y:auto;padding-bottom:calc(40px + env(safe-area-inset-bottom,0px));">
+
+    <!-- Topbar -->
+    <div class="settings-topbar">
+      <button onclick="closeSettings()" class="settings-back-btn">
+        <i class="ti ti-arrow-left"></i> Back
+      </button>
+      <div class="settings-title">Settings</div>
+      <div style="width:60px;"></div>
+    </div>
+
+    <div style="padding:0 16px;">
+
+      <!-- ── SAVE BANNER (shown after any change) ── -->
+      <div id="settings-save-banner" style="display:none;position:sticky;top:calc(56px + env(safe-area-inset-top,0px));z-index:10;margin:0 -16px;padding:10px 20px;background:var(--green);color:#fff;font-size:0.85rem;font-weight:700;display:flex;align-items:center;justify-content:space-between;">
+        <span><i class="ti ti-circle-dot"></i> Unsaved changes</span>
+        <button onclick="saveAllSettings()" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:8px;color:#fff;font-size:0.8rem;font-weight:700;padding:6px 14px;cursor:pointer;">Save All</button>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION: MY PROFILE
+      ══════════════════════════════════════ -->
+      <div class="settings-section-header">
+        <i class="ti ti-user"></i> My Profile
+      </div>
+      <div class="settings-card">
+
+        <div class="settings-row">
+          <label class="settings-label">Name</label>
+          <input id="set-name" class="settings-input" type="text" placeholder="Your name" oninput="markSettingsDirty()" />
+        </div>
+
+        <div class="settings-row">
+          <label class="settings-label">Goal Score</label>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input id="set-goal" class="settings-input" type="number" min="60" max="130" placeholder="90" style="width:72px;text-align:center;" oninput="markSettingsDirty()" />
+            <span style="font-size:0.75rem;color:var(--muted);">strokes</span>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <label class="settings-label">Handedness</label>
+          <select id="set-hand" class="settings-select" onchange="markSettingsDirty()">
+            <option value="left">Left-Handed</option>
+            <option value="right">Right-Handed</option>
+          </select>
+        </div>
+
+        <div class="settings-row" style="border:none;">
+          <label class="settings-label">Skill Level</label>
+          <select id="set-skill" class="settings-select" onchange="markSettingsDirty()">
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION: MY BAG
+      ══════════════════════════════════════ -->
+      <div class="settings-section-header">
+        <i class="ti ti-briefcase"></i> My Bag
+        <span style="font-size:0.7rem;font-weight:500;color:var(--muted);letter-spacing:0;text-transform:none;margin-left:6px;">tap distance to edit</span>
+      </div>
+      <div class="settings-card" style="padding:0;">
+        <div id="settings-bag-list">
+          <!-- Injected by renderSettingsBag() -->
+        </div>
+        <div style="padding:12px 16px;border-top:1px solid var(--border);">
+          <button onclick="openAddClubForm()" class="settings-add-btn">
+            <i class="ti ti-plus"></i> Add Club
+          </button>
+        </div>
+      </div>
+
+      <!-- Add Club Form (hidden by default) -->
+      <div id="add-club-form" style="display:none;" class="settings-card">
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">New Club</div>
+        <div class="settings-row">
+          <label class="settings-label">Club Name</label>
+          <input id="new-club-name" class="settings-input" type="text" placeholder="e.g. 3-Wood" />
+        </div>
+        <div class="settings-row">
+          <label class="settings-label">Carry (yds)</label>
+          <input id="new-club-dist" class="settings-input" type="number" min="10" max="400" placeholder="150" style="width:72px;text-align:center;" />
+        </div>
+        <div class="settings-row">
+          <label class="settings-label">Loft</label>
+          <input id="new-club-loft" class="settings-input" type="text" placeholder="e.g. 15°" style="width:72px;" />
+        </div>
+        <div class="settings-row" style="border:none;">
+          <label class="settings-label">Wedge?</label>
+          <label class="settings-toggle-wrap">
+            <input type="checkbox" id="new-club-wedge" class="settings-toggle-input" />
+            <span class="settings-toggle-pill"></span>
+          </label>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button onclick="addNewClub()" class="btn-primary" style="flex:1;padding:10px;font-size:0.85rem;">Add to Bag</button>
+          <button onclick="document.getElementById('add-club-form').style.display='none';" style="flex:0 0 auto;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--muted);cursor:pointer;font-size:0.85rem;">Cancel</button>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION: FAMILY
+      ══════════════════════════════════════ -->
+      <div class="settings-section-header">
+        <i class="ti ti-users"></i> Family
+      </div>
+
+      <!-- Son -->
+      <div class="settings-card settings-family-card" id="fam-card-son">
+        <div class="settings-family-header">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="settings-family-avatar" style="background:rgba(59,130,246,0.15);color:#3b82f6;">S</div>
+            <div>
+              <input id="fam-son-name" class="settings-family-name-input" type="text" placeholder="Son's name" oninput="markSettingsDirty()" />
+              <div style="font-size:0.7rem;color:var(--muted);">Junior · Right-handed</div>
+            </div>
+          </div>
+          <div class="settings-level-control">
+            <button onclick="adjustFamilyLevel('son', -1)" class="settings-level-btn">−</button>
+            <div class="settings-level-badge" id="fam-son-level-badge">Lv 1</div>
+            <button onclick="adjustFamilyLevel('son', +1)" class="settings-level-btn">+</button>
+          </div>
+        </div>
+        <div class="settings-family-dists" id="fam-son-dists">
+          <div class="settings-family-dist-row">
+            <span class="settings-label" style="font-size:0.75rem;">Driver</span>
+            <input id="fam-son-driver" type="number" class="settings-input" style="width:60px;text-align:center;padding:4px 6px;font-size:0.85rem;" placeholder="—" oninput="markSettingsDirty()" />
+            <span style="font-size:0.72rem;color:var(--muted);">yds</span>
+          </div>
+          <div class="settings-family-dist-row">
+            <span class="settings-label" style="font-size:0.75rem;">Iron / Hybrid</span>
+            <input id="fam-son-iron" type="number" class="settings-input" style="width:60px;text-align:center;padding:4px 6px;font-size:0.85rem;" placeholder="—" oninput="markSettingsDirty()" />
+            <span style="font-size:0.72rem;color:var(--muted);">yds</span>
+          </div>
+          <div class="settings-family-dist-row">
+            <span class="settings-label" style="font-size:0.75rem;">Wedge</span>
+            <input id="fam-son-wedge" type="number" class="settings-input" style="width:60px;text-align:center;padding:4px 6px;font-size:0.85rem;" placeholder="—" oninput="markSettingsDirty()" />
+            <span style="font-size:0.72rem;color:var(--muted);">yds</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daughter -->
+      <div class="settings-card settings-family-card" id="fam-card-daughter">
+        <div class="settings-family-header">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="settings-family-avatar" style="background:rgba(236,72,153,0.12);color:#ec4899;">D</div>
+            <div>
+              <input id="fam-daughter-name" class="settings-family-name-input" type="text" placeholder="Daughter's name" oninput="markSettingsDirty()" />
+              <div style="font-size:0.7rem;color:var(--muted);">Junior · Left-handed</div>
+            </div>
+          </div>
+          <div class="settings-level-control">
+            <button onclick="adjustFamilyLevel('daughter', -1)" class="settings-level-btn">−</button>
+            <div class="settings-level-badge" id="fam-daughter-level-badge">Lv 1</div>
+            <button onclick="adjustFamilyLevel('daughter', +1)" class="settings-level-btn">+</button>
+          </div>
+        </div>
+        <div class="settings-family-dists">
+          <div class="settings-family-dist-row">
+            <span class="settings-label" style="font-size:0.75rem;">Driver</span>
+            <input id="fam-daughter-driver" type="number" class="settings-input" style="width:60px;text-align:center;padding:4px 6px;font-size:0.85rem;" placeholder="—" oninput="markSettingsDirty()" />
+            <span style="font-size:0.72rem;color:var(--muted);">yds</span>
+          </div>
+          <div class="settings-family-dist-row">
+            <span class="settings-label" style="font-size:0.75rem;">Iron / Hybrid</span>
+            <input id="fam-daughter-iron" type="number" class="settings-input" style="width:60px;text-align:center;padding:4px 6px;font-size:0.85rem;" placeholder="—" oninput="markSettingsDirty()" />
+            <span style="font-size:0.72rem;color:var(--muted);">yds</span>
+          </div>
+          <div class="settings-family-dist-row">
+            <span class="settings-label" style="font-size:0.75rem;">Wedge</span>
+            <input id="fam-daughter-wedge" type="number" class="settings-input" style="width:60px;text-align:center;padding:4px 6px;font-size:0.85rem;" placeholder="—" oninput="markSettingsDirty()" />
+            <span style="font-size:0.72rem;color:var(--muted);">yds</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mom -->
+      <div class="settings-card settings-family-card" id="fam-card-mom">
+        <div class="settings-family-header">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="settings-family-avatar" style="background:rgba(20,184,166,0.12);color:#14b8a6;">M</div>
+            <div>
+              <input id="fam-mom-name" class="settings-family-name-input" type="text" placeholder="Mom's name" oninput="markSettingsDirty()" />
+              <div style="font-size:0.7rem;color:var(--muted);">Adult beginner</div>
+            </div>
+          </div>
+          <div>
+            <select id="fam-mom-skill" class="settings-select" style="font-size:0.8rem;padding:6px 10px;" onchange="markSettingsDirty()">
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grandma -->
+      <div class="settings-card settings-family-card" id="fam-card-grandma">
+        <div class="settings-family-header">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="settings-family-avatar" style="background:rgba(168,85,247,0.12);color:#a855f7;">G</div>
+            <div>
+              <input id="fam-grandma-name" class="settings-family-name-input" type="text" placeholder="Grandma's name" oninput="markSettingsDirty()" />
+              <div style="font-size:0.7rem;color:var(--muted);">Getting back out there</div>
+            </div>
+          </div>
+          <div>
+            <select id="fam-grandma-skill" class="settings-select" style="font-size:0.8rem;padding:6px 10px;" onchange="markSettingsDirty()">
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="returning">Returning</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION: SECURITY
+      ══════════════════════════════════════ -->
+      <div class="settings-section-header">
+        <i class="ti ti-shield-lock"></i> Security
+      </div>
+      <div class="settings-card">
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:14px;">Change your 4-digit PIN. All family profiles use the same PIN.</div>
+
+        <div class="settings-row">
+          <label class="settings-label">Current PIN</label>
+          <input id="pin-current" class="settings-input" type="password" inputmode="numeric" maxlength="4" placeholder="••••" style="width:80px;text-align:center;letter-spacing:4px;" />
+        </div>
+        <div class="settings-row">
+          <label class="settings-label">New PIN</label>
+          <input id="pin-new" class="settings-input" type="password" inputmode="numeric" maxlength="4" placeholder="••••" style="width:80px;text-align:center;letter-spacing:4px;" />
+        </div>
+        <div class="settings-row" style="border:none;">
+          <label class="settings-label">Confirm PIN</label>
+          <input id="pin-confirm" class="settings-input" type="password" inputmode="numeric" maxlength="4" placeholder="••••" style="width:80px;text-align:center;letter-spacing:4px;" />
+        </div>
+        <div id="pin-change-msg" style="font-size:0.75rem;margin:6px 0 0;display:none;"></div>
+        <button onclick="changePin()" class="settings-add-btn" style="margin-top:12px;">
+          <i class="ti ti-lock-check"></i> Update PIN
+        </button>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION: LOG A PAST ROUND
+      ══════════════════════════════════════ -->
+      <div class="settings-section-header">
+        <i class="ti ti-notebook"></i> Log a Past Round
+      </div>
+      <div class="settings-card">
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:14px;">Manually add a round you forgot to log during play.</div>
+
+        <div class="settings-row">
+          <label class="settings-label">Player</label>
+          <select id="log-round-player" class="settings-select" style="font-size:0.85rem;">
+            <option value="dad">Dad (Me)</option>
+            <option value="son">Son</option>
+            <option value="daughter">Daughter</option>
+            <option value="mom">Mom</option>
+            <option value="grandma">Grandma</option>
+          </select>
+        </div>
+
+        <div class="settings-row">
+          <label class="settings-label">Date</label>
+          <input id="log-round-date" class="settings-input" type="date" style="font-size:0.85rem;" />
+        </div>
+
+        <div class="settings-row">
+          <label class="settings-label">Course</label>
+          <input id="log-round-course" class="settings-input" type="text" placeholder="Course name" />
+        </div>
+
+        <div class="settings-row">
+          <label class="settings-label">Score</label>
+          <input id="log-round-score" class="settings-input" type="number" min="40" max="200" placeholder="92" style="width:72px;text-align:center;" />
+        </div>
+
+        <div class="settings-row">
+          <label class="settings-label">Par</label>
+          <input id="log-round-par" class="settings-input" type="number" min="27" max="73" placeholder="72" style="width:72px;text-align:center;" />
+        </div>
+
+        <div class="settings-row" style="border:none;flex-direction:column;align-items:flex-start;gap:8px;">
+          <label class="settings-label">Notes</label>
+          <textarea id="log-round-notes" class="settings-input" rows="3" placeholder="Anything worth remembering about this round..." style="width:100%;resize:none;font-family:inherit;"></textarea>
+        </div>
+
+        <div id="log-round-msg" style="font-size:0.75rem;margin:6px 0 0;display:none;"></div>
+        <button onclick="logPastRound()" class="btn-primary" style="width:100%;margin-top:12px;">
+          <i class="ti ti-plus"></i> Save Round
+        </button>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION: APP INFO
+      ══════════════════════════════════════ -->
+      <div class="settings-section-header">
+        <i class="ti ti-info-circle"></i> App
+      </div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <span class="settings-label">Device ID</span>
+          <span id="settings-device-id" style="font-size:0.7rem;color:var(--muted);font-family:monospace;word-break:break-all;"></span>
+        </div>
+        <div class="settings-row" style="border:none;">
+          <span class="settings-label">Profile stored in</span>
+          <span id="settings-profile-source" style="font-size:0.8rem;color:var(--muted);">Supabase</span>
+        </div>
+      </div>
+
+      <!-- Bottom save button -->
+      <button onclick="saveAllSettings()" class="btn-primary" style="width:100%;margin-top:8px;padding:14px;">
+        <i class="ti ti-device-floppy"></i> Save All Settings
+      </button>
+
+    </div><!-- /padding wrapper -->
+  </div><!-- /settings-overlay -->
     ══════════════════════════════════════ -->
     <div class="page dad-sect" id="page-caddie">
       <div class="page-header">
@@ -5093,6 +5705,10 @@
   renderKidLevelCard('son', null);   // show level card immediately (rounds fill in after PIN)
   renderKidLevelCard('girl', null);  // show level card immediately
 
+  // Sprint 3: load user profile from Supabase (overrides PIN, clubs, etc.)
+  // Non-blocking — app works fine if this fails (no signal, tables not yet created)
+  loadUserProfile().catch(e => console.warn('[SpinVibes] Profile load error:', e));
+
 
   // ── CLUB SYSTEM ──────────────────────────────────────────────
   const CLUBS = [
@@ -5867,7 +6483,7 @@
     _dadPin += d;
     updatePinDots('dad', _dadPin.length);
     if (_dadPin.length === 4) {
-      if (_dadPin === '4417') {
+      if (_dadPin === getActivePin()) {
         sessionStorage.setItem('sv-dad-unlocked', '1');
         document.getElementById('dad-pin-overlay').style.opacity = '0';
         setTimeout(() => {
@@ -5959,7 +6575,7 @@
     _sonPin += d;
     updatePinDots('son', _sonPin.length);
     if (_sonPin.length === 4) {
-      if (_sonPin === '4417') {
+      if (_sonPin === getActivePin()) {
         sessionStorage.setItem('sv-son-unlocked', '1');
         document.getElementById('son-pin-overlay').style.opacity = '0';
         setTimeout(() => {
@@ -5997,7 +6613,7 @@
     _momPin += d;
     updatePinDots('mom', _momPin.length);
     if (_momPin.length === 4) {
-      if (_momPin === '4417') {
+      if (_momPin === getActivePin()) {
         sessionStorage.setItem('sv-family-unlocked', '1');
         const ov = document.getElementById('mom-pin-overlay');
         ov.style.opacity = '0';
@@ -6024,7 +6640,7 @@
       if (dot) dot.classList.toggle('filled', i < _grandmaPin.length);
     }
     if (_grandmaPin.length === 4) {
-      if (_grandmaPin === '4417') {
+      if (_grandmaPin === getActivePin()) {
         sessionStorage.setItem('sv-family-unlocked', '1');
         const ov = document.getElementById('grandma-pin-overlay');
         ov.style.opacity = '0';
@@ -8473,6 +9089,500 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Course ✓'; }
     }
   }
+
+  // ══════════════════════════════════════════════════════════════
+  // SPRINT 3 — SETTINGS & PROFILE SYSTEM
+  // ══════════════════════════════════════════════════════════════
+
+  // ── Module-level profile state ────────────────────────────────
+  let _activePin     = '4417';   // overridden at boot from Supabase
+  let _activeClubs   = null;     // null = fall back to hardcoded CLUBS const
+  let _activeProfile = null;     // loaded Supabase sv_profiles row
+  let _familyMembers = {};       // loaded Supabase sv_family_members by role
+  let _settingsClubs = [];       // working copy used by bag editor
+
+  // ── Helpers ───────────────────────────────────────────────────
+  function getOrCreateDeviceId() {
+    let id = localStorage.getItem('sv-device-id');
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem('sv-device-id', id);
+    }
+    return id;
+  }
+
+  function getActivePin()   { return _activePin; }
+  function getActiveClubs() { return _activeClubs || CLUBS; }
+  function getUserName()    { return _activeProfile?.display_name || 'Jeremy'; }
+  function getGoalScore()   { return _activeProfile?.goal_score   || 90; }
+
+  // ── Boot-time profile loader ──────────────────────────────────
+  // Called in initApp(). Loads from Supabase and overrides defaults.
+  // Fails silently so the app continues working on no-signal.
+  async function loadUserProfile() {
+    const deviceId = getOrCreateDeviceId();
+    try {
+      // 1. Profile row
+      const { data: profile } = await _sb
+        .from('sv_profiles').select('*')
+        .eq('device_id', deviceId).maybeSingle();
+
+      if (profile) {
+        _activeProfile = profile;
+        _activePin = profile.pin_code || '4417';
+
+        // 2. Clubs
+        const { data: clubs } = await _sb
+          .from('sv_clubs').select('*')
+          .eq('profile_id', profile.id)
+          .order('sort_order', { ascending: true });
+        if (clubs && clubs.length) {
+          _activeClubs = clubs.map(c => ({
+            name:    c.name,
+            display: c.display_name || c.name,
+            dist:    c.dist,
+            loft:    c.loft || '',
+            wedge:   c.is_wedge  || false,
+            confirmed: c.confirmed || false,
+            note:    c.note || '',
+          }));
+        }
+
+        // 3. Family members
+        const { data: members } = await _sb
+          .from('sv_family_members').select('*')
+          .eq('profile_id', profile.id);
+        if (members && members.length) {
+          members.forEach(m => { _familyMembers[m.role] = m; });
+          // Sync skill levels back to localStorage so the level system picks them up
+          ['son','daughter'].forEach(role => {
+            const m = _familyMembers[role];
+            if (m && m.skill_level) {
+              localStorage.setItem('sv-' + role + '-level', String(m.skill_level));
+            }
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('[SpinVibes] Profile load skipped (no signal or table missing):', e.message);
+    }
+  }
+
+  // ── Supabase save helpers ─────────────────────────────────────
+  async function saveProfileToSupabase(profileData) {
+    const { data, error } = await _sb
+      .from('sv_profiles')
+      .upsert(profileData, { onConflict: 'device_id' })
+      .select().maybeSingle();
+    if (error) throw error;
+    return data;
+  }
+
+  async function saveClubsToSupabase(profileId, clubs) {
+    // Delete existing then re-insert (simpler than diff + upsert for a small list)
+    await _sb.from('sv_clubs').delete().eq('profile_id', profileId);
+    if (!clubs.length) return;
+    const rows = clubs.map((c, i) => ({
+      profile_id:   profileId,
+      name:         c.name,
+      display_name: c.display || c.name,
+      dist:         c.dist,
+      loft:         c.loft || null,
+      is_wedge:     c.wedge || false,
+      confirmed:    c.confirmed || false,
+      note:         c.note || null,
+      sort_order:   i,
+    }));
+    const { error } = await _sb.from('sv_clubs').insert(rows);
+    if (error) throw error;
+  }
+
+  async function saveFamilyMembersToSupabase(profileId) {
+    const roles = ['son', 'daughter', 'mom', 'grandma'];
+    for (const role of roles) {
+      const m = _familyMembers[role];
+      if (!m) continue;
+      const { error } = await _sb
+        .from('sv_family_members')
+        .upsert({ ...m, profile_id: profileId }, { onConflict: 'profile_id,role' });
+      if (error) console.warn('Family member save error:', role, error);
+    }
+  }
+
+  // ── Settings overlay ──────────────────────────────────────────
+  let _settingsDirty = false;
+
+  function openSettings() {
+    const overlay = document.getElementById('settings-overlay');
+    if (!overlay) return;
+    overlay.style.display = 'block';
+    _settingsDirty = false;
+    hideSaveBanner();
+    populateSettingsForm();
+  }
+
+  function closeSettings() {
+    const overlay = document.getElementById('settings-overlay');
+    if (overlay) overlay.style.display = 'none';
+  }
+
+  function markSettingsDirty() {
+    _settingsDirty = true;
+    const banner = document.getElementById('settings-save-banner');
+    if (banner) banner.style.display = 'flex';
+  }
+
+  function hideSaveBanner() {
+    const banner = document.getElementById('settings-save-banner');
+    if (banner) banner.style.display = 'none';
+    _settingsDirty = false;
+  }
+
+  function populateSettingsForm() {
+    // My Profile
+    const p = _activeProfile || {};
+    const nameEl  = document.getElementById('set-name');
+    const goalEl  = document.getElementById('set-goal');
+    const handEl  = document.getElementById('set-hand');
+    const skillEl = document.getElementById('set-skill');
+    if (nameEl)  nameEl.value  = p.display_name || 'Jeremy';
+    if (goalEl)  goalEl.value  = p.goal_score   || 90;
+    if (handEl)  handEl.value  = p.handedness   || 'left';
+    if (skillEl) skillEl.value = p.skill_level  || 'intermediate';
+
+    // Bag — deep copy so edits don't mutate active clubs until Save
+    _settingsClubs = getActiveClubs().map(c => ({ ...c }));
+    renderSettingsBag();
+
+    // Family
+    const roles = ['son', 'daughter', 'mom', 'grandma'];
+    roles.forEach(role => {
+      const m = _familyMembers[role] || {};
+      const nameIn = document.getElementById('fam-' + role + '-name');
+      if (nameIn) nameIn.value = m.display_name || capitalize(role);
+
+      if (role === 'son' || role === 'daughter') {
+        const lvl = m.skill_level || parseInt(localStorage.getItem('sv-' + role + '-level') || '1');
+        _familyMembers[role] = { ...m, role, skill_level: lvl };
+        updateFamilyLevelBadge(role, lvl);
+        const driverIn = document.getElementById('fam-' + role + '-driver');
+        const ironIn   = document.getElementById('fam-' + role + '-iron');
+        const wedgeIn  = document.getElementById('fam-' + role + '-wedge');
+        if (driverIn) driverIn.value = m.driver_dist || '';
+        if (ironIn)   ironIn.value   = m.iron_dist   || '';
+        if (wedgeIn)  wedgeIn.value  = m.wedge_dist  || '';
+      }
+      if (role === 'mom') {
+        const skillIn = document.getElementById('fam-mom-skill');
+        if (skillIn) skillIn.value = m.skill_level_text || 'beginner';
+      }
+      if (role === 'grandma') {
+        const skillIn = document.getElementById('fam-grandma-skill');
+        if (skillIn) skillIn.value = m.skill_level_text || 'returning';
+      }
+    });
+
+    // Set today's date as default for log-round
+    const logDate = document.getElementById('log-round-date');
+    if (logDate) logDate.value = new Date().toISOString().slice(0, 10);
+
+    // Device info
+    const devEl = document.getElementById('settings-device-id');
+    if (devEl) devEl.textContent = getOrCreateDeviceId().slice(0, 12) + '…';
+    const srcEl = document.getElementById('settings-profile-source');
+    if (srcEl) srcEl.textContent = _activeProfile ? 'Supabase ✓' : 'Defaults (not yet saved)';
+  }
+
+  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  // ── Bag Editor ────────────────────────────────────────────────
+  function renderSettingsBag() {
+    const el = document.getElementById('settings-bag-list');
+    if (!el) return;
+    if (!_settingsClubs.length) {
+      el.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:0.85rem;text-align:center;">No clubs yet. Add one below.</div>';
+      return;
+    }
+    el.innerHTML = _settingsClubs.map((c, i) => `
+      <div class="settings-bag-row">
+        <span class="settings-bag-name">${c.display || c.name}</span>
+        <input class="settings-bag-dist-input"
+          type="number" min="1" max="400"
+          value="${c.dist}"
+          onchange="updateClubDist(${i}, this.value)"
+          oninput="markSettingsDirty()" />
+        <span style="font-size:0.7rem;color:var(--muted);">yds</span>
+        <button class="settings-bag-confirmed ${c.confirmed ? 'is-confirmed' : 'is-estimated'}"
+          onclick="toggleClubConfirmed(${i})">
+          ${c.confirmed ? '✓ Confirmed' : 'Est.'}
+        </button>
+        <button class="settings-bag-remove" onclick="removeClub(${i})" title="Remove">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+    `).join('');
+  }
+
+  function updateClubDist(i, val) {
+    if (_settingsClubs[i]) {
+      _settingsClubs[i].dist = parseInt(val) || _settingsClubs[i].dist;
+      markSettingsDirty();
+    }
+  }
+
+  function toggleClubConfirmed(i) {
+    if (_settingsClubs[i]) {
+      _settingsClubs[i].confirmed = !_settingsClubs[i].confirmed;
+      markSettingsDirty();
+      renderSettingsBag();
+    }
+  }
+
+  function removeClub(i) {
+    _settingsClubs.splice(i, 1);
+    markSettingsDirty();
+    renderSettingsBag();
+  }
+
+  function openAddClubForm() {
+    const form = document.getElementById('add-club-form');
+    if (form) form.style.display = 'block';
+    const nameIn = document.getElementById('new-club-name');
+    if (nameIn) nameIn.focus();
+  }
+
+  function addNewClub() {
+    const name  = (document.getElementById('new-club-name')?.value || '').trim();
+    const dist  = parseInt(document.getElementById('new-club-dist')?.value) || 0;
+    const loft  = (document.getElementById('new-club-loft')?.value  || '').trim();
+    const wedge = document.getElementById('new-club-wedge')?.checked || false;
+
+    if (!name)  { showToast('Enter a club name', 'error'); return; }
+    if (!dist)  { showToast('Enter a carry distance', 'error'); return; }
+
+    _settingsClubs.push({ name, display: name, dist, loft, wedge, confirmed: false, note: '' });
+    markSettingsDirty();
+    renderSettingsBag();
+
+    // Reset form
+    ['new-club-name','new-club-dist','new-club-loft'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    const wedgeEl = document.getElementById('new-club-wedge');
+    if (wedgeEl) wedgeEl.checked = false;
+    const form = document.getElementById('add-club-form');
+    if (form) form.style.display = 'none';
+  }
+
+  // ── Family Level Controls ─────────────────────────────────────
+  function adjustFamilyLevel(role, delta) {
+    const current = _familyMembers[role]?.skill_level
+      || parseInt(localStorage.getItem('sv-' + role + '-level') || '1');
+    const next = Math.min(4, Math.max(1, current + delta));
+    if (!_familyMembers[role]) _familyMembers[role] = { role };
+    _familyMembers[role].skill_level = next;
+    updateFamilyLevelBadge(role, next);
+    markSettingsDirty();
+  }
+
+  function updateFamilyLevelBadge(role, level) {
+    const badge = document.getElementById('fam-' + role + '-level-badge');
+    if (badge) badge.textContent = 'Lv ' + level;
+  }
+
+  // ── PIN Change ────────────────────────────────────────────────
+  async function changePin() {
+    const current = document.getElementById('pin-current')?.value || '';
+    const newPin  = document.getElementById('pin-new')?.value     || '';
+    const confirm = document.getElementById('pin-confirm')?.value  || '';
+    const msgEl   = document.getElementById('pin-change-msg');
+
+    function pinMsg(text, ok) {
+      if (!msgEl) return;
+      msgEl.style.display = 'block';
+      msgEl.style.color = ok ? 'var(--green)' : 'var(--red, #ef4444)';
+      msgEl.textContent = text;
+    }
+
+    if (current !== _activePin) { pinMsg('Current PIN is incorrect.', false); return; }
+    if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) { pinMsg('New PIN must be exactly 4 digits.', false); return; }
+    if (newPin !== confirm) { pinMsg('PINs don\'t match.', false); return; }
+
+    // Update in memory immediately
+    _activePin = newPin;
+    if (_activeProfile) _activeProfile.pin_code = newPin;
+
+    // Persist to Supabase
+    try {
+      const deviceId = getOrCreateDeviceId();
+      await _sb.from('sv_profiles')
+        .upsert({
+          device_id: deviceId,
+          pin_code: newPin,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'device_id' });
+      pinMsg('PIN updated successfully.', true);
+    } catch(e) {
+      pinMsg('Saved locally — will sync when online.', true);
+    }
+
+    // Clear fields
+    ['pin-current','pin-new','pin-confirm'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  }
+
+  // ── Save All ──────────────────────────────────────────────────
+  async function saveAllSettings() {
+    const saveBtn = document.querySelector('#settings-overlay .btn-primary:last-of-type');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
+
+    try {
+      const deviceId = getOrCreateDeviceId();
+
+      // 1. Collect profile fields
+      const display_name = document.getElementById('set-name')?.value.trim()  || 'Golfer';
+      const goal_score   = parseInt(document.getElementById('set-goal')?.value)  || 90;
+      const handedness   = document.getElementById('set-hand')?.value            || 'left';
+      const skill_level  = document.getElementById('set-skill')?.value           || 'intermediate';
+
+      // 2. Upsert profile
+      const saved = await saveProfileToSupabase({
+        device_id: deviceId, display_name, goal_score,
+        handedness, skill_level, pin_code: _activePin,
+        updated_at: new Date().toISOString(),
+      });
+      _activeProfile = saved;
+
+      // 3. Save clubs
+      await saveClubsToSupabase(saved.id, _settingsClubs);
+      _activeClubs = _settingsClubs.map(c => ({ ...c }));
+
+      // 4. Collect + save family members
+      ['son','daughter','mom','grandma'].forEach(role => {
+        const nameIn = document.getElementById('fam-' + role + '-name');
+        const display_name = nameIn?.value.trim() || capitalize(role);
+        if (!_familyMembers[role]) _familyMembers[role] = { role };
+        _familyMembers[role].display_name = display_name;
+
+        if (role === 'son' || role === 'daughter') {
+          const lvl = _familyMembers[role].skill_level
+            || parseInt(localStorage.getItem('sv-' + role + '-level') || '1');
+          _familyMembers[role].skill_level = lvl;
+          // Also update localStorage so live level system picks it up
+          localStorage.setItem('sv-' + role + '-level', String(lvl));
+          _familyMembers[role].driver_dist = parseInt(document.getElementById('fam-' + role + '-driver')?.value) || null;
+          _familyMembers[role].iron_dist   = parseInt(document.getElementById('fam-' + role + '-iron')?.value)   || null;
+          _familyMembers[role].wedge_dist  = parseInt(document.getElementById('fam-' + role + '-wedge')?.value)  || null;
+        }
+        if (role === 'mom')    _familyMembers[role].skill_level_text = document.getElementById('fam-mom-skill')?.value    || 'beginner';
+        if (role === 'grandma') _familyMembers[role].skill_level_text = document.getElementById('fam-grandma-skill')?.value || 'returning';
+      });
+      await saveFamilyMembersToSupabase(saved.id);
+
+      // 5. Update any live UI that depends on profile data
+      updateLiveProfileUI();
+
+      showToast('Settings saved!');
+      hideSaveBanner();
+
+      const srcEl = document.getElementById('settings-profile-source');
+      if (srcEl) srcEl.textContent = 'Supabase ✓';
+    } catch(e) {
+      console.error('Settings save error:', e);
+      showToast('Save failed — check signal', 'error');
+    } finally {
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save All Settings'; }
+    }
+  }
+
+  // Refresh live UI elements that depend on loaded profile data
+  function updateLiveProfileUI() {
+    // Refresh Dad home-hero name if shown (update any elements with id 'dad-name-display')
+    document.querySelectorAll('.dad-name-display').forEach(el => {
+      el.textContent = getUserName();
+    });
+    // Refresh Next Target display
+    document.querySelectorAll('.dad-goal-display').forEach(el => {
+      el.textContent = '<' + getGoalScore();
+    });
+    // Re-render clubs expander if open
+    const clubsEl = document.getElementById('clubs-expander-content');
+    if (clubsEl && clubsEl.style.display !== 'none') renderClubsExpander?.();
+  }
+
+  // ── Log a Past Round ──────────────────────────────────────────
+  async function logPastRound() {
+    const player  = document.getElementById('log-round-player')?.value || 'dad';
+    const date    = document.getElementById('log-round-date')?.value   || new Date().toISOString().slice(0,10);
+    const course  = (document.getElementById('log-round-course')?.value || '').trim();
+    const score   = parseInt(document.getElementById('log-round-score')?.value) || 0;
+    const par     = parseInt(document.getElementById('log-round-par')?.value)   || 72;
+    const notes   = (document.getElementById('log-round-notes')?.value || '').trim();
+    const msgEl   = document.getElementById('log-round-msg');
+
+    function logMsg(text, ok) {
+      if (!msgEl) return;
+      msgEl.style.display = 'block';
+      msgEl.style.color = ok ? 'var(--green)' : 'var(--red, #ef4444)';
+      msgEl.textContent = text;
+    }
+
+    if (!course) { logMsg('Enter the course name.', false); return; }
+    if (!score || score < 40 || score > 200) { logMsg('Enter a valid score (40–200).', false); return; }
+
+    const roundObj = {
+      date_played:  date,
+      course_name:  course,
+      course_par:   par,
+      total_score:  score,
+      score_vs_par: score - par,
+      holes:        [],   // no per-hole data for manual log
+      stars:        1,
+      reflection:   { best: '', worked: '', worst: '', fix: '', stars: 1, notes },
+      is_practice:  false,
+    };
+
+    const saveBtn = document.querySelector('#settings-overlay .btn-primary');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
+
+    try {
+      if (player === 'dad') {
+        roundObj.tee_color = 'White';
+        await saveDadRound(roundObj);
+      } else if (player === 'son') {
+        await saveSonRound(roundObj);
+      } else if (player === 'daughter') {
+        await saveGirlRound(roundObj);
+      } else if (player === 'mom') {
+        await saveMomRound(roundObj);
+      } else if (player === 'grandma') {
+        await saveGrandmaRound(roundObj);
+      }
+
+      // Also save notes to sv_round_notes if notes provided
+      // (Round ID not available for manual logs, so we skip that here)
+
+      logMsg('Round saved! View it in My Game.', true);
+      ['log-round-course','log-round-score','log-round-notes'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      const logPar = document.getElementById('log-round-par');
+      if (logPar) logPar.value = '';
+    } catch(e) {
+      console.error(e);
+      logMsg('Save failed — check your signal.', false);
+    } finally {
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Round'; }
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  // END SPRINT 3 — SETTINGS
+  // ══════════════════════════════════════════════════════════════
 
   async function retryFailedFamSaves(btn) {
     btn.disabled = true; btn.textContent = 'Retrying...';
