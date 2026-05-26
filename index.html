@@ -5777,7 +5777,7 @@
   // Bump BUILD_ID with every deploy. App checks on load — if version
   // changed, SW caches are cleared and page reloads. localStorage
   // (logs, notes, profile) is never touched.
-  const BUILD_ID = '2026-05-26-v32';
+  const BUILD_ID = '2026-05-26-v33';
   (function checkBuild() {
     const prev = localStorage.getItem('sv-build');
     if (prev && prev !== BUILD_ID) {
@@ -9144,14 +9144,24 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   async function loadUserProfile() {
     const deviceId = getOrCreateDeviceId();
     try {
-      // 1. Profile row
-      const { data: profile } = await _sb
+      // 1. Profile row — try this device first, fall back to pin_code for cross-device sync
+      let { data: profile } = await _sb
         .from('sv_profiles').select('*')
         .eq('device_id', deviceId).maybeSingle();
+
+      if (!profile) {
+        // Cross-device: look up by the stored pin (phone finds computer's saved profile)
+        const storedPin = localStorage.getItem('sv-pin') || '4417';
+        const { data: byPin } = await _sb
+          .from('sv_profiles').select('*')
+          .eq('pin_code', storedPin).maybeSingle();
+        profile = byPin || null;
+      }
 
       if (profile) {
         _activeProfile = profile;
         _activePin = profile.pin_code || '4417';
+        localStorage.setItem('sv-pin', _activePin); // persist for cross-device lookup
 
         // 2. Clubs
         const { data: clubs } = await _sb
@@ -9168,6 +9178,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
             confirmed: c.confirmed || false,
             note:    c.note || '',
           }));
+          localStorage.setItem('sv-active-clubs', JSON.stringify(_activeClubs)); // cache for offline/refresh
         }
 
         // 3. Family members
