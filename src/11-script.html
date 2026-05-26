@@ -4536,9 +4536,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     document.querySelectorAll('.dad-goal-display').forEach(el => {
       el.textContent = '<' + getGoalScore();
     });
-    // Re-render clubs expander if open
-    const clubsEl = document.getElementById('clubs-expander-content');
-    if (clubsEl && clubsEl.style.display !== 'none') renderClubsExpander?.();
+    // Re-render bag details table if it's currently open
+    const bagDetails = document.getElementById('bag-details');
+    if (bagDetails && bagDetails.style.display !== 'none') renderBagDetails();
   }
 
   // ── Log a Past Round ──────────────────────────────────────────
