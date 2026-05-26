@@ -6529,11 +6529,12 @@
     const saved = JSON.parse(localStorage.getItem('sv-clubs') || '{}');
     const body = document.getElementById('bag-details-body');
     if (!body) return;
-    body.innerHTML = CLUBS.map((c, i) => {
+    const activeClubs = getActiveClubs();
+    body.innerHTML = activeClubs.map((c, i) => {
       const logged = saved[c.name];
       const hits   = saved[c.name + '_n'] || 0;
       const carry  = logged !== undefined ? logged : c.dist;
-      const isLast = i === CLUBS.length - 1;
+      const isLast = i === activeClubs.length - 1;
       const nameCell = c.wedge ? `<strong>${c.display}</strong>` : c.display;
       const loftStyle = c.wedge ? 'color:var(--gold-l);' : '';
       const carryBadge = hits > 0
