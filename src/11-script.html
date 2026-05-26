@@ -16,6 +16,23 @@
   let _pendingAfterPin = null;
   let _pendingSonAfterPin = null;
 
+  // ── CLUBS — declared at top so bag/caddie never hit TDZ from init errors ──
+  const CLUBS = [
+    { name: 'Driver',    dist: 195, loft: '10.5°', display: 'Driver',        confirmed: true,  note: 'Vice Boost · 10.5° · Graphite · Midsize grip · 190–200 yds ✅ Confirmed' },
+    { name: '7-Wood',    dist: 188, loft: '21°',   display: '7-Wood',        confirmed: true,  note: 'Callaway Paradym Ai Smoke MAX · 21° · Aldila Ascent 40g · Senior flex · 180–195 yds ✅ May 2026' },
+    { name: '4-Hybrid',  dist: 175, loft: '22°',   display: '4-Hybrid',      confirmed: true,  note: 'Vice Boost · 22° · 170–180 yds · confirmed' },
+    { name: '4-iron',    dist: 165, loft: '21°',   display: '4-Iron',        confirmed: false, note: 'Vice Boost · LH · Steel · ~165 yds estimated' },
+    { name: '5-iron',    dist: 155, loft: '24°',   display: '5-Iron',        confirmed: false, note: 'Vice Boost · LH · Steel · ~155 yds estimated' },
+    { name: '6-iron',    dist: 150, loft: '27°',   display: '6-Iron',        confirmed: false, note: 'Vice Boost · LH · Steel · 145–155 yds estimated' },
+    { name: '7-iron',    dist: 135, loft: '31°',   display: '7-Iron',        confirmed: true,  note: 'Vice Boost · LH · Steel · 130–140 yds ✅ confirmed' },
+    { name: '8-iron',    dist: 125, loft: '35°',   display: '8-Iron',        confirmed: false, note: 'Vice Boost · LH · Steel · 120–130 yds estimated' },
+    { name: '9-iron',    dist: 115, loft: '39°',   display: '9-Iron',        confirmed: true,  note: 'Vice Boost · LH · Steel · 110–120 yds ✅ confirmed' },
+    { name: 'PW',        dist: 100, loft: '44°',   display: 'PW · Pitching', confirmed: true,  wedge: true, note: 'Vice Boost · LH · 90–110 yds ✅ confirmed' },
+    { name: 'Gap (50°)', dist: 95,  loft: '50°',   display: 'GW · Gap',      confirmed: true,  wedge: true, note: 'Callaway Opus · S Grind · 85–105 yds ✅ confirmed' },
+    { name: 'SW (56°)',  dist: 85,  loft: '56°',   display: 'SW · Sand',     confirmed: false, wedge: true, note: 'Callaway Opus Platinum Chrome · S Grind · 80–90 yds estimated ✅ May 2026' },
+    { name: 'LW (60°)',  dist: 68,  loft: '60°',   display: 'LW · Lob',      confirmed: false, wedge: true, note: 'Callaway Opus · 60–75 yds estimated · specialty/flops ✅ May 2026' },
+  ];
+
   // ── SUPABASE — wrapped safely so CDN failure can't crash the whole script ──
   const SUPABASE_URL  = 'https://zairvjyiwhajsulefyoi.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphaXJ2anlpd2hhanN1bGVmeW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMDkxODAsImV4cCI6MjA5MTY4NTE4MH0.AAdJfqSGHMergPgL4tEoBMn0Wr5d8D1NuxhPMonp_60';
@@ -798,22 +815,7 @@
   loadUserProfile().catch(e => console.warn('[SpinVibes] Profile load error:', e));
 
 
-  // ── CLUB SYSTEM ──────────────────────────────────────────────
-  const CLUBS = [
-    { name: 'Driver',    dist: 195, loft: '10.5°', display: 'Driver',        note: 'Vice Boost · 10.5° · Graphite · Midsize grip · 190–200 yds ✅ Confirmed' },
-    { name: '7-Wood',    dist: 188, loft: '21°',   display: '7-Wood',        note: 'Callaway Paradym Ai Smoke MAX · 21° · Aldila Ascent 40g · Senior flex · 180–195 yds ✅ May 2026' },
-    { name: '4-Hybrid',  dist: 175, loft: '22°',   display: '4-Hybrid',      note: 'Vice Boost · 22° · 170–180 yds · confirmed' },
-    { name: '4-iron',    dist: 165, loft: '21°',   display: '4-Iron',        note: 'Vice Boost · LH · Steel · ~165 yds estimated' },
-    { name: '5-iron',    dist: 155, loft: '24°',   display: '5-Iron',        note: 'Vice Boost · LH · Steel · ~155 yds estimated' },
-    { name: '6-iron',    dist: 150, loft: '27°',   display: '6-Iron',        note: 'Vice Boost · LH · Steel · 145–155 yds estimated' },
-    { name: '7-iron',    dist: 135, loft: '31°',   display: '7-Iron',        note: 'Vice Boost · LH · Steel · 130–140 yds ✅ confirmed' },
-    { name: '8-iron',    dist: 125, loft: '35°',   display: '8-Iron',        note: 'Vice Boost · LH · Steel · 120–130 yds estimated' },
-    { name: '9-iron',    dist: 115, loft: '39°',   display: '9-Iron',        note: 'Vice Boost · LH · Steel · 110–120 yds ✅ confirmed' },
-    { name: 'PW',        dist: 100, loft: '44°',   display: 'PW · Pitching', wedge: true, note: 'Vice Boost · LH · 90–110 yds ✅ confirmed' },
-    { name: 'Gap (50°)', dist: 95,  loft: '50°',   display: 'GW · Gap',      wedge: true, note: 'Callaway Opus · S Grind · 85–105 yds ✅ confirmed' },
-    { name: 'SW (56°)',  dist: 85,  loft: '56°',   display: 'SW · Sand',     wedge: true, note: 'Callaway Opus Platinum Chrome · S Grind · 80–90 yds estimated ✅ May 2026' },
-    { name: 'LW (60°)',  dist: 68,  loft: '60°',   display: 'LW · Lob',      wedge: true, note: 'Callaway Opus · 60–75 yds estimated · specialty/flops ✅ May 2026' },
-  ];
+  // ── CLUB SYSTEM — defined at top of file (see line ~20) ──────
 
   // ── ACHIEVEMENT BADGE SYSTEM ──────────────────────────────────
   const BADGES = [
