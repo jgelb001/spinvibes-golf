@@ -16,6 +16,7 @@
 #   07-page-caddie.html   Caddie tab
 #   08-page-strategy.html Strategy tab
 #   09-pages-mygame.html  Son/Girl/Mom/Grandma progress pages + /pages close
+#   06b-page-settings.html  Settings overlay — Sprint 3 (position:fixed, outside #pages)
 #   10-nav.html           #nav bar + /app close
 #   11-script.html        All JavaScript + </body></html>
 
@@ -37,6 +38,7 @@ cat \
   "$SRC/07-page-caddie.html" \
   "$SRC/08-page-strategy.html" \
   "$SRC/09-pages-mygame.html" \
+  "$SRC/06b-page-settings.html" \
   "$SRC/10-nav.html" \
   "$SRC/11-script.html" \
   > "$OUT"

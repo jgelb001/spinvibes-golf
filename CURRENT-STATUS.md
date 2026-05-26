@@ -1,7 +1,7 @@
 # SpinVibes Golf — Current Status
 > **Update this at the end of every Cowork session.** This is the first thing to read when starting a new session. It answers: where are we, what's broken, what's next.
 
-*Last updated: 2026-05-25 (session 15 — Sprint 4 complete)*
+*Last updated: 2026-05-25 (session 16 — Sprint 4 confirmed, Sprint 5 up next)*
 
 ---
 
@@ -28,6 +28,17 @@
 | Next goal | Break 90 — 3 strokes away |
 | Bag | Callaway Driver + 7-wood. Vice Boost 4H + irons (Takomo still arriving). Callaway Opus 50°/56°/60° wedges. Odyssey Ai-ONE #7 putter ⚠️ weights too heavy — returning to lighter config |
 | Pin | 4417 |
+
+---
+
+## What Was Just Finished (Session 16 — May 25, 2026)
+
+### Session 16 — Housekeeping + Handoff ✅
+- Sprint 4 git commit confirmed pushed by Jeremy
+- `round_type` column in `dad_rounds` verified via Supabase REST API — all rows returning `regulation_18` ✅
+- Dark mode HTML + PDF (v2) saved to Golf folder (`spinvibes_roadmap_strategy_dark_v2.html` + `.pdf`)
+- Photo/Supabase Storage infrastructure reviewed — `uploadRoundPhotos()` already wired for family rounds
+- Sprint 5 scoped and ready to start in new Cowork task
 
 ---
 

@@ -4434,16 +4434,46 @@
          GIRL PROGRESS PAGE
     ══════════════════════════════════════ -->
     <div class="page" id="page-girl-progress">
-      <div class="page-header" data-icon="🌸" style="background:linear-gradient(160deg,rgba(236,72,153,0.18) 0%,var(--bg) 100%);border-bottom-color:rgba(236,72,153,0.3);">
-        <div class="page-tag" style="color:#ec4899;">My Game</div>
-        <div class="page-title" style="color:#f9a8d4;">Daughter's Rounds 🌸</div>
-        <div class="page-sub">Family rounds · All her best moments</div>
+      <!-- PIN Overlay -->
+      <div id="girl-pin-overlay" style="position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;padding-top:calc(32px + env(safe-area-inset-top,0px));overflow-y:auto;">
+        <div style="margin-bottom:16px;"><i class="ti ti-lock" style="font-size:2.5rem;color:#ec4899;"></i></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:#ec4899;letter-spacing:2px;margin-bottom:6px;">Daughter's Progress</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:28px;">Enter PIN to continue</div>
+        <div id="girl-pin-dots" style="display:flex;gap:12px;margin-bottom:28px;">
+          <div class="pin-dot" id="girl-dot-0"></div>
+          <div class="pin-dot" id="girl-dot-1"></div>
+          <div class="pin-dot" id="girl-dot-2"></div>
+          <div class="pin-dot" id="girl-dot-3"></div>
+        </div>
+        <div id="girl-pin-error" style="font-size:0.75rem;color:var(--red);margin-bottom:12px;opacity:0;transition:opacity 0.3s;">Incorrect PIN</div>
+        <div class="pin-pad">
+          <button class="pin-key" onclick="girlPinKey('1')">1</button>
+          <button class="pin-key" onclick="girlPinKey('2')">2</button>
+          <button class="pin-key" onclick="girlPinKey('3')">3</button>
+          <button class="pin-key" onclick="girlPinKey('4')">4</button>
+          <button class="pin-key" onclick="girlPinKey('5')">5</button>
+          <button class="pin-key" onclick="girlPinKey('6')">6</button>
+          <button class="pin-key" onclick="girlPinKey('7')">7</button>
+          <button class="pin-key" onclick="girlPinKey('8')">8</button>
+          <button class="pin-key" onclick="girlPinKey('9')">9</button>
+          <button class="pin-key pin-key-empty"></button>
+          <button class="pin-key" onclick="girlPinKey('0')">0</button>
+          <button class="pin-key pin-key-del" onclick="girlPinBackspace()">⌫</button>
+        </div>
       </div>
-      <!-- Level card — injected by renderKidLevelCard('girl') -->
-      <div id="girl-level-card"></div>
-      <div class="section" id="girl-rounds-content" style="padding-bottom:40px;">
-        <div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0;">Loading...</div>
-      </div>
+      <!-- Page Content -->
+      <div id="girl-progress-content">
+        <div class="page-header" data-icon="🌸" style="background:linear-gradient(160deg,rgba(236,72,153,0.18) 0%,var(--bg) 100%);border-bottom-color:rgba(236,72,153,0.3);">
+          <div class="page-tag" style="color:#ec4899;">My Game</div>
+          <div class="page-title" style="color:#f9a8d4;">Daughter's Rounds 🌸</div>
+          <div class="page-sub">Family rounds · All her best moments</div>
+        </div>
+        <!-- Level card — injected by renderKidLevelCard('girl') -->
+        <div id="girl-level-card"></div>
+        <div class="section" id="girl-rounds-content" style="padding-bottom:40px;">
+          <div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0;">Loading...</div>
+        </div>
+      </div><!-- /girl-progress-content -->
     </div><!-- /page-girl-progress -->
 
     <!-- ══════════════════════════════════════
@@ -4938,7 +4968,7 @@
 
 <script>
 
-  // ── SPRINT 3: Profile state — declared first so PIN handlers can access safely ──
+  // ── SPRINT 3: Profile state — declared FIRST (before any code that could throw) ──
   let _activePin     = '4417';   // overridden at boot from Supabase
   let _activeClubs   = null;     // null = fall back to hardcoded CLUBS const
   let _activeProfile = null;     // loaded Supabase sv_profiles row
@@ -4946,10 +4976,27 @@
   let _settingsClubs = [];       // working copy used by bag editor
   let _settingsDirty = false;
 
-  // ── SUPABASE ─────────────────────────────────────────────────
+  // ── PIN ACCUMULATOR VARS — declared at top to avoid TDZ if SDK crashes below ──
+  let _dadPin = '';
+  let _sonPin = '';
+  let _girlPin = '';
+  let _momPin = '', _grandmaPin = '';
+  let _pendingAfterPin = null;
+  let _pendingSonAfterPin = null;
+
+  // ── SUPABASE — wrapped safely so CDN failure can't crash the whole script ──
   const SUPABASE_URL  = 'https://zairvjyiwhajsulefyoi.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphaXJ2anlpd2hhanN1bGVmeW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMDkxODAsImV4cCI6MjA5MTY4NTE4MH0.AAdJfqSGHMergPgL4tEoBMn0Wr5d8D1NuxhPMonp_60';
-  const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  let _sb = null;
+  try {
+    if (typeof supabase !== 'undefined') {
+      _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    } else {
+      console.warn('[SpinVibes] Supabase SDK not loaded — offline / CDN miss');
+    }
+  } catch(e) {
+    console.warn('[SpinVibes] Supabase init error:', e.message);
+  }
 
   // ── SUPABASE HELPERS ─────────────────────────────────────────
   async function saveDadRound(round) {
@@ -5488,8 +5535,13 @@
       renderCaddieMessages(false);
     }
     if (id === 'girl-progress') {
-      renderKidLevelCard('girl', null); // show card immediately while loading
-      loadGirlRoundsAndRender();
+      if (sessionStorage.getItem('sv-girl-unlocked') !== '1') {
+        document.getElementById('girl-pin-overlay').style.display = 'flex';
+      } else {
+        document.getElementById('girl-pin-overlay').style.display = 'none';
+        renderKidLevelCard('girl', null);
+        loadGirlRoundsAndRender();
+      }
     }
     if (id === 'range') {
       updateRangeLevelBadge('son');
@@ -6480,8 +6532,6 @@
   ];
 
   // ── DAD PIN ───────────────────────────────────────────────────
-  let _dadPin = '';
-  let _pendingAfterPin = null; // optional callback name to run after PIN success
   function dadPinKey(d) {
     if (_dadPin.length >= 4) return;
     _dadPin += d;
@@ -6571,9 +6621,40 @@
     }
   }
 
+  // ── GIRL / DAUGHTER PIN ──────────────────────────────────────
+  function girlPinKey(d) {
+    if (_girlPin.length >= 4) return;
+    _girlPin += d;
+    updatePinDots('girl', _girlPin.length);
+    if (_girlPin.length === 4) {
+      if (_girlPin === _activePin) {
+        sessionStorage.setItem('sv-girl-unlocked', '1');
+        const ov = document.getElementById('girl-pin-overlay');
+        ov.style.opacity = '0';
+        setTimeout(() => {
+          ov.style.display = 'none';
+          ov.style.opacity = '1';
+          renderKidLevelCard('girl', null);
+          loadGirlRoundsAndRender();
+        }, 300);
+      } else {
+        const dotsEl = document.getElementById('girl-pin-dots');
+        dotsEl.classList.add('pin-shake');
+        setTimeout(() => dotsEl.classList.remove('pin-shake'), 400);
+        const errEl = document.getElementById('girl-pin-error');
+        errEl.style.opacity = '1';
+        setTimeout(() => errEl.style.opacity = '0', 1500);
+        _girlPin = '';
+        updatePinDots('girl', 0);
+      }
+    }
+  }
+  function girlPinBackspace() {
+    _girlPin = _girlPin.slice(0, -1);
+    updatePinDots('girl', _girlPin.length);
+  }
+
   // ── SON PIN ───────────────────────────────────────────────────
-  let _sonPin = '';
-  let _pendingSonAfterPin = null;
   function sonPinKey(d) {
     if (_sonPin.length >= 4) return;
     _sonPin += d;
@@ -6610,8 +6691,6 @@
   }
 
   // ── MOM / GRANDMA PIN + ROUNDS ───────────────────────────────
-  let _momPin = '', _grandmaPin = '';
-
   function momPinKey(d) {
     if (_momPin.length >= 4) return;
     _momPin += d;
