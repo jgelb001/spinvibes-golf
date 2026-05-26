@@ -4942,6 +4942,14 @@
 
 <script>
 
+  // ── SPRINT 3: Profile state — declared first so PIN handlers can access safely ──
+  let _activePin     = '4417';   // overridden at boot from Supabase
+  let _activeClubs   = null;     // null = fall back to hardcoded CLUBS const
+  let _activeProfile = null;     // loaded Supabase sv_profiles row
+  let _familyMembers = {};       // loaded Supabase sv_family_members by role
+  let _settingsClubs = [];       // working copy used by bag editor
+  let _settingsDirty = false;
+
   // ── SUPABASE ─────────────────────────────────────────────────
   const SUPABASE_URL  = 'https://zairvjyiwhajsulefyoi.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphaXJ2anlpd2hhanN1bGVmeW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMDkxODAsImV4cCI6MjA5MTY4NTE4MH0.AAdJfqSGHMergPgL4tEoBMn0Wr5d8D1NuxhPMonp_60';
@@ -9094,13 +9102,6 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   // SPRINT 3 — SETTINGS & PROFILE SYSTEM
   // ══════════════════════════════════════════════════════════════
 
-  // ── Module-level profile state ────────────────────────────────
-  let _activePin     = '4417';   // overridden at boot from Supabase
-  let _activeClubs   = null;     // null = fall back to hardcoded CLUBS const
-  let _activeProfile = null;     // loaded Supabase sv_profiles row
-  let _familyMembers = {};       // loaded Supabase sv_family_members by role
-  let _settingsClubs = [];       // working copy used by bag editor
-
   // ── Helpers ───────────────────────────────────────────────────
   function getOrCreateDeviceId() {
     let id = localStorage.getItem('sv-device-id');
@@ -9210,8 +9211,6 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   }
 
   // ── Settings overlay ──────────────────────────────────────────
-  let _settingsDirty = false;
-
   function openSettings() {
     const overlay = document.getElementById('settings-overlay');
     if (!overlay) return;
