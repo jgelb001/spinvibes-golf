@@ -159,16 +159,20 @@
       </div>
       <div id="mom-progress-content">
         <div class="page-header" style="background:linear-gradient(160deg,rgba(184,101,48,0.15) 0%,var(--bg) 100%);">
-          <div class="page-tag" style="color:#B86530;">MOM · MY GAME</div>
+          <div class="page-tag" style="color:#B86530;">MOM · MY GAME 🔒</div>
           <div class="page-title" style="color:#e8a070;">My Progress</div>
         </div>
-        <div class="section">
-          <button class="btn-primary" onclick="openMomRoundModal()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#B86530;">
+        <div class="section" style="display:flex;gap:10px;">
+          <button class="btn-primary" onclick="openMomRoundModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#B86530;">
             <i class="ti ti-flag-2" style="font-size:1rem;"></i> Log a Round
           </button>
+          <button onclick="lockMomProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(184,101,48,0.35);border-radius:10px;padding:0 14px;color:#e8a070;font-size:1.1rem;font-weight:600;cursor:pointer;">🔒</button>
         </div>
-        <div class="section" id="mom-rounds-list">
-          <div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0;">No rounds yet — tap Log a Round to start.</div>
+        <div class="section">
+          <div class="section-title">Round History</div>
+          <div id="mom-rounds-list">
+            <div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0;">No rounds yet — tap Log a Round to start.</div>
+          </div>
         </div>
       </div>
       <!-- Mom quick round modal -->
@@ -199,8 +203,8 @@
         <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:#9A8050;letter-spacing:2px;margin-bottom:6px;">My Game</div>
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:28px;">Enter family PIN to continue</div>
         <div id="grandma-pin-dots" style="display:flex;gap:12px;margin-bottom:28px;">
-          <div class="pin-dot" id="gma-dot-0"></div><div class="pin-dot" id="gma-dot-1"></div>
-          <div class="pin-dot" id="gma-dot-2"></div><div class="pin-dot" id="gma-dot-3"></div>
+          <div class="pin-dot" id="grandma-dot-0"></div><div class="pin-dot" id="grandma-dot-1"></div>
+          <div class="pin-dot" id="grandma-dot-2"></div><div class="pin-dot" id="grandma-dot-3"></div>
         </div>
         <div id="grandma-pin-error" style="font-size:0.75rem;color:var(--red);margin-bottom:12px;opacity:0;transition:opacity 0.3s;">Incorrect PIN</div>
         <div class="pin-pad">
@@ -212,16 +216,20 @@
       </div>
       <div id="grandma-progress-content">
         <div class="page-header" style="background:linear-gradient(160deg,rgba(154,128,80,0.15) 0%,var(--bg) 100%);">
-          <div class="page-tag" style="color:#9A8050;">MY GAME</div>
+          <div class="page-tag" style="color:#9A8050;">GRANDMA · MY GAME 🔒</div>
           <div class="page-title" style="color:#c4a870;">My Progress</div>
         </div>
-        <div class="section">
-          <button class="btn-primary" onclick="openGrandmaRoundModal()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:#9A8050;">
+        <div class="section" style="display:flex;gap:10px;">
+          <button class="btn-primary" onclick="openGrandmaRoundModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#9A8050;">
             <i class="ti ti-flag-2" style="font-size:1rem;"></i> Log a Round
           </button>
+          <button onclick="lockGrandmaProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(154,128,80,0.35);border-radius:10px;padding:0 14px;color:#c4a870;font-size:1.1rem;font-weight:600;cursor:pointer;">🔒</button>
         </div>
-        <div class="section" id="grandma-rounds-list">
-          <div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0;">No rounds yet — tap Log a Round to start.</div>
+        <div class="section">
+          <div class="section-title">Round History</div>
+          <div id="grandma-rounds-list">
+            <div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0;">No rounds yet — tap Log a Round to start.</div>
+          </div>
         </div>
       </div>
       <!-- Grandma quick round modal -->

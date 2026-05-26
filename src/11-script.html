@@ -16,6 +16,34 @@
   let _pendingAfterPin = null;
   let _pendingSonAfterPin = null;
 
+  // ── BADGES — declared at top so renderBadges() never hits TDZ ──────────────
+  const BADGES = [
+    { id:'first_tee',   name:'First Tee',  desc:'Played your first round',       color:'#3B7CB8',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,4 34,20 52,20 38,31 44,48 28,38 12,48 18,31 4,20 22,20" fill="{{c}}" opacity="0.15"/><polygon points="28,4 34,20 52,20 38,31 44,48 28,38 12,48 18,31 4,20 22,20" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="28" cy="32" r="5" fill="{{c}}" opacity="0.9"/><line x1="28" y1="20" x2="28" y2="27" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+      check:(rounds)=>rounds.length>=1 },
+    { id:'first_birdie',name:'Birdie!',    desc:'First birdie on any hole',       color:'#1E7A3A',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.1"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="28" r="18" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.4"/><text x="28" y="33" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="16" fill="{{c}}">−1</text></svg>`,
+      check:(rounds)=>rounds.some(r=>{const hs=Array.isArray(r.holes)?r.holes:JSON.parse(r.holes||'[]');return hs.some(h=>(h.score-h.par)===-1);}) },
+    { id:'par_round',   name:'Par Round',  desc:'Shot even par or better',        color:'#8a6010',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="48" height="48" rx="8" fill="{{c}}" opacity="0.1"/><rect x="4" y="4" width="48" height="48" rx="8" fill="none" stroke="{{c}}" stroke-width="2.5"/><text x="28" y="24" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="11" fill="{{c}}" opacity="0.7">EVEN</text><text x="28" y="38" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="18" fill="{{c}}">PAR</text></svg>`,
+      check:(rounds)=>rounds.some(r=>r.score_vs_par!==undefined?r.score_vs_par<=0:false) },
+    { id:'five_rounds', name:'5 Rounds',   desc:'Played 5 rounds',                color:'#7C5CBF',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.12"/><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2"/><text x="28" y="33" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="20" fill="{{c}}">5</text></svg>`,
+      check:(rounds)=>rounds.length>=5 },
+    { id:'hat_trick',   name:'Hat Trick',  desc:'3 birdies in one round',         color:'#C0392B',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="28" r="17" fill="none" stroke="{{c}}" stroke-width="1.5" opacity="0.5"/><text x="28" y="34" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" fill="{{c}}">3×</text></svg>`,
+      check:(rounds)=>rounds.some(r=>{const hs=Array.isArray(r.holes)?r.holes:JSON.parse(r.holes||'[]');return hs.filter(h=>(h.score-h.par)<=-1).length>=3;}) },
+    { id:'new_course',  name:'Explorer',   desc:'Played 2 different courses',     color:'#B86530',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="28" cy="20" r="5" fill="{{c}}" opacity="0.9"/><line x1="28" y1="25" x2="28" y2="36" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/></svg>`,
+      check:(rounds)=>new Set(rounds.map(r=>r.course_name)).size>=2 },
+    { id:'putting_pro', name:'Putt Pro',   desc:'1-putt 3 holes in a round',      color:'#2A7EA8',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="48" height="48" rx="8" fill="{{c}}" opacity="0.08"/><rect x="4" y="4" width="48" height="48" rx="8" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="28" cy="25" r="9" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="25" r="4" fill="{{c}}" opacity="0.7"/><line x1="16" y1="40" x2="40" y2="40" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/><line x1="28" y1="34" x2="28" y2="40" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+      check:(rounds)=>rounds.some(r=>{const hs=Array.isArray(r.holes)?r.holes:JSON.parse(r.holes||'[]');return hs.filter(h=>h.putts===1).length>=3;}) },
+    { id:'ten_rounds',  name:'10 Rounds',  desc:'Played 10 rounds',               color:'#8a6010',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.15"/><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2.5"/><text x="28" y="34" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="18" fill="{{c}}">10</text></svg>`,
+      check:(rounds)=>rounds.length>=10 },
+  ];
+
   // ── CLUBS — declared at top so bag/caddie never hit TDZ from init errors ──
   const CLUBS = [
     { name: 'Driver',    dist: 195, loft: '10.5°', display: 'Driver',        confirmed: true,  note: 'Vice Boost · 10.5° · Graphite · Midsize grip · 190–200 yds ✅ Confirmed' },
@@ -597,7 +625,7 @@
       updateRangeLevelBadge('girl');
     }
     if (id === 'mom-progress') {
-      if (sessionStorage.getItem('sv-family-unlocked') !== '1') {
+      if (sessionStorage.getItem('sv-mom-unlocked') !== '1') {
         document.getElementById('mom-pin-overlay').style.display = 'flex';
       } else {
         document.getElementById('mom-pin-overlay').style.display = 'none';
@@ -605,7 +633,7 @@
       }
     }
     if (id === 'grandma-progress') {
-      if (sessionStorage.getItem('sv-family-unlocked') !== '1') {
+      if (sessionStorage.getItem('sv-grandma-unlocked') !== '1') {
         document.getElementById('grandma-pin-overlay').style.display = 'flex';
       } else {
         document.getElementById('grandma-pin-overlay').style.display = 'none';
@@ -817,130 +845,7 @@
 
   // ── CLUB SYSTEM — defined at top of file (see line ~20) ──────
 
-  // ── ACHIEVEMENT BADGE SYSTEM ──────────────────────────────────
-  const BADGES = [
-    {
-      id: 'first_tee',
-      name: 'First Tee',
-      desc: 'Played your first round',
-      color: '#3B7CB8',
-      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="28,4 34,20 52,20 38,31 44,48 28,38 12,48 18,31 4,20 22,20" fill="{{c}}" opacity="0.15"/>
-        <polygon points="28,4 34,20 52,20 38,31 44,48 28,38 12,48 18,31 4,20 22,20" fill="none" stroke="{{c}}" stroke-width="2"/>
-        <circle cx="28" cy="32" r="5" fill="{{c}}" opacity="0.9"/>
-        <line x1="28" y1="20" x2="28" y2="27" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/>
-      </svg>`,
-      check: (rounds) => rounds.length >= 1
-    },
-    {
-      id: 'first_birdie',
-      name: 'Birdie!',
-      desc: 'First birdie on any hole',
-      color: '#1E7A3A',
-      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.1"/>
-        <circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/>
-        <circle cx="28" cy="28" r="18" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.4"/>
-        <text x="28" y="33" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="16" fill="{{c}}">−1</text>
-      </svg>`,
-      check: (rounds) => rounds.some(r => {
-        const hs = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes||'[]');
-        return hs.some(h => (h.score - h.par) === -1);
-      })
-    },
-    {
-      id: 'par_round',
-      name: 'Par Round',
-      desc: 'Shot even par or better',
-      color: '#8a6010',
-      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="4" width="48" height="48" rx="8" fill="{{c}}" opacity="0.1"/>
-        <rect x="4" y="4" width="48" height="48" rx="8" fill="none" stroke="{{c}}" stroke-width="2.5"/>
-        <text x="28" y="24" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="11" fill="{{c}}" opacity="0.7">EVEN</text>
-        <text x="28" y="38" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="18" fill="{{c}}">PAR</text>
-      </svg>`,
-      check: (rounds) => rounds.some(r => r.score_vs_par !== undefined ? r.score_vs_par <= 0 : false)
-    },
-    {
-      id: 'five_rounds',
-      name: '5 Rounds',
-      desc: 'Played 5 rounds',
-      color: '#7C5CBF',
-      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.12"/>
-        <polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2"/>
-        <text x="28" y="33" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="20" fill="{{c}}">5</text>
-      </svg>`,
-      check: (rounds) => rounds.length >= 5
-    },
-    {
-      id: 'hat_trick',
-      name: 'Hat Trick',
-      desc: '3 birdies in one round',
-      color: '#C0392B',
-      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/>
-        <circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/>
-        <circle cx="28" cy="28" r="17" fill="none" stroke="{{c}}" stroke-width="1.5" opacity="0.5"/>
-        <circle cx="28" cy="28" r="10" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.3"/>
-        <text x="28" y="22" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="8" fill="{{c}}" opacity="0.8">HAT</text>
-        <text x="28" y="34" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" fill="{{c}}">3×</text>
-        <text x="28" y="43" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="8" fill="{{c}}" opacity="0.8">BIRDIE</text>
-      </svg>`,
-      check: (rounds) => rounds.some(r => {
-        const hs = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes||'[]');
-        return hs.filter(h => (h.score - h.par) <= -1).length >= 3;
-      })
-    },
-    {
-      id: 'new_course',
-      name: 'Explorer',
-      desc: 'Played 2 different courses',
-      color: '#B86530',
-      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/>
-        <circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/>
-        <line x1="28" y1="5" x2="28" y2="51" stroke="{{c}}" stroke-width="1" opacity="0.3"/>
-        <line x1="5" y1="28" x2="51" y2="28" stroke="{{c}}" stroke-width="1" opacity="0.3"/>
-        <ellipse cx="28" cy="28" rx="12" ry="24" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.3"/>
-        <circle cx="28" cy="20" r="5" fill="{{c}}" opacity="0.9"/>
-        <line x1="28" y1="25" x2="28" y2="36" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/>
-      </svg>`,
-      check: (rounds) => new Set(rounds.map(r => r.course_name)).size >= 2
-    },
-    {
-      id: 'putting_pro',
-      name: 'Putt Pro',
-      desc: '1-putt 3 holes in a round',
-      color: '#2A7EA8',
-      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="4" width="48" height="48" rx="8" fill="{{c}}" opacity="0.08"/>
-        <rect x="4" y="4" width="48" height="48" rx="8" fill="none" stroke="{{c}}" stroke-width="2"/>
-        <circle cx="28" cy="25" r="9" fill="none" stroke="{{c}}" stroke-width="2.5"/>
-        <circle cx="28" cy="25" r="4" fill="{{c}}" opacity="0.7"/>
-        <line x1="16" y1="40" x2="40" y2="40" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="28" y1="34" x2="28" y2="40" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/>
-        <text x="43" y="18" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="10" fill="{{c}}">1</text>
-      </svg>`,
-      check: (rounds) => rounds.some(r => {
-        const hs = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes||'[]');
-        return hs.filter(h => h.putts === 1).length >= 3;
-      })
-    },
-    {
-      id: 'ten_rounds',
-      name: '10 Rounds',
-      desc: 'Played 10 rounds',
-      color: '#8a6010',
-      svg: `<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.15"/>
-        <polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.08"/>
-        <polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2.5"/>
-        <text x="28" y="34" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="18" fill="{{c}}">10</text>
-      </svg>`,
-      check: (rounds) => rounds.length >= 10
-    },
-  ];
+  // ── ACHIEVEMENT BADGE SYSTEM — defined at top of file (see line ~20) ──────
 
   function renderBadges(rounds, accentColor) {
     const color = accentColor || '#3B7CB8';
@@ -1614,6 +1519,24 @@
     updatePinDots('son', 0);
     document.getElementById('son-pin-overlay').style.display = 'flex';
   }
+  function lockGirlProgress() {
+    sessionStorage.removeItem('sv-girl-unlocked');
+    _girlPin = '';
+    updatePinDots('girl', 0);
+    document.getElementById('girl-pin-overlay').style.display = 'flex';
+  }
+  function lockMomProgress() {
+    sessionStorage.removeItem('sv-mom-unlocked');
+    _momPin = '';
+    updatePinDots('mom', 0);
+    document.getElementById('mom-pin-overlay').style.display = 'flex';
+  }
+  function lockGrandmaProgress() {
+    sessionStorage.removeItem('sv-grandma-unlocked');
+    _grandmaPin = '';
+    updatePinDots('grandma', 0);
+    document.getElementById('grandma-pin-overlay').style.display = 'flex';
+  }
   function toggleBagDetails() {
     const d = document.getElementById('bag-details');
     const c = document.getElementById('bag-caret');
@@ -1731,7 +1654,7 @@
     updatePinDots('mom', _momPin.length);
     if (_momPin.length === 4) {
       if (_momPin === _activePin) {
-        sessionStorage.setItem('sv-family-unlocked', '1');
+        sessionStorage.setItem('sv-mom-unlocked', '1');
         const ov = document.getElementById('mom-pin-overlay');
         ov.style.opacity = '0';
         setTimeout(() => { ov.style.display = 'none'; ov.style.opacity = '1'; loadMomRoundsAndRender(); }, 300);
@@ -1751,14 +1674,10 @@
   function grandmaPinKey(d) {
     if (_grandmaPin.length >= 4) return;
     _grandmaPin += d;
-    // grandma dots use 'gma-dot-X' ids
-    for (let i = 0; i < 4; i++) {
-      const dot = document.getElementById('gma-dot-' + i);
-      if (dot) dot.classList.toggle('filled', i < _grandmaPin.length);
-    }
+    updatePinDots('grandma', _grandmaPin.length);
     if (_grandmaPin.length === 4) {
       if (_grandmaPin === _activePin) {
-        sessionStorage.setItem('sv-family-unlocked', '1');
+        sessionStorage.setItem('sv-grandma-unlocked', '1');
         const ov = document.getElementById('grandma-pin-overlay');
         ov.style.opacity = '0';
         setTimeout(() => { ov.style.display = 'none'; ov.style.opacity = '1'; loadGrandmaRoundsAndRender(); }, 300);
@@ -1770,16 +1689,13 @@
         errEl.style.opacity = '1';
         setTimeout(() => errEl.style.opacity = '0', 1500);
         _grandmaPin = '';
-        for (let i = 0; i < 4; i++) { const d2 = document.getElementById('gma-dot-' + i); if (d2) d2.classList.remove('filled'); }
+        updatePinDots('grandma', 0);
       }
     }
   }
   function grandmaPinBackspace() {
     _grandmaPin = _grandmaPin.slice(0, -1);
-    for (let i = 0; i < 4; i++) {
-      const d = document.getElementById('gma-dot-' + i);
-      if (d) d.classList.toggle('filled', i < _grandmaPin.length);
-    }
+    updatePinDots('grandma', _grandmaPin.length);
   }
 
   // Mom round storage (localStorage — simple, no Supabase table yet)
