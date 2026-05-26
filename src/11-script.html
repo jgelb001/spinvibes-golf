@@ -15,6 +15,8 @@
   let _momPin = '', _grandmaPin = '';
   let _pendingAfterPin = null;
   let _pendingSonAfterPin = null;
+  let _dadLoadedRounds = [];   // cache for round editing
+  let _editingRoundId   = null;
 
   // ── BADGES — declared at top so renderBadges() never hits TDZ ──────────────
   const BADGES = [
@@ -1829,6 +1831,7 @@
     }
     try {
       const rounds = await loadDadRounds();
+      _dadLoadedRounds = rounds; // cache for editing
       renderDadHistory(rounds);
     } catch(e) {
       console.error('[SpinVibes] loadDadRounds error:', e);
@@ -2024,7 +2027,10 @@
             ${ref.fix ? '<div style="margin-bottom:6px;"><i class="ti ti-tool" style="color:var(--muted);vertical-align:-1px;"></i> <em>' + ref.fix + '</em></div>' : ''}
             ${ref.best ? '<div style="margin-bottom:6px;"><i class="ti ti-trophy" style="color:var(--gold);vertical-align:-1px;"></i> <em>' + ref.best + '</em></div>' : ''}
             ${ref.worst ? '<div style="margin-bottom:6px;"><i class="ti ti-x" style="color:var(--red,#c0392b);vertical-align:-1px;"></i> <em>' + ref.worst + '</em></div>' : ''}
-            <button class="round-delete-btn" onclick="confirmDeleteDadRound('${r.id}')">Delete Round</button>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="round-edit-btn" onclick="openRoundEditModal('${r.id}')">✎ Edit</button>
+              <button class="round-delete-btn" style="margin-top:0;" onclick="confirmDeleteDadRound('${r.id}')">Delete Round</button>
+            </div>
           </div>
         </div>`;
     }).join('') + legacyCards;
@@ -2193,6 +2199,86 @@
       loadDadRoundsAndRender();
     } catch(e) {
       showToast('Delete failed — check your signal', 'error');
+    }
+  }
+
+  // ── ROUND EDITING ─────────────────────────────────────────────
+  function openRoundEditModal(roundId) {
+    const r = _dadLoadedRounds.find(r => r.id === roundId);
+    if (!r) return showToast('Round not found', 'error');
+    _editingRoundId = roundId;
+    const holes = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]');
+    const d = new Date(r.date_played + 'T12:00:00');
+    const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const clubOptions = ['', ...getActiveClubs().map(c => c.name)];
+
+    let modal = document.getElementById('round-edit-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'round-edit-modal';
+      document.body.appendChild(modal);
+    }
+    modal.innerHTML = `
+      <div class="rem-inner">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--gold);margin-bottom:2px;">Edit Round</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:18px;">${dateStr} · ${r.course_name}</div>
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;">APPROACH DATA</div>
+        ${holes.map((h, i) => `
+          <div class="rem-hole-row">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);width:28px;flex-shrink:0;">H${h.hole}</div>
+            <div style="font-size:0.7rem;color:var(--muted);width:22px;flex-shrink:0;text-align:right;">p${h.par}</div>
+            <select id="rem-club-${i}" style="flex:1;min-width:0;">
+              <option value="">— none —</option>
+              ${clubOptions.filter(c => c).map(c =>
+                `<option value="${c}"${h.approach_club === c ? ' selected' : ''}>${c}</option>`
+              ).join('')}
+            </select>
+            <input id="rem-yds-${i}" type="number" min="0" max="320" placeholder="yds"
+              value="${h.approach_yds != null ? h.approach_yds : ''}" />
+          </div>`).join('')}
+        <div style="display:flex;gap:10px;margin-top:20px;">
+          <button onclick="saveRoundEdit(${holes.length})"
+            style="flex:1;padding:13px;background:var(--green);border:none;border-radius:10px;color:var(--cream);font-family:'Outfit',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;">
+            Save Changes
+          </button>
+          <button onclick="closeRoundEditModal()"
+            style="padding:13px 18px;background:none;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Outfit',sans-serif;font-size:0.9rem;cursor:pointer;">
+            Cancel
+          </button>
+        </div>
+      </div>`;
+    modal.style.display = 'block';
+  }
+
+  function closeRoundEditModal() {
+    const modal = document.getElementById('round-edit-modal');
+    if (modal) modal.style.display = 'none';
+    _editingRoundId = null;
+  }
+
+  async function saveRoundEdit(holeCount) {
+    const r = _dadLoadedRounds.find(r => r.id === _editingRoundId);
+    if (!r) return;
+    const holes = (Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]')).map((h, i) => {
+      const club = document.getElementById(`rem-club-${i}`)?.value || '';
+      const ydsRaw = document.getElementById(`rem-yds-${i}`)?.value;
+      return { ...h, approach_club: club || null, approach_yds: ydsRaw ? parseInt(ydsRaw, 10) : null };
+    });
+    try {
+      // Anon key has no UPDATE permission — delete + reinsert with updated holes
+      const { error: delErr } = await _sb.from('dad_rounds').delete().eq('id', _editingRoundId);
+      if (delErr) throw delErr;
+      const newRound = { ...r, holes };
+      delete newRound.id;
+      delete newRound.created_at;
+      const safeRound = { ...newRound, stars: Math.max(1, newRound.stars || 1) };
+      const { error: insErr } = await _sb.from('dad_rounds').insert([safeRound]);
+      if (insErr) throw insErr;
+      showToast('Round updated ✓');
+      closeRoundEditModal();
+      loadDadRoundsAndRender();
+    } catch(e) {
+      showToast('Save failed — ' + (e?.message || 'check signal'), 'error');
     }
   }
 
