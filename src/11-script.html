@@ -800,7 +800,7 @@
   // Bump BUILD_ID with every deploy. App checks on load — if version
   // changed, SW caches are cleared and page reloads. localStorage
   // (logs, notes, profile) is never touched.
-  const BUILD_ID = '2026-05-26-v31';
+  const BUILD_ID = '2026-05-26-v32';
   (function checkBuild() {
     const prev = localStorage.getItem('sv-build');
     if (prev && prev !== BUILD_ID) {
@@ -826,6 +826,13 @@
 
   // ── INIT ─────────────────────────────────────────────────────
   initTheme();
+  // Restore saved club distances from localStorage cache (instant, no network needed)
+  (function restoreCachedClubs() {
+    try {
+      const cached = localStorage.getItem('sv-active-clubs');
+      if (cached) _activeClubs = JSON.parse(cached);
+    } catch(e) { /* ignore parse errors */ }
+  })();
   initProfile();
   loadMilestones();
   renderSessions();
@@ -4490,9 +4497,10 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       });
       _activeProfile = saved;
 
-      // 3. Save clubs
+      // 3. Save clubs — Supabase + localStorage cache (cache survives refresh without Supabase)
       await saveClubsToSupabase(saved.id, _settingsClubs);
       _activeClubs = _settingsClubs.map(c => ({ ...c }));
+      localStorage.setItem('sv-active-clubs', JSON.stringify(_activeClubs));
 
       // 4. Collect + save family members
       ['son','daughter','mom','grandma'].forEach(role => {
