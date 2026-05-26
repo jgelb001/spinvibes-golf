@@ -5866,11 +5866,12 @@
   }
 
   function getClubDist(name) {
+    // Settings/Supabase distances are the source of truth for suggestions
+    const active = getActiveClubs().find(c => c.name === name);
+    if (active) return active.dist;
+    // Legacy fallback: per-shot rolling average (sv-clubs) if club not in active list
     const saved = JSON.parse(localStorage.getItem('sv-clubs') || '{}');
-    if (saved[name] !== undefined) return saved[name];
-    // Use active clubs (Settings-saved / Supabase) so approach game reflects real bag distances
-    const def = getActiveClubs().find(c => c.name === name);
-    return def ? def.dist : 100;
+    return saved[name] !== undefined ? saved[name] : 100;
   }
 
   function recordClubHit(clubName, yards) {
