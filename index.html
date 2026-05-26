@@ -6856,11 +6856,16 @@
   async function loadDadRoundsAndRender() {
     const listEl = document.getElementById('dad-history-list');
     listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;"><i class="ti ti-loader-2" style="font-size:1.1rem;vertical-align:-2px;"></i> Loading your rounds…</div>';
+    if (!_sb) {
+      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:0.85rem;">Supabase SDK not loaded — reload the page</div>';
+      return;
+    }
     try {
       const rounds = await loadDadRounds();
       renderDadHistory(rounds);
     } catch(e) {
-      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:0.85rem;">Could not connect — check your signal</div>';
+      console.error('[SpinVibes] loadDadRounds error:', e);
+      listEl.innerHTML = `<div style="text-align:center;padding:20px;color:var(--red);font-size:0.85rem;">Error: ${e?.message || 'unknown'}</div>`;
     }
   }
 
