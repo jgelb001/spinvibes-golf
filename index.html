@@ -5027,12 +5027,12 @@
   // ── CLUBS — declared at top so bag/caddie never hit TDZ from init errors ──
   const CLUBS = [
     { name: 'Driver',    dist: 195, loft: '10.5°', display: 'Driver',        confirmed: true,  note: 'Vice Boost · 10.5° · Graphite · Midsize grip · 190–200 yds ✅ Confirmed' },
-    { name: '7-Wood',    dist: 188, loft: '21°',   display: '7-Wood',        confirmed: true,  note: 'Callaway Paradym Ai Smoke MAX · 21° · Aldila Ascent 40g · Senior flex · 180–195 yds ✅ May 2026' },
+    { name: '7-Wood',    dist: 170, loft: '21°',   display: '7-Wood',        confirmed: true,  note: 'Callaway Paradym Ai Smoke MAX · 21° · Aldila Ascent 40g · Senior flex · 165–175 yds carry / ~185 total ✅ May 2026' },
     { name: '4-Hybrid',  dist: 175, loft: '22°',   display: '4-Hybrid',      confirmed: true,  note: 'Vice Boost · 22° · 170–180 yds · confirmed' },
     { name: '4-iron',    dist: 165, loft: '21°',   display: '4-Iron',        confirmed: false, note: 'Vice Boost · LH · Steel · ~165 yds estimated' },
     { name: '5-iron',    dist: 155, loft: '24°',   display: '5-Iron',        confirmed: false, note: 'Vice Boost · LH · Steel · ~155 yds estimated' },
-    { name: '6-iron',    dist: 150, loft: '27°',   display: '6-Iron',        confirmed: false, note: 'Vice Boost · LH · Steel · 145–155 yds estimated' },
-    { name: '7-iron',    dist: 135, loft: '31°',   display: '7-Iron',        confirmed: true,  note: 'Vice Boost · LH · Steel · 130–140 yds ✅ confirmed' },
+    { name: '6-iron',    dist: 150, loft: '27°',   display: '6-Iron',        confirmed: false, note: 'Vice irons · LH · Steel · 145–155 yds estimated · ⚠️ ball position issue — high dispersion May 26, reconfirm' },
+    { name: '7-iron',    dist: 137, loft: '31°',   display: '7-Iron',        confirmed: true,  note: 'Vice irons · LH · Steel · 130–137 yds ✅ confirmed May 2026' },
     { name: '8-iron',    dist: 125, loft: '35°',   display: '8-Iron',        confirmed: false, note: 'Vice Boost · LH · Steel · 120–130 yds estimated' },
     { name: '9-iron',    dist: 115, loft: '39°',   display: '9-Iron',        confirmed: true,  note: 'Vice Boost · LH · Steel · 110–120 yds ✅ confirmed' },
     { name: 'PW',        dist: 100, loft: '44°',   display: 'PW · Pitching', confirmed: true,  wedge: true, note: 'Vice Boost · LH · 90–110 yds ✅ confirmed' },
@@ -8020,14 +8020,14 @@
   // ── AI CADDIE ─────────────────────────────────────────────────
   let _caddieHistory = [];
   // Caddie system prompt — lean, fast
-  const _CADDIE_SYSTEM = `Jeremy's carries: Driver 190-200 | 7W 180-195 | 4H 170-180 | 4i ~165 | 5i ~155 | 6i 145-155 | 7i 130-140 | 8i 120-130 | 9i 110-120 | PW 90-110 | GW 85-105 | SW 80-90 | LW 60-75. Left-handed beginner, goal: break 90.
+  const _CADDIE_SYSTEM = `Jeremy's carries: Driver 190-200 | 7W 165-175 | 4H 170-180 | 4i ~165 | 5i ~155 | 6i 145-155 | 7i 130-137 | 8i 120-130 | 9i 110-120 | PW 90-110 | GW 85-105 | SW 80-90 | LW 60-75. Left-handed beginner, goal: break 90.
 Name the club. Show distance math in one line. One sentence of strategy. 2 sentences total. If no distance given, ask for it first.`;
 
   function _caddieSystemWithCtx() { return _CADDIE_SYSTEM; }
 
   // Family-round caddie — player-aware yardage cards
   const _FAM_YARDAGES = {
-    dad:     `Dad (Jeremy, left-handed): Driver 190-200 | 7W 180-195 | 4H 170-180 | 4i ~165 | 5i ~155 | 6i 145-155 | 7i 130-140 | 8i 120-130 | 9i 110-120 | PW 90-110 | GW 85-105 | SW 80-90 | LW 60-75`,
+    dad:     `Dad (Jeremy, left-handed): Driver 190-200 | 7W 165-175 | 4H 170-180 | 4i ~165 | 5i ~155 | 6i 145-155 | 7i 130-137 | 8i 120-130 | 9i 110-120 | PW 90-110 | GW 85-105 | SW 80-90 | LW 60-75`,
     son:     `Son (right-handed, junior set, age 8): Driver ~60-80 | FW Wood ~50-65 | 5i ~40-55 | 7i ~30-45 | 9i ~25-35 | SW ~15-25`,
     girl:    `Daughter (lefty, age 5, junior set): distances vary — ask how far she hits before recommending`,
     mom:     `Mom (right-handed, beginner): distances unknown — ask how far she hits before recommending`,
