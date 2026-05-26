@@ -5867,8 +5867,10 @@
 
   function getClubDist(name) {
     const saved = JSON.parse(localStorage.getItem('sv-clubs') || '{}');
-    const def   = CLUBS.find(c => c.name === name);
-    return saved[name] !== undefined ? saved[name] : (def ? def.dist : 100);
+    if (saved[name] !== undefined) return saved[name];
+    // Use active clubs (Settings-saved / Supabase) so approach game reflects real bag distances
+    const def = getActiveClubs().find(c => c.name === name);
+    return def ? def.dist : 100;
   }
 
   function recordClubHit(clubName, yards) {
@@ -5886,7 +5888,7 @@
   function suggestClub(yards) {
     if (!yards || yards < 1) return null;
     // Driver excluded from approach suggestions — 7-Wood IS available for long layups (170+ yds)
-    const approachClubs = CLUBS.filter(c => c.name !== 'Driver');
+    const approachClubs = getActiveClubs().filter(c => c.name !== 'Driver');
     const ranked = approachClubs.map(c => ({ ...c, avg: getClubDist(c.name) }))
                                 .sort((a, b) => a.avg - b.avg);
     // Best fit: can reach AND not more than 40 yds overkill
@@ -6050,7 +6052,7 @@
     const note = suggested ? clubNote(suggested, yards) : '';
     // All clubs except Driver — reversed so SHORT clubs are LEFT, LONG clubs RIGHT
     // This matches the slider direction (30 yds = left, 250 yds = right)
-    const approachClubs = [...CLUBS.filter(c => c.name !== 'Driver')].reverse();
+    const approachClubs = [...getActiveClubs().filter(c => c.name !== 'Driver')].reverse();
 
     el.innerHTML = `
       ${suggested ? `<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
