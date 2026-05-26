@@ -1549,7 +1549,7 @@
     _dadPin += d;
     updatePinDots('dad', _dadPin.length);
     if (_dadPin.length === 4) {
-      if (_dadPin === getActivePin()) {
+      if (_dadPin === _activePin) {
         sessionStorage.setItem('sv-dad-unlocked', '1');
         document.getElementById('dad-pin-overlay').style.opacity = '0';
         setTimeout(() => {
@@ -1641,7 +1641,7 @@
     _sonPin += d;
     updatePinDots('son', _sonPin.length);
     if (_sonPin.length === 4) {
-      if (_sonPin === getActivePin()) {
+      if (_sonPin === _activePin) {
         sessionStorage.setItem('sv-son-unlocked', '1');
         document.getElementById('son-pin-overlay').style.opacity = '0';
         setTimeout(() => {
@@ -1679,7 +1679,7 @@
     _momPin += d;
     updatePinDots('mom', _momPin.length);
     if (_momPin.length === 4) {
-      if (_momPin === getActivePin()) {
+      if (_momPin === _activePin) {
         sessionStorage.setItem('sv-family-unlocked', '1');
         const ov = document.getElementById('mom-pin-overlay');
         ov.style.opacity = '0';
@@ -1706,7 +1706,7 @@
       if (dot) dot.classList.toggle('filled', i < _grandmaPin.length);
     }
     if (_grandmaPin.length === 4) {
-      if (_grandmaPin === getActivePin()) {
+      if (_grandmaPin === _activePin) {
         sessionStorage.setItem('sv-family-unlocked', '1');
         const ov = document.getElementById('grandma-pin-overlay');
         ov.style.opacity = '0';
@@ -4450,9 +4450,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
   // ── PIN Change ────────────────────────────────────────────────
   async function changePin() {
-    const current = document.getElementById('pin-current')?.value || '';
-    const newPin  = document.getElementById('pin-new')?.value     || '';
-    const confirm = document.getElementById('pin-confirm')?.value  || '';
+    const newPin  = (document.getElementById('pin-new')?.value     || '').trim();
+    const confirm = (document.getElementById('pin-confirm')?.value  || '').trim();
     const msgEl   = document.getElementById('pin-change-msg');
 
     function pinMsg(text, ok) {
@@ -4462,9 +4461,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       msgEl.textContent = text;
     }
 
-    if (current !== _activePin) { pinMsg('Current PIN is incorrect.', false); return; }
     if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) { pinMsg('New PIN must be exactly 4 digits.', false); return; }
-    if (newPin !== confirm) { pinMsg('PINs don\'t match.', false); return; }
+    if (newPin !== confirm) { pinMsg('PINs don\'t match — re-enter and try again.', false); return; }
 
     // Update in memory immediately
     _activePin = newPin;
@@ -4485,7 +4483,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     }
 
     // Clear fields
-    ['pin-current','pin-new','pin-confirm'].forEach(id => {
+    ['pin-new','pin-confirm'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
