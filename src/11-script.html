@@ -816,7 +816,7 @@
   // Bump BUILD_ID with every deploy. App checks on load — if version
   // changed, SW caches are cleared and page reloads. localStorage
   // (logs, notes, profile) is never touched.
-  const BUILD_ID = '2026-05-26-v38';
+  const BUILD_ID = '2026-05-26-v39';
   (function checkBuild() {
     const prev = localStorage.getItem('sv-build');
     if (prev && prev !== BUILD_ID) {
@@ -2218,10 +2218,10 @@
   // ── BEST ROUND (dynamic) ──────────────────────────────────────
   function refreshDadBestRound(rounds) {
     // rounds = already-loaded array (avoids second network call)
-    // Exclude practice rounds from best-round display
-    const scored = rounds.filter(r => !r.is_practice && r.total_score > 0);
-    if (!scored.length) return;
-    const best = scored.reduce((a, b) => a.total_score <= b.total_score ? a : b);
+    // Only regulation rounds count — exclude par-3/exec and practice
+    const regulation = rounds.filter(r => !r.is_practice && r.total_score > 0 && isRegulationRound(r));
+    if (!regulation.length) return;
+    const best = regulation.reduce((a, b) => a.total_score <= b.total_score ? a : b);
     const el = document.getElementById('dad-home-best');
     if (!el) return;
     const d = new Date(best.date_played + 'T12:00:00');
@@ -2232,14 +2232,14 @@
   async function loadDadBestRoundFromSupabase() {
     if (!_sb) return;
     try {
+      // Fetch all non-practice rounds with round_type + course_par so isRegulationRound() can filter
       const { data } = await _sb
         .from('dad_rounds')
-        .select('total_score, date_played, is_practice')
+        .select('total_score, date_played, is_practice, round_type, course_par')
         .eq('is_practice', false)
-        .order('total_score', { ascending: true })
-        .limit(1);
+        .order('total_score', { ascending: true });
       if (data && data.length) refreshDadBestRound(data);
-    } catch(e) { /* silent — home hero keeps hardcoded fallback */ }
+    } catch(e) { /* silent — home hero keeps loading fallback */ }
   }
 
   async function confirmDeleteDadRound(id) {
