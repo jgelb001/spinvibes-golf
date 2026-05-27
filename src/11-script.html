@@ -74,7 +74,8 @@
   // ── CADDIE — swap this URL after deploying the Cloudflare Worker ──────────
   // Deploy: cd caddie-worker && wrangler secret put ANTHROPIC_API_KEY && wrangler deploy
   // Then replace the URL below with your workers.dev URL (or caddie.spinvibes.com)
-  const CADDIE_URL = 'https://spinvibes-caddie.spinvibes.workers.dev'; // Cloudflare Worker — key stored as CF secret
+  const CADDIE_URL    = 'https://spinvibes-caddie.spinvibes.workers.dev'; // Cloudflare Worker — key stored as CF secret
+  const WORKER_SECRET = 'sv-golf-2026-xK9mPqR4nBzT'; // Must match WORKER_SECRET set via: wrangler secret put WORKER_SECRET
 
   // ── SUPABASE — wrapped safely so CDN failure can't crash the whole script ──
   const SUPABASE_URL  = 'https://zairvjyiwhajsulefyoi.supabase.co';
@@ -815,7 +816,7 @@
   // Bump BUILD_ID with every deploy. App checks on load — if version
   // changed, SW caches are cleared and page reloads. localStorage
   // (logs, notes, profile) is never touched.
-  const BUILD_ID = '2026-05-26-v36';
+  const BUILD_ID = '2026-05-26-v37';
   (function checkBuild() {
     const prev = localStorage.getItem('sv-build');
     if (prev && prev !== BUILD_ID) {
@@ -3207,7 +3208,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     try {
       const resp = await fetch(CADDIE_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-SpinVibes-Token': WORKER_SECRET },
         body: JSON.stringify({
           messages: _caddieHistory.slice(-6),
           systemPrompt: _caddieSystemWithCtx()
@@ -3863,7 +3864,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     try {
       const resp = await fetch(CADDIE_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-SpinVibes-Token': WORKER_SECRET },
         body: JSON.stringify({
           messages: _dadLiveCaddieHistory.slice(-6),
           systemPrompt: _CADDIE_SYSTEM + holeCtx
@@ -3911,7 +3912,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     try {
       const resp = await fetch(CADDIE_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-SpinVibes-Token': WORKER_SECRET },
         body: JSON.stringify({
           messages: _famCaddieHistory.slice(-6),
           systemPrompt
@@ -4108,7 +4109,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
       const resp = await fetch('https://golf.spinvibes.com/.netlify/functions/parse-scorecard', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-SpinVibes-Token': WORKER_SECRET },
         body: JSON.stringify({ image: base64, mediaType, teeColor }),
       });
       const data = await resp.json();
