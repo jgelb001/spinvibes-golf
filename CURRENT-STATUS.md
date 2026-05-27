@@ -1,7 +1,7 @@
 # SpinVibes Golf — Current Status
 > **Update this at the end of every Cowork session.** This is the first thing to read when starting a new session. It answers: where are we, what's broken, what's next.
 
-*Last updated: 2026-05-25 (session 16 — Sprint 4 confirmed, Sprint 5 up next)*
+*Last updated: 2026-05-26 (session 17 — Start New Round fixed, TCI Oaks+Creek added)*
 
 ---
 
@@ -11,7 +11,7 @@
 |------|--------|
 | spinvibes.com (PWA) | ✅ Live — GitHub Pages |
 | golf.spinvibes.com (guide builder) | ✅ Live — GitHub Pages |
-| Service worker | **v67 / cache v113** |
+| Service worker | **v85 / cache v131** |
 | Stable checkpoint | **`v1.0-stable`** tag on GitHub — safe rollback before file split |
 | Last commit | Sprint 4: kids leveling system — level cards, progress bars, confetti ceremony, range badges |
 | Supabase | ✅ Operational |
@@ -28,6 +28,20 @@
 | Next goal | Break 90 — 3 strokes away |
 | Bag | Callaway Driver + 7-wood. Vice Boost 4H + irons (Takomo still arriving). Callaway Opus 50°/56°/60° wedges. Odyssey Ai-ONE #7 putter ⚠️ weights too heavy — returning to lighter config |
 | Pin | 4417 |
+
+---
+
+## What Was Just Finished (Session 17 — May 26, 2026)
+
+### Critical Bug Fix: Start New Round + TCI Course ✅
+
+| Fix | What changed |
+|-----|-------------|
+| Start New Round broken | Root cause: `KID_LEVELS` declared mid-file (~line 2856) but called by `updateRangeLevelBadge()` at init (~line 5885). Script crashed → `_dadRound` never initialized → `openDadModal()` threw TDZ error on every tap |
+| KID_LEVELS moved to top | Same pattern as BADGES/CLUBS fix. Now declared right after CLUBS, before any init code |
+| CADDIE_URL self-reference | `const CADDIE_URL = CADDIE_URL` (left over from CF deploy session) was crashing entire script on load — fixed to correct Netlify URL |
+| TCI — Oaks + Creek | New course added: Oaks front 9 → Creek back 9, par 72, Sage tees, per-hole yardages |
+| SW bumped | v85 / cache v131, BUILD_ID v35 |
 
 ---
 
