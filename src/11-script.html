@@ -816,7 +816,7 @@
   // Bump BUILD_ID with every deploy. App checks on load — if version
   // changed, SW caches are cleared and page reloads. localStorage
   // (logs, notes, profile) is never touched.
-  const BUILD_ID = '2026-05-26-v37';
+  const BUILD_ID = '2026-05-26-v38';
   (function checkBuild() {
     const prev = localStorage.getItem('sv-build');
     if (prev && prev !== BUILD_ID) {
@@ -1865,8 +1865,9 @@
   // Helper: is this a regulation 18-hole round?
   // Checks explicit round_type first (new rounds), falls back to course_par inference (legacy)
   function isRegulationRound(r) {
+    if ((r.course_par || 0) < 65) return false; // safety net — par-3/exec always excluded
     if (r.round_type) return r.round_type === 'regulation_18';
-    return (r.course_par || 0) >= 60;
+    return true; // legacy rounds with course_par >= 65 assumed regulation
   }
   // Visual tag for non-regulation rounds
   function roundTypeTag(r) {
