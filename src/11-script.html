@@ -63,6 +63,14 @@
     { name: 'LW (60°)',  dist: 68,  loft: '60°',   display: 'LW · Lob',      confirmed: false, wedge: true, note: 'Callaway Opus · 60–75 yds estimated · specialty/flops ✅ May 2026' },
   ];
 
+  // ── KID LEVELS — declared at top to prevent TDZ when updateRangeLevelBadge() runs at init ──
+  const KID_LEVELS = {
+    1: { name: 'Just for Fun', emoji: '🌟', color: '#ec4899', desc: 'Make contact, celebrate every shot, no rules.', nextLabel: 'Getting the Hang of It', nextTrigger: '3 rounds played', roundsNeeded: 3 },
+    2: { name: 'Getting the Hang of It', emoji: '⚡', color: '#3b82f6', desc: 'Basic swing mechanics, count pars, intro to rules.', nextLabel: 'Learning the Game', nextTrigger: '5 rounds + first par', roundsNeeded: 5 },
+    3: { name: 'Learning the Game', emoji: '🎯', color: '#22c55e', desc: 'Full stats, approach tracking, strategy, real scoring.', nextLabel: 'Getting Serious', nextTrigger: '8 rounds + first birdie', roundsNeeded: 8 },
+    4: { name: 'Getting Serious', emoji: '🏆', color: '#c8922a', desc: 'Dad-level complexity. Tournament ready.', nextLabel: null, nextTrigger: null, roundsNeeded: null },
+  };
+
   // ── CADDIE — swap this URL after deploying the Cloudflare Worker ──────────
   // Deploy: cd caddie-worker && wrangler secret put ANTHROPIC_API_KEY && wrangler deploy
   // Then replace the URL below with your workers.dev URL (or caddie.spinvibes.com)
@@ -807,7 +815,7 @@
   // Bump BUILD_ID with every deploy. App checks on load — if version
   // changed, SW caches are cleared and page reloads. localStorage
   // (logs, notes, profile) is never touched.
-  const BUILD_ID = '2026-05-26-v34';
+  const BUILD_ID = '2026-05-26-v35';
   (function checkBuild() {
     const prev = localStorage.getItem('sv-build');
     if (prev && prev !== BUILD_ID) {
