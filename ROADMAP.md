@@ -388,6 +388,15 @@ create table courses (
 
 **Keep this updated.** Every meaningful web-app change gets a one-line entry here with date.
 
+### 2026-05-26 — Session 17–18 (bug fixes + planning)
+- Fixed Start New Round crash: KID_LEVELS TDZ — moved to top of src/11-script.html (same pattern as BADGES/CLUBS)
+- Fixed CADDIE_URL self-reference crash (leftover from CF deploy session)
+- Added TCI — Oaks + Creek course (Oaks front 9 → Creek back 9, par 72, Sage tees)
+- SW bumped: v85 / cache v131
+- All roadmap open questions resolved (see Section 7)
+- Leveling system fully detailed (L1–L4 content per tab)
+- Sprint 5 fully scoped (6 build tasks in order)
+
 ### 2026-05-25 — Sprint 3B
 - Added `round_type text DEFAULT 'regulation_18'` column to `dad_rounds` in Supabase
 - Added Format pill row to round entry modal (⛳ 18-Hole / 🏌️ 9-Hole / 📍 Par-3); auto-selects on course change

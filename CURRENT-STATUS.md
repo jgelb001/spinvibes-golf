@@ -1,7 +1,7 @@
 # SpinVibes Golf — Current Status
 > **Update this at the end of every Cowork session.** This is the first thing to read when starting a new session. It answers: where are we, what's broken, what's next.
 
-*Last updated: 2026-05-26 (session 17 — Start New Round fixed, TCI Oaks+Creek added)*
+*Last updated: 2026-05-26 (session 18 — all open questions resolved, Sprint 5 fully scoped)*
 
 ---
 
@@ -13,7 +13,7 @@
 | golf.spinvibes.com (guide builder) | ✅ Live — GitHub Pages |
 | Service worker | **v85 / cache v131** |
 | Stable checkpoint | **`v1.0-stable`** tag on GitHub — safe rollback before file split |
-| Last commit | Sprint 4: kids leveling system — level cards, progress bars, confetti ceremony, range badges |
+| Last commit | Roadmap: all open questions resolved, leveling system fleshed out, Sprint 5 scoped |
 | Supabase | ✅ Operational |
 | Caddie proxy | ✅ Live at `spinvibes-golf.netlify.app/.netlify/functions/caddie` |
 | Netlify | ⚠️ Credit limit resets ~June 1. Caddie function still live |
@@ -28,6 +28,26 @@
 | Next goal | Break 90 — 3 strokes away |
 | Bag | Callaway Driver + 7-wood. Vice Boost 4H + irons (Takomo still arriving). Callaway Opus 50°/56°/60° wedges. Odyssey Ai-ONE #7 putter ⚠️ weights too heavy — returning to lighter config |
 | Pin | 4417 |
+
+---
+
+## What Was Just Finished (Session 18 — May 26, 2026)
+
+### Planning: Open Questions + Sprint 5 Scope ✅
+
+All open questions from the roadmap resolved. Key decisions:
+
+| Decision | Outcome |
+|----------|---------|
+| Level-up triggers | Round count + skill milestone; **account holder** always approves (not "Dad" — inclusive language) |
+| Level content gates | Fully defined per level: Range / My Game / Short Game content for L1–L4 |
+| Photo privacy | Private by default, per-photo shareable opt-in, stored in Supabase Storage |
+| Sharing formats | 5 card templates: full scorecard+gallery, hole+scorecard overlay, course logo card, hole badge, app overlay |
+| AI range tips | Post-round Caddie suggestion + manual override; default to a clear recommendation |
+| Monetization | One-time unlock + family add-ons; Founders Family discount; competitive analysis before prices |
+| Android | iOS first, Android later based on demand |
+| Courses | User-submitted scorecard photos now; proper API (golfbert etc.) researched for Sprint 6 |
+| Merch | VistaPrint-style print integration — lower priority, post-Sprint 5 |
 
 ---
 
@@ -132,13 +152,19 @@
 
 ## Next Up — Sprint 5: Family Memories + Social Sharing
 
-**Goal:** capture real memories from rounds and make them shareable.
+**Goal:** capture real memories from rounds and make them shareable. Fully scoped — ready to build.
 
-**Key tasks:**
-1. Persist photos to Supabase Storage (image bucket with signed URLs) — currently stored in memory only
-2. Shareable round recap card — canvas-generated PNG with scorecard overlay, course, score vs par, SpinVibes branding
-3. Web Share API — native share sheet on mobile (Instagram, Messages, etc.)
-4. Family gallery view — all round photos by date on the family round history
+**Build order:**
+1. Supabase Storage bucket + RLS policy + signed URL generation
+2. Wire `uploadRoundPhotos()` to actually persist (already scaffolded, currently in-memory only)
+3. Canvas recap card builder — 5 templates (full scorecard+gallery / hole+overlay / course logo / hole badge / app overlay)
+4. Web Share API — native share sheet on mobile; download fallback on desktop
+5. Family gallery / Memories section on Home tab (by date, filterable by player/course)
+6. AI range suggestion — post-round Caddie call → focus area stored in localStorage, shown on Range tab
+
+**Also queued (Sprint 4B — small cleanup before Sprint 5 or during):**
+- Account holder language audit: rename "Dad-only" PROMOTE button and all "Dad" framing to "account holder"
+- Skill milestone auto-detection: flag first par / first birdie in son/girl rounds for level-up trigger
 
 ---
 
