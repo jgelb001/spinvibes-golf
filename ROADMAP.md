@@ -114,33 +114,70 @@ Priority items:
 
 **The concept:** gamify progression for kids with a level system. As they develop, new content and complexity unlocks — just like a video game.
 
-**Level structure:**
+---
 
-| Level | Name | Who | Focus |
-|-------|------|-----|-------|
-| 1 | Just for Fun | Daughter (age 5), new kids | Make contact, celebrate everything, no rules |
-| 2 | Getting the Hang of It | Son (age 8), consistent kids | Basic swing mechanics, count pars, intro to rules |
-| 3 | Learning the Game | Motivated junior | Full stats, approach tracking, strategy, scoring |
-| 4 | Getting Serious | Teen / serious junior | Same depth as Dad section |
+#### Level Structure (FINAL — decided 2026-05-26)
 
-**Implementation:**
-- Level stored in localStorage per profile (son_level, girl_level)
-- Level Up ceremony: full-screen animation + new badge unlock
-- Range/Short Game/My Game content gated by level
-- Badges remain at all levels — they feed the intrinsic motivation
-- Son current level: 2 (consistent hitter, starting to understand scoring)
-- Daughter current level: 1 (just for fun)
+| Level | Name | Emoji | Who | Core Focus |
+|-------|------|-------|-----|------------|
+| 1 | Just for Fun | 🌟 | Daughter (age 5), brand-new juniors | Make contact, celebrate every shot, zero rules |
+| 2 | Getting the Hang of It | ⚡ | Son (age 8), consistent hitters | Basic swing mechanics, count total score, intro to rules |
+| 3 | Learning the Game | 🎯 | Motivated juniors | Full stats, approach tracking, score vs par, real strategy |
+| 4 | Getting Serious | 🏆 | Teen / serious junior | Full Dad-level complexity, tournament mindset |
 
-**Level-up triggers (examples):**
-- Level 1 → 2: Complete 3 rounds, make 5 good contacts in a range session
-- Level 2 → 3: First par logged, 5 rounds completed
-- Level 3 → 4: First birdie, consistent scoring
+---
 
-**Range content changes by level:**
-- Level 1: "Make It Move" — celebrate every contact, no correction
-- Level 2: "Contact Challenge" + basic ball position
-- Level 3: Full phase structure + swing cues + stats tracking
-- Level 4: Full Dad-style range plan
+#### What Changes at Each Level (FINAL)
+
+**Level 1 — Just for Fun**
+- Range: "Make It Move" card — celebrate every contact, no corrections, fun emojis
+- My Game: sticker-style badges only, no stroke counting, no history pressure
+- Short Game: "Try it!" prompts — simple chip/putt challenges, no technique
+- Scoring: optional, not shown in recap unless account holder enables it
+- Tone: pure celebration. Every swing is a win.
+
+**Level 2 — Getting the Hang of It**
+- Range: "Contact Challenge" — basic ball position cues, one swing thought per session
+- My Game: total score per round, basic badges, round history card (score only, no per-hole)
+- Short Game: technique intro — grip, setup, one chipping drill, one putting drill
+- Scoring: total score tracked, displayed as "X shots today"
+- Tone: encouraging and playful, but starting to build real habits
+
+**Level 3 — Learning the Game**
+- Range: Full phase structure (warmup / irons / scoring clubs / finisher), junior swing cues, 1–2 focus areas, stats-informed suggestions
+- My Game: unlocks per-hole score tracking, score vs par per hole, putting stats, approach tracking, fairways hit — junior version of Dad's stats page
+- Short Game: full drill library with technique explanations, course strategy tips (when to chip vs pitch vs putt from fringe)
+- Strategy tab: simplified — basic course management, layup vs go decisions, par-3 tips
+- Scoring: real hole-by-hole scoring, score vs par displayed
+- Tone: serious but fun. Real feedback, real growth.
+
+**Level 4 — Getting Serious**
+- Everything Dad has — full stats, caddie access, approach planning, round reflection
+- Range: same as Dad's range plan (add AI-suggested focus from last round)
+- Tone: peer-level with Dad. Tournament ready.
+
+---
+
+#### Level-Up Triggers (FINAL)
+
+Triggers are a combination of round count + skill milestone. The app flags readiness — the **account holder** (not "Dad" — moms, grandparents, any caretaker) makes the final call and taps Promote.
+
+| Transition | Auto-flag fires when… | Account holder approves? |
+|------------|----------------------|--------------------------|
+| L1 → L2 | 3 rounds played | ✅ Always |
+| L2 → L3 | 5 rounds + first par logged | ✅ Always |
+| L3 → L4 | 8 rounds + first birdie logged | ✅ Always |
+
+**Language note:** All UI text uses "account holder" approval framing — never "Dad". The promote button and confirmation dialog should be warm and inclusive.
+
+---
+
+#### Implementation Status
+- Level cards, progress bars, promote button, confetti ceremony: ✅ DONE (Sprint 4)
+- Range level badges: ✅ DONE
+- Per-level content changes (Range, My Game, Short Game): ⬜ Sprint 4B / Sprint 5 refinement
+- Skill milestone tracking (first par, first birdie auto-detection): ⬜ Sprint 4B
+- Account holder language audit (rename "Dad-only" → account holder): ⬜ Sprint 4B
 
 ---
 
@@ -148,31 +185,46 @@ Priority items:
 
 **The concept:** capture real memories from rounds and share them. This is the emotional core of the app — families building a story together on the course.
 
-**Per-hole photo/video capture (upgrade from current):**
-- Currently: base64 photo stored in memory only (lost when modal closes)
-- Target: persist photos to **Supabase Storage** (image bucket with signed URLs)
-- Store `photo_url` alongside each hole in the `holes` JSON
-- Photos visible in round recap and family history
+---
 
-**Shareable round recap cards:**
-- After a round, generate a shareable image with:
-  - Scorecard overlay (hole-by-hole or summary)
-  - Course name + date + total score vs par
-  - Location tag (if available)
-  - Best moment / milestone highlight (e.g., "First birdie! H5")
-  - SpinVibes watermark / branding
-- Export as PNG via `canvas` API
-- Share to Instagram, Messages, etc. via native share sheet (Web Share API on mobile, Capacitor native share when wrapped)
+#### Decisions (FINAL — 2026-05-26)
 
-**Family gallery:**
-- A "Memories" tab or section showing all round photos by date
-- Filter by player, course, or date range
-- Private by default (only family can see)
+**Photo storage:**
+- Photos stored in **Supabase Storage** (private bucket, signed URLs)
+- Private by default — only accessible to the family
+- Account holder can opt-in to make individual photos shareable (per-photo, explicit toggle)
+- Future (lower priority): VistaPrint-style merch integration — print photos on balls, canvas, cards
 
-**Social tagging / overlays:**
-- Course name + hole number badge on each photo
-- Score badge ("Birdie!", "Par", "+2") on player photos
-- "Playing with: Dad, Son, Daughter" tag
+**Sharing formats — multiple card templates, account holder picks:**
+1. **Full scorecard + image gallery** — complete hole-by-hole scorecard with round photos tiled
+2. **Hole image + scorecard overlay** — a single hole photo with the scorecard laid over it
+3. **Course logo / course look** — stylized card with course name, date, score vs par, SpinVibes branding (no photo needed)
+4. **Hole badge card** — single photo with hole number and score badge ("Birdie! · Hole 7")
+5. **App overlay only** — any photo with just the SpinVibes app branding overlay
+
+All formats export as PNG via `canvas` API → shared via Web Share API (native sheet on mobile: Instagram, Messages, etc.)
+
+**Course data (user-submitted scorecard photo approach):**
+- User can photograph a physical scorecard and upload it to the course database
+- Available to all users once approved
+- Future research: proper course API (greens, bunkers, slope data) — look at golfbert, golfcourseapi, etc.
+
+**AI range suggestions:**
+- Caddie analyzes last round stats and suggests 1–2 focus areas for next range session
+- Suggestion shown on Range tab with brief rationale ("Your approach shots from 100–130 yds cost you 4 strokes — work on your gap wedge")
+- Account holder / player can swap it out manually if they want something different
+- Default to a clear recommendation — don't ask users to choose if we can make the call for them
+
+---
+
+#### Build Plan
+
+1. **Supabase Storage setup** — create `round-photos` bucket, RLS policy (private per family), signed URL generation
+2. **Photo persistence** — wire `uploadRoundPhotos()` (already scaffolded) to actually write to storage; store `photo_url` per hole in `holes` JSON
+3. **Recap card builder** — canvas-based PNG generator with 5 card templates (see above)
+4. **Web Share API** — native share sheet on mobile; fallback to download PNG on desktop
+5. **Family gallery view** — Memories section on Home tab: all round photos by date, filterable by player/course
+6. **AI range suggestion** — post-round Caddie call that produces a range focus suggestion stored in localStorage
 
 ---
 
@@ -184,14 +236,25 @@ Priority items:
 - Supabase Auth (email + Apple Sign-In)
 - Replace PIN gate with real auth
 - Unified `rounds` table with `profile_id` and `user_id`
-- Family onboarding: "I'm the parent → add my family members"
-- Sub-profiles for kids under parent account
+- Family onboarding: "I'm the account holder → add my family members"
+- Sub-profiles for kids under account holder's account
 - Cross-device sync for club averages
-- Course list from Supabase (public read, user-submitted)
+- Course list from Supabase (user-submitted scorecards, account holder curates)
+
+**Monetization (DECIDED — finalize after competitive analysis):**
+- Structure: one-time unlock + family member add-ons (no recurring subscription pressure)
+- Founders Family tier: early adopters get a discount or lifetime access
+- Referral program: free invite codes that unlock family add-ons
+- Competitive analysis required before setting price points — look at 18Birdies, Arccos, Golfshot, The Grint
+- Premium features: family profiles, photo storage, sharing cards, AI range suggestions
+- Core solo Dad tracking: free forever
+
+**Platform (DECIDED):**
+- iOS first. Android added based on demand — Capacitor supports both from same codebase.
 
 **Data model additions:**
-- `round_type` column in `rounds` table: `'regulation_18' | '9_hole' | 'par3_exec' | 'range'`
-- `family_id` linking parent + child profiles
+- `family_id` linking account holder + child profiles
+- `account_holder_id` replacing hardcoded "Dad" references
 
 ---
 
@@ -203,6 +266,7 @@ Priority items:
 - App icon, splash screen, App Store assets
 - Privacy policy + Terms
 - TestFlight beta → App Store submission
+- Android: add after iOS ships, based on user demand
 
 ---
 
@@ -306,13 +370,17 @@ create table courses (
 
 ## 7. Open Questions
 
-- [ ] Kids photos — consent and privacy approach for minor photos stored in cloud?
-- [ ] Social sharing — direct share vs. shareable link vs. downloadable image?
-- [ ] Level-up system — dad-controlled (you unlock your kid's next level) or auto-triggered?
-- [ ] Free tier vs. paid tier — one-time purchase vs. subscription? (Decide in Sprint 6)
-- [ ] Android — same Capacitor project or skip for now?
-- [ ] Public courses data source — scrape, partner, or grow from user submissions?
-- [ ] Range focus suggestions — static list or AI-generated from last round's stats?
+- [x] Kids photos — **private by default, shareable per-photo (opt-in). Stored in Supabase Storage.**
+- [x] Social sharing — **5 card templates (see Sprint 5). PNG export via canvas + Web Share API.**
+- [x] Level-up system — **round count + skill milestone triggers flag; account holder always approves.**
+- [x] Free tier vs. paid — **one-time unlock + family add-ons. Founders Family discount. Competitive analysis before price points.**
+- [x] Android — **iOS first, Android later based on demand.**
+- [x] Public courses — **user-submitted scorecard photos for now. Explore proper course API (golfbert etc.) in Sprint 6.**
+- [x] Range focus suggestions — **AI-suggested from last round + manual override. Default to a clear recommendation.**
+- [ ] VistaPrint / merch integration — print photos on balls, canvas, scorecards. Lower priority, post-Sprint 5.
+- [ ] Course API research — golfbert, golfcourseapi, or similar for slope/greens/bunker data. Sprint 6 prep.
+- [ ] Kids photos consent — formalize privacy policy language for minor photos before Sprint 6 public launch.
+- [ ] "Account holder" UX — audit all UI text to remove "Dad" framing. Sprint 4B / Sprint 6.
 
 ---
 
@@ -347,4 +415,4 @@ create table courses (
 
 ---
 
-*Last updated: 2026-05-25 (Sprint 3A complete)*
+*Last updated: 2026-05-26 (Sprint 4 complete — all open questions resolved, Sprint 5 scoped)*
