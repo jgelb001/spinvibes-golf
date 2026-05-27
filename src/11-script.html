@@ -2853,44 +2853,7 @@
   //  KIDS LEVELING SYSTEM
   // ══════════════════════════════════════════════════════════
 
-  const KID_LEVELS = {
-    1: {
-      name: 'Just for Fun',
-      emoji: '🌟',
-      color: '#ec4899',
-      desc: 'Make contact, celebrate every shot, no rules.',
-      nextLabel: 'Getting the Hang of It',
-      nextTrigger: '3 rounds played',
-      roundsNeeded: 3,
-    },
-    2: {
-      name: 'Getting the Hang of It',
-      emoji: '⚡',
-      color: '#3b82f6',
-      desc: 'Basic swing mechanics, count pars, intro to rules.',
-      nextLabel: 'Learning the Game',
-      nextTrigger: '5 rounds + first par',
-      roundsNeeded: 5,
-    },
-    3: {
-      name: 'Learning the Game',
-      emoji: '🎯',
-      color: '#22c55e',
-      desc: 'Full stats, approach tracking, strategy, real scoring.',
-      nextLabel: 'Getting Serious',
-      nextTrigger: '8 rounds + first birdie',
-      roundsNeeded: 8,
-    },
-    4: {
-      name: 'Getting Serious',
-      emoji: '🏆',
-      color: '#c8922a',
-      desc: 'Dad-level complexity. Tournament ready.',
-      nextLabel: null,
-      nextTrigger: null,
-      roundsNeeded: null,
-    },
-  };
+  // KID_LEVELS moved to top of file — see line ~20
 
   function getKidLevel(who) {
     const defaults = { son: 2, girl: 1 };
