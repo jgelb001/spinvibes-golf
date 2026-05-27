@@ -5109,7 +5109,7 @@
   // ── CADDIE — swap this URL after deploying the Cloudflare Worker ──────────
   // Deploy: cd caddie-worker && wrangler secret put ANTHROPIC_API_KEY && wrangler deploy
   // Then replace the URL below with your workers.dev URL (or caddie.spinvibes.com)
-  const CADDIE_URL = 'https://spinvibes-golf.netlify.app/.netlify/functions/caddie'; // ← UPDATE AFTER CF DEPLOY
+  const CADDIE_URL = 'https://spinvibes-caddie.spinvibes.workers.dev'; // Cloudflare Worker — key stored as CF secret
 
   // ── SUPABASE — wrapped safely so CDN failure can't crash the whole script ──
   const SUPABASE_URL  = 'https://zairvjyiwhajsulefyoi.supabase.co';
@@ -5850,7 +5850,7 @@
   // Bump BUILD_ID with every deploy. App checks on load — if version
   // changed, SW caches are cleared and page reloads. localStorage
   // (logs, notes, profile) is never touched.
-  const BUILD_ID = '2026-05-26-v35';
+  const BUILD_ID = '2026-05-26-v36';
   (function checkBuild() {
     const prev = localStorage.getItem('sv-build');
     if (prev && prev !== BUILD_ID) {
