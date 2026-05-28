@@ -1,13 +1,14 @@
 // SpinVibes Golf — Service Worker v91
 // Strategy: network-first for HTML, cache-first for everything else
 
-const CACHE = 'spinvibes-golf-v137';
+const CACHE = 'spinvibes-golf-v138';
 
 const ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/spinvibes_profile.svg',
+  '/spinvibes_logo.png',
   'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap'
 ];
 
