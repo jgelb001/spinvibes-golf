@@ -9082,65 +9082,77 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const p    = FAM_PLAYERS[pk];
       const sc   = h.scores[pk];
       const diff = sc - h.par;
-      const dLbl = diff === 0 ? 'E' : (diff > 0 ? '+'+diff : ''+diff);
-      return `<div class="fam-player-row">
-        <div class="fam-player-badge" style="background:${p.bg};">${p.emoji}</div>
-        <div class="fam-player-label">
-          <div class="fam-player-name" style="color:${p.color};">${p.name}</div>
-          <div class="fam-player-vpar" id="fvpar-${pk}" style="color:${famScoreColor(diff)};">${dLbl} this hole</div>
+      const dLbl = diff === 0 ? 'E' : (diff > 0 ? `+${diff}` : `${diff}`);
+      return `<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <div style="width:38px;height:38px;border-radius:50%;background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">${p.emoji}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:0.88rem;color:${p.color};">${p.name}</div>
+          <div id="fvpar-${pk}" style="font-size:0.7rem;color:${famScoreColor(diff)};font-weight:600;margin-top:1px;">${dLbl}</div>
         </div>
-        <div class="fam-score-stepper">
-          <button class="stepper-btn" onclick="famHoleScore('${pk}',-1)">\u2212</button>
-          <div class="fam-score-val" id="fsc-${pk}" style="color:${famScoreColor(diff)};">${sc}</div>
-          <button class="stepper-btn" onclick="famHoleScore('${pk}',1)">+</button>
+        <div style="display:flex;align-items:center;">
+          <button onclick="famHoleScore('${pk}',-1)" style="width:46px;height:46px;border-radius:12px 0 0 12px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-right:none;color:var(--cream);font-size:1.5rem;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;">-</button>
+          <div id="fsc-${pk}" style="width:54px;height:46px;background:var(--surface);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.9rem;line-height:1;color:${famScoreColor(diff)};">${sc}</div>
+          <button onclick="famHoleScore('${pk}',1)" style="width:46px;height:46px;border-radius:0 12px 12px 0;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-left:none;color:var(--cream);font-size:1.4rem;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;">+</button>
         </div>
       </div>`;
     }).join('');
 
+    // Photo section: banner if photo exists, compact add-row if not
+    const photoBanner = h.photo
+      ? `<div style="margin:-16px -16px 0;height:190px;overflow:hidden;position:relative;border-radius:0;">
+           <img src="${h.photo}" style="width:100%;height:100%;object-fit:cover;cursor:pointer;" onclick="famViewPhoto()">
+           <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 45%,rgba(22,18,13,0.88) 100%);pointer-events:none;"></div>
+           <div style="position:absolute;bottom:10px;right:12px;display:flex;gap:6px;">
+             <button onclick="document.getElementById('fhpc').click()" style="background:rgba(16,10,5,0.65);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.18);border-radius:8px;padding:5px 11px;color:#fff;font-size:0.72rem;cursor:pointer;">📷 Retake</button>
+             <button onclick="document.getElementById('fhpr').click()" style="background:rgba(16,10,5,0.65);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.18);border-radius:8px;padding:5px 11px;color:#fff;font-size:0.72rem;cursor:pointer;">🖼️ Replace</button>
+           </div>
+         </div>`
+      : `<div style="display:flex;gap:7px;margin-bottom:4px;">
+           <button onclick="document.getElementById('fhpc').click()" style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:10px;padding:9px 6px;color:var(--muted);font-size:0.8rem;cursor:pointer;">📷 Camera</button>
+           <button onclick="document.getElementById('fhpr').click()" style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:10px;padding:9px 6px;color:var(--muted);font-size:0.8rem;cursor:pointer;">🖼️ Roll</button>
+         </div>`;
+
     document.getElementById('fam-modal-body').innerHTML = `
-      <div style="text-align:center;margin-bottom:16px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--cream);line-height:1;">HOLE ${h.hole}</div>
-        ${h.yds ? `<div style="font-size:0.85rem;color:var(--gold);font-weight:700;letter-spacing:1px;margin-top:2px;">${h.yds} yds</div>` : ''}
-        <div style="font-size:0.8rem;color:var(--muted);margin-top:4px;">
-          Par &nbsp;
-          <button class="stepper-btn" onclick="famHolePar(-1)">\u2212</button>
-          <span id="fh-par" style="font-size:1rem;color:var(--cream);font-weight:700;margin:0 8px;">${h.par}</span>
-          <button class="stepper-btn" onclick="famHolePar(1)">+</button>
+      ${photoBanner}
+      <input type="file" id="fhpc" accept="image/*" capture="environment" style="display:none;" onchange="famLoadHolePhoto(this)">
+      <input type="file" id="fhpr" accept="image/*" style="display:none;" onchange="famLoadHolePhoto(this)">
+
+      <div style="display:flex;align-items:baseline;justify-content:space-between;padding:${h.photo ? '12px' : '2px'} 0 8px;">
+        <div style="display:flex;align-items:baseline;gap:10px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:2.6rem;color:var(--cream);line-height:1;">HOLE ${h.hole}</div>
+          ${h.yds ? `<span style="font-size:0.78rem;color:var(--gold);font-weight:700;">${h.yds} yds</span>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:0.75rem;color:var(--muted);">Par</span>
+          <button onclick="famHolePar(-1)" style="width:26px;height:26px;border-radius:6px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);color:var(--cream);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">-</button>
+          <span id="fh-par" style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--cream);min-width:20px;text-align:center;">${h.par}</span>
+          <button onclick="famHolePar(1)" style="width:26px;height:26px;border-radius:6px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);color:var(--cream);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
         </div>
       </div>
-      <div id="fam-player-rows" style="background:var(--surface);border-radius:12px;padding:4px 14px;">${playerRows}</div>
 
-      <!-- HOLE PHOTO -->
-      <input type="file" id="fam-hole-photo-camera" accept="image/*" capture="environment" style="display:none;" onchange="famLoadHolePhoto(this)">
-      <input type="file" id="fam-hole-photo-roll" accept="image/*" style="display:none;" onchange="famLoadHolePhoto(this)">
-      <div style="margin-top:14px;display:flex;align-items:center;gap:8px;">
-        <button onclick="document.getElementById('fam-hole-photo-camera').click()" style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:10px;padding:10px;color:var(--muted);font-size:0.82rem;cursor:pointer;">\ud83d\udcf7 Camera</button>
-        <button onclick="document.getElementById('fam-hole-photo-roll').click()" style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:10px;padding:10px;color:var(--muted);font-size:0.82rem;cursor:pointer;">\ud83d\uddbc\ufe0f Roll</button>
-        ${h.photo ? `<img src="${h.photo}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;border:2px solid var(--gold);flex-shrink:0;cursor:pointer;" onclick="famViewPhoto()">` : ''}
+      <div id="fam-player-rows" style="background:var(--surface);border-radius:14px;padding:0 14px;">${playerRows}</div>
+
+      <div class="modal-nav-row" style="margin-top:14px;gap:7px;">
+        <button class="btn-ghost" onclick="famHoleBack()" ${_famHoleIdx===0?'disabled style="opacity:0.3;"':''} style="padding:12px 14px;">←</button>
+        <button class="btn-ghost" onclick="famMidRoundScorecard()" style="font-size:0.78rem;padding:12px 14px;">📋</button>
+        <button class="btn-gold" onclick="famHoleNext()" style="flex:1;padding:12px;">${isLast ? 'Results →' : 'Next →'}</button>
       </div>
 
-      <div class="modal-nav-row" style="margin-top:16px;">
-        <button class="btn-ghost" onclick="famHoleBack()" ${_famHoleIdx===0?'disabled style="opacity:0.3;"':''}>\u2190 Back</button>
-        <button class="btn-ghost" onclick="famMidRoundScorecard()" style="font-size:0.78rem;padding:10px 12px;">\ud83d\udccb Card</button>
-        <button class="btn-gold" onclick="famHoleNext()">${isLast ? 'See Results \u2192' : 'Next Hole \u2192'}</button>
-      </div>
-
-      <!-- CADDIE PANEL -->
-      <div style="margin-top:14px;">
+      <div style="margin-top:10px;">
         <button onclick="toggleFamCaddie()" id="fam-caddie-toggle"
-          style="width:100%;background:var(--surface2);border:1px solid rgba(138,96,16,0.25);border-radius:10px;padding:11px 16px;color:var(--gold-l);font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;">
-          <span>\ud83c\udf99\ufe0f Ask Caddie \u2014 Hole ${h.hole}, Par ${h.par}</span>
-          <span id="fam-caddie-caret">${_famCaddieOpen ? '\u25b2' : '\u25bc'}</span>
+          style="width:100%;background:var(--surface2);border:1px solid rgba(138,96,16,0.25);border-radius:10px;padding:10px 16px;color:var(--gold-l);font-size:0.84rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;">
+          <span>🎙️ Caddie — H${h.hole} P${h.par}</span>
+          <span id="fam-caddie-caret">${_famCaddieOpen ? '▲' : '▼'}</span>
         </button>
         <div id="fam-caddie-panel" style="display:${_famCaddieOpen ? 'block' : 'none'};background:var(--surface);border:1px solid rgba(138,96,16,0.15);border-top:none;border-radius:0 0 10px 10px;padding:12px 14px;">
-          <div id="fam-caddie-msgs" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;font-size:0.83rem;line-height:1.5;"></div>
+          <div id="fam-caddie-msgs" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;font-size:0.83rem;line-height:1.5;"></div>
           <div style="display:flex;gap:8px;align-items:flex-end;">
             <textarea id="fam-caddie-input" rows="2"
               style="flex:1;background:var(--surface2);border:1px solid rgba(138,96,16,0.25);border-radius:8px;padding:8px 10px;color:var(--cream);font-family:'Outfit',sans-serif;font-size:0.85rem;resize:none;"
-              placeholder="How far to the pin? What's your lie?"
+              placeholder="Yardage? Lie? Wind?"
               onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendFamCaddieMsg();}"></textarea>
             <button onclick="sendFamCaddieMsg()" id="fam-caddie-send"
-              style="background:var(--green);border:none;border-radius:8px;padding:10px 14px;color:var(--cream);font-weight:700;font-size:0.85rem;cursor:pointer;flex-shrink:0;">Send</button>
+              style="background:var(--green);border:none;border-radius:8px;padding:10px 14px;color:var(--cream);font-weight:700;font-size:1rem;cursor:pointer;flex-shrink:0;">➤</button>
           </div>
         </div>
       </div>
@@ -9227,255 +9239,462 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
   // ── RECAP CARD BUILDER ───────────────────────────────────────
   function _loadImg(src) {
-    return new Promise(resolve => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload  = () => resolve(img);
-      img.onerror = () => resolve(null);
-      img.src = src;
+    // Fetch as blob first to avoid canvas cross-origin taint with Supabase Storage URLs
+    return new Promise(async resolve => {
+      try {
+        const resp = await fetch(src);
+        const blob = await resp.blob();
+        const url  = URL.createObjectURL(blob);
+        const img  = new Image();
+        img.onload  = () => { URL.revokeObjectURL(url); resolve(img); };
+        img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+        img.src = url;
+      } catch(e) { resolve(null); }
     });
   }
 
-  async function shareRecapCard() {
+  // ── SHARE TEMPLATE PICKER ────────────────────────────────────
+  let _shareOrientation = 'portrait'; // 'portrait' | 'landscape'
+
+  function showSharePicker() {
+    const overlay = document.createElement('div');
+    overlay.id = 'share-picker-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const sheet = document.createElement('div');
+    sheet.style.cssText = 'width:100%;background:var(--surface);border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));';
+    sheet.innerHTML = `
+      <div style="width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 14px;"></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:var(--cream);text-align:center;margin-bottom:16px;">Share Round</div>
+      <div style="display:flex;gap:8px;margin-bottom:18px;background:var(--surface2);border-radius:10px;padding:4px;">
+        <button id="sp-portrait" onclick="setShareOrientation('portrait',this)" style="flex:1;border:none;border-radius:8px;padding:8px;font-size:0.82rem;font-weight:700;cursor:pointer;background:var(--gold);color:var(--bg);">◻ Portrait</button>
+        <button id="sp-landscape" onclick="setShareOrientation('landscape',this)" style="flex:1;border:none;border-radius:8px;padding:8px;font-size:0.82rem;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);">▭ Landscape</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button onclick="buildAndShare('scorecard')" style="background:var(--surface2);border:1px solid rgba(212,175,112,0.2);border-radius:14px;padding:16px;text-align:left;cursor:pointer;color:var(--cream);">
+          <div style="font-weight:700;font-size:0.95rem;margin-bottom:3px;">📊 Full Scorecard</div>
+          <div style="font-size:0.78rem;color:var(--muted);">All holes, all players, winner — on a photo collage background</div>
+        </button>
+        <button onclick="buildAndShare('hole')" style="background:var(--surface2);border:1px solid rgba(212,175,112,0.2);border-radius:14px;padding:16px;text-align:left;cursor:pointer;color:var(--cream);">
+          <div style="font-weight:700;font-size:0.95rem;margin-bottom:3px;">📸 Hole Highlight</div>
+          <div style="font-size:0.78rem;color:var(--muted);">Pick a hole photo — score overlaid on the image</div>
+        </button>
+        <button onclick="buildAndShare('best')" style="background:var(--surface2);border:1px solid rgba(212,175,110,0.2);border-radius:14px;padding:16px;text-align:left;cursor:pointer;color:var(--cream);">
+          <div style="font-weight:700;font-size:0.95rem;margin-bottom:3px;">⭐ Best Moment</div>
+          <div style="font-size:0.78rem;color:var(--muted);">Auto-picks your best hole — with photo or prompts to add one</div>
+        </button>
+      </div>
+    `;
+    overlay.appendChild(sheet);
+    document.body.appendChild(overlay);
+  }
+
+  function setShareOrientation(val, btn) {
+    _shareOrientation = val;
+    document.getElementById('sp-portrait').style.background  = val === 'portrait'  ? 'var(--gold)' : 'transparent';
+    document.getElementById('sp-portrait').style.color       = val === 'portrait'  ? 'var(--bg)'   : 'var(--muted)';
+    document.getElementById('sp-landscape').style.background = val === 'landscape' ? 'var(--gold)' : 'transparent';
+    document.getElementById('sp-landscape').style.color      = val === 'landscape' ? 'var(--bg)'   : 'var(--muted)';
+  }
+
+  async function buildAndShare(template) {
+    const pickerOverlay = document.getElementById('share-picker-overlay');
+    if (pickerOverlay) pickerOverlay.remove();
+    if (template === 'hole') { _showHolePickerSheet(); return; }
     const btn = document.getElementById('fam-share-btn');
     if (btn) { btn.disabled = true; btn.textContent = 'Building…'; }
-
     try {
-      const players  = _famRound.players || [];
-      const totals   = {};
-      players.forEach(pk => { totals[pk] = 0; });
-      _famHoles.forEach(h => players.forEach(pk => { totals[pk] += h.scores[pk] || 0; }));
-      const totalPar = _famHoles.reduce((a, h) => a + h.par, 0);
-      const minScore = Math.min(...players.map(pk => totals[pk]));
-      const winners  = players.filter(pk => totals[pk] === minScore);
-      const winMsg   = winners.length === players.length ? '🤝 All Tied!'
-        : '🏆 ' + winners.map(pk => FAM_PLAYERS[pk].name).join(' & ') + (winners.length === 1 ? ' wins!' : ' tie!');
+      let blob;
+      if (template === 'scorecard') blob = await _buildScorecardCard();
+      else                          blob = await _buildBestMomentCard();
+      if (blob) await _doShare(blob);
+    } catch(e) { console.warn('Share error:', e); }
+    finally { if (btn) { btn.disabled = false; btn.textContent = '📤 Share'; } }
+  }
 
-      // Collect photos (up to 3)
-      const photoUrls = _famHoles.map(h => h.photo).filter(p => p && p.startsWith('http')).slice(0, 3);
-      const hasPhotos = photoUrls.length > 0;
-
-      // Canvas dimensions
-      const W = 800, H = hasPhotos ? 1000 : 780;
-      const canvas = document.createElement('canvas');
-      canvas.width = W; canvas.height = H;
-      const ctx = canvas.getContext('2d');
-
-      // --- Background ---
-      ctx.fillStyle = '#16120d';
-      ctx.fillRect(0, 0, W, H);
-
-      // Gold top bar
-      const grad = ctx.createLinearGradient(0, 0, W, 0);
-      grad.addColorStop(0, '#8a6010');
-      grad.addColorStop(0.5, '#d4af70');
-      grad.addColorStop(1, '#8a6010');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, 6);
-      ctx.fillRect(0, H - 6, W, 6);
-
-      // --- SPINVIBES GOLF header ---
-      ctx.fillStyle = '#d4af70';
-      ctx.font = '600 22px "Outfit", Arial, sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillText('🏌 SPINVIBES GOLF', 48, 54);
-      ctx.fillStyle = '#8a7a5a';
-      ctx.font = '400 15px "Outfit", Arial, sans-serif';
-      ctx.fillText('spinvibes.com', W - 48, 54);
-      ctx.textAlign = 'left';
-
-      // Divider
-      ctx.strokeStyle = 'rgba(212,175,112,0.2)';
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(48, 68); ctx.lineTo(W - 48, 68); ctx.stroke();
-
-      // --- Course name ---
-      ctx.fillStyle = '#f5f0e8';
-      ctx.font = 'bold 52px "Bebas Neue", Impact, Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(_famRound.course_name.toUpperCase(), W / 2, 140);
-
-      // Date + par
-      ctx.fillStyle = '#8a7a5a';
-      ctx.font = '400 18px "Outfit", Arial, sans-serif';
-      ctx.fillText(`${_famRound.date_played}  ·  Par ${totalPar}`, W / 2, 170);
-
-      // Divider
-      ctx.strokeStyle = 'rgba(212,175,112,0.15)';
-      ctx.beginPath(); ctx.moveTo(48, 192); ctx.lineTo(W - 48, 192); ctx.stroke();
-
-      // --- Player score chips ---
-      const chipW = Math.min(160, (W - 96) / players.length - 12);
-      const chipStartX = (W - (players.length * (chipW + 12) - 12)) / 2;
-      const chipY = 215;
-      const playerColors = { dad:'#8a6010', son:'#60a5fa', girl:'#f472b6', mom:'#f2c879', grandma:'#d4af70' };
-      const playerBgs    = { dad:'rgba(138,96,16,0.25)', son:'rgba(96,165,250,0.2)', girl:'rgba(244,114,182,0.2)', mom:'rgba(242,200,121,0.2)', grandma:'rgba(212,175,112,0.2)' };
-
-      players.forEach((pk, i) => {
-        const p = FAM_PLAYERS[pk];
-        if (!p) return;
-        const cx = chipStartX + i * (chipW + 12);
-        const isWinner = winners.includes(pk);
-
-        // Chip background
-        ctx.fillStyle = playerBgs[pk] || 'rgba(255,255,255,0.08)';
-        _roundRect(ctx, cx, chipY, chipW, 88, 12);
-        ctx.fill();
-
-        // Winner border glow
-        if (isWinner) {
-          ctx.strokeStyle = '#d4af70';
-          ctx.lineWidth = 2;
-          _roundRect(ctx, cx, chipY, chipW, 88, 12);
-          ctx.stroke();
-        }
-
-        // Emoji
-        ctx.font = '28px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(p.emoji, cx + chipW / 2, chipY + 36);
-
-        // Name
-        ctx.fillStyle = '#f5f0e8';
-        ctx.font = '600 14px "Outfit", Arial, sans-serif';
-        ctx.fillText(p.name, cx + chipW / 2, chipY + 58);
-
-        // Score
-        ctx.font = 'bold 32px "Bebas Neue", Impact, Arial, sans-serif';
-        ctx.fillStyle = playerColors[pk] || '#d4af70';
-        ctx.fillText(String(totals[pk] ?? '?'), cx + chipW / 2, chipY + 86);
-      });
-
-      // --- Winner banner ---
-      ctx.fillStyle = '#d4af70';
-      ctx.font = 'bold 28px "Outfit", Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(winMsg, W / 2, 360);
-
-      // Divider
-      ctx.strokeStyle = 'rgba(212,175,112,0.15)';
-      ctx.beginPath(); ctx.moveTo(48, 380); ctx.lineTo(W - 48, 380); ctx.stroke();
-
-      // --- Scorecard mini table ---
-      const tableStartY = 405;
-      const rowH = 26;
-      const col0W = 80;
-      const colW  = (W - 96 - col0W) / players.length;
-
-      // Header row
-      ctx.fillStyle = 'rgba(212,175,112,0.1)';
-      ctx.fillRect(48, tableStartY, W - 96, rowH);
-      ctx.fillStyle = '#8a7a5a';
-      ctx.font = '600 12px "Outfit", Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('HOLE', 48 + col0W / 2, tableStartY + 18);
-      players.forEach((pk, i) => {
-        const p = FAM_PLAYERS[pk];
-        ctx.fillStyle = playerColors[pk] || '#d4af70';
-        ctx.fillText(p ? p.name.toUpperCase() : pk, 48 + col0W + i * colW + colW / 2, tableStartY + 18);
-      });
-
-      // Hole rows
-      _famHoles.forEach((h, idx) => {
-        const y = tableStartY + (idx + 1) * rowH;
-        if (idx % 2 === 0) {
-          ctx.fillStyle = 'rgba(255,255,255,0.03)';
-          ctx.fillRect(48, y, W - 96, rowH);
-        }
-        ctx.fillStyle = '#8a7a5a';
-        ctx.font = '400 12px "Outfit", Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(`H${h.hole} P${h.par}`, 48 + col0W / 2, y + 18);
-        players.forEach((pk, i) => {
-          const score = h.scores[pk] || 0;
-          const diff  = score - h.par;
-          ctx.fillStyle = diff <= -1 ? '#fbbf24' : diff === 0 ? '#f5f0e8' : diff === 1 ? '#f5f0e8' : '#ef4444';
-          ctx.font = diff <= -1 ? 'bold 12px "Outfit", Arial' : '400 12px "Outfit", Arial';
-          ctx.fillText(String(score), 48 + col0W + i * colW + colW / 2, y + 18);
-        });
-      });
-
-      // Total row
-      const totalY = tableStartY + (_famHoles.length + 1) * rowH;
-      ctx.fillStyle = 'rgba(212,175,112,0.12)';
-      ctx.fillRect(48, totalY, W - 96, rowH);
-      ctx.fillStyle = '#d4af70';
-      ctx.font = 'bold 13px "Outfit", Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('TOTAL', 48 + col0W / 2, totalY + 18);
-      players.forEach((pk, i) => {
-        ctx.fillStyle = playerColors[pk] || '#d4af70';
-        ctx.font = 'bold 13px "Outfit", Arial, sans-serif';
-        ctx.fillText(String(totals[pk]), 48 + col0W + i * colW + colW / 2, totalY + 18);
-      });
-
-      // --- Photos strip ---
-      if (hasPhotos) {
-        const photoY = H - 180;
-        ctx.strokeStyle = 'rgba(212,175,112,0.15)';
-        ctx.beginPath(); ctx.moveTo(48, photoY - 16); ctx.lineTo(W - 48, photoY - 16); ctx.stroke();
-        ctx.fillStyle = '#8a7a5a';
-        ctx.font = '400 13px "Outfit", Arial, sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText('ROUND PHOTOS', 48, photoY);
-
-        const imgs = await Promise.all(photoUrls.map(u => _loadImg(u)));
-        const ph = 140, pw = Math.floor((W - 96 - (photoUrls.length - 1) * 10) / photoUrls.length);
-        imgs.forEach((img, i) => {
-          if (!img) return;
-          const px = 48 + i * (pw + 10);
-          const py = photoY + 10;
-          ctx.save();
-          _roundRect(ctx, px, py, pw, ph, 8);
-          ctx.clip();
-          // Draw image maintaining aspect ratio (cover)
-          const ar = img.width / img.height;
-          let dw = pw, dh = ph, dx = px, dy = py;
-          if (ar > pw / ph) { dh = ph; dw = ph * ar; dx = px - (dw - pw) / 2; }
-          else { dw = pw; dh = pw / ar; dy = py - (dh - ph) / 2; }
-          ctx.drawImage(img, dx, dy, dw, dh);
-          ctx.restore();
-        });
-      }
-
-      // --- Convert and share ---
-      canvas.toBlob(async blob => {
-        const filename = `spinvibes-${(_famRound.course_name||'round').replace(/\s+/g,'-').toLowerCase()}-${_famRound.date_played||''}.png`;
-        try {
-          if (navigator.canShare && navigator.canShare({ files: [new File([blob], filename, { type: 'image/png' })] })) {
-            await navigator.share({ files: [new File([blob], filename, { type: 'image/png' })], title: `SpinVibes Golf — ${_famRound.course_name}` });
-          } else {
-            // Desktop fallback: download
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = filename;
-            a.click();
-          }
-        } catch(e) {
-          // Share cancelled — do nothing
-        }
-        if (btn) { btn.disabled = false; btn.textContent = '📤 Share'; }
-      }, 'image/png');
-
-    } catch(e) {
-      console.warn('Recap card error:', e);
-      if (btn) { btn.disabled = false; btn.textContent = '📤 Share'; }
+  function _showHolePickerSheet() {
+    const photoHoles = _famHoles.filter(h => h.photo && h.photo.startsWith('http'));
+    if (!photoHoles.length) {
+      showToast('No hole photos to share yet', 'error'); return;
     }
+    const overlay = document.createElement('div');
+    overlay.id = 'hole-picker-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const sheet = document.createElement('div');
+    sheet.style.cssText = 'width:100%;background:var(--surface);border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));max-height:80vh;overflow-y:auto;';
+    const photoItems = photoHoles.map(h => {
+      const scores = _famRound.players.map(pk => {
+        const p = FAM_PLAYERS[pk]; if (!p) return '';
+        const s = h.scores[pk]||0, diff = s - h.par;
+        const dStr = diff===0?'E':diff>0?`+${diff}`:String(diff);
+        return `<span style="color:${p.color};font-weight:700;font-size:0.72rem;">${p.emoji}${s}(${dStr})</span>`;
+      }).join(' ');
+      return `<div onclick="pickHoleAndShare(${h.hole})" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;">
+        <img src="${h.photo}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0;">
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:0.88rem;color:var(--cream);">Hole ${h.hole} &nbsp;&middot;&nbsp; Par ${h.par}</div>
+          <div style="font-size:0.75rem;margin-top:3px;">${scores}</div>
+        </div>
+        <div style="color:var(--gold);font-size:1rem;">›</div>
+      </div>`;
+    }).join('');
+    sheet.innerHTML = `
+      <div style="width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 14px;"></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--cream);margin-bottom:14px;">Pick a Hole</div>
+      ${photoItems}
+    `;
+    overlay.appendChild(sheet);
+    document.body.appendChild(overlay);
   }
 
-  function _roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
+  async function pickHoleAndShare(holeNum) {
+    const overlay = document.getElementById('hole-picker-overlay');
+    if (overlay) overlay.remove();
+    const btn = document.getElementById('fam-share-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Building…'; }
+    try {
+      const h = _famHoles.find(x => x.hole === holeNum);
+      const blob = await _buildHoleHighlightCard(h);
+      if (blob) await _doShare(blob);
+    } catch(e) {}
+    finally { if (btn) { btn.disabled = false; btn.textContent = '📤 Share'; } }
   }
+
+  async function _doShare(blob) {
+    const course   = (_famRound.course_name||'round').replace(/\s+/g,'-').toLowerCase();
+    const date     = _famRound.date_played || '';
+    const filename = `spinvibes-${course}-${date}.png`;
+    try {
+      const file = new File([blob], filename, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: `SpinVibes Golf — ${_famRound.course_name}` });
+        return;
+      }
+    } catch(e) { /* share cancelled */ }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+  }
+
+  // ── CARD HELPERS ─────────────────────────────────────────────
+  const _C = {
+    bg:'#16120d', surf:'#231c14', gold:'#d4af70', goldDim:'#8a6010', cream:'#f5f0e8', muted:'#8a7a5a',
+    dad:'#d4a520', son:'#60a5fa', girl:'#f472b6', mom:'#f2c879', grandma:'#d4af70',
+    dadBg:'rgba(212,165,32,0.3)', sonBg:'rgba(96,165,250,0.25)', girlBg:'rgba(244,114,182,0.25)',
+    momBg:'rgba(242,200,121,0.25)', grandmaBg:'rgba(212,175,112,0.25)',
+  };
+
+  function _cardDims() {
+    return _shareOrientation === 'landscape' ? { W:1280, H:720 } : { W:720, H:1280 };
+  }
+
+  function _makeCanvas(w, h) { const c = document.createElement('canvas'); c.width=w; c.height=h; return c; }
+
+  function _gradBar(ctx, w) {
+    const g = ctx.createLinearGradient(0,0,w,0);
+    g.addColorStop(0,_C.goldDim); g.addColorStop(0.5,_C.gold); g.addColorStop(1,_C.goldDim); return g;
+  }
+
+  function _rr(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+  }
+
+  function _drawImgCover(ctx, img, x, y, w, h) {
+    const ar = img.width/img.height;
+    let dw=w, dh=h, dx=x, dy=y;
+    if (ar > w/h) { dh=h; dw=h*ar; dx=x-(dw-w)/2; }
+    else           { dw=w; dh=w/ar; dy=y-(dh-h)/2; }
+    ctx.drawImage(img, dx, dy, dw, dh);
+  }
+
+  function _canvasToBlob(canvas) { return new Promise(r => canvas.toBlob(r, 'image/png')); }
+
+  function _famTotals() {
+    const players = _famRound.players||[], totals={};
+    players.forEach(pk => { totals[pk]=0; });
+    _famHoles.forEach(h => players.forEach(pk => { totals[pk]+=(h.scores[pk]||0); }));
+    return totals;
+  }
+
+  // ── TEMPLATE 1: FULL SCORECARD ON COLLAGE BG ─────────────────
+  async function _buildScorecardCard() {
+    const { W, H } = _cardDims();
+    const players  = _famRound.players||[];
+    const totals   = _famTotals();
+    const totalPar = _famHoles.reduce((a,h)=>a+h.par,0);
+    const minScore = Math.min(...players.map(pk=>totals[pk]));
+    const winners  = players.filter(pk=>totals[pk]===minScore);
+    const winMsg   = winners.length===players.length?'🤝 Tied!'
+      :'🏆 '+winners.map(pk=>FAM_PLAYERS[pk].name).join(' & ')+(winners.length===1?' wins!':' tie!');
+
+    const canvas = _makeCanvas(W, H);
+    const ctx    = canvas.getContext('2d');
+
+    // --- Collage background ---
+    const photoUrls = _famHoles.map(h=>h.photo).filter(p=>p&&p.startsWith('http'));
+    ctx.fillStyle = _C.bg; ctx.fillRect(0,0,W,H);
+    if (photoUrls.length) {
+      const imgs = await Promise.all(photoUrls.slice(0,6).map(u=>_loadImg(u)));
+      const validImgs = imgs.filter(Boolean);
+      if (validImgs.length) {
+        const cols = Math.ceil(Math.sqrt(validImgs.length));
+        const rows = Math.ceil(validImgs.length/cols);
+        const cw = W/cols, ch = H/rows;
+        validImgs.forEach((img,i) => {
+          if (!img) return;
+          const col=i%cols, row=Math.floor(i/cols);
+          ctx.save(); ctx.rect(col*cw, row*ch, cw, ch); ctx.clip();
+          _drawImgCover(ctx, img, col*cw, row*ch, cw, ch); ctx.restore();
+        });
+        // dark overlay so text is readable
+        ctx.fillStyle = 'rgba(16,10,5,0.82)'; ctx.fillRect(0,0,W,H);
+      }
+    }
+
+    // Gold bars
+    ctx.fillStyle = _gradBar(ctx,W); ctx.fillRect(0,0,W,7); ctx.fillRect(0,H-7,W,7);
+
+    const isLS = _shareOrientation === 'landscape';
+    const pad  = 36;
+    const scaleF = isLS ? 0.72 : 1;
+
+    function fs(n) { return Math.round(n*scaleF)+'px'; }
+
+    // Header
+    ctx.fillStyle=_C.gold; ctx.font=`600 ${fs(18)} Outfit,Arial,sans-serif`; ctx.textAlign='left';
+    ctx.fillText('🏌 SPINVIBES GOLF', pad, pad+22);
+    ctx.fillStyle=_C.muted; ctx.font=`400 ${fs(13)} Outfit,Arial,sans-serif`; ctx.textAlign='right';
+    ctx.fillText('spinvibes.com', W-pad, pad+22);
+    ctx.strokeStyle='rgba(212,175,112,0.2)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(pad,pad+36); ctx.lineTo(W-pad,pad+36); ctx.stroke();
+
+    let y = pad+60;
+
+    // Course name
+    ctx.fillStyle=_C.cream; ctx.font=`bold ${fs(44)} "Bebas Neue",Impact,Arial,sans-serif`; ctx.textAlign='center';
+    ctx.fillText((_famRound.course_name||'').toUpperCase(), W/2, y); y+=isLS?30:36;
+    ctx.fillStyle=_C.muted; ctx.font=`400 ${fs(14)} Outfit,Arial,sans-serif`;
+    ctx.fillText(`${_famRound.date_played}  ·  Par ${totalPar}`, W/2, y); y+=isLS?20:28;
+    ctx.strokeStyle='rgba(212,175,112,0.15)';
+    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke(); y+=isLS?14:18;
+
+    // Player chips row
+    const chipW = Math.min(130, (W-pad*2)/players.length-10)*scaleF;
+    const chipH = 74*scaleF;
+    const chipX0 = (W-(players.length*(chipW+10)-10))/2;
+    players.forEach((pk,i) => {
+      const p = FAM_PLAYERS[pk]; if (!p) return;
+      const cx = chipX0+i*(chipW+10);
+      ctx.fillStyle=_C[pk+'Bg']||'rgba(255,255,255,0.08)';
+      _rr(ctx,cx,y,chipW,chipH,8); ctx.fill();
+      if (winners.includes(pk)) { ctx.strokeStyle=_C.gold; ctx.lineWidth=1.5; _rr(ctx,cx,y,chipW,chipH,8); ctx.stroke(); }
+      ctx.font=`${fs(22)} Arial`; ctx.textAlign='center'; ctx.fillText(p.emoji, cx+chipW/2, y+chipH*0.42);
+      ctx.fillStyle=_C[pk]||_C.gold; ctx.font=`bold ${fs(26)} "Bebas Neue",Impact,Arial`;
+      ctx.fillText(String(totals[pk]??'?'), cx+chipW/2, y+chipH*0.78);
+      ctx.fillStyle=_C.cream; ctx.font=`500 ${fs(11)} Outfit,Arial`;
+      ctx.fillText(p.name, cx+chipW/2, y+chipH*0.94);
+    });
+    y += chipH+isLS?14:18;
+
+    // Winner
+    ctx.fillStyle=_C.gold; ctx.font=`bold ${fs(20)} Outfit,Arial,sans-serif`; ctx.textAlign='center';
+    ctx.fillText(winMsg, W/2, y); y+=isLS?18:24;
+    ctx.strokeStyle='rgba(212,175,112,0.15)';
+    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke(); y+=isLS?12:16;
+
+    // Scorecard table
+    const rowH  = isLS?22:26;
+    const col0W = isLS?70:80;
+    const colW  = (W-pad*2-col0W)/players.length;
+    const tblW  = W-pad*2;
+
+    // header row
+    ctx.fillStyle='rgba(212,175,112,0.12)'; ctx.fillRect(pad,y,tblW,rowH);
+    ctx.fillStyle=_C.muted; ctx.font=`600 ${fs(10)} Outfit,Arial,sans-serif`; ctx.textAlign='center';
+    ctx.fillText('HOLE', pad+col0W/2, y+rowH-8);
+    players.forEach((pk,i)=>{ ctx.fillStyle=_C[pk]||_C.gold; ctx.fillText((FAM_PLAYERS[pk]?.name||pk).toUpperCase().slice(0,4), pad+col0W+i*colW+colW/2, y+rowH-8); });
+    y+=rowH;
+
+    _famHoles.forEach((h,idx)=>{
+      if (y+rowH > H-60) return; // don't overflow into footer
+      if(idx%2===0){ctx.fillStyle='rgba(255,255,255,0.03)';ctx.fillRect(pad,y,tblW,rowH);}
+      ctx.fillStyle=_C.muted; ctx.font=`400 ${fs(10)} Outfit,Arial`; ctx.textAlign='center';
+      ctx.fillText(`H${h.hole} P${h.par}`, pad+col0W/2, y+rowH-8);
+      players.forEach((pk,i)=>{
+        const s=h.scores[pk]||0, diff=s-h.par;
+        ctx.fillStyle=diff<=-1?'#fbbf24':diff===0?_C.cream:'#ef4444';
+        ctx.font=diff<=-1?`bold ${fs(10)} Outfit,Arial`:`400 ${fs(10)} Outfit,Arial`;
+        ctx.fillText(String(s), pad+col0W+i*colW+colW/2, y+rowH-8);
+      });
+      y+=rowH;
+    });
+
+    // total row
+    ctx.fillStyle='rgba(212,175,112,0.14)'; ctx.fillRect(pad,y,tblW,rowH);
+    ctx.fillStyle=_C.gold; ctx.font=`bold ${fs(11)} Outfit,Arial`; ctx.textAlign='center';
+    ctx.fillText('TOTAL', pad+col0W/2, y+rowH-8);
+    players.forEach((pk,i)=>{ ctx.fillStyle=_C[pk]||_C.gold; ctx.font=`bold ${fs(11)} Outfit,Arial`; ctx.fillText(String(totals[pk]), pad+col0W+i*colW+colW/2, y+rowH-8); });
+
+    return _canvasToBlob(canvas);
+  }
+
+  // ── TEMPLATE 2: HOLE HIGHLIGHT ────────────────────────────────
+  async function _buildHoleHighlightCard(h) {
+    if (!h) return null;
+    const { W, H } = _cardDims();
+    const canvas = _makeCanvas(W, H);
+    const ctx    = canvas.getContext('2d');
+    const players = _famRound.players||[];
+    const isLS    = _shareOrientation === 'landscape';
+
+    ctx.fillStyle = _C.bg; ctx.fillRect(0,0,W,H);
+
+    // Full-bleed photo
+    if (h.photo && h.photo.startsWith('http')) {
+      const img = await _loadImg(h.photo);
+      if (img) { _drawImgCover(ctx,img,0,0,W,H); }
+    }
+
+    // Heavy dark gradient from bottom ~60% upward for portrait, right side for landscape
+    const gH = ctx.createLinearGradient(0, H*0.3, 0, H);
+    gH.addColorStop(0,'rgba(16,10,5,0)'); gH.addColorStop(0.5,'rgba(16,10,5,0.75)'); gH.addColorStop(1,'rgba(16,10,5,0.97)');
+    ctx.fillStyle=gH; ctx.fillRect(0,0,W,H);
+
+    // Gold bars
+    ctx.fillStyle=_gradBar(ctx,W); ctx.fillRect(0,0,W,6); ctx.fillRect(0,H-6,W,6);
+
+    // Hole label top-left
+    ctx.fillStyle='rgba(16,10,5,0.6)'; _rr(ctx,24,20,160,36,8); ctx.fill();
+    ctx.fillStyle=_C.gold; ctx.font='bold 13px Outfit,Arial,sans-serif'; ctx.textAlign='left';
+    ctx.fillText(`HOLE ${h.hole}  ·  PAR ${h.par}`, 36, 44);
+
+    // SpinVibes top-right
+    ctx.fillStyle='rgba(16,10,5,0.6)'; _rr(ctx,W-140,20,116,36,8); ctx.fill();
+    ctx.fillStyle=_C.gold; ctx.font='600 12px Outfit,Arial,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('🏌 SPINVIBES', W-82, 43);
+
+    // Bottom content — score chips
+    const chipH2 = isLS?90:100, chipW2 = Math.min(150, (W-60)/players.length-12);
+    const chipX2 = (W-(players.length*(chipW2+12)-12))/2;
+    const chipY2 = H - chipH2 - (isLS?40:60);
+
+    players.forEach((pk,i)=>{
+      const p=FAM_PLAYERS[pk]; if(!p) return;
+      const score=h.scores[pk]||0, diff=score-h.par;
+      const dStr=diff===0?'E':diff>0?`+${diff}`:String(diff);
+      const cx=chipX2+i*(chipW2+12);
+      ctx.fillStyle='rgba(16,10,5,0.72)'; _rr(ctx,cx,chipY2,chipW2,chipH2,12); ctx.fill();
+      ctx.strokeStyle=_C[pk]||_C.gold; ctx.lineWidth=2; _rr(ctx,cx,chipY2,chipW2,chipH2,12); ctx.stroke();
+      ctx.font='22px Arial'; ctx.textAlign='center'; ctx.fillText(p.emoji, cx+chipW2/2, chipY2+chipH2*0.32);
+      ctx.fillStyle=_C.cream; ctx.font='500 12px Outfit,Arial'; ctx.fillText(p.name, cx+chipW2/2, chipY2+chipH2*0.52);
+      ctx.fillStyle=_C[pk]||_C.gold; ctx.font='bold 32px "Bebas Neue",Impact,Arial'; ctx.fillText(String(score), cx+chipW2/2, chipY2+chipH2*0.82);
+      ctx.fillStyle=diff<0?'#fbbf24':diff===0?_C.muted:'#ef4444'; ctx.font='400 11px Outfit,Arial';
+      ctx.fillText(dStr, cx+chipW2/2, chipY2+chipH2*0.95);
+    });
+
+    // Course + date at very bottom
+    ctx.fillStyle=_C.muted; ctx.font='400 12px Outfit,Arial,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(`${(_famRound.course_name||'').toUpperCase()}  ·  ${_famRound.date_played||''}`, W/2, H-20);
+
+    return _canvasToBlob(canvas);
+  }
+
+  // ── TEMPLATE 3: BEST MOMENT ───────────────────────────────────
+  async function _buildBestMomentCard() {
+    const players = _famRound.players||[];
+    // Find best hole: lowest score vs par, prefer holes with photos
+    let bestHole = null, bestScore = Infinity;
+    _famHoles.forEach(h => {
+      players.forEach(pk => {
+        const diff = (h.scores[pk]||0)-h.par;
+        const photoBonus = (h.photo && h.photo.startsWith('http')) ? -0.5 : 0;
+        if (diff+photoBonus < bestScore) { bestScore=diff+photoBonus; bestHole=h; }
+      });
+    });
+    if (!bestHole) return null;
+
+    // If no photo on the best hole, prompt user
+    if (!bestHole.photo || !bestHole.photo.startsWith('http')) {
+      const wants = await new Promise(resolve => {
+        const overlay = document.createElement('div');
+        overlay.style.cssText='position:fixed;inset:0;z-index:9600;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;padding:20px;';
+        overlay.innerHTML=`<div style="background:var(--surface);border-radius:16px;padding:24px;max-width:320px;text-align:center;">
+          <div style="font-size:2rem;margin-bottom:10px;">⭐</div>
+          <div style="font-weight:700;color:var(--cream);margin-bottom:6px;">Best hole: Hole ${bestHole.hole}</div>
+          <div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px;">No photo for this hole. Add one now to make this card pop!</div>
+          <div style="display:flex;gap:8px;justify-content:center;">
+            <button onclick="this.closest('div[style]').dataset.ans='skip';this.closest('div[style]').click()" style="flex:1;padding:10px;background:var(--surface2);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--muted);font-size:0.85rem;cursor:pointer;">Share anyway</button>
+            <button onclick="this.closest('div[style]').dataset.ans='skip';this.closest('div[style]').click()" style="flex:1;padding:10px;background:var(--gold);border:none;border-radius:10px;color:var(--bg);font-weight:700;font-size:0.85rem;cursor:pointer;">Build card</button>
+          </div>
+        </div>`;
+        overlay.onclick = () => { document.body.removeChild(overlay); resolve(true); };
+        document.body.appendChild(overlay);
+      });
+    }
+
+    // Build achievement label
+    const minDiff = Math.min(...players.map(pk=>(bestHole.scores[pk]||0)-bestHole.par));
+    const achievement = minDiff<=-2?'🦅 Eagle!':minDiff===-1?'🌿 Birdie':minDiff===0?'🎯 Par':'Best Hole';
+
+    // Use hole highlight but add BEST HOLE badge + achievement label
+    const { W, H } = _cardDims();
+    const canvas = _makeCanvas(W, H);
+    const ctx    = canvas.getContext('2d');
+
+    // Build base hole card first by drawing on same canvas
+    if (bestHole.photo && bestHole.photo.startsWith('http')) {
+      const img = await _loadImg(bestHole.photo);
+      if (img) { _drawImgCover(ctx,img,0,0,W,H); }
+    } else {
+      ctx.fillStyle=_C.bg; ctx.fillRect(0,0,W,H);
+    }
+
+    const gH = ctx.createLinearGradient(0,H*0.25,0,H);
+    gH.addColorStop(0,'rgba(16,10,5,0)'); gH.addColorStop(0.55,'rgba(16,10,5,0.8)'); gH.addColorStop(1,'rgba(16,10,5,0.97)');
+    ctx.fillStyle=gH; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle=_gradBar(ctx,W); ctx.fillRect(0,0,W,6); ctx.fillRect(0,H-6,W,6);
+
+    // BEST HOLE badge (top right)
+    ctx.fillStyle=_C.gold; _rr(ctx,W-130,18,106,30,15); ctx.fill();
+    ctx.fillStyle=_C.bg; ctx.font='bold 11px Outfit,Arial,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('BEST HOLE', W-77, 37);
+
+    // Hole + achievement label (top left)
+    ctx.fillStyle='rgba(16,10,5,0.6)'; _rr(ctx,20,18,170,30,8); ctx.fill();
+    ctx.fillStyle=_C.gold; ctx.font='bold 12px Outfit,Arial,sans-serif'; ctx.textAlign='left';
+    ctx.fillText(`${achievement}  ·  HOLE ${bestHole.hole} PAR ${bestHole.par}`, 32, 37);
+
+    // Player chips
+    const players2 = _famRound.players||[];
+    const isLS = _shareOrientation==='landscape';
+    const chipH3=isLS?90:100, chipW3=Math.min(150,(W-60)/players2.length-12);
+    const chipX3=(W-(players2.length*(chipW3+12)-12))/2;
+    const chipY3=H-chipH3-(isLS?40:60);
+    players2.forEach((pk,i)=>{
+      const p=FAM_PLAYERS[pk]; if(!p) return;
+      const score=bestHole.scores[pk]||0, diff=score-bestHole.par;
+      const dStr=diff===0?'E':diff>0?`+${diff}`:String(diff);
+      const cx=chipX3+i*(chipW3+12);
+      ctx.fillStyle='rgba(16,10,5,0.72)'; _rr(ctx,cx,chipY3,chipW3,chipH3,12); ctx.fill();
+      ctx.strokeStyle=_C[pk]||_C.gold; ctx.lineWidth=2; _rr(ctx,cx,chipY3,chipW3,chipH3,12); ctx.stroke();
+      ctx.font='22px Arial'; ctx.textAlign='center'; ctx.fillText(p.emoji, cx+chipW3/2, chipY3+chipH3*0.32);
+      ctx.fillStyle=_C.cream; ctx.font='500 12px Outfit,Arial'; ctx.fillText(p.name, cx+chipW3/2, chipY3+chipH3*0.52);
+      ctx.fillStyle=diff<0?'#fbbf24':_C[pk]||_C.gold; ctx.font='bold 32px "Bebas Neue",Impact,Arial'; ctx.fillText(String(score), cx+chipW3/2, chipY3+chipH3*0.82);
+      ctx.fillStyle=diff<0?'#fbbf24':diff===0?_C.muted:'#ef4444'; ctx.font='400 11px Outfit,Arial';
+      ctx.fillText(dStr, cx+chipW3/2, chipY3+chipH3*0.95);
+    });
+    ctx.fillStyle=_C.muted; ctx.font='400 12px Outfit,Arial,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(`${(_famRound.course_name||'').toUpperCase()}  ·  ${_famRound.date_played||''}`, W/2, H-20);
+
+    return _canvasToBlob(canvas);
+  }
+
+  function _roundRect(ctx, x, y, w, h, r) { _rr(ctx, x, y, w, h, r); }
+
 
   function renderFamSummary() {
     document.getElementById('fam-modal-label').textContent = 'Scorecard';
@@ -9528,7 +9747,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       <button class="btn-primary" style="width:100%;margin-top:12px;" onclick="saveFamRound(this)">Save to My Game \u2713</button>
       <div style="display:flex;gap:8px;margin-top:8px;">
         <button class="btn-ghost" style="flex:1;" onclick="closeFamilyModal()">Done</button>
-        <button class="btn-ghost" style="flex:1;" id="fam-share-btn" onclick="shareRecapCard()">\ud83d\udce4 Share</button>
+        <button class="btn-ghost" style="flex:1;" id="fam-share-btn" onclick="showSharePicker()">\ud83d\udce4 Share</button>
       </div>
     `;
   }
