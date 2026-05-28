@@ -1,7 +1,7 @@
 # SpinVibes Golf — Current Status
 > **Update this at the end of every Cowork session.** This is the first thing to read when starting a new session. It answers: where are we, what's broken, what's next.
 
-*Last updated: 2026-05-26 (session 18 — all open questions resolved, Sprint 5 fully scoped)*
+*Last updated: 2026-05-27 (session 19 — round flow verified at TCI; guide builder caddie switched to CF Worker)*
 
 ---
 
@@ -11,12 +11,13 @@
 |------|--------|
 | spinvibes.com (PWA) | ✅ Live — GitHub Pages |
 | golf.spinvibes.com (guide builder) | ✅ Live — GitHub Pages |
-| Service worker | **v85 / cache v131** |
+| Service worker | **v89 / cache v135** |
 | Stable checkpoint | **`v1.0-stable`** tag on GitHub — safe rollback before file split |
-| Last commit | Roadmap: all open questions resolved, leveling system fleshed out, Sprint 5 scoped |
+| Last commit | Session 19: round flow test + guide caddie CF Worker migration |
 | Supabase | ✅ Operational |
-| Caddie proxy | ✅ Live at `spinvibes-golf.netlify.app/.netlify/functions/caddie` |
-| Netlify | ⚠️ Credit limit resets ~June 1. Caddie function still live |
+| Caddie proxy (PWA) | ✅ CF Worker at `spinvibes-caddie.spinvibes.workers.dev` (WORKER_SECRET set) |
+| Caddie proxy (guide) | ✅ CF Worker — guide.html updated + committed to GitHub. ⚠️ **Jeremy must run `npx wrangler deploy` from `caddie-worker/` to add `golf.spinvibes.com` to ALLOWED_ORIGINS** |
+| Netlify | No longer used for caddie — credits were exhausted. Only `send-guide-email` function remains on Netlify |
 
 ---
 
@@ -28,6 +29,24 @@
 | Next goal | Break 90 — 3 strokes away |
 | Bag | Callaway Driver + 7-wood. Vice Boost 4H + irons (Takomo still arriving). Callaway Opus 50°/56°/60° wedges. Odyssey Ai-ONE #7 putter ⚠️ weights too heavy — returning to lighter config |
 | Pin | 4417 |
+
+---
+
+## What Was Just Finished (Session 19 — May 27, 2026)
+
+### Round Flow Test + Guide Builder Caddie Migration ✅
+
+| Item | Result |
+|------|--------|
+| Round flow test (TCI Oaks+Creek) | ✅ Full pass — PIN, course select, hole scoring, scorecard, caddie all working |
+| CF Worker `ALLOWED_ORIGINS` | ✅ Added `golf.spinvibes.com` to `caddie-worker/worker.js` |
+| guide.html caddie URL | ✅ Switched from Netlify to `https://spinvibes-caddie.spinvibes.workers.dev` |
+| guide.html request body | ✅ Updated to CF Worker format: `{ systemPrompt, messages: [{role, content}], max_tokens: 60 }` |
+| guide.html commit | ✅ Committed to GitHub — "Switch guide caddie from Netlify to CF Worker" |
+| Netlify deploy | ✅ golf.spinvibes.com auto-deployed ~60s after commit |
+| CF Worker deploy | ⚠️ **Jeremy still needs to run:** `cd ~/Documents/SpinVibes/Golf/spinvibes-golf/caddie-worker && npx wrangler deploy` |
+
+**Rate limiting note:** Guide builder users get `max_tokens: 60` (vs Jeremy's 80 in the PWA) + existing 7-second cooldown between calls. Jeremy has no cooldown or token cap in the PWA.
 
 ---
 
@@ -150,7 +169,26 @@ All open questions from the roadmap resolved. Key decisions:
 
 ---
 
-## Next Up — Sprint 5: Family Memories + Social Sharing
+## Guide Builder Sprint — COMPLETE ✅ (May 27, 2026)
+
+| Feature | Status |
+|---------|--------|
+| Supabase `guide_users` table | ✅ |
+| Supabase `guide_sessions` table | ✅ |
+| Supabase `guide_rounds` table | ✅ |
+| UUID personal links (`guide.html?u=UUID`) | ✅ |
+| Wizard saves profile to Supabase on generate | ✅ |
+| Guide loads profile from Supabase when `?u=` present | ✅ |
+| Progress notes → Supabase (cross-device) | ✅ |
+| Full round tracking — hole-by-hole, history, delete | ✅ |
+| Legacy long-URL links still work as fallback | ✅ |
+
+**Remaining guide builder work (next session):**
+- Personalized plan from PGA coaching docs — call Claude at generate time with skill/goal/weaknesses to produce a tailored coaching brief stored in Supabase
+
+---
+
+## Next Up — Sprint 5 (PWA): Family Memories + Social Sharing
 
 **Goal:** capture real memories from rounds and make them shareable. Fully scoped — ready to build.
 
@@ -221,7 +259,8 @@ All open questions from the roadmap resolved. Key decisions:
 | GitHub Pages | golf.spinvibes.com | Repo: `jgelb001/spinvibes-golf-guide` |
 | Supabase | Database | `https://zairvjyiwhajsulefyoi.supabase.co` |
 | GoDaddy | DNS | Manages spinvibes.com + golf.spinvibes.com |
-| Netlify | Caddie function only | `spinvibes-golf.netlify.app` |
+| Cloudflare Workers | Caddie proxy (PWA + guide) | `spinvibes-caddie.spinvibes.workers.dev` — API key stored as CF secret |
+| Netlify | Email function only | `send-guide-email` — sends guide PDFs via Resend |
 | Resend | Email | guide@spinvibes.com |
 
 **Rollback to stable:** `git checkout v1.0-stable` inside `spinvibes-golf/`

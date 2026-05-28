@@ -388,6 +388,13 @@ create table courses (
 
 **Keep this updated.** Every meaningful web-app change gets a one-line entry here with date.
 
+### 2026-05-27 — Session 19 (round flow test + guide caddie CF Worker migration)
+- Verified full round flow at TCI Oaks+Creek: PIN → course select → scoring → scorecard → caddie ✅
+- Added `golf.spinvibes.com` to `ALLOWED_ORIGINS` in `caddie-worker/worker.js`
+- Updated `guide.html` (spinvibes-golf-guide repo): caddie URL → CF Worker, request body → CF Worker format (`systemPrompt` + `messages[]` + `max_tokens: 60`)
+- guide.html committed to GitHub — Netlify auto-deployed golf.spinvibes.com
+- ⚠️ Jeremy must `npx wrangler deploy` from `caddie-worker/` to push updated CF Worker
+
 ### 2026-05-26 — Session 17–18 (bug fixes + planning)
 - Fixed Start New Round crash: KID_LEVELS TDZ — moved to top of src/11-script.html (same pattern as BADGES/CLUBS)
 - Fixed CADDIE_URL self-reference crash (leftover from CF deploy session)

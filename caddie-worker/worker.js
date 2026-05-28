@@ -10,18 +10,53 @@
 // After deploy, update CADDIE_URL in src/11-script.html
 
 const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
+
+// Only accept requests from these origins — blocks external abuse
+const ALLOWED_ORIGINS = [
+  'https://spinvibes.com',
+  'https://www.spinvibes.com',
+  'https://golf.spinvibes.com',  // guide builder
+  'http://localhost',             // local dev
+  'http://127.0.0.1',            // local dev
+];
+
+function getAllowedOrigin(request) {
+  const origin = request.headers.get('Origin') || '';
+  return ALLOWED_ORIGINS.find(o => origin.startsWith(o)) || null;
+}
+
+const CORS_HEADERS = (origin) => ({
+  'Access-Control-Allow-Origin': origin || 'https://spinvibes.com',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
+  'Access-Control-Allow-Headers': 'Content-Type, X-SpinVibes-Token',
+});
 
 export default {
   async fetch(request, env) {
+    const origin = getAllowedOrigin(request);
 
     // CORS preflight
     if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: CORS_HEADERS });
+      if (!origin) return new Response(null, { status: 403 });
+      return new Response(null, { status: 204, headers: CORS_HEADERS(origin) });
+    }
+
+    // Block requests from unknown origins
+    if (!origin) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Verify shared secret — blocks wrong tokens but allows missing token
+    // (missing = old cached app version; wrong = external abuse attempt)
+    const token = request.headers.get('X-SpinVibes-Token') || '';
+    if (env.WORKER_SECRET && token && token !== env.WORKER_SECRET) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json', ...CORS_HEADERS(origin) },
+      });
     }
 
     if (request.method !== 'POST') {
@@ -51,7 +86,7 @@ export default {
         body: JSON.stringify({
           model:      body.model      || 'claude-haiku-4-5-20251001',
           max_tokens: body.max_tokens || 80,
-          system:     body.system,
+          system:     body.system || body.systemPrompt,   // support both field names
           messages:   body.messages,
         }),
       });
@@ -64,9 +99,12 @@ export default {
 
     const data = await anthropicRes.json();
 
-    return new Response(JSON.stringify(data), {
+    // Extract text and return in { reply } format the app expects
+    const replyText = data?.content?.[0]?.text || "Sorry, I couldn't get a read on that. Try again.";
+
+    return new Response(JSON.stringify({ reply: replyText }), {
       status: anthropicRes.status,
-      headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+      headers: { 'Content-Type': 'application/json', ...CORS_HEADERS(origin) },
     });
   },
 };

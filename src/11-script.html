@@ -3002,7 +3002,7 @@
     updateRangeLevelBadge(who);
   }
 
-  // Show level badge in range section header
+  // Show level badge in range section header + re-render body
   function updateRangeLevelBadge(who) {
     const el = document.getElementById(who + '-range-level-badge');
     if (!el) return;
@@ -3013,6 +3013,565 @@
         <span style="font-size:0.85rem;">${def.emoji}</span>
         <span style="font-size:0.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${def.color};">Level ${level} · ${def.name}</span>
       </div>`;
+    if (who === 'son')  renderSonRangeBody(level);
+    if (who === 'girl') renderGirlRangeBody(level);
+  }
+
+  // ══════════════════════════════════════════════════════════
+  //  KIDS RANGE — LEVEL-GATED CONTENT
+  // ══════════════════════════════════════════════════════════
+
+  function expCard(badgeHtml, title, pills, body, cueText, cueStyle, detailHtml) {
+    const pillsHtml = pills.map(p => `<span class="pill">${p}</span>`).join('');
+    return `
+    <div class="card">
+      ${badgeHtml}
+      <div class="card-title">${title}</div>
+      <div class="pill-row">${pillsHtml}</div>
+      <div class="card-body">${body}</div>
+      <div class="cue-box" style="${cueStyle || ''}">💬 ${cueText}</div>
+      <div class="exp-trigger" onclick="toggleExp(this)">More Detail <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div class="exp-body"><div class="exp-inner">${detailHtml}<button class="exp-close" onclick="closeExp(this)">✕ Close</button></div></div>
+    </div>`;
+  }
+
+  // ── SON RANGE BODY ─────────────────────────────────────
+  function renderSonRangeBody(level) {
+    const el = document.getElementById('son-range-body');
+    if (!el) return;
+    const lv = level || getKidLevel('son');
+    el.innerHTML = _sonRangeHtml(lv);
+  }
+
+  function _sonRangeHtml(lv) {
+    // Shared: stat row varies by level
+    const statRow = {
+      1: `<div class="stat"><div class="stat-num" style="color:#3b82f6;">25</div><div class="stat-lbl">Balls</div></div><div class="stat"><div class="stat-num" style="color:#fcd34d;">😄</div><div class="stat-lbl">Have Fun</div></div><div class="stat"><div class="stat-num" style="color:#3b82f6;">7i</div><div class="stat-lbl">Start Here</div></div><div class="stat"><div class="stat-num" style="color:#ec4899;">1</div><div class="stat-lbl">Thought</div></div>`,
+      2: `<div class="stat"><div class="stat-num" style="color:#3b82f6;">30</div><div class="stat-lbl">Balls</div></div><div class="stat"><div class="stat-num" style="color:#3b82f6;">3</div><div class="stat-lbl">Phases</div></div><div class="stat"><div class="stat-num" style="color:#fcd34d;">😄</div><div class="stat-lbl">Have Fun</div></div><div class="stat"><div class="stat-num" style="color:#3b82f6;">9i</div><div class="stat-lbl">Start Here</div></div>`,
+      3: `<div class="stat"><div class="stat-num" style="color:#22c55e;">40</div><div class="stat-lbl">Balls</div></div><div class="stat"><div class="stat-num" style="color:#22c55e;">4</div><div class="stat-lbl">Phases</div></div><div class="stat"><div class="stat-num" style="color:#22c55e;">PW</div><div class="stat-lbl">Clock Drill</div></div><div class="stat"><div class="stat-num" style="color:#c8922a;">🎯</div><div class="stat-lbl">Target Mode</div></div>`,
+      4: `<div class="stat"><div class="stat-num" style="color:#c8922a;">50</div><div class="stat-lbl">Balls</div></div><div class="stat"><div class="stat-num" style="color:#c8922a;">5</div><div class="stat-lbl">Phases</div></div><div class="stat"><div class="stat-num" style="color:#c8922a;">Pump</div><div class="stat-lbl">Warmup</div></div><div class="stat"><div class="stat-num" style="color:#c8922a;">↗</div><div class="stat-lbl">Full Plan</div></div>`,
+    }[lv] || '';
+
+    let cards = '';
+
+    if (lv === 1) {
+      // L1 — JUST FOR FUN: contact only, max encouragement, no technique
+      cards = `
+      <div class="section">
+        ${expCard(
+          '<span class="fun-badge">Warm Up</span>',
+          '5 Magic Swings — No Ball 🌀',
+          ['7-Iron','Super slow','Feel it first'],
+          'Pick up the 7-iron. Take <strong>5 super slow practice swings</strong> — so slow it feels silly. Feel the club go back, then whoosh through. No ball yet.',
+          '"Turn your back to the target — then FIRE!"',
+          '',
+          `<div class="exp-detail">Swings 1–2: go so slow it's funny. Swings 3–4: normal speed. Swing 5: <strong>hold your finish for 3 seconds</strong>. If you wobble, you swung too hard.</div>
+          <div class="exp-detail"><strong>Pro Tip:</strong> Close your eyes for one swing and feel the club head. That heavy feeling at the bottom? That's exactly right.</div>`
+        )}
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);">Phase 1</span>',
+          'Make It Fly! ✈️',
+          ['9-Iron or 7-Iron','~12 balls','Count every airborne shot'],
+          '<strong>The Game:</strong> Hit 8 out of 12 in the air. Count every shot that flies — out loud! It doesn\'t matter where it goes, only that it goes UP.',
+          '"Hit DOWN on it — the club does the lifting!"',
+          '',
+          `<div class="exp-detail"><strong>Setup:</strong> Ball in the middle of your stance. Feet shoulder-width. Weight 50/50. Swing through — don't scoop the ball up. The 9-iron does that for you.</div>
+          <div class="exp-detail"><strong>If you hit 8+ in the air — you WIN Phase 1!</strong> Move on. Under 8? No stress — take 4 more. Every shot is practice.</div>
+          <div class="exp-mistake"><div class="em-lbl">⚠ Watch For</div><p>Trying to help the ball up. Hit <strong>through</strong> the ball. The divot appears <em>in front</em> of where the ball was.</p></div>`
+        )}
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">Phase 2</span>',
+          'Distance Explorer 📏',
+          ['7-Iron','Fairway Wood','~10 balls'],
+          '<strong>The Game:</strong> Which club goes farthest? Hit 5 with the 7-iron, 5 with the fairway wood. Remember your personal record!',
+          '"Longer club = wider, smoother swing. Same sequence!"',
+          '',
+          `<div class="exp-detail"><strong>Ball position moves forward</strong> with longer clubs — for the fairway wood, play it just inside your left heel (lead heel). Same swing, just a wider arc.</div>
+          <div class="exp-detail"><strong>Track your record:</strong> What's your longest 7-iron today? Write it down or remember it — that's your number to beat next time.</div>`
+        )}
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#ef4444,#f97316);">Bonus</span>',
+          'Rocket Launch 🚀 — Driver!',
+          ['Driver','~3 balls','Max fun'],
+          'Tee it up and <strong>just rip it</strong>. No swing thoughts. If it goes sideways, laugh and try again. Pure fun.',
+          '"Sweep it up off the tee. Smooth is fast!"',
+          '',
+          `<div class="exp-detail"><strong>Tee height:</strong> about half the ball above the clubface. Ball off your left (lead) heel. Wide stance. Weight slightly back. Driver is the ONE club you hit on the upswing.</div>`
+        )}
+      </div>
+      <div class="section">
+        <div class="section-title">🏁 Finish — Putting Game</div>
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#10b981,#059669);">Putting</span>',
+          'Closest to the Hole vs Dad 🏆',
+          ['Putter','5 balls each','Any distance'],
+          'Both players putt 5 balls. <strong>Closest to the hole wins.</strong> Let him pick where you putt from. He has full control.',
+          '"Eyes on the ball — roll it smooth!"',
+          '',
+          `<div class="exp-detail"><strong>If he sinks one:</strong> full celebration. Jump around. Make it a moment he wants to recreate every session.</div>
+          <div class="exp-detail">For short putts: pick a specific spot on the back of the cup, not just the middle — it sharpens focus immediately.</div>`
+        )}
+        <div class="section-title" style="margin-top:4px;">Level 1 Golden Rules 🌟</div>
+        <div class="check-row"><span>Count your GOOD shots — forget the bad ones instantly.</span></div>
+        <div class="check-row"><span>⏱ Stop at <strong>25–30 minutes</strong> — leave him wanting more.</span></div>
+        <div class="check-row"><span>Water break whenever. No performance without hydration.</span></div>
+        <div class="check-row"><span>One swing thought only: <strong>"Turn and FIRE!"</strong></span></div>
+        <div class="check-row"><span>Bad shot? Laugh and reload. No dwelling — ever.</span></div>
+      </div>`;
+
+    } else if (lv === 2) {
+      // L2 — GETTING THE HANG OF IT: mechanics intro, grip check, half-swing contact, clock drill intro
+      cards = `
+      <div class="section">
+        ${expCard(
+          '<span class="fun-badge">Warm Up</span>',
+          'Grip Check + 5 Practice Swings 🤝',
+          ['7-Iron','2 min','Grip first — every session'],
+          'Before hitting a single ball: check the grip. Club runs diagonally across the fingers — not in the palm. Then take 5 slow practice swings and hold the finish.',
+          '"Grip in the fingers. Turn your back to the target. Hold the finish."',
+          '',
+          `<div class="exp-detail"><strong>Grip check:</strong> Hold the club at waist height. The "V" formed by your thumb and forefinger should point toward your right shoulder (trail shoulder). If it points toward the sky, the grip is too weak.</div>
+          <div class="exp-detail">Swings 4–5: hold the finish for a full 3 seconds. Balanced? Good. Wobbling? Swing was too hard or too fast.</div>`
+        )}
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);">Phase 1</span>',
+          'Contact Challenge — 9-to-3',
+          ['9-Iron','~10 balls','Half swing only'],
+          '<strong>The Drill:</strong> Club goes to 9 o\'clock back, 3 o\'clock through. Small and controlled. Goal: 8/10 solid contacts. No full swings yet — half swing builds the habit.',
+          '"Ball first, then ground — in that order."',
+          '',
+          `<div class="exp-detail"><strong>9-to-3 explained:</strong> Imagine a clock face. Backswing stops when the lead arm points at 9 o'clock (about hip height). Follow-through stops at 3 o'clock. Same length both sides.</div>
+          <div class="exp-detail"><strong>Good contact signal:</strong> You'll hear a clean click and see a small divot <em>in front of where the ball was</em>. That divot is proof you hit ball-first.</div>
+          <div class="exp-mistake"><div class="em-lbl">⚠ Common Miss</div><p>Scooping — trying to lift the ball up with your hands. Trust the 9-iron's loft. Hit down and through. The ball goes up on its own.</p></div>`
+        )}
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">Phase 2</span>',
+          'Distance Explorer + Clock Drill Intro 📏',
+          ['PW or 9-iron','7-Iron','~15 balls'],
+          '<strong>Task 1:</strong> Hit 5 PW at half swing (9 o\'clock). Note how far. Hit 5 at full swing. See the difference? That\'s the clock drill. <strong>Task 2:</strong> 5 with 7-iron — track your record distance.',
+          '"Know your numbers. What does your half-swing PW carry?"',
+          '',
+          `<div class="exp-detail"><strong>Clock Drill basics:</strong> Same club, 3 different backswing lengths = 3 different distances. 7 o'clock (hip high) = short. 9 o'clock (shoulder) = medium. 11 o'clock (full) = max. Learn these numbers — they're your secret weapon.</div>
+          <div class="exp-detail"><strong>Your 7-iron PR:</strong> How far did it carry today? Write it down or remember it. Beating your personal record is the real game.</div>`
+        )}
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#ef4444,#f97316);">Phase 3</span>',
+          'Driver + Fairway Wood 🚀',
+          ['Driver','FW Wood','~5 balls each'],
+          'Tee up and swing. Two cues only: <strong>turn your back to the target</strong> on the backswing, and <strong>hold your finish</strong>. That\'s it.',
+          '"Smooth is fast. Harder doesn\'t mean farther."',
+          '',
+          `<div class="exp-detail"><strong>Driver tee setup:</strong> Half the ball above the clubface. Ball off your left (lead) heel. Wide stance. The driver is the ONE club you hit slightly on the upswing.</div>
+          <div class="exp-detail">For fairway wood: ball just inside left heel. Same easy swing as the driver — just don't swing as hard. Smooth tempo produces the distance.</div>`
+        )}
+      </div>
+      <div class="section">
+        <div class="section-title">🏁 Finish — Ring of Fire Putting</div>
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#10b981,#059669);">Putting</span>',
+          'Ring of Fire 🔥',
+          ['Putter','5 balls','3 feet away from hole'],
+          'Place 5 balls in a circle around the hole — all exactly <strong>3 feet away</strong>. Make ALL 5 in a row. Miss one? Start over. Same drill tour pros use every day.',
+          '"Pick a spot on the back of the cup. Aim for THAT spot — not the middle."',
+          '',
+          `<div class="card" style="background:rgba(0,0,0,0.15);margin-bottom:8px;"><div class="card-title" style="font-size:0.85rem;">🎯 Eyes Over the Ball</div><div class="card-body">Drop a ball from your nose — it should land on your ball. If not, adjust your position. Eyes directly over ball = consistent path.</div></div>
+          <div class="card" style="background:rgba(0,0,0,0.15);margin-bottom:0;"><div class="card-title" style="font-size:0.85rem;">🎯 Pendulum Only</div><div class="card-body">Shoulders rock, wrists stay locked. Backswing and follow-through are the same length. No flipping at impact.</div></div>`
+        )}
+        <div class="section-title" style="margin-top:4px;">Level 2 Golden Rules ⚡</div>
+        <div class="check-row"><span>Check your grip <strong>before every session</strong> — it's the habit that sticks for life.</span></div>
+        <div class="check-row"><span>One swing thought per session — commit to it fully, don't switch mid-session.</span></div>
+        <div class="check-row"><span>Track your 7-iron distance. It's your benchmark club.</span></div>
+        <div class="check-row"><span>⏱ Sessions stay at <strong>30–40 minutes</strong>. Quality over quantity.</span></div>
+        <div class="check-row"><span>Count your par-3 scores — that's real scoring starting now.</span></div>
+      </div>`;
+
+    } else if (lv === 3) {
+      // L3 — LEARNING THE GAME: structured plan, clock drill, course management intro, lag putting
+      cards = `
+      <div class="section">
+        ${expCard(
+          '<span class="fun-badge">Warm Up</span>',
+          'Pump Drill + Alignment Check 🔄',
+          ['PW or 9-iron','3 reps','Then 5 half-swings'],
+          '<strong>Pump Drill:</strong> Take the club to the top of your backswing, then PAUSE — feel your hips fire toward the target before your arms come down. Do this 3 times with no ball, then hit 5 half-swing shots.',
+          '"Hips fire FIRST. Club arrives LAST. That\'s where the speed comes from."',
+          '',
+          `<div class="exp-detail"><strong>Why the Pump Drill:</strong> Most golfers lose distance and consistency because they throw the club from the top with their arms. The Pump Drill trains the correct sequence: hips → torso → arms → club. Every extra yard comes from this.</div>
+          <div class="exp-detail"><strong>Alignment check:</strong> Before your first ball, set an alignment stick (or club on the ground) pointing at your target. Check that your feet, hips, and shoulders are all parallel to it. Do this every session.</div>`
+        )}
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);">Phase 1</span>',
+          'Short Iron Contact Quality',
+          ['9-iron','PW','~12 balls'],
+          'Focus: ball-first contact, forward shaft lean, divot AFTER the ball. <strong>Not a distance session</strong> — a contact quality session.',
+          '"Ball first, then ground. In that exact order, every time."',
+          '',
+          `<div class="exp-detail"><strong>Tee in the Ground drill:</strong> Push a tee into the ground 2 inches in front of where your ball sits. Goal: hit the ball AND clip the tee. If you clip the tee, shaft lean is correct.</div>
+          <div class="exp-detail"><strong>Read your divot:</strong> Divot in front of the ball = correct. Divot behind the ball = you're hitting the ground first (fat). No divot = you're scooping.</div>`
+        )}
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">Phase 2</span>',
+          'Clock Drill — Wedge Distance Control ⏱',
+          ['PW or GW','~15 balls','7 / 9 / 11 o\'clock'],
+          '<strong>The Drill:</strong> 5 balls at each backswing position. Record where they land. Same tempo at all three positions — only the length changes.',
+          '"What\'s your 9 o\'clock PW? Know that number before every short shot."',
+          '',
+          `<div class="exp-detail"><strong>How to use it on the course:</strong> You have 55 yards. Your 9 o'clock PW goes 60 yards. That's your shot. Step in, commit, swing. No guessing.</div>
+          <div class="exp-detail"><strong>Three distances to know this session:</strong><br>7 o'clock ≈ _____ yards · 9 o'clock ≈ _____ yards · 11 o'clock ≈ _____ yards<br>Write these down after today's session.</div>`
+        )}
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#22c55e,#059669);">Phase 3</span>',
+          'Course Management Challenge 🧠',
+          ['Any club','~10 balls','Pick a target, commit'],
+          'Pick a target on the range — a flag, a sign, a yardage marker. Choose your club based on the distance. Aim at the safe side of the target. Commit and swing.',
+          '"Where\'s the trouble? Aim AWAY from it — always."',
+          '',
+          `<div class="exp-detail"><strong>Pre-shot routine (start building this now):</strong><br>1. Stand behind the ball — see the shot, pick the target.<br>2. Walk in, align the clubface first, then your feet.<br>3. One waggle. One thought.<br>4. Commit and swing. No more thinking after step 3.</div>
+          <div class="exp-detail"><strong>Course management rule #1:</strong> When in trouble — chip out. The goal is never "can I make par?" It's "how do I avoid a big number?" A bogey from trouble is a victory.</div>`
+        )}
+      </div>
+      <div class="section">
+        <div class="section-title">🏁 Finish — Lag Putting + Ring of Fire</div>
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#10b981,#059669);">Putting</span>',
+          'Lag From 20 Feet + Ring of Fire 🔥',
+          ['Putter','10 balls','Distance control first'],
+          '<strong>Part 1:</strong> 5 putts from 20 feet — goal is to leave every one inside 3 feet. Don\'t try to make them. Just get them close. <strong>Part 2:</strong> Ring of Fire — 3 feet, make all 5.',
+          '"Distance control first. Direction is secondary on long putts."',
+          '',
+          `<div class="exp-detail"><strong>Eyes Closed drill:</strong> On 2 of your 5 lag putts, close your eyes after you start the stroke. Feel the distance in your arms — don't try to see where it goes. This builds distance instinct faster than anything.</div>
+          <div class="exp-detail"><strong>3-putt math:</strong> Every 3-putt is a stroke you gave away. Lag putting well from 20 feet eliminates most 3-putts. That's 2–4 strokes per round — without changing your swing.</div>`
+        )}
+        <div class="section-title" style="margin-top:4px;">Level 3 Session Rules 🎯</div>
+        <div class="check-row"><span>Pump Drill warmup — <strong>every session without exception</strong>.</span></div>
+        <div class="check-row"><span>Know your 3 clock-drill distances for your scoring wedge.</span></div>
+        <div class="check-row"><span>Pick a target before every swing on the range — no hitting to nowhere.</span></div>
+        <div class="check-row"><span>Track doubles on the course — eliminating them is your fastest scoring path.</span></div>
+        <div class="check-row"><span>Short game gets <strong>half your session time</strong>. It's where scores are made.</span></div>
+      </div>`;
+
+    } else {
+      // L4 — GETTING SERIOUS: full complexity, all drills, course management deep, stats tracking
+      cards = `
+      <div class="section">
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#c8922a,#92400e);">Warm Up</span>',
+          'Pump Drill + Feet Together Reset 🔄',
+          ['PW','3 Pump reps','5 Feet Together shots'],
+          '<strong>Pump Drill:</strong> 3 reps with no ball — feel hips fire before arms drop. Then 5 Feet Together half-swings. This sequence is your warmup for every session from here forward.',
+          '"Hips lead. Club arrives last. Hold the finish."',
+          '',
+          `<div class="exp-detail"><strong>Feet Together drill:</strong> Stand with feet touching. Hit half-swing shots. Balance breaks if your tempo is wrong — this self-corrects immediately. 5 solid Feet Together shots = your swing is in rhythm.</div>
+          <div class="exp-detail"><strong>Alignment station:</strong> Every session starts with a club on the ground pointing at your target. Check that feet, hips, and shoulders are all parallel. Non-negotiable at this level.</div>`
+        )}
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);">Phase 1</span>',
+          'Short Iron — Contact + Shaft Lean',
+          ['9-iron','PW','~12 balls'],
+          'Tee in the Ground drill: push a tee 2 inches ahead of your ball. Goal: clip the ball AND the tee. Forward shaft lean achieved. Ball-first contact confirmed.',
+          '"Club loft does the lifting. Hit DOWN — it goes UP."',
+          '',
+          `<div class="exp-detail">If you're catching the tee first, ball position is too far forward. Move it back one ball-width toward your trail foot.</div>
+          <div class="exp-detail"><strong>Diagnose your miss:</strong> After every poor contact — ask why. Fat = you bottomed out before the ball. Thin = you stood up at impact. Scoop = trail hand took over. Name the fault, apply the fix.</div>`
+        )}
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">Phase 2</span>',
+          'Full Clock Drill — Scoring Wedge',
+          ['PW or GW','~12 balls','7 / 9 / 11 o\'clock'],
+          'Full clock drill with your scoring wedge. 4 balls at each position. Record distances. <strong>These 3 numbers are your scoring system</strong> — know them cold.',
+          '"Same tempo at all 3 positions. Swing length controls distance, not effort."',
+          '',
+          `<div class="exp-detail"><strong>Trajectory control:</strong> For a lower, penetrating shot — ball slightly toward trail foot, hands more forward, shorter follow-through. For higher, softer landing — ball slightly forward, open face slightly, full finish.</div>
+          <div class="exp-detail">On the course: you never guess distances inside 100 yards. You know your number and you commit to it. That's what separates Level 4 from everyone else.</div>`
+        )}
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#22c55e,#059669);">Phase 3</span>',
+          'Mid Irons — Hip Sequence',
+          ['7-iron','6-iron','~10 balls'],
+          'Full swing — but with a focus on hip sequence. Hips start turning toward the target before the arms come down. Count fairways hit on your imaginary range target.',
+          '"Belt buckle fires FIRST. The rest follows."',
+          '',
+          `<div class="exp-detail"><strong>Hip sequence check:</strong> At the top of the backswing, pause for a half-second and feel your hips start turning before your arms move. That pause is the Pump Drill in real time.</div>
+          <div class="exp-detail"><strong>Count fairways:</strong> Pick a 30-yard wide target on the range. How many out of 10 land in the "fairway"? Goal is 6+. That's the stat that matters off the tee.</div>`
+        )}
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#c8922a,#92400e);">Phase 4</span>',
+          'Driver — Control Over Distance',
+          ['Driver','~10 balls','Target: fairways, not yards'],
+          '<strong>Two tasks:</strong> 5 at 80% effort (smooth, controlled). 5 at full effort. Count which group hits the imaginary fairway more often. That\'s the lesson.',
+          '"Fairway first. Distance is a bonus."',
+          '',
+          `<div class="exp-detail">80% effort almost always wins the fairway test. The harder you swing, the wider the miss. Distance comes from sequence, not effort.</div>
+          <div class="exp-detail"><strong>Pre-shot routine is mandatory at Level 4:</strong> Every driver shot gets a full routine — stand behind, see the shot, pick intermediate target, walk in, waggle, commit. No exceptions.</div>`
+        )}
+      </div>
+      <div class="section">
+        <div class="section-title">🏁 Short Game — Full Routine</div>
+        ${expCard(
+          '<span class="fun-badge" style="background:linear-gradient(135deg,#10b981,#059669);">Short Game</span>',
+          'Bump-and-Run + Lag + Ring of Fire 🔥',
+          ['9-iron chip','Putter','15 min'],
+          '<strong>Station 1:</strong> 5 bump-and-run chips with 9-iron from 10 yards — land it 3 feet on the green and let it release. <strong>Station 2:</strong> Lag from 25 feet — inside 3 feet goal. <strong>Station 3:</strong> Ring of Fire.',
+          '"Short game is where scores live. Own this and the rounds follow."',
+          '',
+          `<div class="exp-detail"><strong>Bump-and-run setup:</strong> Ball just back of center. Weight 70% lead foot (stays there). Narrow stance. Pendulum motion — no wrist flip. 9-iron: 20% air time, 80% roll.</div>
+          <div class="exp-detail"><strong>Level 4 stats to track on the course:</strong> Fairways hit · Greens in regulation · Putts per hole · Up-and-down % from inside 30 yards. These four numbers tell you exactly where strokes are going.</div>`
+        )}
+        <div class="section-title" style="margin-top:4px;">Level 4 Standards 🏆</div>
+        <div class="check-row"><span>Pump Drill + alignment stick — every single session.</span></div>
+        <div class="check-row"><span>Know your 3 clock-drill distances by heart. No guessing inside 100 yards.</span></div>
+        <div class="check-row"><span>Pre-shot routine on every swing — on the range and on the course.</span></div>
+        <div class="check-row"><span>Track fairways hit, putts per round, and up-and-down percentage.</span></div>
+        <div class="check-row"><span>Short game gets <strong>at least 20 min</strong> of every session. Always.</span></div>
+      </div>`;
+    }
+
+    return `<div class="section"><div class="stat-row">${statRow}</div></div>${cards}`;
+  }
+
+  // ── GIRL RANGE BODY ─────────────────────────────────────
+  function renderGirlRangeBody(level) {
+    const el = document.getElementById('girl-range-body');
+    if (!el) return;
+    const lv = level || getKidLevel('girl');
+    el.innerHTML = _girlRangeHtml(lv);
+  }
+
+  function _girlRangeHtml(lv) {
+    const statRow = {
+      1: `<div class="stat"><div class="stat-num" style="color:#ec4899;">15</div><div class="stat-lbl">Balls Max</div></div><div class="stat"><div class="stat-num" style="color:#ec4899;">😄</div><div class="stat-lbl">Vibes</div></div><div class="stat"><div class="stat-num" style="color:#14b8a6;">7i</div><div class="stat-lbl">Start Here</div></div><div class="stat"><div class="stat-num" style="color:#ec4899;">✨</div><div class="stat-lbl">All Smiles</div></div>`,
+      2: `<div class="stat"><div class="stat-num" style="color:#ec4899;">20</div><div class="stat-lbl">Balls</div></div><div class="stat"><div class="stat-num" style="color:#ec4899;">3</div><div class="stat-lbl">Phases</div></div><div class="stat"><div class="stat-num" style="color:#14b8a6;">9i</div><div class="stat-lbl">Start Here</div></div><div class="stat"><div class="stat-num" style="color:#ec4899;">😄</div><div class="stat-lbl">Have Fun</div></div>`,
+      3: `<div class="stat"><div class="stat-num" style="color:#22c55e;">30</div><div class="stat-lbl">Balls</div></div><div class="stat"><div class="stat-num" style="color:#22c55e;">3</div><div class="stat-lbl">Phases</div></div><div class="stat"><div class="stat-num" style="color:#22c55e;">9i</div><div class="stat-lbl">Clock Drill</div></div><div class="stat"><div class="stat-num" style="color:#c8922a;">🎯</div><div class="stat-lbl">Target Mode</div></div>`,
+      4: `<div class="stat"><div class="stat-num" style="color:#c8922a;">40</div><div class="stat-lbl">Balls</div></div><div class="stat"><div class="stat-num" style="color:#c8922a;">4</div><div class="stat-lbl">Phases</div></div><div class="stat"><div class="stat-num" style="color:#c8922a;">Pump</div><div class="stat-lbl">Warmup</div></div><div class="stat"><div class="stat-num" style="color:#c8922a;">↗</div><div class="stat-lbl">Full Plan</div></div>`,
+    }[lv] || '';
+
+    const pink = 'border-color:#ec4899;color:#f9a8d4;';
+    const teal = 'border-color:#14b8a6;color:#5eead4;';
+    let cards = '';
+
+    if (lv === 1) {
+      cards = `
+      <div class="section">
+        ${expCard(
+          '<span class="girl-badge">Warm Up</span>',
+          '3 Magic Swings — No Ball 🪄',
+          ['7-Iron','Super slow','2 min'],
+          'Pick up the 7-iron and take <strong>3 super slow practice swings</strong> — like moving through honey. Feel the club go back, then swoop through. No ball yet — just feel it!',
+          '"Reach back and SWOOOOOP!"',
+          pink,
+          `<div class="exp-detail">Make it silly — go SO slow it's funny. Let her laugh. On the 3rd swing, ask her to hold the finish and balance on one foot. Any giggles = winning.</div>
+          <div class="exp-detail"><strong>What you're teaching:</strong> Muscle memory for the swing shape before adding the challenge of a ball. At this age this is everything.</div>`
+        )}
+        ${expCard(
+          '<span class="girl-badge" style="background:linear-gradient(135deg,#ec4899,#f97316);">Phase 1</span>',
+          'Make It Move! ✨',
+          ['7-Iron','~8 balls','Any forward motion = win'],
+          '<strong>The only goal:</strong> hit the ball and make it go forward. ANY forward movement counts! Count every one that moves and cheer out loud.',
+          '"Just hit it and watch where it goes!"',
+          pink,
+          `<div class="exp-detail"><strong>For a lefty:</strong> Ball in the middle of her stance. Right hand on top of the grip (lead hand for lefty). Let her swing naturally — no corrections at this age.</div>
+          <div class="exp-detail"><strong>If the ball isn't moving:</strong> Tee it up! There's no shame in teeing up at the range. It builds confidence fast.</div>
+          <div class="exp-detail"><strong>Account holder focus:</strong> Watch for her head staying down through impact — that's the one thing worth gently mentioning. Everything else can wait.</div>`
+        )}
+        ${expCard(
+          '<span class="girl-badge" style="background:linear-gradient(135deg,#14b8a6,#6366f1);">Phase 2</span>',
+          'Pick Your Club! 🌈',
+          ['Her choice','~5 balls','Pure fun'],
+          'Let her pick <strong>any club she wants</strong> and just hit. No rules. Driver off the deck? Sure. Putter at the targets? Why not. Just swing and smile.',
+          '"Which one do you want to try?"',
+          teal,
+          `<div class="exp-detail">Autonomy is everything at this age. Letting her choose gives her ownership. She'll remember the fun, not whether she used the "right" club.</div>
+          <div class="exp-detail"><strong>End here</strong> — while she's still happy and energized. A 15-minute session ending on a high beats a 40-minute session ending in frustration every time.</div>`
+        )}
+      </div>
+      <div class="section">
+        <div class="section-title">🏁 Putt Putt vs the Account Holder! 🎯</div>
+        ${expCard(
+          '<span class="girl-badge">Putting</span>',
+          'Closest to the Hole Wins! 🏆',
+          ['Putter','5 balls each','Any distance'],
+          'Both players putt 5 balls. <strong>Whoever gets closest to the hole wins.</strong> Let her pick where you putt from. She has full control.',
+          '"Eyes on the ball, roll it smooth — like sending it on a little trip to the hole!"',
+          pink,
+          `<div class="exp-detail"><strong>Let her win sometimes.</strong> Not always — she'll know if it's fake — but occasionally miss just enough that she beats you genuinely. Beating a grown-up is massive motivation.</div>
+          <div class="exp-detail"><strong>If she sinks one:</strong> Stop everything. Full celebration. Make it a moment she wants to recreate every time.</div>
+          <div class="exp-detail"><strong>Lefty putting at this age:</strong> Just get her rolling the ball forward. Don't correct grip or stance yet — contact and direction are enough.</div>`
+        )}
+        <div class="section-title" style="margin-top:4px;">Level 1 Golden Rules 🌟</div>
+        <div class="check-row"><span>🎉 Cheer for <strong>every</strong> swing — contact or not, she tried!</span></div>
+        <div class="check-row"><span>⏱ Stop at 15 minutes — <strong>always leave her wanting more</strong></span></div>
+        <div class="check-row"><span>🍦 Promise a treat after — she earned it by showing up</span></div>
+        <div class="check-row"><span>📵 Phone away — she notices, and it matters to her</span></div>
+        <div class="check-row"><span>🌈 Not feeling it today? That's totally fine — <strong>come back next time</strong></span></div>
+      </div>`;
+
+    } else if (lv === 2) {
+      cards = `
+      <div class="section">
+        ${expCard(
+          '<span class="girl-badge">Warm Up</span>',
+          'Grip Check + 3 Magic Swings 🤝',
+          ['7-Iron','Grip first','2 min'],
+          'Before hitting: quick grip check — club runs across the fingers, not the palm. Then 3 slow practice swings. Hold the finish on the last one.',
+          '"Grip in the fingers. Reach back. Hold the finish!"',
+          pink,
+          `<div class="exp-detail"><strong>Simple grip check for a lefty:</strong> Right hand on top (lead hand), left hand below. Club sits at the base of the fingers — not deep in the palm. Ask her to show you her grip before every session.</div>`
+        )}
+        ${expCard(
+          '<span class="girl-badge" style="background:linear-gradient(135deg,#ec4899,#f97316);">Phase 1</span>',
+          'Make It Fly! ✈️',
+          ['9-Iron','~10 balls','Count shots in the air'],
+          '<strong>The Game:</strong> Hit 6 out of 10 in the air. Count every airborne shot out loud! Doesn\'t matter where it goes — only that it goes UP.',
+          '"Hit DOWN on it — the club does the lifting!"',
+          pink,
+          `<div class="exp-detail"><strong>Good contact check:</strong> A small divot (or brushed grass) should appear <em>in front of where the ball was</em>. That means ball-first contact — perfect.</div>
+          <div class="exp-detail"><strong>If she hits 6+ in the air — WIN!</strong> Move on. Under 6? No stress — 4 more tries. Every swing is getting better.</div>`
+        )}
+        ${expCard(
+          '<span class="girl-badge" style="background:linear-gradient(135deg,#14b8a6,#6366f1);">Phase 2</span>',
+          'Distance Explorer 📏',
+          ['7-Iron','FW Wood','~8 balls'],
+          'Hit 4 with the 7-iron, 4 with the fairway wood. Which goes farther? Remember your personal record!',
+          '"Longer club = wider, smoother swing. Same sequence!"',
+          teal,
+          `<div class="exp-detail"><strong>Ball position:</strong> moves forward with longer clubs. For the fairway wood, play it just inside the right heel (lead heel for a lefty). Same swing, just a wider arc.</div>
+          <div class="exp-detail"><strong>Her 7-iron personal record:</strong> How far did it go today? That number is hers to beat next time.</div>`
+        )}
+      </div>
+      <div class="section">
+        <div class="section-title">🏁 Finish — Closest to the Hole 2.0</div>
+        ${expCard(
+          '<span class="girl-badge">Putting</span>',
+          'Ring of Fire — Starter Version 🔥',
+          ['Putter','5 balls','2 feet from hole'],
+          'Place 5 balls around the hole — <strong>2 feet away</strong> (closer than normal for now). Make all 5 in a row. Miss? Start over. These are the putts that change scores.',
+          '"Pick a spot on the back of the cup. Aim there — not just \"at the hole\"."',
+          pink,
+          `<div class="exp-detail">2 feet builds confidence fast. When she's making all 5 consistently, move out to 3 feet. That's the progression.</div>
+          <div class="exp-detail"><strong>One key:</strong> Shoulders rock like a pendulum. Wrists stay quiet. Same backswing and follow-through length.</div>`
+        )}
+        <div class="section-title" style="margin-top:4px;">Level 2 Rules ⚡</div>
+        <div class="check-row"><span>Check her grip before <strong>every session</strong>.</span></div>
+        <div class="check-row"><span>Count every shot in the air — it's the real score at this level.</span></div>
+        <div class="check-row"><span>Track her 7-iron personal record. Beat it next time.</span></div>
+        <div class="check-row"><span>⏱ Sessions stay at <strong>20–25 minutes</strong>.</span></div>
+      </div>`;
+
+    } else if (lv === 3) {
+      cards = `
+      <div class="section">
+        ${expCard(
+          '<span class="girl-badge">Warm Up</span>',
+          'Grip Check + Half-Swing Contact 🤝',
+          ['9-iron','5 half-swings','No rush'],
+          'Grip check first, then 5 half-swing shots with the 9-iron. 9-to-3 only — club to hip height back, hip height through. Clean contact before full swings.',
+          '"Ball first, then ground — in that order."',
+          pink,
+          `<div class="exp-detail"><strong>9-to-3 explained:</strong> Backswing stops when your lead arm points at 9 o'clock (hip height). Follow-through stops at 3 o'clock. Same length both sides — pendulum motion.</div>`
+        )}
+        ${expCard(
+          '<span class="girl-badge" style="background:linear-gradient(135deg,#ec4899,#f97316);">Phase 1</span>',
+          'Clock Drill — Pitching Wedge 📏',
+          ['PW or 9-iron','~12 balls','3 distances'],
+          '<strong>The Drill:</strong> 4 balls at 7 o\'clock (hip height), 4 at 9 o\'clock (shoulder), 4 at 11 o\'clock (full). Note how far each goes. These are her scoring distances.',
+          '"Same tempo at all 3 positions. Length controls distance, not effort."',
+          pink,
+          `<div class="exp-detail"><strong>Why this matters:</strong> Inside 100 yards, guessing costs strokes. Knowing "my 9 o'clock wedge goes 50 yards" eliminates guessing. That's a scoring skill.</div>
+          <div class="exp-detail">Record her 3 distances after this session. She'll use them on the course.</div>`
+        )}
+        ${expCard(
+          '<span class="girl-badge" style="background:linear-gradient(135deg,#14b8a6,#6366f1);">Phase 2</span>',
+          'Distance Explorer + Target Practice 🎯',
+          ['7-Iron','FW Wood','~12 balls'],
+          'Hit 6 with the 7-iron at a specific target on the range — not just "out there." Pick a flag or a yardage sign. Then 6 with the fairway wood.',
+          '"Pick the target BEFORE you swing. Aim at something specific."',
+          teal,
+          `<div class="exp-detail"><strong>Pre-shot routine:</strong> Stand behind the ball → see the shot → pick a target → walk in → swing. At Level 3, every swing has a target. No hitting to nowhere.</div>`
+        )}
+      </div>
+      <div class="section">
+        <div class="section-title">🏁 Short Game + Putting</div>
+        ${expCard(
+          '<span class="girl-badge" style="background:linear-gradient(135deg,#10b981,#059669);">Short Game</span>',
+          'Chip + Ring of Fire 🔥',
+          ['9-iron chip','Putter','10 min'],
+          '<strong>Chipping:</strong> 5 bump-and-run chips from 8 yards with 9-iron. Goal: land it 2–3 feet onto the green and let it roll. <strong>Putting:</strong> Ring of Fire at 3 feet.',
+          '"Land it soft. Let it roll. Don\'t try to put it in the hole on the fly."',
+          pink,
+          `<div class="exp-detail"><strong>Chip setup:</strong> Ball just back of center. Weight 70% on lead foot (stays there). Narrow stance. Pendulum motion — no wrist flip. The 9-iron rolls the ball like a long putt once it lands.</div>
+          <div class="exp-detail">Ring of Fire: 5 balls, 3 feet away. Make all 5 in a row. Miss? Start over. This is the same drill the best players in the world use every day.</div>`
+        )}
+        <div class="section-title" style="margin-top:4px;">Level 3 Rules 🎯</div>
+        <div class="check-row"><span>Every swing at the range needs a <strong>specific target</strong>.</span></div>
+        <div class="check-row"><span>Know her 3 clock-drill distances by heart.</span></div>
+        <div class="check-row"><span>Short game gets half the session. Always.</span></div>
+        <div class="check-row"><span>Start counting <strong>pars</strong> on the course — not just total score.</span></div>
+      </div>`;
+
+    } else {
+      // L4
+      cards = `
+      <div class="section">
+        ${expCard(
+          '<span class="girl-badge" style="background:linear-gradient(135deg,#c8922a,#92400e);">Warm Up</span>',
+          'Pump Drill + Alignment Check 🔄',
+          ['9-iron or PW','3 Pump reps','5 half-swings'],
+          '<strong>Pump Drill:</strong> Take the club to the top, pause — feel the hips fire before the arms come down. 3 reps, no ball. Then 5 half-swing contact shots with alignment stick on the ground.',
+          '"Hips lead. Club arrives last. That\'s where the speed lives."',
+          pink,
+          `<div class="exp-detail"><strong>Pump Drill for lefties:</strong> At the top, your left hip (trail hip) is loaded. The RIGHT hip (lead hip) starts the downswing by firing toward the target — before your arms come down. That's the sequence.</div>
+          <div class="exp-detail"><strong>Alignment stick:</strong> Every session. Feet, hips, shoulders — all parallel to target line. This habit alone is worth strokes.</div>`
+        )}
+        ${expCard(
+          '<span class="girl-badge" style="background:linear-gradient(135deg,#ec4899,#f97316);">Phase 1</span>',
+          'Short Iron — Ball-First Contact Quality',
+          ['9-iron','PW','~10 balls'],
+          'Tee in the Ground drill: tee pushed 2 inches ahead of the ball. Clip the ball AND the tee. Forward shaft lean. Ball-first contact.',
+          '"Ball first, then ground. In that exact order."',
+          pink,
+          `<div class="exp-detail">If you clip the tee: shaft lean is correct. If you miss the tee: you're hitting ball-only or ground-first. Move ball back one position.</div>`
+        )}
+        ${expCard(
+          '<span class="girl-badge" style="background:linear-gradient(135deg,#14b8a6,#6366f1);">Phase 2</span>',
+          'Clock Drill — Full System',
+          ['PW','SW if available','~12 balls'],
+          'Full clock drill. 4 balls at 7 / 9 / 11 o\'clock. Record distances. These are her 3 scoring distances — know them cold.',
+          '"Same tempo. Same rhythm. Swing length is the only variable."',
+          teal,
+          `<div class="exp-detail">On the course: no guessing inside 100 yards. She picks the clock position that matches the distance, commits, and swings. That's a system.</div>`
+        )}
+        ${expCard(
+          '<span class="girl-badge" style="background:linear-gradient(135deg,#22c55e,#059669);">Phase 3</span>',
+          'Target Practice — Course Management',
+          ['7-iron','FW Wood','~10 balls'],
+          'Every swing at a named target. Before each shot: where\'s the trouble? Aim away from it. <strong>Hit 10 shots using the full pre-shot routine.</strong>',
+          '"Where\'s the trouble? Aim AWAY from it — every time."',
+          teal,
+          `<div class="exp-detail"><strong>Pre-shot routine (non-negotiable at Level 4):</strong> Stand behind ball → see the shot → pick target → walk in → align clubface first, then feet → one waggle → commit → swing. Every single shot.</div>`
+        )}
+      </div>
+      <div class="section">
+        <div class="section-title">🏁 Short Game Clinic</div>
+        ${expCard(
+          '<span class="girl-badge" style="background:linear-gradient(135deg,#10b981,#059669);">Short Game</span>',
+          'Chips + Lag Putts + Ring of Fire 🔥',
+          ['9-iron','Putter','15 min'],
+          '<strong>Station 1:</strong> 5 bump-and-run chips, land 3 feet onto green. <strong>Station 2:</strong> 5 lag putts from 20 feet — goal inside 3 feet. <strong>Station 3:</strong> Ring of Fire.',
+          '"Short game is where rounds are won. Own it."',
+          pink,
+          `<div class="exp-detail"><strong>Chip setup (lefty):</strong> Ball slightly back of center. Weight 70% on right (lead) foot. Narrow stance. Wrists stay quiet — shoulders do the rocking.</div>
+          <div class="exp-detail"><strong>Eyes Closed lag drill:</strong> On 2 of your 5 lag putts, close your eyes after you start the stroke. Feel the distance. This builds instinct you can't get any other way.</div>`
+        )}
+        <div class="section-title" style="margin-top:4px;">Level 4 Standards 🏆</div>
+        <div class="check-row"><span>Pump Drill warmup — <strong>every session, no exceptions</strong>.</span></div>
+        <div class="check-row"><span>Know clock-drill distances for scoring wedge by heart.</span></div>
+        <div class="check-row"><span>Full pre-shot routine on every swing, range and course.</span></div>
+        <div class="check-row"><span>Short game = minimum 15 min of every session.</span></div>
+        <div class="check-row"><span>Track pars, birdies, and putts per round. Find the pattern.</span></div>
+      </div>`;
+    }
+
+    return `<div class="section"><div class="stat-row">${statRow}</div></div>${cards}`;
   }
 
   // ── SON ROUND MODAL ─────────────────────────────────────────
