@@ -89,6 +89,25 @@
         </div>
       </div>
 
+      <!-- FAMILY MEMORIES GALLERY -->
+      <div class="section dad-sect" id="fam-memories-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div class="section-title" style="margin-bottom:0;">Family Memories</div>
+          <button class="btn-ghost" style="font-size:0.75rem;padding:6px 12px;" onclick="loadMemoriesGallery()">↺ Refresh</button>
+        </div>
+        <!-- Player filter pills -->
+        <div id="mem-filter-pills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+          <div class="pill selected" data-val="all" onclick="memFilterPill(this)" style="background:rgba(138,96,16,0.18);color:var(--gold);border:1px solid rgba(138,96,16,0.3);border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;">All</div>
+          <div class="pill" data-val="dad" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(138,96,16,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">🏌 Dad</div>
+          <div class="pill" data-val="son" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(96,165,250,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">⛳ Son</div>
+          <div class="pill" data-val="girl" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(244,114,182,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">🌸 Daughter</div>
+          <div class="pill" data-val="mom" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(242,200,121,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">🌺 Mom</div>
+        </div>
+        <div id="fam-memories-list">
+          <div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px 0;">Loading memories…</div>
+        </div>
+      </div>
+
           </div><!-- /dad-sect -->
 
       <div class="son-sect">

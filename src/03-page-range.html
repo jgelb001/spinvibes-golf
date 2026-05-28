@@ -27,6 +27,12 @@
             <button onclick="editRangeFocus()" style="background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;text-decoration:underline;">Edit</button>
           </div>
           <div id="range-focus-display"></div>
+          <!-- AI Tip from last round — injected by renderRangeAiTip() -->
+          <div id="range-ai-tip-row" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(138,96,16,0.2);">
+            <div style="font-size:0.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">🤖 AI Tip</div>
+            <div id="range-ai-tip-text" style="font-size:0.85rem;color:var(--cream);line-height:1.4;"></div>
+            <div id="range-ai-tip-date" style="font-size:0.7rem;color:var(--muted);margin-top:3px;"></div>
+          </div>
           <div id="range-focus-edit" style="display:none;margin-top:8px;">
             <div style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;">Pick 1–2 things to work on this session. Keep it specific.</div>
             <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;" id="range-focus-chips">

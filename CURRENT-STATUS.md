@@ -1,7 +1,7 @@
 # SpinVibes Golf — Current Status
 > **Update this at the end of every Cowork session.** This is the first thing to read when starting a new session. It answers: where are we, what's broken, what's next.
 
-*Last updated: 2026-05-27 (session 19 — round flow verified at TCI; guide builder caddie switched to CF Worker)*
+*Last updated: 2026-05-28 (session 21 — Sprint 5: Family Memories + Social Sharing)*
 
 ---
 
@@ -11,12 +11,12 @@
 |------|--------|
 | spinvibes.com (PWA) | ✅ Live — GitHub Pages |
 | golf.spinvibes.com (guide builder) | ✅ Live — GitHub Pages |
-| Service worker | **v89 / cache v135** |
+| Service worker | **v90 / cache v136** |
 | Stable checkpoint | **`v1.0-stable`** tag on GitHub — safe rollback before file split |
-| Last commit | Session 19: round flow test + guide caddie CF Worker migration |
+| Last commit | Session 21: Sprint 5 — Family Memories + Social Sharing |
 | Supabase | ✅ Operational |
 | Caddie proxy (PWA) | ✅ CF Worker at `spinvibes-caddie.spinvibes.workers.dev` (WORKER_SECRET set) |
-| Caddie proxy (guide) | ✅ CF Worker — guide.html updated + committed to GitHub. ⚠️ **Jeremy must run `npx wrangler deploy` from `caddie-worker/` to add `golf.spinvibes.com` to ALLOWED_ORIGINS** |
+| Caddie proxy (guide) | ✅ CF Worker — `golf.spinvibes.com` in ALLOWED_ORIGINS, deployed ✅ |
 | Netlify | No longer used for caddie — credits were exhausted. Only `send-guide-email` function remains on Netlify |
 
 ---
@@ -32,6 +32,54 @@
 
 ---
 
+## What Was Just Finished (Session 21 — May 28, 2026)
+
+### Sprint 5 — Family Memories + Social Sharing ✅
+
+| Item | Result |
+|------|--------|
+| Supabase Storage `round-photos` bucket | ✅ Setup SQL provided — Jeremy runs in Supabase |
+| Photo picker — camera + roll | ✅ Two buttons: 📷 Camera (`capture="environment"`) + 🖼️ Roll (no capture). Both feed `famLoadHolePhoto()`. |
+| Family Memories gallery on Home tab | ✅ New "Family Memories" section in Dad view with player filter pills (All/Dad/Son/Daughter/Mom). Shows rounds with date, scores, photo count. Horizontal photo strip for rounds with photos. Tap round → `viewFamRound()`. Loads on Home tab activation. |
+| Canvas recap card builder | ✅ `shareRecapCard()` — draws 800×(780-1000)px PNG: SpinVibes Golf header, course name, player score chips, winner banner, mini scorecard table, photo strip (up to 3 photos if present). |
+| Web Share API | ✅ `navigator.canShare()` check → share on mobile, download fallback on desktop. Share button added to family scorecard summary. |
+| AI range tip — post-round | ✅ `generatePostRoundRangeTip()` fires async after family round save (Dad only). CF Worker → 1-sentence tip → `sv-range-ai-tip` in localStorage → shown in Range tab Today's Focus card under "🤖 AI Tip". |
+| `renderRangeAiTip()` | ✅ Called on Range tab load + after tip generates. Displays tip text + "After [course] · [date]" label. |
+| SW bumped | v90 / cache v136 |
+
+**How the photo flow works:** Hole photo captured → base64 in `_famHoles[i].photo` → on round save, `uploadRoundPhotos()` uploads each to `round-photos/[uuid]/hole-N.jpg` → replaces with public URL → URL stored in `family_rounds.holes[].photo` in Supabase.
+
+**⚠️ Requires:** Supabase Storage bucket `round-photos` (public) + anon upload/read policies. SQL provided in session — Jeremy must run this before photo persistence works.
+
+---
+
+## What Was Just Finished (Session 20 — May 27, 2026)
+
+### AI Coaching Plans + Level-Gated Kids Range Content ✅
+
+| Item | Result |
+|------|--------|
+| `guide_users.coaching_plan` column | ✅ Added via Supabase SQL |
+| `buildCoachingSystemPrompt(a)` | ✅ Full PGA-grounded prompt — all goals, all age groups, LH reversal |
+| Goal-specific context | ✅ fun/social/fitness · break120 · break100 · break90 · break80 · compete — each with its own scoring math + strategy |
+| Age voice branches | ✅ Junior (simple/games/celebrate effort) · Teen (explain the why, respect) · Senior (tempo/energy) · Adult (default) |
+| CF Worker coaching call | ✅ `generateCoachingPlan()` in index.html — called before Supabase INSERT, plan stored in `coaching_plan` column |
+| guide.html `_coachingPlan` | ✅ Loaded from Supabase in `initGuide()`, displayed in Coach's Brief if present; falls back to hardcoded content |
+| Son range — level-gated | ✅ L1/L2/L3/L4 each render a fully different session (balls, phases, drills, cues) via `renderSonRangeBody()` |
+| Girl range — level-gated | ✅ L1/L2/L3/L4 each render a fully different session (LH cues throughout) via `renderGirlRangeBody()` |
+| Level badge re-renders body | ✅ `updateRangeLevelBadge()` now calls render — promote a kid and range content updates instantly |
+| Both repos pushed | ✅ spinvibes.com + golf.spinvibes.com both live |
+
+**How the coaching plan generates:** User completes wizard → "Building your plan…" → CF Worker calls Claude Haiku with PGA-grounded system prompt → ~200-word personalized brief → stored in Supabase → displayed in Coach's Brief on guide load. Fallback to hardcoded content if generation fails or on legacy links.
+
+**Kids range progression (Son — RH · Girl — LH):**
+- L1: Contact games, distance explorer, putting vs account holder. Fun only, no technique.
+- L2: Grip check, 9-to-3 drill, clock drill intro, Ring of Fire.
+- L3: Pump Drill warmup, Tee in Ground, full clock drill, course management challenge, lag putting.
+- L4: Full complexity — alignment station, shaft lean drills, clock drill system, pre-shot routine, stats tracking.
+
+---
+
 ## What Was Just Finished (Session 19 — May 27, 2026)
 
 ### Round Flow Test + Guide Builder Caddie Migration ✅
@@ -39,14 +87,11 @@
 | Item | Result |
 |------|--------|
 | Round flow test (TCI Oaks+Creek) | ✅ Full pass — PIN, course select, hole scoring, scorecard, caddie all working |
-| CF Worker `ALLOWED_ORIGINS` | ✅ Added `golf.spinvibes.com` to `caddie-worker/worker.js` |
-| guide.html caddie URL | ✅ Switched from Netlify to `https://spinvibes-caddie.spinvibes.workers.dev` |
-| guide.html request body | ✅ Updated to CF Worker format: `{ systemPrompt, messages: [{role, content}], max_tokens: 60 }` |
-| guide.html commit | ✅ Committed to GitHub — "Switch guide caddie from Netlify to CF Worker" |
-| Netlify deploy | ✅ golf.spinvibes.com auto-deployed ~60s after commit |
-| CF Worker deploy | ⚠️ **Jeremy still needs to run:** `cd ~/Documents/SpinVibes/Golf/spinvibes-golf/caddie-worker && npx wrangler deploy` |
+| CF Worker `ALLOWED_ORIGINS` | ✅ Added `golf.spinvibes.com` — deployed ✅ |
+| guide.html caddie URL | ✅ Switched from Netlify to CF Worker |
+| guide.html request body | ✅ Updated to CF Worker format |
 
-**Rate limiting note:** Guide builder users get `max_tokens: 60` (vs Jeremy's 80 in the PWA) + existing 7-second cooldown between calls. Jeremy has no cooldown or token cap in the PWA.
+**Rate limiting note:** Guide builder users get `max_tokens: 60` (vs Jeremy's 80 in the PWA) + existing 7-second cooldown. Jeremy has no cooldown or cap in the PWA.
 
 ---
 
@@ -188,21 +233,14 @@ All open questions from the roadmap resolved. Key decisions:
 
 ---
 
-## Next Up — Sprint 5 (PWA): Family Memories + Social Sharing
+## Next Up — Sprint 6: Multi-User Auth + Onboarding
 
-**Goal:** capture real memories from rounds and make them shareable. Fully scoped — ready to build.
+**Goal:** Real Supabase auth (email/magic link), user profiles, family onboarding wizard. Replace localStorage PIN system with proper auth + RLS.
 
-**Build order:**
-1. Supabase Storage bucket + RLS policy + signed URL generation
-2. Wire `uploadRoundPhotos()` to actually persist (already scaffolded, currently in-memory only)
-3. Canvas recap card builder — 5 templates (full scorecard+gallery / hole+overlay / course logo / hole badge / app overlay)
-4. Web Share API — native share sheet on mobile; download fallback on desktop
-5. Family gallery / Memories section on Home tab (by date, filterable by player/course)
-6. AI range suggestion — post-round Caddie call → focus area stored in localStorage, shown on Range tab
-
-**Also queued (Sprint 4B — small cleanup before Sprint 5 or during):**
+**Also queued (Sprint 5B cleanup — small items before Sprint 6):**
 - Account holder language audit: rename "Dad-only" PROMOTE button and all "Dad" framing to "account holder"
 - Skill milestone auto-detection: flag first par / first birdie in son/girl rounds for level-up trigger
+- Pricing research + monetization page (one-time unlock + family add-ons)
 
 ---
 
@@ -216,8 +254,8 @@ All open questions from the roadmap resolved. Key decisions:
 | 3B | Round type differentiation + mobile stroke fix | ✅ DONE |
 | 4 | Kids leveling system (Level 1→4 progression) | ✅ DONE |
 | 4 | Kids leveling system (Level 1→4 progression) | ✅ DONE |
-| 5 | Family memories + social sharing (photos, recap cards) | **← YOU ARE HERE** |
-| 6 | Multi-user auth + real Supabase profiles + family onboarding | Queued |
+| 5 | Family memories + social sharing (photos, recap cards) | ✅ DONE |
+| 6 | Multi-user auth + real Supabase profiles + family onboarding | **← YOU ARE HERE** |
 | 7 | App Store via Capacitor | Queued |
 
 ---

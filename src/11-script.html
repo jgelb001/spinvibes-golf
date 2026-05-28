@@ -639,6 +639,11 @@
     if (id === 'range') {
       updateRangeLevelBadge('son');
       updateRangeLevelBadge('girl');
+      loadRangeFocus();
+      renderRangeAiTip();
+    }
+    if (id === 'home' && currentProfile === 'dad') {
+      loadMemoriesGallery();
     }
     if (id === 'mom-progress') {
       if (sessionStorage.getItem('sv-mom-unlocked') !== '1') {
@@ -4027,6 +4032,70 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     }
   }
 
+  // ── FAMILY MEMORIES GALLERY ───────────────────────────────────
+  let _memFilter = 'all';
+
+  function memFilterPill(el) {
+    _memFilter = el.dataset.val;
+    document.querySelectorAll('#mem-filter-pills .pill').forEach(p => {
+      const active = p === el;
+      p.classList.toggle('selected', active);
+      p.style.color    = active ? 'var(--gold)' : 'var(--muted)';
+      p.style.background = active ? 'rgba(138,96,16,0.18)' : p.style.background.replace('0.18','0.08');
+      p.style.borderColor = active ? 'rgba(138,96,16,0.3)' : 'rgba(255,255,255,0.08)';
+    });
+    loadMemoriesGallery();
+  }
+
+  async function loadMemoriesGallery() {
+    const listEl = document.getElementById('fam-memories-list');
+    if (!listEl) return;
+    listEl.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px 0;">Loading…</div>';
+    try {
+      let rounds = await loadFamilyRounds();
+      if (!rounds || rounds.length === 0) {
+        listEl.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:24px 0;">No family rounds yet — start one! ⛳</div>';
+        return;
+      }
+      if (_memFilter !== 'all') {
+        rounds = rounds.filter(r => (r.players || []).includes(_memFilter));
+      }
+      if (rounds.length === 0) {
+        listEl.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:24px 0;">No rounds for this player yet.</div>';
+        return;
+      }
+      listEl.innerHTML = rounds.map(r => {
+        const totals  = r.totals || {};
+        const players = r.players || [];
+        const photos  = (r.holes || []).map(h => h.photo).filter(p => p && p.startsWith('http'));
+        const chips   = players.map(pk => {
+          const p = FAM_PLAYERS[pk];
+          if (!p) return '';
+          return `<span style="background:${p.bg};color:${p.color};padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:700;">${p.emoji} ${totals[pk] ?? '?'}</span>`;
+        }).join('');
+        const photoStrip = photos.length ? `
+          <div style="display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+            ${photos.map(src => `<img src="${src}" loading="lazy"
+              style="width:72px;height:72px;object-fit:cover;border-radius:8px;flex-shrink:0;border:1px solid rgba(138,96,16,0.25);cursor:pointer;"
+              onclick="event.stopPropagation();_showPhotoOverlay('${src}')">`).join('')}
+          </div>` : '';
+        return `<div style="background:var(--surface);border-radius:12px;padding:12px 14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.05);">
+          <div onclick="viewFamRound(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:0.88rem;color:var(--cream);">${r.course_name}</div>
+              <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">${r.date_played}${photos.length ? ` · 📷 ${photos.length}` : ''}</div>
+            </div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;max-width:160px;">${chips}</div>
+            <div style="color:var(--muted);font-size:0.9rem;">›</div>
+          </div>
+          ${photoStrip}
+        </div>`;
+      }).join('');
+    } catch(e) {
+      listEl.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px 0;">Could not load — check signal</div>';
+    }
+  }
+
   async function loadFamHistory() {
     const listEl = document.getElementById('fam-history-list');
     if (!listEl) return;
@@ -4179,12 +4248,12 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       <div id="fam-player-rows" style="background:var(--surface);border-radius:12px;padding:4px 14px;">${playerRows}</div>
 
       <!-- HOLE PHOTO -->
-      <div style="margin-top:14px;display:flex;align-items:center;gap:10px;">
-        <input type="file" id="fam-hole-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="famLoadHolePhoto(this)">
-        <button onclick="document.getElementById('fam-hole-photo-input').click()" style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:10px;padding:10px;color:var(--muted);font-size:0.82rem;cursor:pointer;">
-          ${h.photo ? '\ud83d\udcf7 Change Photo' : '\ud83d\udcf7 Add Hole Photo'}
-        </button>
-        ${h.photo ? `<img src="${h.photo}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid rgba(138,96,16,0.3);" onclick="famViewPhoto()">` : ''}
+      <input type="file" id="fam-hole-photo-camera" accept="image/*" capture="environment" style="display:none;" onchange="famLoadHolePhoto(this)">
+      <input type="file" id="fam-hole-photo-roll" accept="image/*" style="display:none;" onchange="famLoadHolePhoto(this)">
+      <div style="margin-top:14px;display:flex;align-items:center;gap:8px;">
+        <button onclick="document.getElementById('fam-hole-photo-camera').click()" style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:10px;padding:10px;color:var(--muted);font-size:0.82rem;cursor:pointer;">\ud83d\udcf7 Camera</button>
+        <button onclick="document.getElementById('fam-hole-photo-roll').click()" style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:10px;padding:10px;color:var(--muted);font-size:0.82rem;cursor:pointer;">\ud83d\uddbc\ufe0f Roll</button>
+        ${h.photo ? `<img src="${h.photo}" style="width:52px;height:52px;object-fit:cover;border-radius:8px;border:2px solid var(--gold);flex-shrink:0;cursor:pointer;" onclick="famViewPhoto()">` : ''}
       </div>
 
       <div class="modal-nav-row" style="margin-top:16px;">
@@ -4293,6 +4362,258 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     if (_famHoleIdx > 0) { _famHoleIdx--; renderFamHole(); }
   }
 
+  // ── RECAP CARD BUILDER ───────────────────────────────────────
+  function _loadImg(src) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload  = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = src;
+    });
+  }
+
+  async function shareRecapCard() {
+    const btn = document.getElementById('fam-share-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Building…'; }
+
+    try {
+      const players  = _famRound.players || [];
+      const totals   = {};
+      players.forEach(pk => { totals[pk] = 0; });
+      _famHoles.forEach(h => players.forEach(pk => { totals[pk] += h.scores[pk] || 0; }));
+      const totalPar = _famHoles.reduce((a, h) => a + h.par, 0);
+      const minScore = Math.min(...players.map(pk => totals[pk]));
+      const winners  = players.filter(pk => totals[pk] === minScore);
+      const winMsg   = winners.length === players.length ? '🤝 All Tied!'
+        : '🏆 ' + winners.map(pk => FAM_PLAYERS[pk].name).join(' & ') + (winners.length === 1 ? ' wins!' : ' tie!');
+
+      // Collect photos (up to 3)
+      const photoUrls = _famHoles.map(h => h.photo).filter(p => p && p.startsWith('http')).slice(0, 3);
+      const hasPhotos = photoUrls.length > 0;
+
+      // Canvas dimensions
+      const W = 800, H = hasPhotos ? 1000 : 780;
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+
+      // --- Background ---
+      ctx.fillStyle = '#16120d';
+      ctx.fillRect(0, 0, W, H);
+
+      // Gold top bar
+      const grad = ctx.createLinearGradient(0, 0, W, 0);
+      grad.addColorStop(0, '#8a6010');
+      grad.addColorStop(0.5, '#d4af70');
+      grad.addColorStop(1, '#8a6010');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, 6);
+      ctx.fillRect(0, H - 6, W, 6);
+
+      // --- SPINVIBES GOLF header ---
+      ctx.fillStyle = '#d4af70';
+      ctx.font = '600 22px "Outfit", Arial, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('🏌 SPINVIBES GOLF', 48, 54);
+      ctx.fillStyle = '#8a7a5a';
+      ctx.font = '400 15px "Outfit", Arial, sans-serif';
+      ctx.fillText('spinvibes.com', W - 48, 54);
+      ctx.textAlign = 'left';
+
+      // Divider
+      ctx.strokeStyle = 'rgba(212,175,112,0.2)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(48, 68); ctx.lineTo(W - 48, 68); ctx.stroke();
+
+      // --- Course name ---
+      ctx.fillStyle = '#f5f0e8';
+      ctx.font = 'bold 52px "Bebas Neue", Impact, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(_famRound.course_name.toUpperCase(), W / 2, 140);
+
+      // Date + par
+      ctx.fillStyle = '#8a7a5a';
+      ctx.font = '400 18px "Outfit", Arial, sans-serif';
+      ctx.fillText(`${_famRound.date_played}  ·  Par ${totalPar}`, W / 2, 170);
+
+      // Divider
+      ctx.strokeStyle = 'rgba(212,175,112,0.15)';
+      ctx.beginPath(); ctx.moveTo(48, 192); ctx.lineTo(W - 48, 192); ctx.stroke();
+
+      // --- Player score chips ---
+      const chipW = Math.min(160, (W - 96) / players.length - 12);
+      const chipStartX = (W - (players.length * (chipW + 12) - 12)) / 2;
+      const chipY = 215;
+      const playerColors = { dad:'#8a6010', son:'#60a5fa', girl:'#f472b6', mom:'#f2c879', grandma:'#d4af70' };
+      const playerBgs    = { dad:'rgba(138,96,16,0.25)', son:'rgba(96,165,250,0.2)', girl:'rgba(244,114,182,0.2)', mom:'rgba(242,200,121,0.2)', grandma:'rgba(212,175,112,0.2)' };
+
+      players.forEach((pk, i) => {
+        const p = FAM_PLAYERS[pk];
+        if (!p) return;
+        const cx = chipStartX + i * (chipW + 12);
+        const isWinner = winners.includes(pk);
+
+        // Chip background
+        ctx.fillStyle = playerBgs[pk] || 'rgba(255,255,255,0.08)';
+        _roundRect(ctx, cx, chipY, chipW, 88, 12);
+        ctx.fill();
+
+        // Winner border glow
+        if (isWinner) {
+          ctx.strokeStyle = '#d4af70';
+          ctx.lineWidth = 2;
+          _roundRect(ctx, cx, chipY, chipW, 88, 12);
+          ctx.stroke();
+        }
+
+        // Emoji
+        ctx.font = '28px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(p.emoji, cx + chipW / 2, chipY + 36);
+
+        // Name
+        ctx.fillStyle = '#f5f0e8';
+        ctx.font = '600 14px "Outfit", Arial, sans-serif';
+        ctx.fillText(p.name, cx + chipW / 2, chipY + 58);
+
+        // Score
+        ctx.font = 'bold 32px "Bebas Neue", Impact, Arial, sans-serif';
+        ctx.fillStyle = playerColors[pk] || '#d4af70';
+        ctx.fillText(String(totals[pk] ?? '?'), cx + chipW / 2, chipY + 86);
+      });
+
+      // --- Winner banner ---
+      ctx.fillStyle = '#d4af70';
+      ctx.font = 'bold 28px "Outfit", Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(winMsg, W / 2, 360);
+
+      // Divider
+      ctx.strokeStyle = 'rgba(212,175,112,0.15)';
+      ctx.beginPath(); ctx.moveTo(48, 380); ctx.lineTo(W - 48, 380); ctx.stroke();
+
+      // --- Scorecard mini table ---
+      const tableStartY = 405;
+      const rowH = 26;
+      const col0W = 80;
+      const colW  = (W - 96 - col0W) / players.length;
+
+      // Header row
+      ctx.fillStyle = 'rgba(212,175,112,0.1)';
+      ctx.fillRect(48, tableStartY, W - 96, rowH);
+      ctx.fillStyle = '#8a7a5a';
+      ctx.font = '600 12px "Outfit", Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('HOLE', 48 + col0W / 2, tableStartY + 18);
+      players.forEach((pk, i) => {
+        const p = FAM_PLAYERS[pk];
+        ctx.fillStyle = playerColors[pk] || '#d4af70';
+        ctx.fillText(p ? p.name.toUpperCase() : pk, 48 + col0W + i * colW + colW / 2, tableStartY + 18);
+      });
+
+      // Hole rows
+      _famHoles.forEach((h, idx) => {
+        const y = tableStartY + (idx + 1) * rowH;
+        if (idx % 2 === 0) {
+          ctx.fillStyle = 'rgba(255,255,255,0.03)';
+          ctx.fillRect(48, y, W - 96, rowH);
+        }
+        ctx.fillStyle = '#8a7a5a';
+        ctx.font = '400 12px "Outfit", Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`H${h.hole} P${h.par}`, 48 + col0W / 2, y + 18);
+        players.forEach((pk, i) => {
+          const score = h.scores[pk] || 0;
+          const diff  = score - h.par;
+          ctx.fillStyle = diff <= -1 ? '#fbbf24' : diff === 0 ? '#f5f0e8' : diff === 1 ? '#f5f0e8' : '#ef4444';
+          ctx.font = diff <= -1 ? 'bold 12px "Outfit", Arial' : '400 12px "Outfit", Arial';
+          ctx.fillText(String(score), 48 + col0W + i * colW + colW / 2, y + 18);
+        });
+      });
+
+      // Total row
+      const totalY = tableStartY + (_famHoles.length + 1) * rowH;
+      ctx.fillStyle = 'rgba(212,175,112,0.12)';
+      ctx.fillRect(48, totalY, W - 96, rowH);
+      ctx.fillStyle = '#d4af70';
+      ctx.font = 'bold 13px "Outfit", Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('TOTAL', 48 + col0W / 2, totalY + 18);
+      players.forEach((pk, i) => {
+        ctx.fillStyle = playerColors[pk] || '#d4af70';
+        ctx.font = 'bold 13px "Outfit", Arial, sans-serif';
+        ctx.fillText(String(totals[pk]), 48 + col0W + i * colW + colW / 2, totalY + 18);
+      });
+
+      // --- Photos strip ---
+      if (hasPhotos) {
+        const photoY = H - 180;
+        ctx.strokeStyle = 'rgba(212,175,112,0.15)';
+        ctx.beginPath(); ctx.moveTo(48, photoY - 16); ctx.lineTo(W - 48, photoY - 16); ctx.stroke();
+        ctx.fillStyle = '#8a7a5a';
+        ctx.font = '400 13px "Outfit", Arial, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('ROUND PHOTOS', 48, photoY);
+
+        const imgs = await Promise.all(photoUrls.map(u => _loadImg(u)));
+        const ph = 140, pw = Math.floor((W - 96 - (photoUrls.length - 1) * 10) / photoUrls.length);
+        imgs.forEach((img, i) => {
+          if (!img) return;
+          const px = 48 + i * (pw + 10);
+          const py = photoY + 10;
+          ctx.save();
+          _roundRect(ctx, px, py, pw, ph, 8);
+          ctx.clip();
+          // Draw image maintaining aspect ratio (cover)
+          const ar = img.width / img.height;
+          let dw = pw, dh = ph, dx = px, dy = py;
+          if (ar > pw / ph) { dh = ph; dw = ph * ar; dx = px - (dw - pw) / 2; }
+          else { dw = pw; dh = pw / ar; dy = py - (dh - ph) / 2; }
+          ctx.drawImage(img, dx, dy, dw, dh);
+          ctx.restore();
+        });
+      }
+
+      // --- Convert and share ---
+      canvas.toBlob(async blob => {
+        const filename = `spinvibes-${(_famRound.course_name||'round').replace(/\s+/g,'-').toLowerCase()}-${_famRound.date_played||''}.png`;
+        try {
+          if (navigator.canShare && navigator.canShare({ files: [new File([blob], filename, { type: 'image/png' })] })) {
+            await navigator.share({ files: [new File([blob], filename, { type: 'image/png' })], title: `SpinVibes Golf — ${_famRound.course_name}` });
+          } else {
+            // Desktop fallback: download
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            a.click();
+          }
+        } catch(e) {
+          // Share cancelled — do nothing
+        }
+        if (btn) { btn.disabled = false; btn.textContent = '📤 Share'; }
+      }, 'image/png');
+
+    } catch(e) {
+      console.warn('Recap card error:', e);
+      if (btn) { btn.disabled = false; btn.textContent = '📤 Share'; }
+    }
+  }
+
+  function _roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
   function renderFamSummary() {
     document.getElementById('fam-modal-label').textContent = 'Scorecard';
     document.getElementById('fam-running-bar').style.display = 'none';
@@ -4342,7 +4663,10 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       </div>
       <div id="fam-save-status" style="margin-top:14px;"></div>
       <button class="btn-primary" style="width:100%;margin-top:12px;" onclick="saveFamRound(this)">Save to My Game \u2713</button>
-      <button class="btn-ghost"   style="width:100%;margin-top:8px;"  onclick="closeFamilyModal()">Done</button>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn-ghost" style="flex:1;" onclick="closeFamilyModal()">Done</button>
+        <button class="btn-ghost" style="flex:1;" id="fam-share-btn" onclick="shareRecapCard()">\ud83d\udce4 Share</button>
+      </div>
     `;
   }
 
@@ -4584,9 +4908,55 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     }
     btn.textContent = failed.length === 0 ? 'Saved! \u2713' : 'Partial Save';
     if (failed.length === 0) btn.disabled = false;
+
+    // Fire AI range tip async (Dad only, non-blocking)
+    if (players.includes('dad')) {
+      const dadScore  = totals['dad'] || 0;
+      const diffStr   = dadScore - _famRound.course_par;
+      const diffLabel = diffStr === 0 ? 'even par' : (diffStr > 0 ? `+${diffStr}` : `${diffStr}`);
+      generatePostRoundRangeTip(dadScore, _famRound.course_par, diffLabel, _famRound.course_name);
+    }
   }
 
-  // ── ADD COURSE OVERLAY ───────────────────────────────────────
+  async function generatePostRoundRangeTip(score, par, diffLabel, courseName) {
+    try {
+      const systemPrompt = `You are a concise golf coach. Based on the round data, output ONE range focus recommendation in a single sentence of 20 words or fewer. Start exactly with "Today at the range, focus on". No punctuation other than a period at the end.`;
+      const userMsg = `Round: ${courseName}, score ${score} (${diffLabel} vs par ${par}). What should this player work on at the range?`;
+      const resp = await fetch(CADDIE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-SpinVibes-Token': WORKER_SECRET },
+        body: JSON.stringify({
+          systemPrompt,
+          messages: [{ role: 'user', content: userMsg }],
+          max_tokens: 60,
+        })
+      });
+      if (!resp.ok) return;
+      const data = await resp.json();
+      const tip = (data?.reply || '').trim();
+      if (tip) {
+        localStorage.setItem('sv-range-ai-tip', JSON.stringify({ tip, date: new Date().toISOString().split('T')[0], course: courseName }));
+        renderRangeAiTip();
+      }
+    } catch(e) { /* non-fatal */ }
+  }
+
+  function renderRangeAiTip() {
+    const el = document.getElementById('range-ai-tip-text');
+    if (!el) return;
+    try {
+      const stored = JSON.parse(localStorage.getItem('sv-range-ai-tip'));
+      if (stored && stored.tip) {
+        el.textContent = stored.tip;
+        const dateEl = document.getElementById('range-ai-tip-date');
+        if (dateEl) dateEl.textContent = stored.course ? `After ${stored.course} · ${stored.date}` : stored.date;
+        const row = document.getElementById('range-ai-tip-row');
+        if (row) row.style.display = '';
+      }
+    } catch(e) { /* no tip stored */ }
+  }
+
+  // ── ADD COURSE OVERLAY ───────────────────────────────────────────
   let _addCourseContext = 'dad'; // which modal opened the overlay
   let _parsedCourse    = null;
 
