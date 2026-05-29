@@ -11,9 +11,9 @@
 |------|--------|
 | spinvibes.com (PWA) | ✅ Live — GitHub Pages |
 | golf.spinvibes.com (guide builder) | ✅ Live — GitHub Pages |
-| Service worker | **v90 / cache v136** |
+| Service worker | **v92 / cache v138** |
 | Stable checkpoint | **`v1.0-stable`** tag on GitHub — safe rollback before file split |
-| Last commit | Session 21: Sprint 5 — Family Memories + Social Sharing |
+| Last commit | Session 22: Sprint 5B cleanup — share card redesign + language audit + milestones |
 | Supabase | ✅ Operational |
 | Caddie proxy (PWA) | ✅ CF Worker at `spinvibes-caddie.spinvibes.workers.dev` (WORKER_SECRET set) |
 | Caddie proxy (guide) | ✅ CF Worker — `golf.spinvibes.com` in ALLOWED_ORIGINS, deployed ✅ |
@@ -29,6 +29,21 @@
 | Next goal | Break 90 — 3 strokes away |
 | Bag | Callaway Driver + 7-wood. Vice Boost 4H + irons (Takomo still arriving). Callaway Opus 50°/56°/60° wedges. Odyssey Ai-ONE #7 putter ⚠️ weights too heavy — returning to lighter config |
 | Pin | 4417 |
+
+---
+
+## What Was Just Finished (Session 22 — May 29, 2026)
+
+### Sprint 5B Cleanup ✅
+
+| Item | Result |
+|------|--------|
+| Share card redesign | ✅ All 3 templates rebuilt: Full Scorecard (logo centered, collage BG, no URL), Hole Highlight (full-bleed photo, gold inset frame, logo badge TR, compact chips, no emojis), Best Moment (player picker — choose whose best hole, same photo frame treatment) |
+| Logo — no EST. 2024 | ✅ `spinvibes_logo_no_est.png` created via Python bg-removal + crop. Added to PWA as `spinvibes_logo.png`. |
+| Best Moment player picker | ✅ `_showBestMomentPickerSheet()` — shows all players with their auto-detected best hole + achievement label. Calls `pickPlayerAndShareBest(pk)` → `_buildBestMomentCard(playerKey)`. |
+| Account holder language | ✅ "Dad-level complexity" → "Pro-level complexity". PROMOTE button now only visible when `currentProfile === 'dad'`. Code comments updated. |
+| First par/birdie milestone | ✅ `checkKidMilestones(who, holes)` — detects first-ever par/birdie per kid, fires gold toast, sets `sv-[who]-first-birdie` / `sv-[who]-first-par` flags in localStorage. Called on son solo rounds + family rounds. |
+| SW bumped | v92 / cache v138 |
 
 ---
 

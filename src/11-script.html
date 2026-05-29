@@ -68,7 +68,7 @@
     1: { name: 'Just for Fun', emoji: '🌟', color: '#ec4899', desc: 'Make contact, celebrate every shot, no rules.', nextLabel: 'Getting the Hang of It', nextTrigger: '3 rounds played', roundsNeeded: 3 },
     2: { name: 'Getting the Hang of It', emoji: '⚡', color: '#3b82f6', desc: 'Basic swing mechanics, count pars, intro to rules.', nextLabel: 'Learning the Game', nextTrigger: '5 rounds + first par', roundsNeeded: 5 },
     3: { name: 'Learning the Game', emoji: '🎯', color: '#22c55e', desc: 'Full stats, approach tracking, strategy, real scoring.', nextLabel: 'Getting Serious', nextTrigger: '8 rounds + first birdie', roundsNeeded: 8 },
-    4: { name: 'Getting Serious', emoji: '🏆', color: '#c8922a', desc: 'Dad-level complexity. Tournament ready.', nextLabel: null, nextTrigger: null, roundsNeeded: null },
+    4: { name: 'Getting Serious', emoji: '🏆', color: '#c8922a', desc: 'Pro-level complexity. Tournament ready.', nextLabel: null, nextTrigger: null, roundsNeeded: null },
   };
 
   // ── CADDIE — swap this URL after deploying the Cloudflare Worker ──────────
@@ -2915,7 +2915,7 @@
                 <div style="font-size:1rem;font-weight:700;color:var(--cream);line-height:1.1;">${def.name}</div>
               </div>
             </div>
-            ${level < 4 ? `<button onclick="adminLevelUp('${who}')" style="background:none;border:1px solid ${color}70;border-radius:8px;padding:5px 10px;color:${color};font-size:0.68rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;white-space:nowrap;">PROMOTE ▲</button>` : '<span style="font-size:0.75rem;color:var(--gold);font-weight:700;">MAX LEVEL 🏆</span>'}
+            ${level < 4 ? (currentProfile==='dad' ? `<button onclick="adminLevelUp('${who}')" style="background:none;border:1px solid ${color}70;border-radius:8px;padding:5px 10px;color:${color};font-size:0.68rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;white-space:nowrap;">PROMOTE ▲</button>` : '') : '<span style="font-size:0.75rem;color:var(--gold);font-weight:700;">MAX LEVEL</span>'}
           </div>
           <div style="font-size:0.8rem;color:var(--muted);margin-top:6px;">${def.desc}</div>
           ${progressHtml}
@@ -2923,7 +2923,7 @@
       </div>`;
   }
 
-  // Dad manually promotes a kid — requires confirmation
+  // Account holder promotes a kid — requires confirmation
   function adminLevelUp(who) {
     const current = getKidLevel(who);
     if (current >= 4) { showToast('Already at max level! 🏆'); return; }
@@ -2949,6 +2949,45 @@
       const name = who === 'son' ? 'Son' : 'Daughter';
       setTimeout(() => showToast(`🌟 ${name} has enough rounds for Level ${current + 1}! Check their progress page.`, 'gold'), 800);
     }
+  }
+
+  // Check for first-ever par / birdie milestones on a kid round
+  // Fires a celebratory toast the very first time it happens — does not auto-promote
+  function checkKidMilestones(who, holes) {
+    if (!holes || !holes.length) return;
+    const name = who === 'son' ? 'Son' : 'Daughter';
+
+    // First birdie (score <= par - 1 on any hole)
+    const hasBirdie = holes.some(h => {
+      const par   = h.par   || h.course_par || 3;
+      const score = h.score || (h.scores && h.scores[who]) || 0;
+      return score > 0 && score <= par - 1;
+    });
+    if (hasBirdie && !localStorage.getItem('sv-' + who + '-first-birdie')) {
+      localStorage.setItem('sv-' + who + '-first-birdie', new Date().toISOString().split('T')[0]);
+      setTimeout(() => showToast('🌿 First Birdie for ' + name + '! Amazing round!', 'gold'), 600);
+      // Also flag for level-up consideration
+      localStorage.setItem('sv-' + who + '-milestone-birdie', '1');
+    }
+
+    // First par (score === par on any hole, if no birdie already flagged)
+    if (!localStorage.getItem('sv-' + who + '-first-par')) {
+      const hasPar = holes.some(h => {
+        const par   = h.par   || h.course_par || 3;
+        const score = h.score || (h.scores && h.scores[who]) || 0;
+        return score > 0 && score === par;
+      });
+      if (hasPar) {
+        localStorage.setItem('sv-' + who + '-first-par', new Date().toISOString().split('T')[0]);
+        if (!hasBirdie) {
+          setTimeout(() => showToast('🎯 First Par for ' + name + '! Keep it up!', 'gold'), 600);
+        }
+        localStorage.setItem('sv-' + who + '-milestone-par', '1');
+      }
+    }
+
+    // After milestones, re-check auto level-up threshold
+    // (milestone flags are considered alongside round count in future Sprint 6)
   }
 
   // Full-screen level up ceremony
@@ -3896,6 +3935,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
     try {
       await saveSonRound(roundObj);
+      checkKidMilestones('son', _sonHoles);
       showToast('Round saved! ✓');
       closeSonModal();
       loadSonRoundsAndRender();
@@ -5235,7 +5275,11 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     btn.textContent = failed.length === 0 ? 'Saved! \u2713' : 'Partial Save';
     if (failed.length === 0) btn.disabled = false;
 
-    // Fire AI range tip async (Dad only, non-blocking)
+    // Check kid milestones for son/girl in family rounds
+    if (players.includes('son'))  checkKidMilestones('son',  _famHoles);
+    if (players.includes('girl')) checkKidMilestones('girl', _famHoles);
+
+    // Fire AI range tip async (account holder only, non-blocking)
     if (players.includes('dad')) {
       const dadScore  = totals['dad'] || 0;
       const diffStr   = dadScore - _famRound.course_par;
