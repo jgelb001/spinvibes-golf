@@ -88,10 +88,158 @@
 
   // ── KID LEVELS — declared at top to prevent TDZ when updateRangeLevelBadge() runs at init ──
   const KID_LEVELS = {
-    1: { name: 'Just for Fun', emoji: '🌟', color: '#ec4899', desc: 'Make contact, celebrate every shot, no rules.', nextLabel: 'Getting the Hang of It', nextTrigger: '3 rounds played', roundsNeeded: 3 },
-    2: { name: 'Getting the Hang of It', emoji: '⚡', color: '#3b82f6', desc: 'Basic swing mechanics, count pars, intro to rules.', nextLabel: 'Learning the Game', nextTrigger: '5 rounds + first par', roundsNeeded: 5 },
-    3: { name: 'Learning the Game', emoji: '🎯', color: '#22c55e', desc: 'Full stats, approach tracking, strategy, real scoring.', nextLabel: 'Getting Serious', nextTrigger: '8 rounds + first birdie', roundsNeeded: 8 },
-    4: { name: 'Getting Serious', emoji: '🏆', color: '#c8922a', desc: 'Pro-level complexity. Tournament ready.', nextLabel: null, nextTrigger: null, roundsNeeded: null },
+    0: { name: 'Fresh Caddie',    emoji: '🎒', color: '#888780', desc: 'Welcome to the game. Everything starts here.', nextLabel: 'Grip & Ripper', nextTrigger: '4 activity points', roundsNeeded: 0 },
+    1: { name: 'Grip & Ripper',   emoji: '🏌', color: '#639922', desc: 'Just hit it. No form, no distance, no rules. Pure fun.', nextLabel: 'Ball Finder', nextTrigger: '12 pts + first round + check-in', roundsNeeded: 1 },
+    2: { name: 'Ball Finder',     emoji: '🔍', color: '#1D9E75', desc: 'Contact getting consistent. Noticing distance. Putting starts here.', nextLabel: 'Straight Shooter', nextTrigger: '25 pts + Contact Challenge + check-in', roundsNeeded: 2 },
+    3: { name: 'Straight Shooter',emoji: '🎯', color: '#378ADD', desc: 'Hitting clubs the way they were built. Distance and direction starting to matter.', nextLabel: 'Par Machine', nextTrigger: '42 pts + first par + check-in', roundsNeeded: 3 },
+    4: { name: 'Par Machine',     emoji: '⚙', color: '#7F77DD', desc: 'Keeping real score. Chasing clean holes. Golf is clicking.', nextLabel: 'Course Reader', nextTrigger: '65 pts + 2 pars + check-in', roundsNeeded: 5 },
+    5: { name: 'Course Reader',   emoji: '🗺', color: '#D4537E', desc: 'Thinking about the full hole before the swing. Course awareness forming.', nextLabel: 'Shot Shaper', nextTrigger: '95 pts + Scoring Challenge + check-in', roundsNeeded: 8 },
+    6: { name: 'Shot Shaper',     emoji: '✂', color: '#BA7517', desc: 'Every shot has a purpose. Numbers getting real.', nextLabel: 'Course Boss', nextTrigger: '130 pts + within +15 par + check-in', roundsNeeded: 10 },
+    7: { name: 'Course Boss',     emoji: '👑', color: '#D85A30', desc: 'Strategy on every shot. Comfortable under pressure. Junior golf is calling.', nextLabel: 'Tour Bound', nextTrigger: '170 pts + within +10 par + check-in', roundsNeeded: 15 },
+    8: { name: 'Tour Bound',      emoji: '🏆', color: '#c8922a', desc: 'Tournament ready. The real deal. Reserved for the kids who put in the work.', nextLabel: null, nextTrigger: null, roundsNeeded: null },
+  };
+
+
+  // ── KID LEVEL REQUIREMENTS — points-based composite gates ──────────────────
+  // Activity points: round = 3 pts, range/practice session = 1 pt
+  const KID_LEVEL_REQS = {
+    0: { points: 4,   checkin: true, challenge: null },                           // Fresh Caddie → Grip & Ripper
+    1: { points: 12,  checkin: true, challenge: null, minRounds: 1 },             // Grip & Ripper → Ball Finder
+    2: { points: 25,  checkin: true, challenge: 1 },                              // Ball Finder → Straight Shooter
+    3: { points: 42,  checkin: true, challenge: 2 },                              // Straight Shooter → Par Machine
+    4: { points: 65,  checkin: true, challenge: 3 },                              // Par Machine → Course Reader
+    5: { points: 95,  checkin: true, challenge: 4 },                              // Course Reader → Shot Shaper
+    6: { points: 130, checkin: true, challenge: null, withinPar: 15 },            // Shot Shaper → Course Boss
+    7: { points: 170, checkin: true, challenge: null, withinPar: 10 },            // Course Boss → Tour Bound
+    8: null,
+  };
+
+  // ── KID CHALLENGES — PGA-guided, one per level gate, auto-verified ────────────
+  const KID_CHALLENGES = {
+    1: { // L2→L3 (Ball Finder → Straight Shooter)
+      title: 'Contact Challenge',
+      badge: 'PGA Start Golf',
+      desc:  'Log a range session with a feel rating of 3 or better — solid contact, ball going up and forward.',
+      short: 'Range session — feel 3+',
+      check: (who, rounds) => getKidRangeSessions(who).some(s => s.feel >= 3),
+    },
+    2: { // L3→L4 (Straight Shooter → Par Machine)
+      title: 'First Par Challenge',
+      badge: 'PGA Prep Golf',
+      desc:  'Make par on any hole during a real round. One clean par earns the badge.',
+      short: 'First par in a round',
+      check: (who, rounds) => !!localStorage.getItem('sv-' + who + '-first-par'),
+    },
+    3: { // L4→L5 (Par Machine → Course Reader)
+      title: 'Two-Par Challenge',
+      badge: 'PGA Prep Golf',
+      desc:  'Make par on at least 2 holes — same round or across rounds. Prove it wasn't a fluke.',
+      short: '2 pars recorded',
+      check: (who, rounds) => {
+        let total = 0;
+        (rounds||[]).forEach(r => {
+          const hs = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes||'[]');
+          hs.forEach(h => { if (h.score > 0 && h.par && h.score <= h.par) total++; });
+        });
+        return total >= 2;
+      },
+    },
+    4: { // L5→L6 (Course Reader → Shot Shaper)
+      title: 'Scoring Challenge',
+      badge: 'PGA Play Golf',
+      desc:  'Shoot within 15 strokes of course par in a full round with all holes tracked.',
+      short: 'Round within +15 of par',
+      check: (who, rounds) => (rounds||[]).some(r => typeof r.score_vs_par === 'number' && r.score_vs_par <= 15),
+    },
+  };
+
+  // ── KID CHECK-IN QUESTIONS — account holder observes and answers ─────────────
+  // ── KID CHECK-IN QUESTIONS — account holder observes and answers ─────────────
+  // passing = min yes answers required to pass the check-in
+  const KID_CHECKIN_QS = {
+    0: {
+      title:    'Level 1 Readiness Check',
+      subtitle: 'Quick check after their very first sessions.',
+      passing:  1,
+      questions: [
+        'Are they excited to come back and play again?',
+      ],
+    },
+    1: {
+      title:    'Level 2 Readiness Check',
+      subtitle: 'Based on what you\'ve seen in their first few sessions.',
+      passing:  2,
+      questions: [
+        'Are they making contact with the ball regularly?',
+        'Do they look forward to coming out to play?',
+      ],
+    },
+    2: {
+      title:    'Level 3 Readiness Check',
+      subtitle: 'Based on what you\'ve observed in their range sessions and rounds.',
+      passing:  2,
+      questions: [
+        'Can they grip the club correctly without being reminded?',
+        'Do they understand what different clubs are used for?',
+        'Are they starting to notice where their shots go?',
+      ],
+    },
+    3: {
+      title:    'Level 4 Readiness Check',
+      subtitle: 'Answer based on what you\'ve seen over their last few rounds.',
+      passing:  2,
+      questions: [
+        'Do they keep their own score without help?',
+        'Do they understand what par means on each hole?',
+        'Are they starting to think about the next shot before they get there?',
+      ],
+    },
+    4: {
+      title:    'Level 5 Readiness Check',
+      subtitle: 'Answer based on what you\'ve observed over the season.',
+      passing:  3,
+      questions: [
+        'Do they know basic rules (out of bounds, penalty strokes)?',
+        'Are they starting to think about club selection?',
+        'Do they finish every hole without giving up?',
+        'Are they engaged throughout a full round?',
+      ],
+    },
+    5: {
+      title:    'Level 6 Readiness Check',
+      subtitle: 'A real skill milestone — answer honestly.',
+      passing:  3,
+      questions: [
+        'Do they think about the hole layout before they tee off?',
+        'Are they tracking their own stats (score, pars, birdies)?',
+        'Can they handle a bad shot and move on without losing focus?',
+        'Do they adjust strategy when conditions change (wind, rough, lies)?',
+      ],
+    },
+    6: {
+      title:    'Level 7 Readiness Check',
+      subtitle: 'Junior golf territory — answer carefully.',
+      passing:  4,
+      questions: [
+        'Do they understand course management — playing away from trouble?',
+        'Can they maintain focus for a full 9 or 18-hole round?',
+        'Are they competitive — do they care about their score improving?',
+        'Would you feel comfortable entering them in a junior clinic or event?',
+        'Are they dedicated enough to practice on their own?',
+      ],
+    },
+    7: {
+      title:    'Level 8 Readiness Check',
+      subtitle: 'Tour Bound is the real deal — be sure.',
+      passing:  4,
+      questions: [
+        'Do they track all stats (fairways, greens in regulation, putts per round)?',
+        'Do they have a consistent pre-shot routine they follow every time?',
+        'Can they compete under pressure and play their best golf when it counts?',
+        'Would you enter them in a junior tournament today?',
+        'Is golf a serious, long-term commitment for them?',
+      ],
+    },
   };
 
   // ── CADDIE — swap this URL after deploying the Cloudflare Worker ──────────
@@ -963,6 +1111,267 @@
       <div class="badge-shelf" style="margin-bottom:4px;">${kidBadgeHtml}</div>
       <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-top:12px;margin-bottom:8px;">SHARED BADGES</div>
       ${renderBadges(rounds, color)}`;
+  }
+
+
+  // ── KID LEVELING HELPERS ──────────────────────────────────────────────────
+
+  function getKidRangeSessions(who) {
+    try { return JSON.parse(localStorage.getItem('sv-' + who + '-range-sessions') || '[]'); }
+    catch(e) { return []; }
+  }
+
+  function saveKidRangeSession(who, session) {
+    const sessions = getKidRangeSessions(who);
+    sessions.unshift({ ...session, date: new Date().toISOString().split('T')[0] });
+    if (sessions.length > 30) sessions.length = 30;
+    localStorage.setItem('sv-' + who + '-range-sessions', JSON.stringify(sessions));
+  }
+
+
+  function getKidActivityPoints(who, rounds) {
+    return (rounds || []).length * 3 + getKidRangeSessions(who).length;
+  }
+
+  // Maps 9-level system (0-8) to 4 content tiers for range body rendering
+  function getRangeContentLevel(level) {
+    if (level <= 1) return 1;
+    if (level <= 3) return 2;
+    if (level <= 5) return 3;
+    return 4;
+  }
+
+  // One-time migration: old 4-level system → new 9-level system
+  function migrateKidLevel(who) {
+    const migKey = 'sv-' + who + '-level-v9';
+    if (localStorage.getItem(migKey)) return;
+    const old = parseInt(localStorage.getItem('sv-' + who + '-level') || '0');
+    const map  = { 1: 2, 2: 3, 3: 5, 4: 7 };
+    const next = map[old];
+    if (next !== undefined) localStorage.setItem('sv-' + who + '-level', String(next));
+    localStorage.setItem(migKey, '1');
+  }
+
+  function getKidReadiness(who, rounds) {
+    const level = getKidLevel(who);
+    const reqs  = KID_LEVEL_REQS[level];
+    if (!reqs) return { ready: true, atMax: true };
+
+    const pts          = getKidActivityPoints(who, rounds || []);
+    const roundCount   = (rounds || []).length;
+    const checkinDone  = !!localStorage.getItem('sv-' + who + '-checkin-' + level);
+    const ch           = reqs.challenge ? KID_CHALLENGES[reqs.challenge] : null;
+    const challengeDone = ch ? (!!localStorage.getItem('sv-' + who + '-challenge-' + level) || ch.check(who, rounds || [])) : true;
+    const pointsDone   = pts >= reqs.points;
+    const roundsDone   = !reqs.minRounds || roundCount >= reqs.minRounds;
+    const withinParDone = !reqs.withinPar || (rounds||[]).some(r => typeof r.score_vs_par === 'number' && r.score_vs_par <= reqs.withinPar);
+
+    return {
+      ready:           pointsDone && roundsDone && checkinDone && challengeDone && withinParDone,
+      pointsDone,      pts,            pointsNeeded:   reqs.points,
+      roundsDone,      roundCount,     minRounds:      reqs.minRounds || 0,
+      withinParDone,   withinPar:      reqs.withinPar  || null,
+      checkinDone,
+      challengeDone,
+      challengeTitle:  ch?.title || '',
+      challengeShort:  ch?.short || '',
+    };
+  }
+
+  function autoCheckChallenge(who, rounds) {
+    const level = getKidLevel(who);
+    const reqs  = KID_LEVEL_REQS[level];
+    if (!reqs || !reqs.challenge) return;
+    const key = 'sv-' + who + '-challenge-' + level;
+    if (localStorage.getItem(key)) return;
+    const ch = KID_CHALLENGES[reqs.challenge];
+    if (ch && ch.check(who, rounds || [])) {
+      localStorage.setItem(key, new Date().toISOString().split('T')[0]);
+      const name = who === 'son' ? 'Son' : 'Daughter';
+      setTimeout(() => showToast(name + ' completed the ' + ch.title + '!', 'gold'), 700);
+      // Also flag for readiness re-check
+      if (who === 'son') loadSonRoundsAndRender && setTimeout(loadSonRoundsAndRender, 1200);
+      if (who === 'girl') loadGirlRoundsAndRender && setTimeout(loadGirlRoundsAndRender, 1200);
+    }
+  }
+
+  // ── RANGE SESSION LOG SHEET ──────────────────────────────────────────────
+
+  function showRangeLogSheet(who) {
+    document.getElementById('range-log-overlay')?.remove();
+    const name = who === 'son' ? 'Son' : 'Daughter';
+    const level = getKidLevel(who);
+    const def   = KID_LEVELS[level];
+    const focuses = ['Contact & Solid Hits','Full Swing','Short Game & Chipping','Putting','Driver','Approach Shots','Course Simulation','Backyard Practice','Simulator Session','Mini Golf','Putting Green','Skills & Drills'];
+    const focusOptions = focuses.map((f,i)=>`<option value="${f}"${i===0?' selected':''}>${f}</option>`).join('');
+
+    const overlay = document.createElement('div');
+    overlay.id = 'range-log-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9800;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;';
+    overlay.innerHTML = `
+      <div style="width:100%;background:var(--surface);border-radius:20px 20px 0 0;padding:24px 20px 32px;max-height:90vh;overflow-y:auto;">
+        <div style="width:36px;height:4px;background:var(--muted);border-radius:2px;margin:0 auto 20px;opacity:0.4;"></div>
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:2px;color:${def.color};margin-bottom:4px;">LOG RANGE SESSION</div>
+        <div style="font-size:1.05rem;font-weight:700;color:var(--cream);margin-bottom:18px;">${name}'s Range Day</div>
+
+        <div style="margin-bottom:16px;">
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;">WHAT DID YOU WORK ON?</label>
+          <select id="rl-focus" style="width:100%;background:var(--surface2);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:11px 14px;color:var(--cream);font-size:0.9rem;-webkit-appearance:none;">
+            ${focusOptions}
+          </select>
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:10px;">HOW DID IT FEEL? (tap to rate)</label>
+          <div style="display:flex;gap:8px;" id="rl-feel-row">
+            ${[1,2,3,4,5].map(n=>`
+              <button onclick="rlSelectFeel(${n})" id="rl-feel-${n}"
+                style="flex:1;padding:10px 4px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:var(--surface2);color:var(--muted);font-size:0.75rem;font-weight:700;cursor:pointer;transition:background 0.15s,color 0.15s;" >
+                ${['😬','😐','🙂','😄','🤩'][n-1]}<br><span style="font-size:0.6rem;">${['Rough','OK','Good','Great','Best!'][n-1]}</span>
+              </button>`).join('')}
+          </div>
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <label style="font-size:0.75rem;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;">NOTES (optional)</label>
+          <textarea id="rl-notes" placeholder="e.g. great contact on the 7-iron today…" rows="2"
+            style="width:100%;background:var(--surface2);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:11px 14px;color:var(--cream);font-size:0.88rem;resize:none;box-sizing:border-box;"></textarea>
+        </div>
+
+        <button onclick="saveRangeSessionFromSheet('${who}')"
+          style="width:100%;padding:14px;background:${def.color};border:none;border-radius:12px;color:#fff;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:10px;">
+          Save Session ✓
+        </button>
+        <button onclick="document.getElementById('range-log-overlay').remove()"
+          style="width:100%;padding:12px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:var(--muted);font-size:0.9rem;cursor:pointer;">
+          Cancel
+        </button>
+      </div>`;
+
+    // tap backdrop to close
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    document.body.appendChild(overlay);
+
+    // pre-select feel 3
+    rlSelectFeel(3);
+  }
+
+  let _rlFeel = 3;
+  function rlSelectFeel(n) {
+    _rlFeel = n;
+    for (let i = 1; i <= 5; i++) {
+      const btn = document.getElementById('rl-feel-' + i);
+      if (!btn) continue;
+      if (i === n) {
+        btn.style.background = 'var(--gold)';
+        btn.style.borderColor = 'var(--gold)';
+        btn.style.color = 'var(--bg)';
+      } else {
+        btn.style.background = 'var(--surface2)';
+        btn.style.borderColor = 'rgba(255,255,255,0.15)';
+        btn.style.color = 'var(--muted)';
+      }
+    }
+  }
+
+  function saveRangeSessionFromSheet(who) {
+    const focus = document.getElementById('rl-focus')?.value || 'General';
+    const notes = document.getElementById('rl-notes')?.value?.trim() || '';
+    saveKidRangeSession(who, { focus, feel: _rlFeel, notes });
+    document.getElementById('range-log-overlay')?.remove();
+    const name = who === 'son' ? 'Son' : 'Daughter';
+    showToast(name + ''s range session logged!', 'gold');
+    // Auto-check if challenge now met
+    const rounds = who === 'son' ? _dadLoadedRounds : []; // best effort — challenge check uses localStorage
+    autoCheckChallenge(who, rounds);
+    // Re-render level card
+    if (who === 'son') loadSonRoundsAndRender();
+    if (who === 'girl') loadGirlRoundsAndRender();
+  }
+
+  // ── ACCOUNT HOLDER CHECK-IN FLOW ────────────────────────────────────────
+
+  function showKidCheckin(who) {
+    const level = getKidLevel(who);
+    const qs    = KID_CHECKIN_QS[level];
+    if (!qs) return;
+    const name  = who === 'son' ? 'Son' : 'Daughter';
+    const def   = KID_LEVELS[level];
+
+    document.getElementById('kid-checkin-overlay')?.remove();
+    const answers = new Array(qs.questions.length).fill(null);
+
+    const overlay = document.createElement('div');
+    overlay.id = 'kid-checkin-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9800;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;';
+
+    function buildHtml() {
+      const qHtml = qs.questions.map((q, i) => `
+        <div style="margin-bottom:14px;">
+          <div style="font-size:0.88rem;color:var(--cream);margin-bottom:8px;line-height:1.4;">${i+1}. ${q}</div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="ciAnswer(${i},true)" id="ci-yes-${i}"
+              style="flex:1;padding:9px;border-radius:10px;border:1px solid ${answers[i]===true?'#22c55e':'rgba(255,255,255,0.15)'};background:${answers[i]===true?'#22c55e22':'var(--surface2)'};color:${answers[i]===true?'#22c55e':'var(--muted)'};font-size:0.88rem;font-weight:700;cursor:pointer;">
+              Yes ✓
+            </button>
+            <button onclick="ciAnswer(${i},false)" id="ci-no-${i}"
+              style="flex:1;padding:9px;border-radius:10px;border:1px solid ${answers[i]===false?'#ef4444':'rgba(255,255,255,0.15)'};background:${answers[i]===false?'#ef444422':'var(--surface2)'};color:${answers[i]===false?'#ef4444':'var(--muted)'};font-size:0.88rem;font-weight:700;cursor:pointer;">
+              Not Yet
+            </button>
+          </div>
+        </div>`).join('');
+
+      const allAnswered = answers.every(a => a !== null);
+      const score       = answers.filter(a => a === true).length;
+
+      return `
+        <div style="width:100%;background:var(--surface);border-radius:20px 20px 0 0;padding:24px 20px 32px;max-height:90vh;overflow-y:auto;">
+          <div style="width:36px;height:4px;background:var(--muted);border-radius:2px;margin:0 auto 20px;opacity:0.4;"></div>
+          <div style="font-size:0.65rem;font-weight:700;letter-spacing:2px;color:${def.color};margin-bottom:4px;">${qs.title.toUpperCase()}</div>
+          <div style="font-size:1rem;font-weight:700;color:var(--cream);margin-bottom:6px;">${name} — Level ${level}→${level+1}</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:20px;">${qs.subtitle}</div>
+          ${qHtml}
+          ${allAnswered ? `
+            <div style="margin:16px 0;padding:12px 16px;background:${score>=(qs.passing||3)?'#22c55e18':'#ef444418'};border-radius:10px;border:1px solid ${score>=(qs.passing||3)?'#22c55e40':'#ef444440'};">
+              <div style="font-size:0.78rem;font-weight:700;color:${score>=(qs.passing||3)?'#22c55e':'#ef4444'};">${score}/${qs.questions.length} — ${score>=(qs.passing||3)?'Ready to level up!':'Not quite yet — keep going'}</div>
+              ${score<(qs.passing||3)?'<div style="font-size:0.75rem;color:var(--muted);margin-top:4px;">Check back after a few more sessions.</div>':''}
+            </div>
+            <button onclick="saveKidCheckin('${who}', ${score})"
+              style="width:100%;padding:14px;background:${score>=(qs.passing||3)?def.color:'var(--surface2)'};border:${score>=(qs.passing||3)?'none':'1px solid rgba(255,255,255,0.12)'};border-radius:12px;color:${score>=(qs.passing||3)?'#fff':'var(--muted)'};font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:10px;">
+              ${score>=(qs.passing||3)?'Confirm Check-In ✓':'Save (not passing yet)'}
+            </button>` : ''}
+          <button onclick="document.getElementById('kid-checkin-overlay').remove()"
+            style="width:100%;padding:12px;background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:var(--muted);font-size:0.9rem;cursor:pointer;">
+            Cancel
+          </button>
+        </div>`;
+    }
+
+    function render() { overlay.innerHTML = buildHtml(); }
+
+    window.ciAnswer = function(i, val) {
+      answers[i] = val;
+      render();
+    };
+
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    document.body.appendChild(overlay);
+    render();
+  }
+
+  function saveKidCheckin(who, score) {
+    const level = getKidLevel(who);
+    const qs    = KID_CHECKIN_QS[level];
+    const pass  = qs ? (qs.passing || 3) : 3;
+    if (score >= pass) {
+      localStorage.setItem('sv-' + who + '-checkin-' + level, String(score) + '/' + new Date().toISOString().split('T')[0]);
+    }
+    document.getElementById('kid-checkin-overlay')?.remove();
+    const name = who === 'son' ? 'Son' : 'Daughter';
+    if (score >= 3) showToast(name + ''s Level ' + (level+1) + ' check-in passed!', 'gold');
+    else showToast('Check-in saved — keep working toward it!');
+    if (who === 'son') loadSonRoundsAndRender();
+    if (who === 'girl') loadGirlRoundsAndRender();
   }
 
   // Returns a score chip span using golf-standard color coding
@@ -2409,6 +2818,7 @@
     const listEl = document.getElementById('son-history-list');
     listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;"><i class="ti ti-loader-2" style="font-size:1.1rem;vertical-align:-2px;"></i> Loading your rounds…</div>';
     try {
+      migrateKidLevel('son');
       const rounds = await loadSonRounds();
       renderKidLevelCard('son', rounds);
       checkAutoLevelUp('son', rounds);
@@ -2473,6 +2883,7 @@
     if (!el) return;
     el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;"><i class="ti ti-loader-2" style="font-size:1.1rem;vertical-align:-2px;"></i> Loading rounds…</div>';
     try {
+      migrateKidLevel('girl');
       const rounds = await loadGirlRounds();
       renderKidLevelCard('girl', rounds);
       checkAutoLevelUp('girl', rounds);
@@ -2929,7 +3340,7 @@
   // KID_LEVELS moved to top of file — see line ~20
 
   function getKidLevel(who) {
-    const defaults = { son: 2, girl: 1 };
+    const defaults = { son: 0, girl: 0 };
     return parseInt(localStorage.getItem('sv-' + who + '-level') || defaults[who] || 1);
   }
   function setKidLevel(who, level) {
@@ -2939,26 +3350,38 @@
   function renderKidLevelCard(who, rounds) {
     const el = document.getElementById(who + '-level-card');
     if (!el) return;
-    const level = getKidLevel(who);
-    const def   = KID_LEVELS[level];
-    const next  = KID_LEVELS[level + 1];
-    const color = def.color;
-    const roundCount = (rounds || []).length;
+    const level    = getKidLevel(who);
+    const def      = KID_LEVELS[level];
+    const color    = def.color;
+    const r        = getKidReadiness(who, rounds || []);
 
-    // Progress bar toward next level
-    let progressHtml = '';
-    if (next) {
-      const target = def.roundsNeeded;
-      const pct    = Math.min(100, Math.round((roundCount / target) * 100));
-      progressHtml = `
-        <div style="margin-top:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-            <span style="font-size:0.7rem;color:var(--muted);">Next: ${def.nextTrigger}</span>
-            <span style="font-size:0.7rem;color:${color};font-weight:700;">${roundCount}/${target} rounds</span>
+    const gate = (done, label, action) => `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">
+        <span style="font-size:0.9rem;${done?'color:#22c55e;':'color:var(--muted);'}">${done?'✓':'○'}</span>
+        <span style="font-size:0.78rem;color:${done?'var(--cream)':'var(--muted)'};">${label}</span>
+        ${!done && action ? `<button onclick="${action}" style="margin-left:auto;background:none;border:1px solid ${color}60;border-radius:6px;padding:3px 8px;color:${color};font-size:0.65rem;font-weight:700;cursor:pointer;white-space:nowrap;">${action.includes('Checkin')||action.includes('checkin')?'START':'LOG'}</button>` : ''}
+      </div>`;
+
+    let readinessHtml = '';
+    if (!r.atMax) {
+      const reqs = KID_LEVEL_REQS[level];
+      const ch   = reqs?.challenge ? KID_CHALLENGES[reqs.challenge] : null;
+      const pct  = Math.min(100, Math.round((r.pts / r.pointsNeeded) * 100));
+      readinessHtml = `
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.07);">
+          <div style="font-size:0.6rem;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;">LEVEL ${level+1} READINESS</div>
+          <div style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <span style="font-size:0.7rem;color:var(--muted);">Activity points</span>
+              <span style="font-size:0.7rem;color:${color};font-weight:700;">${r.pts} / ${r.pointsNeeded}</span>
+            </div>
+            <div class="level-progress-bar"><div class="level-progress-fill" style="width:${pct}%;background:${color};"></div></div>
+            <div style="font-size:0.6rem;color:var(--muted);margin-top:3px;">Round = 3 pts · Range or practice = 1 pt</div>
           </div>
-          <div class="level-progress-bar">
-            <div class="level-progress-fill" style="width:${pct}%;background:${color};"></div>
-          </div>
+          ${r.minRounds ? gate(r.roundsDone, 'First round on a real course', '') : ''}
+          ${gate(r.checkinDone,   'Account holder check-in', currentProfile==='dad'?'showKidCheckin(\'' + who + '\')':'')}
+          ${ch ? gate(r.challengeDone, ch.title + ' — ' + ch.short, '') : ''}
+          ${r.withinPar ? gate(r.withinParDone, 'Shoot within +' + r.withinPar + ' of par in a round', '') : ''}
         </div>`;
     }
 
@@ -2973,10 +3396,10 @@
                 <div style="font-size:1rem;font-weight:700;color:var(--cream);line-height:1.1;">${def.name}</div>
               </div>
             </div>
-            ${level < 4 ? (currentProfile==='dad' ? `<button onclick="adminLevelUp('${who}')" style="background:none;border:1px solid ${color}70;border-radius:8px;padding:5px 10px;color:${color};font-size:0.68rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;white-space:nowrap;">PROMOTE ▲</button>` : '') : '<span style="font-size:0.75rem;color:var(--gold);font-weight:700;">MAX LEVEL</span>'}
+            ${level < 8 ? (currentProfile==='dad' ? `<button onclick="adminLevelUp('${who}')" style="background:${r.ready?color:'none'};border:1px solid ${color}70;border-radius:8px;padding:5px 10px;color:${r.ready?'#fff':color};font-size:0.68rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;white-space:nowrap;">${r.ready?'PROMOTE ▲':'PROMOTE?'}</button>` : '') : '<span style="font-size:0.75rem;color:var(--gold);font-weight:700;">TOUR BOUND</span>'}
           </div>
           <div style="font-size:0.8rem;color:var(--muted);margin-top:6px;">${def.desc}</div>
-          ${progressHtml}
+          ${readinessHtml}
         </div>
       </div>`;
   }
@@ -2984,28 +3407,40 @@
   // Account holder promotes a kid — requires confirmation
   function adminLevelUp(who) {
     const current = getKidLevel(who);
-    if (current >= 4) { showToast('Already at max level! 🏆'); return; }
+    if (current >= 8) { showToast('Already at max level! Tour Bound!', 'gold'); return; }
     const next = KID_LEVELS[current + 1];
     const name = who === 'son' ? 'Son' : 'Daughter';
-    if (!confirm(`Promote ${name} to Level ${current + 1}: "${next.name}"?\n\nThis should be a real milestone moment — make sure they've earned it!`)) return;
+    const r    = getKidReadiness(who, null); // null rounds = use cached state
+
+    let msg = `Promote ${name} to Level ${current + 1}: "${next.name}"?`;
+    if (!r.ready) {
+      const missing = [];
+      if (!r.roundsDone)    missing.push(`${r.roundCount}/${r.roundsNeeded} rounds played`);
+      if (!r.rangeDone)     missing.push(`${r.rangeCount}/${r.rangeNeeded} range sessions`);
+      if (!r.checkinDone)   missing.push('check-in not completed');
+      if (!r.challengeDone) missing.push(`${r.challengeTitle} not completed`);
+      msg += `\n\n⚠️ Still pending:\n• ${missing.join('\n• ')}\n\nYou can still promote — you know best.`;
+    } else {
+      msg += '\n\nAll readiness gates are met — great milestone!';
+    }
+
+    if (!confirm(msg)) return;
     setKidLevel(who, current + 1);
-    // Clear auto-flag for this level so it doesn't ping again
     localStorage.removeItem('sv-' + who + '-autolvl-' + (current + 1));
     triggerLevelUpCeremony(who, current + 1);
   }
 
-  // Check if auto-flag should fire (does NOT auto-promote — just notifies Dad)
+  // Check if auto-flag should fire (does NOT auto-promote — just notifies account holder)
   function checkAutoLevelUp(who, rounds) {
     const current = getKidLevel(who);
-    if (current >= 4) return;
-    const def = KID_LEVELS[current];
-    if (!def.roundsNeeded) return;
-    const roundCount = (rounds || []).length;
+    if (current >= 8) return;
+    autoCheckChallenge(who, rounds); // auto-detect challenge completion
+    const r      = getKidReadiness(who, rounds);
     const flagKey = 'sv-' + who + '-autolvl-' + (current + 1);
-    if (roundCount >= def.roundsNeeded && !localStorage.getItem(flagKey)) {
+    if (r.ready && !localStorage.getItem(flagKey)) {
       localStorage.setItem(flagKey, '1');
       const name = who === 'son' ? 'Son' : 'Daughter';
-      setTimeout(() => showToast(`🌟 ${name} has enough rounds for Level ${current + 1}! Check their progress page.`, 'gold'), 800);
+      setTimeout(() => showToast(name + ' is ready for Level ' + (current + 1) + '! Check their progress page.', 'gold'), 800);
     }
   }
 
@@ -3070,7 +3505,7 @@
       <div style="font-size:0.88rem;color:var(--muted);max-width:280px;line-height:1.6;margin-bottom:24px;">${def.desc}</div>
       <div style="background:${color}18;border:1px solid ${color}50;border-radius:14px;padding:14px 20px;max-width:300px;margin-bottom:28px;">
         <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${color};margin-bottom:5px;">${name} unlocked</div>
-        <div style="font-size:0.85rem;color:var(--cream);">${next ? 'Next milestone: ' + (KID_LEVELS[newLevel].nextTrigger || 'Stay consistent!') : 'You\'ve reached the top — welcome to the big leagues!'}</div>
+        <div style="font-size:0.85rem;color:var(--cream);">${KID_LEVELS[newLevel+1] ? 'Next milestone: ' + (KID_LEVELS[newLevel].nextTrigger || 'Stay consistent!') : 'You\'ve reached the top — welcome to the big leagues!'}</div>
       </div>
       <button onclick="document.getElementById('levelup-overlay').remove();if(typeof loadSonRoundsAndRender==='function'&&'${who}'==='son')loadSonRoundsAndRender();if(typeof loadGirlRoundsAndRender==='function'&&'${who}'==='girl')loadGirlRoundsAndRender();"
         style="background:${color};color:#fff;border:none;border-radius:14px;padding:14px 44px;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;-webkit-tap-highlight-color:transparent;">
@@ -3110,10 +3545,14 @@
     if (!el) return;
     const level = getKidLevel(who);
     const def   = KID_LEVELS[level];
+    const sessions = getKidRangeSessions(who);
     el.innerHTML = `
-      <div style="display:inline-flex;align-items:center;gap:6px;background:${def.color}18;border:1px solid ${def.color}50;border-radius:20px;padding:3px 10px 3px 8px;margin-bottom:4px;">
-        <span style="font-size:0.85rem;">${def.emoji}</span>
-        <span style="font-size:0.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${def.color};">Level ${level} · ${def.name}</span>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:${def.color}18;border:1px solid ${def.color}50;border-radius:20px;padding:3px 10px 3px 8px;">
+          <span style="font-size:0.85rem;">${def.emoji}</span>
+          <span style="font-size:0.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${def.color};">Level ${level} · ${def.name}</span>
+        </div>
+        ${currentProfile==='dad' ? `<button onclick="showRangeLogSheet('${who}')" style="background:${def.color}20;border:1px solid ${def.color}60;border-radius:16px;padding:4px 12px;color:${def.color};font-size:0.68rem;font-weight:700;cursor:pointer;">+ Log Session${sessions.length ? ' ('+sessions.length+')' : ''}</button>` : ''}
       </div>`;
     if (who === 'son')  renderSonRangeBody(level);
     if (who === 'girl') renderGirlRangeBody(level);
@@ -3141,7 +3580,7 @@
   function renderSonRangeBody(level) {
     const el = document.getElementById('son-range-body');
     if (!el) return;
-    const lv = level || getKidLevel('son');
+    const lv = getRangeContentLevel(level !== undefined ? level : getKidLevel('son'));
     el.innerHTML = _sonRangeHtml(lv);
   }
 
@@ -3435,7 +3874,7 @@
   function renderGirlRangeBody(level) {
     const el = document.getElementById('girl-range-body');
     if (!el) return;
-    const lv = level || getKidLevel('girl');
+    const lv = getRangeContentLevel(level !== undefined ? level : getKidLevel('girl'));
     el.innerHTML = _girlRangeHtml(lv);
   }
 
