@@ -46,6 +46,29 @@
       check:(rounds)=>rounds.length>=10 },
   ];
 
+
+  // ── KID BADGES — kid-specific achievements using localStorage flags + rounds ──
+  const KID_BADGES = [
+    { id:'kid_first_par',    name:'First Par',      desc:'Made par on any hole',          color:'#22c55e',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.1"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="28" r="16" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.3"/><text x="28" y="24" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="10" fill="{{c}}" opacity="0.8">FIRST</text><text x="28" y="37" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="16" fill="{{c}}">PAR</text></svg>`,
+      check:(who,rounds)=>!!localStorage.getItem('sv-'+who+'-first-par') },
+    { id:'kid_first_birdie', name:'First Birdie',   desc:'One under par on any hole',     color:'#1E7A3A',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.1"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="28" r="18" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.4"/><text x="28" y="33" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="16" fill="{{c}}">-1</text></svg>`,
+      check:(who,rounds)=>!!localStorage.getItem('sv-'+who+'-first-birdie') },
+    { id:'kid_family_round', name:'Family Round',   desc:'Played in a family round',      color:'#3b82f6',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="20" cy="22" r="5" fill="{{c}}" opacity="0.7"/><circle cx="36" cy="22" r="5" fill="{{c}}" opacity="0.7"/><path d="M12 36 Q20 28 28 32 Q36 28 44 36" fill="none" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/></svg>`,
+      check:(who,rounds)=>!!localStorage.getItem('sv-'+who+'-played-family') },
+    { id:'kid_consistent',   name:'Consistent',     desc:'3 rounds played',               color:'#7C5CBF',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="48" height="48" rx="8" fill="{{c}}" opacity="0.08"/><rect x="4" y="4" width="48" height="48" rx="8" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="18" cy="28" r="5" fill="{{c}}" opacity="0.9"/><circle cx="28" cy="28" r="5" fill="{{c}}" opacity="0.9"/><circle cx="38" cy="28" r="5" fill="{{c}}" opacity="0.9"/></svg>`,
+      check:(who,rounds)=>rounds.length>=3 },
+    { id:'kid_explorer',     name:'Explorer',       desc:'Played 3 different courses',    color:'#B86530',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="28" cy="20" r="5" fill="{{c}}" opacity="0.9"/><line x1="28" y1="25" x2="28" y2="36" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="22" y1="39" x2="34" y2="39" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/></svg>`,
+      check:(who,rounds)=>new Set(rounds.map(r=>r.course_name)).size>=3 },
+    { id:'kid_loves_game',   name:'Loves the Game', desc:'10 rounds played',              color:'#ec4899',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.15"/><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2.5"/><text x="28" y="34" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" fill="{{c}}">10+</text></svg>`,
+      check:(who,rounds)=>rounds.length>=10 },
+  ];
+
   // ── CLUBS — declared at top so bag/caddie never hit TDZ from init errors ──
   const CLUBS = [
     { name: 'Driver',    dist: 195, loft: '10.5°', display: 'Driver',        confirmed: true,  note: 'Vice Boost · 10.5° · Graphite · Midsize grip · 190–200 yds ✅ Confirmed' },
@@ -897,6 +920,49 @@
         </div>`;
       }).join('')}
     </div>`;
+  }
+
+
+  // ── LEVEL SHIELD + KID BADGE SHELF ──────────────────────────────────────
+  function renderKidBadges(who, rounds, accentColor) {
+    const level = getKidLevel(who);
+    const def   = KID_LEVELS[level];
+    const color = accentColor || def.color;
+    const sc = {
+      1:{ fill:'#F5EDD8', stroke:'#B0A070', text:'#6a5c30', bg:'#E8E0D0' },
+      2:{ fill:'#D0EAB8', stroke:'#5A9A30', text:'#1a5008', bg:'#B8D8A0' },
+      3:{ fill:'#C0D8F8', stroke:'#3070C0', text:'#083080', bg:'#A8C8F0' },
+      4:{ fill:'#FAD860', stroke:'#A07800', text:'#503000', bg:'#F0C030' },
+    }[level];
+    const shieldSvg = `<svg viewBox="0 0 56 62" width="44" height="49" xmlns="http://www.w3.org/2000/svg">
+      <path d="M28 3 L53 12 L53 34 Q53 50 28 59 Q3 50 3 34 L3 12 Z" fill="${sc.bg}" stroke="${sc.stroke}" stroke-width="2.5"/>
+      <path d="M28 8 L48 16 L48 34 Q48 47 28 54 Q8 47 8 34 L8 16 Z" fill="${sc.fill}" stroke="none"/>
+      <text x="28" y="27" text-anchor="middle" font-family="Bebas Neue,Impact,sans-serif" font-size="8" fill="${sc.text}" opacity="0.7">LEVEL</text>
+      <text x="28" y="44" text-anchor="middle" font-family="Bebas Neue,Impact,sans-serif" font-size="20" fill="${sc.text}">${level}</text>
+    </svg>`;
+    const shieldHtml = `
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 14px;background:${def.color}18;border-radius:12px;border:1px solid ${def.color}35;">
+        ${shieldSvg}
+        <div>
+          <div style="font-size:0.58rem;font-weight:700;letter-spacing:2px;color:${def.color};margin-bottom:2px;">LEVEL ${level}</div>
+          <div style="font-size:0.88rem;font-weight:700;color:var(--cream);">${def.name}</div>
+          <div style="font-size:0.72rem;color:var(--muted);line-height:1.4;">${def.desc}</div>
+        </div>
+      </div>`;
+    const kidBadgeHtml = KID_BADGES.map(b => {
+      const earned = b.check(who, rounds);
+      const c = earned ? b.color : '#888';
+      const svgHtml = b.svg.replace(/\{\{c\}\}/g, c);
+      return `<div class="badge-item ${earned ? 'earned' : 'locked'}" title="${b.desc}">
+        <div class="badge-svg-wrap ${earned ? '' : 'locked'}">${svgHtml}</div>
+        <div class="badge-name">${b.name}</div>
+      </div>`;
+    }).join('');
+    return `${shieldHtml}
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:${color};margin-bottom:8px;">ACHIEVEMENTS</div>
+      <div class="badge-shelf" style="margin-bottom:4px;">${kidBadgeHtml}</div>
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-top:12px;margin-bottom:8px;">SHARED BADGES</div>
+      ${renderBadges(rounds, color)}`;
   }
 
   // Returns a score chip span using golf-standard color coding
@@ -2359,12 +2425,8 @@
       listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet. Tap \u2018Start New Round\u2019 after your next game. \uD83C\uDFCC\uFE0F</div>';
       return;
     }
-    // Badges section at top
-    const badgesHtml = `
-      <div style="margin-bottom:16px;">
-        <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#3B7CB8;margin-bottom:8px;">ACHIEVEMENTS</div>
-        ${renderBadges(rounds, '#3B7CB8')}
-      </div>`;
+    // Badges section at top (level shield + kid-specific + shared)
+    const badgesHtml = `<div style="margin-bottom:16px;">${renderKidBadges('son', rounds, '#3B7CB8')}</div>`;
     listEl.innerHTML = badgesHtml + rounds.map((r, idx) => {
       const d = new Date(r.date_played + 'T12:00:00');
       const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -2418,11 +2480,7 @@
         el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet — join a Family Round to get started! 🌸</div>';
         return;
       }
-      const girlBadgesHtml = `
-        <div style="margin-bottom:16px;">
-          <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:#B85490;margin-bottom:8px;">ACHIEVEMENTS</div>
-          ${renderBadges(rounds, '#B85490')}
-        </div>`;
+      const girlBadgesHtml = `<div style="margin-bottom:16px;">${renderKidBadges('girl', rounds, '#B85490')}</div>`;
       el.innerHTML = girlBadgesHtml + rounds.map((r, idx) => {
         const d = new Date(r.date_played + 'T12:00:00');
         const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -4880,6 +4938,45 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     finally { if (btn) { btn.disabled = false; btn.textContent = 'Share'; } }
   }
 
+  // Draws a small level shield on canvas for kid share cards
+  function _drawLevelShieldCanvas(ctx, cx, cy, size, level) {
+    const lvl_stroke = { 1:'#B0A070', 2:'#5A9A30', 3:'#3070C0', 4:'#A07800' };
+    const lvl_fill   = { 1:'#F5EDD8', 2:'#D0EAB8', 3:'#C0D8F8', 4:'#FAD860' };
+    const lvl_bg     = { 1:'#E8E0D0', 2:'#B8D8A0', 3:'#A8C8F0', 4:'#F0C030' };
+    const lvl_text   = { 1:'#6a5c30', 2:'#1a5008', 3:'#083080', 4:'#503000' };
+    const stroke = lvl_stroke[level]||'#A07800', fill=lvl_fill[level]||'#FAD860';
+    const bg=lvl_bg[level]||'#F0C030', text=lvl_text[level]||'#503000';
+    const w=size, h=size*1.1;
+    // Outer shield
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx+w/2, cy+h*0.2);
+    ctx.lineTo(cx+w/2, cy+h*0.6);
+    ctx.quadraticCurveTo(cx+w/4, cy+h, cx, cy+h);
+    ctx.quadraticCurveTo(cx-w/4, cy+h, cx-w/2, cy+h*0.6);
+    ctx.lineTo(cx-w/2, cy+h*0.2);
+    ctx.closePath();
+    ctx.fillStyle=bg; ctx.fill();
+    ctx.strokeStyle=stroke; ctx.lineWidth=2; ctx.stroke();
+    // Inner fill
+    const i=size*0.12;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy+i);
+    ctx.lineTo(cx+w/2-i, cy+h*0.22);
+    ctx.lineTo(cx+w/2-i, cy+h*0.58);
+    ctx.quadraticCurveTo(cx+w/4, cy+h-i, cx, cy+h-i);
+    ctx.quadraticCurveTo(cx-w/4, cy+h-i, cx-w/2+i, cy+h*0.58);
+    ctx.lineTo(cx-w/2+i, cy+h*0.22);
+    ctx.closePath();
+    ctx.fillStyle=fill; ctx.fill();
+    // Text
+    ctx.textAlign='center';
+    ctx.fillStyle=text; ctx.font=`500 ${Math.round(size*0.22)}px Outfit,Arial,sans-serif`;
+    ctx.fillText('LVL', cx, cy+h*0.52);
+    ctx.font=`bold ${Math.round(size*0.40)}px "Bebas Neue",Impact,Arial`;
+    ctx.fillText(String(level), cx, cy+h*0.84);
+  }
+
   async function _buildBestMomentCard(playerKey) {
     const players = _famRound.players||[];
     const pk = playerKey || players[0];
@@ -4970,6 +5067,12 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     ctx.fillText(String(score), chipX+chipW/2, chipY+chipH*0.72);
     ctx.fillStyle=d<0?'#fbbf24':d===0?_C.muted:'#ef4444'; ctx.font=`400 ${Math.round(16*sf)}px Outfit,Arial`;
     ctx.fillText(dStr, chipX+chipW/2, chipY+chipH*0.91);
+
+    // Level shield for kid players
+    if (pk === 'son' || pk === 'girl') {
+      const shieldSize = Math.round(36*sf);
+      _drawLevelShieldCanvas(ctx, chipX+chipW-shieldSize*0.6-8, chipY+10*sf, shieldSize, getKidLevel(pk==='son'?'son':'girl'));
+    }
 
     _drawPhotoFrame(ctx, W, H);
 
@@ -5276,8 +5379,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     if (failed.length === 0) btn.disabled = false;
 
     // Check kid milestones for son/girl in family rounds
-    if (players.includes('son'))  checkKidMilestones('son',  _famHoles);
-    if (players.includes('girl')) checkKidMilestones('girl', _famHoles);
+    if (players.includes('son'))  { checkKidMilestones('son',  _famHoles); localStorage.setItem('sv-son-played-family',  '1'); }
+    if (players.includes('girl')) { checkKidMilestones('girl', _famHoles); localStorage.setItem('sv-girl-played-family', '1'); }
 
     // Fire AI range tip async (account holder only, non-blocking)
     if (players.includes('dad')) {
