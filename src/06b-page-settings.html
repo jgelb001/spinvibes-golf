@@ -51,12 +51,25 @@
           </select>
         </div>
 
-        <div class="settings-row" style="border:none;">
+        <div class="settings-row">
           <label class="settings-label">Skill Level</label>
           <select id="set-skill" class="settings-select" onchange="markSettingsDirty()">
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
             <option value="advanced">Advanced</option>
+          </select>
+        </div>
+
+        <div class="settings-row" style="border:none;">
+          <label class="settings-label">Miss Tendency</label>
+          <select id="set-tendency" class="settings-select" onchange="markSettingsDirty()">
+            <option value="">None / Straight</option>
+            <option value="pull_left">Pull Left</option>
+            <option value="push_right">Push Right</option>
+            <option value="hook">Hook (hard left)</option>
+            <option value="slice">Slice (hard right)</option>
+            <option value="thin">Thin / Top it</option>
+            <option value="fat">Fat / Chunk it</option>
           </select>
         </div>
 

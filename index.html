@@ -4061,6 +4061,8 @@
 
         <div id="dad-approach-stats" style="display:none;margin-bottom:12px;"></div>
 
+        <div id="dad-hc-card" style="margin-bottom:4px;padding:0 4px;"></div>
+
         <!-- GAME PLAN SECTION -->
         <div style="margin-bottom:12px;">
           <button
@@ -4533,12 +4535,25 @@
           </select>
         </div>
 
-        <div class="settings-row" style="border:none;">
+        <div class="settings-row">
           <label class="settings-label">Skill Level</label>
           <select id="set-skill" class="settings-select" onchange="markSettingsDirty()">
             <option value="beginner">Beginner</option>
             <option value="intermediate">Intermediate</option>
             <option value="advanced">Advanced</option>
+          </select>
+        </div>
+
+        <div class="settings-row" style="border:none;">
+          <label class="settings-label">Miss Tendency</label>
+          <select id="set-tendency" class="settings-select" onchange="markSettingsDirty()">
+            <option value="">None / Straight</option>
+            <option value="pull_left">Pull Left</option>
+            <option value="push_right">Push Right</option>
+            <option value="hook">Hook (hard left)</option>
+            <option value="slice">Slice (hard right)</option>
+            <option value="thin">Thin / Top it</option>
+            <option value="fat">Fat / Chunk it</option>
           </select>
         </div>
 
@@ -5260,6 +5275,8 @@
         holePars:  Array.isArray(c.hole_pars)  ? c.hole_pars  : (c.hole_pars  ? JSON.parse(c.hole_pars)  : null),
         yardages:  Array.isArray(c.yardages)   ? c.yardages   : (c.yardages   ? JSON.parse(c.yardages)   : null),
         teeColor:  c.tee_color || null,
+        rating:    c.rating    || null,
+        slope:     c.slope     || null,
         _supabaseId: c.id,
         _custom:   true,
       }));
@@ -6809,6 +6826,7 @@
     // ── Temecula Creek Inn ─────────────────────────────────────
     // Source: physical scorecard. Creek = front 9, Stonehouse = back 9.
     { name: 'TCI — Creek + Stonehouse', par: 71, holes: 18, teeColor: 'Sage',
+      rating: 67.4, slope: 124,
       holePars:  [4,3,4,5,4,4,3,5,4, 4,4,4,4,3,4,4,3,5],
       yardages:  [333,150,323,492,349,367,163,453,334, 350,311,335,299,143,321,305,132,480],
     },
@@ -6822,11 +6840,13 @@
     },
     // Source: physical scorecard. Creek = front 9 (C10-C18), Oaks = back 9 (O1-O9). Sage tees.
     { name: 'TCI — Creek + Oaks', par: 72, holes: 18, teeColor: 'Sage',
+      rating: 67.4, slope: 124,
       holePars:  [4,3,4,5,4,4,3,5,4, 4,5,3,4,4,3,5,4,4],
       yardages:  [315,150,323,492,349,367,163,453,334, 300,475,140,385,365,110,438,363,333],
     },
     // Oaks front 9, then Creek back 9 (this weekend's rotation)
     { name: 'TCI — Oaks + Creek', par: 72, holes: 18, teeColor: 'Sage',
+      rating: 67.4, slope: 124,
       holePars:  [4,5,3,4,4,3,5,4,4, 4,3,4,5,4,4,3,5,4],
       yardages:  [300,475,140,385,365,110,438,363,333, 315,150,323,492,349,367,163,453,334],
     },
@@ -7336,6 +7356,7 @@
       statsBar.style.display = 'none';
     }
     renderApproachStats(scoredRounds);
+    renderHandicapCard(scoredRounds);
 
     // Achievements badges
     const dadBadgesHtml = scoredRounds.length >= 1 ? `
@@ -7401,6 +7422,118 @@
           </div>
         </div>`;
     }).join('') + legacyCards;
+  }
+
+  // ── HANDICAP CALCULATOR ──────────────────────────────────────
+  function calcScoreDifferential(score, rating, slope) {
+    return Math.round(((score - rating) * 113 / slope) * 10) / 10;
+  }
+
+  // WHS table: number of best differentials to average given N available rounds
+  function _whsBestCount(n) {
+    if (n <= 5)   return 1;
+    if (n <= 7)   return 2;
+    if (n <= 9)   return 3;
+    if (n <= 11)  return 4;
+    if (n <= 13)  return 5;
+    if (n === 14) return 6;
+    if (n === 15) return 6;
+    if (n === 16) return 6;
+    if (n === 17) return 7;
+    if (n === 18) return 7;
+    if (n === 19) return 8;
+    return 8;
+  }
+
+  // Returns { index, differentials, eligibleCount } or null if no eligible rounds
+  function calcHandicapIndex(rounds) {
+    // Enrich rounds with course rating/slope from COURSES list
+    const allCourses = getAllCourses();
+    const eligible = rounds
+      .filter(r => {
+        const rt = r.round_type || (r.course_par >= 60 ? 'regulation_18' : '');
+        return rt === 'regulation_18';
+      })
+      .map(r => {
+        const course = allCourses.find(c => c.name === r.course_name);
+        const rating = course?.rating || null;
+        const slope  = course?.slope  || null;
+        if (!rating || !slope) return null;
+        return {
+          date: r.date_played,
+          score: r.total_score,
+          rating, slope,
+          diff: calcScoreDifferential(r.total_score, rating, slope),
+          course: r.course_name,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    if (!eligible.length) return null;
+
+    const last20 = eligible.slice(-20);
+    const count  = _whsBestCount(last20.length);
+    const sorted = [...last20].sort((a, b) => a.diff - b.diff);
+    const best   = sorted.slice(0, count);
+    const avg    = best.reduce((s, d) => s + d.diff, 0) / best.length;
+    // WHS applies 0.96 multiplier (soft cap not implemented for simplicity)
+    const index  = Math.round(avg * 0.96 * 10) / 10;
+
+    return { index, differentials: last20, eligibleCount: eligible.length, usedCount: count };
+  }
+
+  function renderHandicapCard(rounds) {
+    const el = document.getElementById('dad-hc-card');
+    if (!el) return;
+    const hc = calcHandicapIndex(rounds);
+    if (!hc) {
+      el.innerHTML = `
+        <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;">
+          <div style="font-size:0.58rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:6px;">HANDICAP INDEX</div>
+          <div style="font-size:0.82rem;color:var(--muted);line-height:1.5;">No eligible rounds yet — play a regulation 18 at TCI to start tracking your index.</div>
+        </div>`;
+      return;
+    }
+    // Last 8 differentials for mini sparkline
+    const recent = hc.differentials.slice(-8);
+    const diffs  = recent.map(d => d.diff);
+    const dMin   = Math.min(...diffs);
+    const dMax   = Math.max(...diffs);
+    const dRange = dMax - dMin || 1;
+    const diffBars = recent.map((d, i) => {
+      // Lower diff = better = taller bar (invert scale)
+      const pct = 100 - Math.round(((d.diff - dMin) / dRange) * 70);
+      const isLast = i === recent.length - 1;
+      const col = d.diff < hc.index ? '#1E7A3A' : 'var(--border)';
+      return `<div title="${d.diff}" style="flex:1;height:${pct}%;min-height:15%;background:${isLast ? '#8a6010' : col};border-radius:2px 2px 0 0;"></div>`;
+    }).join('');
+
+    const indexColor = hc.index <= 18 ? 'var(--gold)' : hc.index <= 25 ? '#a78bfa' : 'var(--cream)';
+    el.innerHTML = `
+      <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px;">
+          <div>
+            <div style="font-size:0.58rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:4px;">HANDICAP INDEX</div>
+            <div style="display:flex;align-items:baseline;gap:6px;">
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:${indexColor};line-height:1;">${hc.index}</div>
+              <div style="font-size:0.72rem;color:var(--muted);">est. WHS</div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.58rem;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px;">ROUNDS USED</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--cream);line-height:1;">${hc.usedCount} <span style="font-size:0.9rem;">of</span> ${hc.eligibleCount}</div>
+            <div style="font-size:0.6rem;color:var(--muted);">best differentials</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:3px;height:28px;">
+          ${diffBars}
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:3px;">
+          <div style="font-size:0.55rem;color:var(--muted);">${recent[0]?.date?.slice(5) || ''}</div>
+          <div style="font-size:0.55rem;color:var(--gold);font-weight:600;">← recent · lower is better</div>
+        </div>
+      </div>`;
   }
 
   function renderApproachStats(rounds) {
@@ -9126,11 +9259,34 @@
 
   // ── AI CADDIE ─────────────────────────────────────────────────
   let _caddieHistory = [];
-  // Caddie system prompt — lean, fast
-  const _CADDIE_SYSTEM = `Jeremy's carries: Driver 190-200 | 7W 165-175 | 4H 170-180 | 4i ~165 | 5i ~155 | 6i 145-155 | 7i 130-137 | 8i 120-130 | 9i 110-120 | PW 90-110 | GW 85-105 | SW 80-90 | LW 60-75. Left-handed beginner, goal: break 90.
-Name the club. Show distance math in one line. One sentence of strategy. 2 sentences total. If no distance given, ask for it first.`;
 
-  function _caddieSystemWithCtx() { return _CADDIE_SYSTEM; }
+  // Caddie system prompt — strategic, conversational, course-management focused
+  const _CADDIE_SYSTEM = `You are a smart, concise on-course caddie for Jeremy — left-handed golfer, goal: break 90.
+
+CARRY DISTANCES (use ONLY these, never generic golf knowledge):
+Driver 190-200 | 7W 165-175 | 4H 170-180 | 4i ~165 | 5i ~155 | 6i 145-155 | 7i 130-137 | 8i 120-130 | 9i 110-120 | PW 90-110 | GW 85-105 | SW 80-90 | LW 60-75
+
+COURSE MANAGEMENT RULES:
+- Think in plays, not just clubs. Recommend the shot strategy first, then the club.
+- Always show distance math inline: "7-iron (130-137 yd carry, fits the 133 gap)."
+- If Jeremy is within 10 yds of his max carry and there is trouble (water, bunker, OB) beyond or left, offer the layup option: name the layup club and the resulting yardage in.
+- If wind, lie, or elevation is mentioned, factor it in explicitly.
+- If no yardage is given, ask for it before recommending anything.
+- 2-3 sentences max. Never pad with generic tips.`;
+
+  function _caddieSystemWithCtx() {
+    const tendency = localStorage.getItem('sv-dad-tendency') || '';
+    const tendencyMap = {
+      pull_left:   'Miss tendency: pulls left. Aim slightly right of target; avoid pins tucked left.',
+      push_right:  'Miss tendency: pushes right. Aim slightly left of target; avoid pins tucked right.',
+      hook:        'Miss tendency: hooks hard left. Club up and aim well right; avoid left trouble.',
+      slice:       'Miss tendency: slices right. Aim left of target and expect rightward curve.',
+      thin:        'Miss tendency: thins/tops. Take one extra club; do not try to help the ball up.',
+      fat:         'Miss tendency: hits fat. Ball slightly back in stance cue; take one less club.',
+    };
+    const tendencyLine = tendencyMap[tendency] || '';
+    return _CADDIE_SYSTEM + (tendencyLine ? '\n\nMISS TENDENCY: ' + tendencyLine : '');
+  }
 
   // Family-round caddie — player-aware yardage cards
   const _FAM_YARDAGES = {
@@ -10752,26 +10908,48 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--gold);">Add New Course</div>
         <button onclick="closeAddCourseOverlay()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">✕</button>
       </div>
-      <label class="modal-label">Tee Color (for yardage row)</label>
+
+      <!-- ── STEP 1: Search ── -->
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:2px;color:var(--gold);margin-bottom:8px;">SEARCH COURSE DATABASE</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input id="ac-search-input" class="modal-input" type="text" placeholder="e.g. Cross Creek, Native Oaks…"
+          style="flex:1;" onkeydown="if(event.key==='Enter')acSearchCourse()"
+          oninput="document.getElementById('ac-search-results').innerHTML='';document.getElementById('ac-search-status').textContent=''">
+        <button onclick="acSearchCourse()" class="btn-gold" style="padding:0 16px;flex:0 0 auto;font-size:0.82rem;">Search</button>
+      </div>
+      <div id="ac-search-status" style="font-size:0.8rem;color:var(--muted);margin-bottom:6px;"></div>
+      <div id="ac-search-results" style="margin-bottom:16px;display:flex;flex-direction:column;gap:6px;"></div>
+
+      <!-- ── Divider ── -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <div style="font-size:0.65rem;color:var(--muted);letter-spacing:1px;">OR SCAN A SCORECARD</div>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+      </div>
+
+      <!-- ── STEP 1b: Photo Parse ── -->
+      <label class="modal-label">Tee Color</label>
       <div class="pill-row" id="ac-tee-pills" style="margin-bottom:16px;">
         <div class="pill active" onclick="selectPill(this,'ac-tee-pills')" data-val="White">White</div>
         <div class="pill" onclick="selectPill(this,'ac-tee-pills')" data-val="Gold">Gold</div>
         <div class="pill" onclick="selectPill(this,'ac-tee-pills')" data-val="Blue">Blue</div>
+        <div class="pill" onclick="selectPill(this,'ac-tee-pills')" data-val="Sage">Sage</div>
         <div class="pill" onclick="selectPill(this,'ac-tee-pills')" data-val="Red">Red</div>
       </div>
-      <label class="modal-label">Scorecard Photo</label>
       <input type="file" id="ac-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="acPhotoSelected(this)">
       <button onclick="document.getElementById('ac-photo-input').click()"
-        style="width:100%;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:12px;padding:20px;color:var(--muted);font-size:0.88rem;cursor:pointer;margin-bottom:12px;">
+        style="width:100%;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:12px;padding:18px;color:var(--muted);font-size:0.88rem;cursor:pointer;margin-bottom:10px;">
         📸 Take Photo or Upload Scorecard
       </button>
-      <div id="ac-photo-preview" style="display:none;margin-bottom:12px;">
+      <div id="ac-photo-preview" style="display:none;margin-bottom:10px;">
         <img id="ac-preview-img" style="width:100%;border-radius:10px;border:1px solid rgba(138,96,16,0.2);">
       </div>
-      <button id="ac-parse-btn" onclick="acParseScorecard()" style="display:none;width:100%;margin-bottom:16px;" class="btn-gold">
-        Parse Scorecard →
+      <button id="ac-parse-btn" onclick="acParseScorecard()" style="display:none;width:100%;margin-bottom:14px;" class="btn-gold">
+        Read Scorecard with AI →
       </button>
-      <div id="ac-parse-status" style="text-align:center;font-size:0.85rem;color:var(--muted);margin-bottom:12px;"></div>
+      <div id="ac-parse-status" style="text-align:center;font-size:0.85rem;color:var(--muted);margin-bottom:10px;"></div>
+
+      <!-- ── STEP 2: Review + save ── -->
       <div id="ac-review-form" style="display:none;"></div>
     `;
   }
@@ -10779,6 +10957,86 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   function closeAddCourseOverlay() {
     const overlay = document.getElementById('add-course-overlay');
     if (overlay) overlay.style.display = 'none';
+  }
+
+  async function acSearchCourse() {
+    const query    = (document.getElementById('ac-search-input')?.value || '').trim();
+    const statusEl = document.getElementById('ac-search-status');
+    const resultsEl= document.getElementById('ac-search-results');
+    if (!query || query.length < 2) { if (statusEl) statusEl.textContent = 'Type at least 2 characters'; return; }
+
+    if (statusEl) statusEl.textContent = 'Searching…';
+    if (resultsEl) resultsEl.innerHTML = '';
+
+    try {
+      const resp = await fetch(CADDIE_URL + '/course-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-SpinVibes-Token': WORKER_SECRET },
+        body: JSON.stringify({ query }),
+      });
+      const data = await resp.json();
+
+      if (!resp.ok || data.error) {
+        if (statusEl) statusEl.textContent = data.error || 'Search failed — check your signal';
+        return;
+      }
+
+      const courses = data.courses || [];
+      if (!courses.length) {
+        if (statusEl) statusEl.textContent = 'No courses found — try a different name or scan the scorecard below';
+        return;
+      }
+
+      if (statusEl) statusEl.textContent = `${courses.length} course${courses.length !== 1 ? 's' : ''} found — tap to select`;
+      if (resultsEl) {
+        resultsEl.innerHTML = courses.map(c => {
+          const loc = [c.city, c.state].filter(Boolean).join(', ');
+          const sub = c.course ? `<div style="font-size:0.72rem;color:var(--muted);">${c.course}${loc ? ' · ' + loc : ''}</div>` :
+                      loc ? `<div style="font-size:0.72rem;color:var(--muted);">${loc}</div>` : '';
+          return `<div onclick="acSelectSearchResult(${c.id})"
+            style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color 0.15s;"
+            onmouseenter="this.style.borderColor='rgba(138,96,16,0.5)'" onmouseleave="this.style.borderColor='var(--border)'">
+            <div style="font-size:0.88rem;font-weight:600;color:var(--cream);">${c.name}</div>
+            ${sub}
+          </div>`;
+        }).join('');
+      }
+    } catch (e) {
+      if (statusEl) statusEl.textContent = 'Network error — check your signal';
+      console.error(e);
+    }
+  }
+
+  async function acSelectSearchResult(courseId) {
+    const teeColor  = document.querySelector('#ac-tee-pills .pill.active')?.dataset.val || 'White';
+    const statusEl  = document.getElementById('ac-search-status');
+    const resultsEl = document.getElementById('ac-search-results');
+
+    if (statusEl) statusEl.textContent = 'Loading course data…';
+    if (resultsEl) resultsEl.innerHTML = '';
+
+    try {
+      const resp = await fetch(CADDIE_URL + '/course-detail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-SpinVibes-Token': WORKER_SECRET },
+        body: JSON.stringify({ courseId, teeColor }),
+      });
+      const data = await resp.json();
+
+      if (!resp.ok || data.error) {
+        if (statusEl) statusEl.textContent = data.error || 'Failed to load course data';
+        return;
+      }
+
+      _parsedCourse = data.course;
+      if (statusEl) statusEl.textContent = '';
+      renderAcReviewForm(_parsedCourse);
+      // Scroll to review form
+      setTimeout(() => document.getElementById('ac-review-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    } catch (e) {
+      if (statusEl) statusEl.textContent = 'Network error — check your signal';
+      console.error(e);
+    }
   }
 
   function acPhotoSelected(input) {
@@ -10812,7 +11070,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const base64    = resized.split(',')[1];
       const mediaType = resized.startsWith('data:image/png') ? 'image/png' : 'image/jpeg';
 
-      const resp = await fetch('https://golf.spinvibes.com/.netlify/functions/parse-scorecard', {
+      const resp = await fetch(CADDIE_URL + '/parse-scorecard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-SpinVibes-Token': WORKER_SECRET },
         body: JSON.stringify({ image: base64, mediaType, teeColor }),
@@ -10883,6 +11141,29 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
             <input type="number" id="ac-holes" class="modal-input" value="${course.holes||18}">
           </div>
         </div>
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;">
+            <label class="modal-label">Course Rating</label>
+            <input type="number" id="ac-rating" class="modal-input" step="0.1" placeholder="e.g. 71.4"
+              value="${course.rating !== null && course.rating !== undefined ? course.rating : ''}">
+          </div>
+          <div style="flex:1;">
+            <label class="modal-label">Slope Rating</label>
+            <input type="number" id="ac-slope" class="modal-input" placeholder="e.g. 128"
+              value="${course.slope !== null && course.slope !== undefined ? course.slope : ''}">
+          </div>
+        </div>
+        ${course.allTees && course.allTees.length > 1 ? `
+        <div style="margin-top:4px;">
+          <label class="modal-label">Switch Tee</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            ${course.allTees.map(t => `
+              <button onclick="acSwitchTee(${JSON.stringify(t).replace(/"/g,'&quot;')})"
+                style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:0.75rem;color:var(--cream);cursor:pointer;">
+                ${t.name}${t.rating ? ' · ' + t.rating + '/' + t.slope : ''}
+              </button>`).join('')}
+          </div>
+        </div>` : ''}
       </div>
       <div style="background:var(--surface);border-radius:12px;padding:14px 16px;margin-bottom:14px;">
         <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Hole Details — review &amp; fix any misreads</div>
@@ -10900,6 +11181,20 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       <button class="btn-primary" style="width:100%;margin-bottom:8px;" onclick="acSaveCourse()">Save Course ✓</button>
       <div id="ac-save-status" style="text-align:center;font-size:0.82rem;color:var(--muted);"></div>
     `;
+  }
+
+  function acSwitchTee(tee) {
+    // Swap rating/slope/yardages to the selected tee without re-fetching
+    const ratingEl = document.getElementById('ac-rating');
+    const slopeEl  = document.getElementById('ac-slope');
+    if (ratingEl) ratingEl.value = tee.rating || '';
+    if (slopeEl)  slopeEl.value  = tee.slope  || '';
+    if (_parsedCourse) {
+      _parsedCourse.rating   = tee.rating || null;
+      _parsedCourse.slope    = tee.slope  || null;
+      _parsedCourse.teeColor = tee.name   || _parsedCourse.teeColor;
+    }
+    showToast(`Switched to ${tee.name} tees`);
   }
 
   function acUpdateHole(idx, field, val) {
@@ -10928,6 +11223,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
 
     try {
+      const rating = parseFloat(document.getElementById('ac-rating')?.value) || _parsedCourse?.rating || null;
+      const slope  = parseInt(document.getElementById('ac-slope')?.value)   || _parsedCourse?.slope  || null;
+
       const { error } = await _sb.from('courses').insert([{
         name,
         par,
@@ -10937,6 +11235,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         tee_color:  teeColor,
         hole_pars:  _parsedCourse?.holePars  || null,
         yardages:   _parsedCourse?.yardages  || null,
+        rating:     rating,
+        slope:      slope,
         submitted_by: 'jeremy',
       }]);
       if (error) throw error;
@@ -11117,6 +11417,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     if (goalEl)  goalEl.value  = p.goal_score   || 90;
     if (handEl)  handEl.value  = p.handedness   || 'left';
     if (skillEl) skillEl.value = p.skill_level  || 'intermediate';
+    const tendEl = document.getElementById('set-tendency');
+    if (tendEl)  tendEl.value  = localStorage.getItem('sv-dad-tendency') || '';
 
     // Bag — deep copy so edits don't mutate active clubs until Save
     _settingsClubs = getActiveClubs().map(c => ({ ...c }));
@@ -11313,6 +11615,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const goal_score   = parseInt(document.getElementById('set-goal')?.value)  || 90;
       const handedness   = document.getElementById('set-hand')?.value            || 'left';
       const skill_level  = document.getElementById('set-skill')?.value           || 'intermediate';
+      const tendency     = document.getElementById('set-tendency')?.value        || '';
+      localStorage.setItem('sv-dad-tendency', tendency);
 
       // 2. Upsert profile
       const saved = await saveProfileToSupabase({
