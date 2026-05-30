@@ -171,7 +171,7 @@
     3: { // L4→L5 (Par Machine → Course Reader)
       title: 'Two-Par Challenge',
       badge: 'PGA Prep Golf',
-      desc:  'Make par on at least 2 holes — same round or across rounds. Prove it wasn't a fluke.',
+      desc:  'Make par on at least 2 holes — same round or across rounds. Prove it was not a fluke.',
       short: '2 pars recorded',
       check: (who, rounds) => {
         let total = 0;
@@ -1375,7 +1375,7 @@
     saveKidRangeSession(who, { focus, feel: _rlFeel, notes });
     document.getElementById('range-log-overlay')?.remove();
     const name = who === 'son' ? 'Son' : 'Daughter';
-    showToast(name + ''s range session logged!', 'gold');
+    showToast(name + '\'s range session logged!', 'gold');
     // Auto-check if challenge now met
     const rounds = who === 'son' ? _dadLoadedRounds : []; // best effort — challenge check uses localStorage
     autoCheckChallenge(who, rounds);
@@ -1463,7 +1463,7 @@
     }
     document.getElementById('kid-checkin-overlay')?.remove();
     const name = who === 'son' ? 'Son' : 'Daughter';
-    if (score >= 3) showToast(name + ''s Level ' + (level+1) + ' check-in passed!', 'gold');
+    if (score >= 3) showToast(name + '\'s Level ' + (level+1) + ' check-in passed!', 'gold');
     else showToast('Check-in saved — keep working toward it!');
     if (who === 'son') loadSonRoundsAndRender();
     if (who === 'girl') loadGirlRoundsAndRender();
