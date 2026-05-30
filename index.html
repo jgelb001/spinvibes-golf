@@ -6683,6 +6683,22 @@
             <div style="font-size:1.6rem;font-weight:700;color:var(--cream);" id="dh-putts-big">${h.putts}</div>
             <button class="stepper-btn" onclick="dadHolePutts(1)" style="width:48px;height:48px;font-size:1.4rem;">+</button>
           </div>
+          <!-- Hole Photo -->
+          <label class="modal-label" style="margin-bottom:6px;">Hole Photo <span style="font-size:0.62rem;opacity:0.5;font-weight:400;">(appears on share card)</span></label>
+          <input type="file" id="dh-photo-input" accept="image/*" style="display:none;" onchange="dadHolePhotoSelected(this)">
+          <div id="dh-photo-wrap" style="margin-bottom:10px;">
+            ${h.photo
+              ? `<div style="position:relative;display:inline-block;">
+                  <img src="${h.photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid rgba(138,96,16,0.3);">
+                  <button onclick="_dadHoles[_dadHoleIdx].photo=null;renderDadLiveHole();" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;width:24px;height:24px;color:#fff;font-size:0.75rem;cursor:pointer;">✕</button>
+                </div>`
+              : `<div style="display:flex;gap:8px;">
+                  <button onclick="document.getElementById('dh-photo-input').setAttribute('capture','environment');document.getElementById('dh-photo-input').click()"
+                    style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:8px;padding:10px;color:var(--muted);font-size:0.8rem;cursor:pointer;">📷 Camera</button>
+                  <button onclick="document.getElementById('dh-photo-input').removeAttribute('capture');document.getElementById('dh-photo-input').click()"
+                    style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:8px;padding:10px;color:var(--muted);font-size:0.8rem;cursor:pointer;">🖼 Roll</button>
+                </div>`}
+          </div>
           <!-- Shot Dispersion -->
           <label class="modal-label" style="margin-bottom:6px;">Approach Miss <span style="font-size:0.62rem;opacity:0.5;font-weight:400;">(optional)</span></label>
           <div class="pill-row" id="dh-miss-dir-pills" style="margin-bottom:8px;">
@@ -6783,6 +6799,7 @@
       || (_manualYards ? (suggestClub(_manualYards)?.name || null) : null);
     _dadHoles[_dadHoleIdx].miss_dir   = document.querySelector('#dh-miss-dir-pills .pill.active')?.dataset.val   || null;
     _dadHoles[_dadHoleIdx].miss_depth = document.querySelector('#dh-miss-depth-pills .pill.active')?.dataset.val || null;
+    // photo already stored directly on _dadHoles[_dadHoleIdx].photo by dadHolePhotoSelected()
     _selectedApproachClub = null; _manualYards = null;
     if (_dadHoleIdx === _dadHoles.length - 1) {
       _clearDraftRound();
@@ -6792,6 +6809,20 @@
       _saveDraftRound();
       renderDadLiveHole();
     }
+  }
+
+  function dadHolePhotoSelected(input) {
+    const file = input.files[0];
+    if (!file) return;
+    famResizePhoto(null, 1200, file).then(dataUrl => {
+      _dadHoles[_dadHoleIdx].photo = dataUrl;
+      const wrap = document.getElementById('dh-photo-wrap');
+      if (wrap) wrap.innerHTML = `
+        <div style="position:relative;display:inline-block;width:100%;">
+          <img src="${dataUrl}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid rgba(138,96,16,0.3);">
+          <button onclick="_dadHoles[_dadHoleIdx].photo=null;renderDadLiveHole();" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;width:24px;height:24px;color:#fff;font-size:0.75rem;cursor:pointer;">✕</button>
+        </div>`;
+    });
   }
 
   function dadToggleDistPanel() {
@@ -8472,7 +8503,10 @@
           <span style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform 0.2s;" id="dr-save-thumb"></span>
         </label>
       </div>
-      <button class="btn-primary" style="width:100%;margin-top:8px;" onclick="saveDadRoundFull()">Save Round</button>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn-ghost" style="flex:0 0 auto;padding:0 16px;" onclick="showDadSharePicker()">📤 Share</button>
+        <button class="btn-primary" style="flex:1;" onclick="saveDadRoundFull()">Save Round</button>
+      </div>
     `;
     // wire toggle visuals
     const cb = document.getElementById('dr-do-save');
@@ -10160,6 +10194,24 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
   // ── SHARE TEMPLATE PICKER ────────────────────────────────────
   let _shareOrientation = 'portrait'; // 'portrait' | 'landscape'
+
+  function showDadSharePicker() {
+    // Map dad solo round into the family round format so all 3 share templates work
+    _famRound = {
+      course_name: _dadRound.course_name || 'Round',
+      date_played: _dadRound.date_played || new Date().toISOString().slice(0,10),
+      course_par:  _dadRound.course_par  || 72,
+      players:     ['dad'],
+    };
+    _famHoles = (_dadHoles || []).map(h => ({
+      hole:   h.hole,
+      par:    h.par,
+      yds:    h.yds || null,
+      photo:  h.photo || null,
+      scores: { dad: h.score || 0 },
+    }));
+    showSharePicker();
+  }
 
   function showSharePicker() {
     const overlay = document.createElement('div');
