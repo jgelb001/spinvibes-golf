@@ -7106,9 +7106,9 @@
     if (!body) return;
     const activeClubs = getActiveClubs();
     body.innerHTML = activeClubs.map((c, i) => {
-      const logged = saved[c.name];
       const hits   = saved[c.name + '_n'] || 0;
-      const carry  = logged !== undefined ? logged : c.dist;
+      // Always use confirmed distance from Settings/Supabase (c.dist) — never let old logged data override
+      const carry  = c.dist;
       const isLast = i === activeClubs.length - 1;
       const nameCell = c.wedge ? `<strong>${c.display}</strong>` : c.display;
       const loftStyle = c.wedge ? 'color:var(--gold-l);' : '';
