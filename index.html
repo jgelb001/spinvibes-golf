@@ -4945,6 +4945,44 @@
     { id:'kid_loves_game',   name:'Loves the Game', desc:'10 rounds played',              color:'#ec4899',
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.15"/><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2.5"/><text x="28" y="34" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" fill="{{c}}">10+</text></svg>`,
       check:(who,rounds)=>rounds.length>=10 },
+
+    // ── Auto badges ──────────────────────────────────────────────
+    { id:'kid_bucket_emptier', name:'Bucket Emptier',  desc:'10 range sessions logged',      color:'#f97316',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><rect x="18" y="20" width="20" height="22" rx="3" fill="none" stroke="{{c}}" stroke-width="2"/><path d="M22 20 L22 16 Q28 12 34 16 L34 20" fill="none" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="24" y1="27" x2="32" y2="27" stroke="{{c}}" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/><line x1="24" y1="31" x2="32" y2="31" stroke="{{c}}" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/><line x1="24" y1="35" x2="32" y2="35" stroke="{{c}}" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/></svg>`,
+      check:(who,rounds)=>getKidRangeSessions(who).length>=10 },
+    { id:'kid_hat_trick',      name:'Hat Trick',       desc:'3 rounds in one month',         color:'#0ea5e9',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><text x="28" y="26" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="11" fill="{{c}}" opacity="0.8">HAT</text><text x="28" y="40" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="16" fill="{{c}}">3x</text></svg>`,
+      check:(who,rounds)=>{
+        const counts={};
+        (rounds||[]).forEach(r=>{
+          const k=(r.date_played||'').slice(0,7);
+          if(k) counts[k]=(counts[k]||0)+1;
+        });
+        return Object.values(counts).some(v=>v>=3);
+      }},
+    { id:'kid_road_warrior',   name:'Road Warrior',    desc:'Played 5 different courses',    color:'#8b5cf6',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><path d="M14 36 Q20 20 28 24 Q36 28 42 20" fill="none" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/><circle cx="14" cy="36" r="3" fill="{{c}}" opacity="0.8"/><circle cx="28" cy="24" r="3" fill="{{c}}" opacity="0.8"/><circle cx="42" cy="20" r="3" fill="{{c}}" opacity="0.8"/></svg>`,
+      check:(who,rounds)=>new Set((rounds||[]).map(r=>r.course_name)).size>=5 },
+    { id:'kid_family_tradition',name:'Family Tradition',desc:'5 family rounds played',       color:'#14b8a6',
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="18" cy="20" r="4" fill="{{c}}" opacity="0.8"/><circle cx="38" cy="20" r="4" fill="{{c}}" opacity="0.8"/><circle cx="28" cy="22" r="4" fill="{{c}}" opacity="0.8"/><path d="M10 38 Q18 28 28 32 Q38 28 46 38" fill="none" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><text x="28" y="50" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="9" fill="{{c}}" opacity="0.8">5x</text></svg>`,
+      check:(who,rounds)=>(parseInt(localStorage.getItem('sv-'+who+'-family-count')||'0')>=5) },
+
+    // ── Manual badges (account holder awards) ────────────────────
+    { id:'kid_rainmaker',   name:'Rainmaker',    desc:'Played a round in the rain',    color:'#38bdf8', manual:true,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><path d="M18 24 Q28 12 38 24" fill="{{c}}" opacity="0.25"/><path d="M18 24 Q28 12 38 24 Q40 28 28 28 Q16 28 18 24Z" fill="{{c}}" opacity="0.6"/><line x1="20" y1="33" x2="18" y2="40" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="28" y1="33" x2="26" y2="40" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="36" y1="33" x2="34" y2="40" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/></svg>`,
+      check:(who)=>!!localStorage.getItem('sv-'+who+'-badge-kid_rainmaker') },
+    { id:'kid_early_bird',  name:'Early Bird',   desc:'Tee time before 8am',           color:'#fbbf24', manual:true,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="28" cy="26" r="9" fill="{{c}}" opacity="0.25"/><circle cx="28" cy="26" r="9" fill="none" stroke="{{c}}" stroke-width="2"/><line x1="28" y1="12" x2="28" y2="16" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="28" y1="36" x2="28" y2="40" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="14" y1="26" x2="18" y2="26" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="38" y1="26" x2="42" y2="26" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><text x="28" y="43" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="8" fill="{{c}}">RISE &amp; SHINE</text></svg>`,
+      check:(who)=>!!localStorage.getItem('sv-'+who+'-badge-kid_early_bird') },
+    { id:'kid_sunset',      name:'Sunset Round', desc:'Played a round after 5pm',      color:'#f97316', manual:true,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><path d="M14 36 Q28 20 42 36" fill="{{c}}" opacity="0.2"/><path d="M14 36 Q28 20 42 36Z" fill="none" stroke="{{c}}" stroke-width="2"/><line x1="28" y1="16" x2="28" y2="12" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="22" x2="13" y2="19" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="40" y1="22" x2="43" y2="19" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="36" x2="46" y2="36" stroke="{{c}}" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/></svg>`,
+      check:(who)=>!!localStorage.getItem('sv-'+who+'-badge-kid_sunset') },
+    { id:'kid_sidekick',    name:'Sidekick',     desc:'Caddied for a full round',      color:'#a78bfa', manual:true,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="28" cy="19" r="6" fill="{{c}}" opacity="0.6"/><path d="M16 38 Q28 28 40 38" fill="none" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/><line x1="28" y1="38" x2="28" y2="45" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="22" y1="32" x2="28" y2="38" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/></svg>`,
+      check:(who)=>!!localStorage.getItem('sv-'+who+'-badge-kid_sidekick') },
+    { id:'kid_dynamic_duo', name:'Dynamic Duo',  desc:'Played same day as account holder', color:'#f43f5e', manual:true,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="20" cy="20" r="5" fill="{{c}}" opacity="0.7"/><circle cx="36" cy="20" r="5" fill="{{c}}" opacity="0.7"/><path d="M12 36 Q20 26 28 30 Q36 26 44 36" fill="none" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+      check:(who)=>!!localStorage.getItem('sv-'+who+'-badge-kid_dynamic_duo') },
   ];
 
   // ── CLUBS — declared at top so bag/caddie never hit TDZ from init errors ──
@@ -5977,7 +6015,11 @@
           <div style="font-size:0.72rem;color:var(--muted);line-height:1.4;">${def.desc}</div>
         </div>
       </div>`;
-    const kidBadgeHtml = KID_BADGES.map(b => {
+    const autoBadges   = KID_BADGES.filter(b => !b.manual);
+    const manualBadges = KID_BADGES.filter(b =>  b.manual);
+    const isAdmin = !!sessionStorage.getItem('sv-dad-unlocked');
+
+    const autoBadgeHtml = autoBadges.map(b => {
       const earned = b.check(who, rounds);
       const c = earned ? b.color : '#888';
       const svgHtml = b.svg.replace(/\{\{c\}\}/g, c);
@@ -5986,11 +6028,62 @@
         <div class="badge-name">${b.name}</div>
       </div>`;
     }).join('');
+
+    const manualBadgeHtml = manualBadges.map(b => {
+      const earned = b.check(who);
+      const c = earned ? b.color : '#888';
+      const svgHtml = b.svg.replace(/\{\{c\}\}/g, c);
+      const awardBtn = isAdmin
+        ? `<div onclick="toggleManualBadge('${who}','${b.id}',this)"
+            style="font-size:0.55rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;
+              color:${earned ? '#ef4444' : b.color};cursor:pointer;margin-top:2px;opacity:0.8;">
+            ${earned ? '✕ Revoke' : '+ Award'}
+          </div>`
+        : '';
+      return `<div class="badge-item ${earned ? 'earned' : 'locked'}" title="${b.desc}" id="mb-${who}-${b.id}">
+        <div class="badge-svg-wrap ${earned ? '' : 'locked'}">${svgHtml}</div>
+        <div class="badge-name">${b.name}</div>
+        ${awardBtn}
+      </div>`;
+    }).join('');
+
     return `${shieldHtml}
       <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:${color};margin-bottom:8px;">ACHIEVEMENTS</div>
-      <div class="badge-shelf" style="margin-bottom:4px;">${kidBadgeHtml}</div>
-      <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-top:12px;margin-bottom:8px;">SHARED BADGES</div>
+      <div class="badge-shelf" style="margin-bottom:4px;">${autoBadgeHtml}</div>
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-top:14px;margin-bottom:8px;">SPECIAL MOMENTS ${isAdmin ? '<span style="font-size:0.55rem;opacity:0.6;font-weight:400;letter-spacing:0;text-transform:none;">— tap to award</span>' : ''}</div>
+      <div class="badge-shelf" style="margin-bottom:4px;">${manualBadgeHtml}</div>
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-top:14px;margin-bottom:8px;">SHARED BADGES</div>
       ${renderBadges(rounds, color)}`;
+  }
+
+  function toggleManualBadge(who, badgeId, el) {
+    const key     = 'sv-' + who + '-badge-' + badgeId;
+    const earned  = !!localStorage.getItem(key);
+    if (earned) {
+      localStorage.removeItem(key);
+      showToast('Badge removed');
+    } else {
+      localStorage.setItem(key, '1');
+      showToast('Badge awarded! 🎖️');
+    }
+    // Re-render the badge item in place
+    const badge = KID_BADGES.find(b => b.id === badgeId);
+    if (!badge) return;
+    const newEarned = !earned;
+    const c = newEarned ? badge.color : '#888';
+    const svgHtml = badge.svg.replace(/\{\{c\}\}/g, c);
+    const container = document.getElementById('mb-' + who + '-' + badgeId);
+    if (container) {
+      container.className = 'badge-item ' + (newEarned ? 'earned' : 'locked');
+      container.innerHTML = `
+        <div class="badge-svg-wrap ${newEarned ? '' : 'locked'}">${svgHtml}</div>
+        <div class="badge-name">${badge.name}</div>
+        <div onclick="toggleManualBadge('${who}','${badgeId}',this)"
+          style="font-size:0.55rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;
+            color:${newEarned ? '#ef4444' : badge.color};cursor:pointer;margin-top:2px;opacity:0.8;">
+          ${newEarned ? '✕ Revoke' : '+ Award'}
+        </div>`;
+    }
   }
 
 
@@ -6576,6 +6669,18 @@
             <div style="font-size:1.6rem;font-weight:700;color:var(--cream);" id="dh-putts-big">${h.putts}</div>
             <button class="stepper-btn" onclick="dadHolePutts(1)" style="width:48px;height:48px;font-size:1.4rem;">+</button>
           </div>
+          <!-- Shot Dispersion -->
+          <label class="modal-label" style="margin-bottom:6px;">Approach Miss <span style="font-size:0.62rem;opacity:0.5;font-weight:400;">(optional)</span></label>
+          <div class="pill-row" id="dh-miss-dir-pills" style="margin-bottom:8px;">
+            <div class="pill${h.miss_dir==='left'?' active':''}"   onclick="selectPill(this,'dh-miss-dir-pills')" data-val="left">← Left</div>
+            <div class="pill${h.miss_dir==='center'?' active':''}" onclick="selectPill(this,'dh-miss-dir-pills')" data-val="center">✓ On</div>
+            <div class="pill${h.miss_dir==='right'?' active':''}"  onclick="selectPill(this,'dh-miss-dir-pills')" data-val="right">Right →</div>
+          </div>
+          <div class="pill-row" id="dh-miss-depth-pills" style="margin-bottom:6px;">
+            <div class="pill${h.miss_depth==='short'?' active':''}"  onclick="selectPill(this,'dh-miss-depth-pills')" data-val="short">Short</div>
+            <div class="pill${h.miss_depth==='pin'?' active':''}"    onclick="selectPill(this,'dh-miss-depth-pills')" data-val="pin">Pin High</div>
+            <div class="pill${h.miss_depth==='long'?' active':''}"   onclick="selectPill(this,'dh-miss-depth-pills')" data-val="long">Long</div>
+          </div>
         </div>
       </div>
       <!-- CADDIE PANEL -->
@@ -6662,6 +6767,8 @@
     _dadHoles[_dadHoleIdx].approach_yds  = _manualYards || null;
     _dadHoles[_dadHoleIdx].approach_club = _selectedApproachClub
       || (_manualYards ? (suggestClub(_manualYards)?.name || null) : null);
+    _dadHoles[_dadHoleIdx].miss_dir   = document.querySelector('#dh-miss-dir-pills .pill.active')?.dataset.val   || null;
+    _dadHoles[_dadHoleIdx].miss_depth = document.querySelector('#dh-miss-depth-pills .pill.active')?.dataset.val || null;
     _selectedApproachClub = null; _manualYards = null;
     if (_dadHoleIdx === _dadHoles.length - 1) {
       _clearDraftRound();
@@ -7683,6 +7790,97 @@
           ✅ Green = avg ≤ +0.5 &nbsp; 🟡 Gold = ≤ +1.2 &nbsp; 🔴 Red = > +1.2
         </div>
         ${trendHtml}
+        ${renderDispersionSection(rounds)}
+      </div>`;
+  }
+
+  function renderDispersionSection(rounds) {
+    // Collect all holes with miss_dir or miss_depth data
+    const missHoles = [];
+    rounds.forEach(r => {
+      const holes = Array.isArray(r.holes) ? r.holes : JSON.parse(r.holes || '[]');
+      holes.forEach(h => { if (h.miss_dir || h.miss_depth) missHoles.push(h); });
+    });
+    if (missHoles.length < 3) return ''; // Need at least 3 data points
+
+    // Direction counts
+    const dir = { left:0, center:0, right:0 };
+    missHoles.forEach(h => { if (h.miss_dir && dir[h.miss_dir] !== undefined) dir[h.miss_dir]++; });
+    const dirTotal = dir.left + dir.center + dir.right || 1;
+
+    // Depth counts
+    const dep = { short:0, pin:0, long:0 };
+    missHoles.forEach(h => { if (h.miss_depth && dep[h.miss_depth] !== undefined) dep[h.miss_depth]++; });
+    const depTotal = dep.short + dep.pin + dep.long || 1;
+
+    const pct = (n, t) => Math.round(n / t * 100);
+    const bar = (pct, color) =>
+      `<div style="height:8px;border-radius:4px;background:${color};width:${Math.max(pct,4)}%;transition:width 0.3s;"></div>`;
+
+    // Dominant miss for callout
+    const dominantDir   = dir.left > dir.right && dir.left > dir.center ? 'left'
+                        : dir.right > dir.left && dir.right > dir.center ? 'right' : 'center';
+    const dominantDepth = dep.short > dep.long && dep.short > dep.pin ? 'short'
+                        : dep.long > dep.short && dep.long > dep.pin ? 'long' : 'pin high';
+    const tipMap = {
+      left:   'You miss left. Aim slightly right of target, avoid pins tucked left.',
+      right:  'You miss right. Aim slightly left of target, avoid pins tucked right.',
+      center: 'Solid direction — keep tracking to confirm the pattern.',
+    };
+    const tip = tipMap[dominantDir];
+
+    return `
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.07);">
+        <div style="font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:10px;">
+          Shot Dispersion <span style="font-weight:400;opacity:0.6;">(${missHoles.length} shots)</span>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--muted);margin-bottom:4px;">
+            <span>Direction</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-size:0.72rem;color:var(--cream);width:52px;">← Left</div>
+              <div style="flex:1;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;">${bar(pct(dir.left,dirTotal),'#f97316')}</div>
+              <div style="font-size:0.72rem;color:var(--muted);width:32px;text-align:right;">${pct(dir.left,dirTotal)}%</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-size:0.72rem;color:var(--cream);width:52px;">✓ On</div>
+              <div style="flex:1;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;">${bar(pct(dir.center,dirTotal),'#22c55e')}</div>
+              <div style="font-size:0.72rem;color:var(--muted);width:32px;text-align:right;">${pct(dir.center,dirTotal)}%</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-size:0.72rem;color:var(--cream);width:52px;">Right →</div>
+              <div style="flex:1;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;">${bar(pct(dir.right,dirTotal),'#3b82f6')}</div>
+              <div style="font-size:0.72rem;color:var(--muted);width:32px;text-align:right;">${pct(dir.right,dirTotal)}%</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-size:0.72rem;color:var(--cream);width:52px;">Short</div>
+              <div style="flex:1;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;">${bar(pct(dep.short,depTotal),'#f97316')}</div>
+              <div style="font-size:0.72rem;color:var(--muted);width:32px;text-align:right;">${pct(dep.short,depTotal)}%</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-size:0.72rem;color:var(--cream);width:52px;">Pin High</div>
+              <div style="flex:1;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;">${bar(pct(dep.pin,depTotal),'#22c55e')}</div>
+              <div style="font-size:0.72rem;color:var(--muted);width:32px;text-align:right;">${pct(dep.pin,depTotal)}%</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-size:0.72rem;color:var(--cream);width:52px;">Long</div>
+              <div style="flex:1;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden;">${bar(pct(dep.long,depTotal),'#3b82f6')}</div>
+              <div style="font-size:0.72rem;color:var(--muted);width:32px;text-align:right;">${pct(dep.long,depTotal)}%</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(138,96,16,0.1);border:1px solid rgba(138,96,16,0.2);border-radius:8px;padding:8px 12px;font-size:0.76rem;color:var(--cream);line-height:1.5;">
+          <strong style="color:var(--gold);">Pattern:</strong> ${tip} Typical depth: <strong>${dominantDepth}</strong>.
+        </div>
       </div>`;
   }
 
@@ -10837,8 +11035,16 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     if (failed.length === 0) btn.disabled = false;
 
     // Check kid milestones for son/girl in family rounds
-    if (players.includes('son'))  { checkKidMilestones('son',  _famHoles); localStorage.setItem('sv-son-played-family',  '1'); }
-    if (players.includes('girl')) { checkKidMilestones('girl', _famHoles); localStorage.setItem('sv-girl-played-family', '1'); }
+    if (players.includes('son'))  {
+      checkKidMilestones('son',  _famHoles);
+      localStorage.setItem('sv-son-played-family', '1');
+      localStorage.setItem('sv-son-family-count', String((parseInt(localStorage.getItem('sv-son-family-count')||'0'))+1));
+    }
+    if (players.includes('girl')) {
+      checkKidMilestones('girl', _famHoles);
+      localStorage.setItem('sv-girl-played-family', '1');
+      localStorage.setItem('sv-girl-family-count', String((parseInt(localStorage.getItem('sv-girl-family-count')||'0'))+1));
+    }
 
     // Fire AI range tip async (account holder only, non-blocking)
     if (players.includes('dad')) {
