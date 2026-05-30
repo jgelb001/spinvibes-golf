@@ -1116,6 +1116,16 @@
       line-height: 1.3;
     }
     .badge-item.earned .badge-name { color: var(--cream); }
+    .badge-desc {
+      font-size: 0.5rem;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.3;
+      opacity: 0.7;
+      max-width: 68px;
+    }
+    .badge-item.locked .badge-desc { opacity: 0.4; }
+    .badge-item.earned .badge-desc { opacity: 0.75; }
 
     /* ── PORTRAIT MOBILE FIXES ── */
     @media (max-width: 599px) {
@@ -5983,6 +5993,7 @@
         return `<div class="badge-item ${earned ? 'earned' : 'locked'}" title="${b.desc}">
           <div class="badge-svg-wrap ${earned ? '' : 'locked'}">${svgHtml}</div>
           <div class="badge-name">${b.name}</div>
+          <div class="badge-desc">${b.desc}</div>
         </div>`;
       }).join('')}
     </div>`;
@@ -6026,6 +6037,7 @@
       return `<div class="badge-item ${earned ? 'earned' : 'locked'}" title="${b.desc}">
         <div class="badge-svg-wrap ${earned ? '' : 'locked'}">${svgHtml}</div>
         <div class="badge-name">${b.name}</div>
+        <div class="badge-desc">${b.desc}</div>
       </div>`;
     }).join('');
 
@@ -6043,6 +6055,7 @@
       return `<div class="badge-item ${earned ? 'earned' : 'locked'}" title="${b.desc}" id="mb-${who}-${b.id}">
         <div class="badge-svg-wrap ${earned ? '' : 'locked'}">${svgHtml}</div>
         <div class="badge-name">${b.name}</div>
+        <div class="badge-desc">${b.desc}</div>
         ${awardBtn}
       </div>`;
     }).join('');
@@ -6078,6 +6091,7 @@
       container.innerHTML = `
         <div class="badge-svg-wrap ${newEarned ? '' : 'locked'}">${svgHtml}</div>
         <div class="badge-name">${badge.name}</div>
+        <div class="badge-desc">${badge.desc}</div>
         <div onclick="toggleManualBadge('${who}','${badgeId}',this)"
           style="font-size:0.55rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;
             color:${newEarned ? '#ef4444' : badge.color};cursor:pointer;margin-top:2px;opacity:0.8;">
