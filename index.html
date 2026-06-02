@@ -9783,6 +9783,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   let _famHoleIdx       = 0;
   let _famCaddieHistory = [];   // persists across hole navigation
   let _famCaddieOpen    = false;
+  let _famCourseId      = null; // GolfCourseAPI course ID
+  let _famCourseData    = null; // { name, allTees: [{name, holePars, yardages}] }
+  let _famPlayerTees    = {};   // { dad: 'Tournament', son: 'Resort', ... }
   let _dadLiveCaddieHistory = [];
   let _dadLiveCaddieOpen    = false;
 
@@ -9812,61 +9815,69 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
   function renderFamSetup() {
     document.getElementById('fam-modal-label').textContent = 'Family Round';
+    _famCourseId   = null;
+    _famCourseData = null;
+    _famPlayerTees = { dad: null, son: null, girl: null, mom: null, grandma: null };
     const today = new Date().toISOString().split('T')[0];
-    const lastCourse = localStorage.getItem('sv-last-fam-course') || '';
-    const courseOpts = [
-      `<option value="-1" disabled ${lastCourse === '' ? 'selected' : ''}>— Select a course —</option>`,
-      ...getAllCourses().map((c,i) => `<option value="${i}" ${lastCourse === String(i) ? 'selected' : ''}>${c.name} (par ${c.par})</option>`)
-    ].join('');
+
     document.getElementById('fam-modal-body').innerHTML = `
       <label class="modal-label">Date</label>
       <input type="date" id="fm-date" class="modal-input" value="${today}">
+
       <label class="modal-label">Course</label>
-      <select id="fm-course" class="modal-input" onchange="famCourseChange(this.value)">
-        ${courseOpts}
-      </select>
-      <div id="fm-custom-wrap" style="display:none;">
-        <input type="text" id="fm-custom-name" class="modal-input" placeholder="Course name">
-        <div style="display:flex;gap:10px;">
-          <input type="number" id="fm-custom-par" class="modal-input" placeholder="Par (e.g. 54)" style="flex:1;">
-          <select id="fm-custom-holes" class="modal-input" style="flex:1;">
-            <option value="18">18 holes</option>
-            <option value="9">9 holes</option>
-          </select>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input type="text" id="fm-search-input" class="modal-input" style="margin-bottom:0;flex:1;"
+          placeholder="Search course name..."
+          onkeydown="if(event.key==='Enter'){event.preventDefault();famSearchCourse();}">
+        <button onclick="famSearchCourse()" style="flex-shrink:0;background:var(--gold);border:none;border-radius:10px;padding:0 16px;color:#1a1300;font-weight:700;font-size:0.85rem;cursor:pointer;touch-action:manipulation;">Search</button>
+      </div>
+      <div id="fm-search-status" style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;"></div>
+      <div id="fm-search-results" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
+
+      <div id="fm-course-selected" style="display:none;background:rgba(138,96,16,0.12);border:1px solid rgba(138,96,16,0.4);border-radius:10px;padding:12px 14px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div id="fm-course-name" style="font-weight:700;font-size:0.9rem;color:var(--cream);"></div>
+            <div id="fm-course-sub" style="font-size:0.72rem;color:var(--muted);margin-top:2px;"></div>
+          </div>
+          <button onclick="famClearCourse()" style="background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;touch-action:manipulation;">&#x2715;</button>
         </div>
       </div>
-      <button class="btn-ghost" style="width:100%;margin-top:4px;margin-bottom:8px;font-size:0.8rem;" onclick="openAddCourseOverlay('fam')">+ Add New Course</button>
+
       <label class="modal-label">Who's playing?</label>
-      <div class="fam-checkbox-grid">
-        <div class="fam-checkbox-card selected" data-player="dad" onclick="famTogglePlayer(this)">
-          <span class="fam-cb-emoji">\uD83C\uDFCC</span>
-          <span class="fam-cb-name">Dad</span>
-        </div>
-        <div class="fam-checkbox-card selected" data-player="son" onclick="famTogglePlayer(this)">
-          <span class="fam-cb-emoji">\u26F3</span>
-          <span class="fam-cb-name">Son</span>
-        </div>
-        <div class="fam-checkbox-card" data-player="girl" onclick="famTogglePlayer(this)">
-          <span class="fam-cb-emoji">\uD83C\uDF38</span>
-          <span class="fam-cb-name">Daughter</span>
-        </div>
-        <div class="fam-checkbox-card" data-player="mom" onclick="famTogglePlayer(this)">
-          <span class="fam-cb-emoji">\uD83C\uDF3A</span>
-          <span class="fam-cb-name">Mom</span>
-        </div>
-        <div class="fam-checkbox-card" data-player="grandma" onclick="famTogglePlayer(this)">
-          <span class="fam-cb-emoji">\u2B50</span>
-          <span class="fam-cb-name">Grandma</span>
-        </div>
+      <div id="fm-players-wrap">
+        ${[
+          {key:'dad',    emoji:'\uD83C\uDFCC',  name:'Dad'},
+          {key:'son',    emoji:'\u26F3',  name:'Son'},
+          {key:'girl',   emoji:'\uD83C\uDF38', name:'Daughter'},
+          {key:'mom',    emoji:'\uD83C\uDF3A', name:'Mom'},
+          {key:'grandma',emoji:'\u2B50', name:'Grandma'},
+        ].map(p => `
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+            <div class="fam-checkbox-card${p.key==='dad'||p.key==='son'?' selected':''}" data-player="${p.key}"
+              onclick="famTogglePlayer(this,'${p.key}')"
+              style="flex-shrink:0;width:56px;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:12px;border:1.5px solid ${p.key==='dad'||p.key==='son'?'rgba(138,96,16,0.5)':'rgba(255,255,255,0.1)'};background:${p.key==='dad'||p.key==='son'?'rgba(138,96,16,0.15)':'var(--surface2)'};cursor:pointer;touch-action:manipulation;">
+              <span style="font-size:1.4rem;">${p.emoji}</span>
+              <span style="font-size:0.58rem;font-weight:700;color:var(--muted);letter-spacing:0.5px;">${p.name.toUpperCase()}</span>
+            </div>
+            <div id="fam-tee-selector-${p.key}" style="flex:1;display:${p.key==='dad'||p.key==='son'?'block':'none'};">
+              <div style="font-size:0.7rem;color:var(--muted);font-weight:600;letter-spacing:0.5px;margin-bottom:4px;">TEE BOX</div>
+              <div id="fam-tee-pills-${p.key}" class="pill-row" style="margin:0;gap:5px;flex-wrap:wrap;">
+                <div class="pill" style="font-size:0.72rem;padding:4px 10px;opacity:0.5;">Search a course first</div>
+              </div>
+            </div>
+          </div>`).join('')}
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:10px;">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:10px;">
         <span style="font-size:0.87rem;color:var(--cream);font-weight:600;">Round type</span>
         <div class="pill-row" id="fm-type-pills" style="margin:0;gap:6px;">
-          <div class="pill active" onclick="selectPill(this,'fm-type-pills')" data-val="scored">\u26f3 Scored</div>
-          <div class="pill" onclick="selectPill(this,'fm-type-pills')" data-val="practice">\ud83c\udfcc\ufe0f Practice</div>
+          <div class="pill active" onclick="selectPill(this,'fm-type-pills')" data-val="scored">&#x26F3; Scored</div>
+          <div class="pill" onclick="selectPill(this,'fm-type-pills')" data-val="practice">&#x1F3CC; Practice</div>
         </div>
       </div>
-      <button class="btn-primary" style="width:100%;margin-top:6px;" onclick="startFamRound()">Start Round \u2192</button>
+      <button class="btn-primary" style="width:100%;margin-top:10px;touch-action:manipulation;" onclick="startFamRound()">Start Round &#x2192;</button>
+
       <div id="fam-history-section" style="margin-top:20px;">
         <div style="font-size:0.75rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Past Family Rounds</div>
         <div id="fam-history-list" style="color:var(--muted);font-size:0.85rem;text-align:center;padding:12px 0;">Loading...</div>
@@ -9875,12 +9886,127 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     loadFamHistory();
   }
 
-  function famCourseChange(val) {
-    const wrap = document.getElementById('fm-custom-wrap');
-    wrap.style.display = parseInt(val) === getAllCourses().length - 1 ? 'block' : 'none';
+  async function famSearchCourse() {
+    const query = (document.getElementById('fm-search-input')?.value || '').trim();
+    const statusEl  = document.getElementById('fm-search-status');
+    const resultsEl = document.getElementById('fm-search-results');
+    if (!query || query.length < 2) { if (statusEl) statusEl.textContent = 'Type at least 2 characters'; return; }
+    if (statusEl) statusEl.textContent = 'Searching...';
+    if (resultsEl) resultsEl.innerHTML = '';
+    try {
+      const resp = await fetch(CADDIE_URL + '/course-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-SpinVibes-Token': WORKER_SECRET },
+        body: JSON.stringify({ query }),
+      });
+      const data = await resp.json();
+      if (!resp.ok || data.error) { if (statusEl) statusEl.textContent = data.error || 'Search failed'; return; }
+      const courses = data.courses || [];
+      if (!courses.length) { if (statusEl) statusEl.textContent = 'No courses found — try a shorter name'; return; }
+      if (statusEl) statusEl.textContent = courses.length + ' found — tap to select';
+      resultsEl.innerHTML = courses.map(c => {
+        const loc = [c.city, c.state].filter(Boolean).join(', ');
+        const sub = loc ? '<div style="font-size:0.7rem;color:var(--muted);">' + loc + '</div>' : '';
+        const safeId   = String(c.id);
+        const safeName = (c.name || '').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        const safeLoc  = loc.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        const safeCourse = (c.course || '').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        return '<div onclick="famSelectCourse(' + safeId + ',\'' + safeName + '\',\'' + safeLoc + '\',\'' + safeCourse + '\')"'
+          + ' style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;touch-action:manipulation;margin-bottom:4px;">'
+          + '<div style="font-size:0.88rem;font-weight:600;color:var(--cream);">' + c.name + '</div>' + sub + '</div>';
+      }).join('');
+    } catch(e) {
+      if (statusEl) statusEl.textContent = 'Network error — check signal';
+    }
   }
 
-  function famTogglePlayer(el) { el.classList.toggle('selected'); }
+  async function famSelectCourse(courseId, clubName, location, courseName) {
+    const statusEl  = document.getElementById('fm-search-status');
+    const resultsEl = document.getElementById('fm-search-results');
+    if (statusEl) statusEl.textContent = 'Loading tee data...';
+    if (resultsEl) resultsEl.innerHTML = '';
+    try {
+      const resp = await fetch(CADDIE_URL + '/course-detail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-SpinVibes-Token': WORKER_SECRET },
+        body: JSON.stringify({ courseId, includeAllTeeHoles: true }),
+      });
+      const data = await resp.json();
+      if (!resp.ok || data.error) { if (statusEl) statusEl.textContent = data.error || 'Failed to load course'; return; }
+
+      _famCourseId   = courseId;
+      _famCourseData = data.course;
+      if (statusEl) statusEl.textContent = '';
+
+      const selectedDiv = document.getElementById('fm-course-selected');
+      const nameEl = document.getElementById('fm-course-name');
+      const subEl  = document.getElementById('fm-course-sub');
+      if (selectedDiv) selectedDiv.style.display = '';
+      if (nameEl) nameEl.textContent = clubName + (courseName ? ' — ' + courseName : '');
+      const teeNames = (data.course.allTees || []).map(t => t.name).join(', ');
+      if (subEl) subEl.textContent = (location || '') + (teeNames ? ' · Tees: ' + teeNames : '');
+
+      famRefreshTeePills();
+    } catch(e) {
+      if (statusEl) statusEl.textContent = 'Network error — check signal';
+    }
+  }
+
+  function famClearCourse() {
+    _famCourseId   = null;
+    _famCourseData = null;
+    const selectedDiv = document.getElementById('fm-course-selected');
+    if (selectedDiv) selectedDiv.style.display = 'none';
+    ['dad','son','girl','mom','grandma'].forEach(pk => {
+      const pillsEl = document.getElementById('fam-tee-pills-' + pk);
+      if (pillsEl) pillsEl.innerHTML = '<div class="pill" style="font-size:0.72rem;padding:4px 10px;opacity:0.5;">Search a course first</div>';
+      _famPlayerTees[pk] = null;
+    });
+    const statusEl = document.getElementById('fm-search-status');
+    if (statusEl) statusEl.textContent = '';
+  }
+
+  function famRefreshTeePills() {
+    const tees = (_famCourseData?.allTees || []);
+    ['dad','son','girl','mom','grandma'].forEach(pk => {
+      const selectorEl = document.getElementById('fam-tee-selector-' + pk);
+      const pillsEl    = document.getElementById('fam-tee-pills-' + pk);
+      if (!selectorEl || !pillsEl) return;
+      const isActive = document.querySelector('.fam-checkbox-card[data-player="' + pk + '"].selected');
+      if (!isActive) return;
+      if (!tees.length) {
+        pillsEl.innerHTML = '<div class="pill" style="font-size:0.72rem;padding:4px 10px;opacity:0.5;">No tee data</div>';
+        return;
+      }
+      // Default: dad gets longest tee (tournament), others get shortest (resort/forward)
+      const defaultTee = pk === 'dad' ? tees[tees.length - 1].name : tees[0].name;
+      if (!_famPlayerTees[pk]) _famPlayerTees[pk] = defaultTee;
+      pillsEl.innerHTML = tees.map(t =>
+        '<div class="pill' + (_famPlayerTees[pk]===t.name?' active':'') + '" onclick="famSetPlayerTee(\'' + pk + '\',\'' + t.name.replace(/'/g,"\\'") + '\')"'
+        + ' data-val="' + t.name + '" style="font-size:0.72rem;padding:4px 10px;touch-action:manipulation;">'
+        + t.name + (t.yards ? ' <span style=\'font-size:0.62rem;opacity:0.7;\'>' + t.yards + 'y</span>' : '') + '</div>'
+      ).join('');
+    });
+  }
+
+  function famSetPlayerTee(pk, teeName) {
+    _famPlayerTees[pk] = teeName;
+    const pillsEl = document.getElementById('fam-tee-pills-' + pk);
+    if (!pillsEl) return;
+    pillsEl.querySelectorAll('.pill').forEach(p => p.classList.toggle('active', p.dataset.val === teeName));
+  }
+
+  function famTogglePlayer(el, pk) {
+    el.classList.toggle('selected');
+    const isSelected = el.classList.contains('selected');
+    el.style.background   = isSelected ? 'rgba(138,96,16,0.15)' : 'var(--surface2)';
+    el.style.borderColor  = isSelected ? 'rgba(138,96,16,0.5)'  : 'rgba(255,255,255,0.1)';
+    const selectorEl = document.getElementById('fam-tee-selector-' + pk);
+    if (selectorEl) {
+      selectorEl.style.display = isSelected ? 'block' : 'none';
+      if (isSelected && _famCourseData) famRefreshTeePills();
+    }
+  }
 
   async function confirmDeleteFamilyRound(id) {
     if (!confirm('Delete this family round?')) return;
@@ -10013,36 +10139,58 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
                          .map(c => c.dataset.player);
     if (!players.length) { showToast('Pick at least one player', 'error'); return; }
 
-    const courseIdx = parseInt(document.getElementById('fm-course').value);
-    if (courseIdx < 0 || isNaN(courseIdx)) { showToast('Please select a course', 'error'); return; }
-    localStorage.setItem('sv-last-fam-course', String(courseIdx));
-    let course = getAllCourses()[courseIdx];
-    let courseName = course.name, coursePar = course.par, numHoles = course.holes;
-    if (courseIdx === getAllCourses().length - 1) {
-      courseName = document.getElementById('fm-custom-name').value.trim() || 'Custom Course';
-      coursePar  = parseInt(document.getElementById('fm-custom-par').value) || 54;
-      numHoles   = parseInt(document.getElementById('fm-custom-holes').value) || 18;
+    const famIsPractice = document.querySelector('#fm-type-pills .pill.active')?.dataset.val === 'practice';
+    const dateVal = document.getElementById('fm-date').value;
+
+    let courseName, coursePar, numHoles, holePars, playerYardages;
+
+    if (_famCourseData) {
+      // API-sourced course — use tee data per player
+      const dadTee = _famCourseData.allTees?.find(t => t.name === _famPlayerTees['dad']) || _famCourseData.allTees?.[_famCourseData.allTees.length - 1] || {};
+      courseName = _famCourseData.name + (_famCourseData.course ? ' — ' + _famCourseData.course : '');
+      numHoles   = (dadTee.holePars || _famCourseData.holePars || []).length || 18;
+      holePars   = dadTee.holePars || _famCourseData.holePars || Array(numHoles).fill(4);
+      coursePar  = holePars.reduce((a,b) => a+b, 0);
+      // Build per-player yardage lookup: { dad: [412, 380, ...], son: [340, 310, ...] }
+      playerYardages = {};
+      players.forEach(pk => {
+        const tee = _famCourseData.allTees?.find(t => t.name === _famPlayerTees[pk]);
+        playerYardages[pk] = tee?.yardages || null;
+      });
+    } else {
+      // No API course — require manual fallback not yet implemented; prompt to search
+      showToast('Please search and select a course first', 'error');
+      return;
     }
 
-    const famIsPractice = document.querySelector('#fm-type-pills .pill.active')?.dataset.val === 'practice';
-    _famRound = { date_played: document.getElementById('fm-date').value, course_name: courseName, course_par: coursePar, players, is_practice: famIsPractice };
+    _famRound = {
+      date_played: dateVal,
+      course_name: courseName,
+      course_par:  coursePar,
+      players,
+      is_practice: famIsPractice,
+      player_tees: Object.fromEntries(players.map(pk => [pk, _famPlayerTees[pk] || null])),
+      course_id:   _famCourseId,
+    };
     _famHoleIdx       = 0;
     _famCaddieHistory = [];
     _famCaddieOpen    = false;
-    const defaultPar = course.blankPars ? 3 : Math.round(coursePar / numHoles);
+
     _famHoles = Array.from({length: numHoles}, (_, i) => {
-      const holePar = (course.holePars && course.holePars[i]) ? course.holePars[i] : defaultPar;
+      const par    = holePars[i] || 4;
       const scores = {};
-      players.forEach(p => { scores[p] = holePar; });
-      const yds = course.yardages ? course.yardages[i] : null;
-      return { hole: i+1, par: holePar, scores, photo: null, yds };
+      players.forEach(p => { scores[p] = par; });
+      // Per-player yardage for this hole
+      const playerYds = {};
+      players.forEach(pk => { playerYds[pk] = playerYardages[pk]?.[i] || null; });
+      return { hole: i+1, par, scores, photo: null, yds: playerYardages['dad']?.[i] || null, playerYds };
     });
 
     document.getElementById('fam-running-bar').style.display = 'flex';
     renderFamHole();
   }
 
-  function famScoreColor(diff) {
+    function famScoreColor(diff) {
     if (diff <= -2) return '#a78bfa';
     if (diff === -1) return '#60a5fa';
     if (diff === 0)  return 'var(--green)';
@@ -10073,7 +10221,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   function renderFamHole() {
     const h      = _famHoles[_famHoleIdx];
     const isLast = _famHoleIdx === _famHoles.length - 1;
-    document.getElementById('fam-modal-label').textContent = `Hole ${h.hole} / ${_famHoles.length}`;
+    document.getElementById('fam-modal-label').textContent = `HOLE ${h.hole} of ${_famHoles.length}`;
     updateFamRunningBar();
 
     const playerRows = _famRound.players.map(pk => {
@@ -10081,16 +10229,24 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const sc   = h.scores[pk];
       const diff = sc - h.par;
       const dLbl = diff === 0 ? 'E' : (diff > 0 ? `+${diff}` : `${diff}`);
+      const playerYds = h.playerYds?.[pk] || null;
+      const teeName   = _famRound.player_tees?.[pk] || null;
+      const ydsLabel  = playerYds ? `${playerYds}y` : '';
+      const teeLabel  = teeName ? `${teeName} tee` : '';
+      const subLine   = [ydsLabel, teeLabel].filter(Boolean).join(' · ');
       return `<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
         <div style="width:38px;height:38px;border-radius:50%;background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">${p.emoji}</div>
         <div style="flex:1;min-width:0;">
           <div style="font-weight:700;font-size:0.88rem;color:${p.color};">${p.name}</div>
-          <div id="fvpar-${pk}" style="font-size:0.7rem;color:${famScoreColor(diff)};font-weight:600;margin-top:1px;">${dLbl}</div>
+          <div style="display:flex;gap:6px;align-items:center;margin-top:2px;">
+            <div id="fvpar-${pk}" style="font-size:0.7rem;color:${famScoreColor(diff)};font-weight:600;">${dLbl}</div>
+            ${subLine ? `<div style="font-size:0.65rem;color:var(--muted);opacity:0.7;">${subLine}</div>` : ''}
+          </div>
         </div>
         <div style="display:flex;align-items:center;">
-          <button onclick="famHoleScore('${pk}',-1)" style="width:46px;height:46px;border-radius:12px 0 0 12px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-right:none;color:var(--cream);font-size:1.5rem;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;">-</button>
+          <button onclick="famHoleScore('${pk}',-1)" style="width:46px;height:46px;border-radius:12px 0 0 12px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-right:none;color:var(--cream);font-size:1.5rem;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;">-</button>
           <div id="fsc-${pk}" style="width:54px;height:46px;background:var(--surface);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.9rem;line-height:1;color:${famScoreColor(diff)};">${sc}</div>
-          <button onclick="famHoleScore('${pk}',1)" style="width:46px;height:46px;border-radius:0 12px 12px 0;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-left:none;color:var(--cream);font-size:1.4rem;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;">+</button>
+          <button onclick="famHoleScore('${pk}',1)" style="width:46px;height:46px;border-radius:0 12px 12px 0;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-left:none;color:var(--cream);font-size:1.4rem;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;">+</button>
         </div>
       </div>`;
     }).join('');
