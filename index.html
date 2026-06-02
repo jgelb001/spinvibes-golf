@@ -4055,6 +4055,17 @@
           <div class="page-title">My Progress</div>
         </div>
 
+        <!-- Resume Round banner — shown by JS when a draft round exists -->
+        <div id="dad-resume-banner" style="display:none;" class="section">
+          <button onclick="openDadModal()" style="width:100%;background:rgba(138,96,16,0.15);border:1px solid rgba(138,96,16,0.5);border-radius:12px;padding:14px 18px;color:var(--gold);font-size:0.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;text-align:left;touch-action:manipulation;">
+            <i class="ti ti-player-play" style="font-size:1.3rem;flex-shrink:0;"></i>
+            <div>
+              <div style="font-size:1rem;font-weight:800;letter-spacing:0.3px;">Resume Round in Progress</div>
+              <div id="dad-resume-banner-sub" style="font-size:0.72rem;color:var(--muted);font-weight:400;margin-top:2px;"></div>
+            </div>
+          </button>
+        </div>
+
         <div class="section" style="display:flex;gap:10px;">
           <button class="btn-primary" onclick="openDadModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;"><i class="ti ti-flag-2" style="font-size:1rem;"></i> Start New Round</button>
           <button onclick="lockDadProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(138,96,16,0.35);border-radius:10px;padding:0 14px;color:var(--gold-l);font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;"><i class="ti ti-lock" style="font-size:1.1rem;"></i></button>
@@ -4127,14 +4138,17 @@
 
             <!-- Dad Round Entry Modal -->
       <div id="dad-modal" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);flex-direction:column;padding-top:env(safe-area-inset-top,0px);">
-        <div style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(138,96,16,0.2);">
-          <div id="dad-modal-step-label" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);">Round Setup</div>
+        <div id="dad-modal-header" style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(138,96,16,0.2);touch-action:none;">
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div id="dad-modal-step-label" style="font-family:'Bebas Neue',sans-serif;font-size:2rem;line-height:1;color:var(--gold);">Round Setup</div>
+            <div id="dad-modal-hole-sub" style="font-size:0.65rem;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;display:none;"></div>
+          </div>
           <div style="display:flex;align-items:center;gap:12px;">
             <div id="dad-running-total" style="display:none;text-align:right;line-height:1;">
               <div id="dad-rt-score" style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--cream);">0</div>
               <div id="dad-rt-diff" style="font-size:0.6rem;font-weight:700;letter-spacing:0.5px;color:var(--muted);">E</div>
             </div>
-            <button onclick="confirmExitRound()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">✕</button>
+            <button id="dad-modal-close-btn" onclick="confirmExitRound()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;touch-action:manipulation;">✕</button>
           </div>
         </div>
         <div id="dad-modal-body" style="flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:20px;padding-bottom:12px;"></div>
@@ -5390,6 +5404,21 @@
     document.getElementById('app').style.display = 'flex';
   }
 
+  function _refreshDadResumeBanner() {
+    const banner = document.getElementById('dad-resume-banner');
+    if (!banner) return;
+    const draft = _loadDraftRound();
+    if (draft && draft.holes && draft.holes.length > 0 && draft.holeIdx < draft.holes.length - 1) {
+      const holesPlayed = draft.holeIdx + 1;
+      const runningTotal = draft.holes.slice(0, holesPlayed).reduce((a, h) => a + h.score, 0);
+      const sub = document.getElementById('dad-resume-banner-sub');
+      if (sub) sub.textContent = `${draft.round.course_name || 'Round'} · Hole ${holesPlayed} of ${draft.holes.length} · Score: ${runningTotal}`;
+      banner.style.display = '';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
   function enterProfile(who) {
     // Called from landing page cards — fade landing out, show app
     sessionStorage.setItem('sv-session', '1'); // mark session active
@@ -5399,6 +5428,7 @@
     landing.classList.add('hidden');
     setTimeout(() => { landing.style.display = 'none'; }, 380);
     showPage('home');
+    if (who === 'dad') _refreshDadResumeBanner();
   }
 
   function switchProfile(who) {
@@ -5407,6 +5437,7 @@
     document.querySelectorAll('.exp-trigger.open').forEach(t => t.classList.remove('open'));
     document.querySelectorAll('.exp-body.open').forEach(b => b.classList.remove('open'));
     showPage('home');
+    if (who === 'dad') _refreshDadResumeBanner();
   }
 
   function goToLanding() {
@@ -6611,7 +6642,11 @@
     const vsStr  = vsRaw >= 0 ? '+' + vsRaw : '' + vsRaw;
     const isLast = _dadHoleIdx === _dadHoles.length - 1;
 
-    document.getElementById('dad-modal-step-label').textContent = `Hole ${h.hole} / ${_dadHoles.length}`;
+    document.getElementById('dad-modal-step-label').textContent = `HOLE ${h.hole}`;
+    const holeSub = document.getElementById('dad-modal-hole-sub');
+    if (holeSub) { holeSub.textContent = `of ${_dadHoles.length} · par ${h.par}`; holeSub.style.display = ''; }
+    const closeBtn = document.getElementById('dad-modal-close-btn');
+    if (closeBtn) closeBtn.style.display = 'none';
     document.getElementById('dad-rt-score').textContent = total;
     const _rtDiffEl = document.getElementById('dad-rt-diff');
     if (_rtDiffEl) {
@@ -6721,7 +6756,7 @@
           <span id="dad-live-caddie-caret">${_dadLiveCaddieOpen ? '▲' : '▼'}</span>
         </button>
         <div id="dad-live-caddie-panel" style="display:${_dadLiveCaddieOpen ? 'block' : 'none'};background:var(--surface);border:1px solid rgba(138,96,16,0.15);border-top:none;border-radius:0 0 10px 10px;padding:12px 14px;">
-          <div id="dad-live-caddie-msgs" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;font-size:0.83rem;line-height:1.5;"></div>
+          <div id="dad-live-caddie-msgs" style="max-height:200px;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;font-size:0.83rem;line-height:1.5;"></div>
           <div style="display:flex;gap:8px;align-items:flex-end;">
             <textarea id="dad-live-caddie-input" rows="2"
               style="flex:1;background:var(--surface2);border:1px solid rgba(138,96,16,0.25);border-radius:8px;padding:8px 10px;color:var(--cream);font-family:'Outfit',sans-serif;font-size:0.85rem;resize:none;"
@@ -6740,23 +6775,27 @@
     if (footer) {
       footer.style.display = '';
       footer.innerHTML = `
-        <div style="display:flex;align-items:center;gap:6px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
           <button onclick="dadMidRoundScorecard()"
-            style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:7px 10px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;">
+            style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:7px 10px;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;">
             <i class="ti ti-clipboard-list" style="font-size:1rem;"></i>
             <span style="font-size:0.5rem;letter-spacing:0.5px;font-weight:700;text-transform:uppercase;">Card</span>
           </button>
           <button onclick="dadHoleScore(-1)"
-            style="flex:0 0 auto;width:44px;height:50px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:1.6rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;">−</button>
+            style="flex:0 0 auto;width:44px;height:50px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:1.6rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;">−</button>
           <div style="flex:0 0 auto;text-align:center;min-width:48px;">
             <div style="font-size:0.42rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1px;">STROKES</div>
             <div class="score-val" id="dh-score" style="font-family:'Bebas Neue',sans-serif;font-size:2rem;line-height:1;">${h.score}</div>
           </div>
           <button onclick="dadHoleScore(1)"
-            style="flex:0 0 auto;width:44px;height:50px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:1.6rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;">+</button>
+            style="flex:0 0 auto;width:44px;height:50px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:1.6rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;">+</button>
           <button onclick="dadLiveNext()" class="btn-gold"
-            style="flex:1;font-size:0.82rem;padding:0;height:50px;border-radius:10px;">${nextLabel}</button>
+            style="flex:1;font-size:0.82rem;padding:0;height:50px;border-radius:10px;touch-action:manipulation;">${nextLabel}</button>
         </div>
+        <button onclick="confirmExitRound()"
+          style="width:100%;background:none;border:1px solid rgba(192,57,43,0.35);border-radius:10px;padding:9px;color:rgba(192,57,43,0.8);font-size:0.78rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;">
+          EXIT ROUND — Progress saved, tap to confirm
+        </button>
       `;
     }
 
@@ -8177,8 +8216,23 @@
   let _dadStep = 'setup'; // 'setup' | 'holes' | 'reflection'
 
   // Lock/unlock background scroll when modal is open (prevents iOS scroll bleed-through)
-  function _lockBodyScroll()   { document.body.style.overflow = 'hidden'; document.body.style.position = 'fixed'; document.body.style.width = '100%'; }
-  function _unlockBodyScroll() { document.body.style.overflow = ''; document.body.style.position = ''; document.body.style.width = ''; }
+  // Uses top-offset technique so iOS doesn't jump to top on lock
+  function _lockBodyScroll() {
+    const scrollY = window.scrollY || 0;
+    document.body.dataset.scrollY = scrollY;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+  }
+  function _unlockBodyScroll() {
+    const scrollY = parseInt(document.body.dataset.scrollY || '0');
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    window.scrollTo(0, scrollY);
+  }
 
   function openDadModal() {
     try { _openDadModalInner(); } catch(e) {
@@ -8225,6 +8279,7 @@
     _releaseWakeLock();
     // Draft is intentionally kept — user may want to resume later.
     // It is cleared automatically on successful save or when they start a fresh round.
+    _refreshDadResumeBanner();
   }
 
   function confirmExitRound() {
@@ -8238,6 +8293,10 @@
 
   function renderDadModalSetup() {
     document.getElementById('dad-modal-step-label').textContent = 'Round Setup';
+    const _holeSub = document.getElementById('dad-modal-hole-sub');
+    if (_holeSub) _holeSub.style.display = 'none';
+    const _closeBtn = document.getElementById('dad-modal-close-btn');
+    if (_closeBtn) _closeBtn.style.display = '';
     const today = new Date().toISOString().split('T')[0];
     const courseOpts = getAllCourses().map((c,i) => `<option value="${i}">${c.name} (par ${c.par})</option>`).join('');
     document.getElementById('dad-modal-body').innerHTML = `

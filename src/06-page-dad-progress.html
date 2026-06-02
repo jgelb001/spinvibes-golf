@@ -34,6 +34,17 @@
           <div class="page-title">My Progress</div>
         </div>
 
+        <!-- Resume Round banner — shown by JS when a draft round exists -->
+        <div id="dad-resume-banner" style="display:none;" class="section">
+          <button onclick="openDadModal()" style="width:100%;background:rgba(138,96,16,0.15);border:1px solid rgba(138,96,16,0.5);border-radius:12px;padding:14px 18px;color:var(--gold);font-size:0.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;text-align:left;touch-action:manipulation;">
+            <i class="ti ti-player-play" style="font-size:1.3rem;flex-shrink:0;"></i>
+            <div>
+              <div style="font-size:1rem;font-weight:800;letter-spacing:0.3px;">Resume Round in Progress</div>
+              <div id="dad-resume-banner-sub" style="font-size:0.72rem;color:var(--muted);font-weight:400;margin-top:2px;"></div>
+            </div>
+          </button>
+        </div>
+
         <div class="section" style="display:flex;gap:10px;">
           <button class="btn-primary" onclick="openDadModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;"><i class="ti ti-flag-2" style="font-size:1rem;"></i> Start New Round</button>
           <button onclick="lockDadProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(138,96,16,0.35);border-radius:10px;padding:0 14px;color:var(--gold-l);font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;"><i class="ti ti-lock" style="font-size:1.1rem;"></i></button>
@@ -106,14 +117,17 @@
 
             <!-- Dad Round Entry Modal -->
       <div id="dad-modal" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);flex-direction:column;padding-top:env(safe-area-inset-top,0px);">
-        <div style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(138,96,16,0.2);">
-          <div id="dad-modal-step-label" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);">Round Setup</div>
+        <div id="dad-modal-header" style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(138,96,16,0.2);touch-action:none;">
+          <div style="display:flex;flex-direction:column;gap:0;">
+            <div id="dad-modal-step-label" style="font-family:'Bebas Neue',sans-serif;font-size:2rem;line-height:1;color:var(--gold);">Round Setup</div>
+            <div id="dad-modal-hole-sub" style="font-size:0.65rem;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;display:none;"></div>
+          </div>
           <div style="display:flex;align-items:center;gap:12px;">
             <div id="dad-running-total" style="display:none;text-align:right;line-height:1;">
               <div id="dad-rt-score" style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--cream);">0</div>
               <div id="dad-rt-diff" style="font-size:0.6rem;font-weight:700;letter-spacing:0.5px;color:var(--muted);">E</div>
             </div>
-            <button onclick="confirmExitRound()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">✕</button>
+            <button id="dad-modal-close-btn" onclick="confirmExitRound()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;touch-action:manipulation;">✕</button>
           </div>
         </div>
         <div id="dad-modal-body" style="flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:20px;padding-bottom:12px;"></div>
