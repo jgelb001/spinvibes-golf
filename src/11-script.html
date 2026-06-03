@@ -5152,7 +5152,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       listEl.innerHTML = rounds.map(r => {
         const totals  = r.totals || {};
         const players = r.players || [];
-        const photos  = (r.holes || []).map(h => h.photo).filter(p => p && p.startsWith('http'));
+        const photos  = (r.holes || []).map(h => h.photo).filter(p => _hasPhoto(p));
         const chips   = players.map(pk => {
           const p = FAM_PLAYERS[pk];
           if (!p) return '';
@@ -5490,6 +5490,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   }
 
   // ── RECAP CARD BUILDER ───────────────────────────────────────
+  // Accept both uploaded HTTP URLs and local base64 captures
+  function _hasPhoto(p) { return p && (p.startsWith('http') || p.startsWith('data:')); }
+
   function _loadImg(src) {
     // Fetch as blob first to avoid canvas cross-origin taint with Supabase Storage URLs
     return new Promise(async resolve => {
@@ -5583,7 +5586,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   }
 
   function _showHolePickerSheet() {
-    const photoHoles = _famHoles.filter(h => h.photo && h.photo.startsWith('http'));
+    const photoHoles = _famHoles.filter(h => h.photo && _hasPhoto(h.photo));
     if (!photoHoles.length) {
       showToast('No hole photos to share yet', 'error'); return;
     }
@@ -5761,7 +5764,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const sf     = _SF;
 
     // --- Collage background ---
-    const photoUrls = _famHoles.map(h=>h.photo).filter(p=>p&&p.startsWith('http'));
+    const photoUrls = _famHoles.map(h=>h.photo).filter(p=>_hasPhoto(p));
     ctx.fillStyle = _C.bg; ctx.fillRect(0,0,W,H);
     if (photoUrls.length) {
       const imgs = await Promise.all(photoUrls.slice(0,6).map(u=>_loadImg(u)));
@@ -5877,7 +5880,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     ctx.fillStyle = _C.bg; ctx.fillRect(0,0,W,H);
 
     // Full-bleed photo
-    if (h.photo && h.photo.startsWith('http')) {
+    if (h.photo && _hasPhoto(h.photo)) {
       const img = await _loadImg(h.photo);
       if (img) { _drawImgCover(ctx,img,0,0,W,H); }
     }
@@ -5941,7 +5944,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const items = players.map(pk => {
       const p = FAM_PLAYERS[pk]; if (!p) return '';
       let bestH=null, bestDiff=Infinity;
-      _famHoles.forEach(h=>{const d=(h.scores[pk]||0)-h.par,b=h.photo&&h.photo.startsWith('http')?-0.5:0;if(d+b<bestDiff){bestDiff=d+b;bestH=h;}});
+      _famHoles.forEach(h=>{const d=(h.scores[pk]||0)-h.par,b=_hasPhoto(h.photo)?-0.5:0;if(d+b<bestDiff){bestDiff=d+b;bestH=h;}});
       const diff = bestH ? (bestH.scores[pk]||0)-bestH.par : 0;
       const ach  = diff<=-2?'Eagle':diff===-1?'Birdie':diff===0?'Par':'Best Hole';
       return `<button onclick="pickPlayerAndShareBest('${pk}')" style="display:flex;align-items:center;gap:14px;width:100%;background:var(--surface2);border:1px solid rgba(212,175,112,0.15);border-radius:14px;padding:14px;cursor:pointer;color:var(--cream);margin-bottom:10px;">
@@ -6020,12 +6023,12 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     let bestHole = null, bestScore = Infinity;
     _famHoles.forEach(h => {
       const diff = (h.scores[pk]||0)-h.par;
-      const photoBonus = (h.photo && h.photo.startsWith('http')) ? -0.5 : 0;
+      const photoBonus = (h.photo && _hasPhoto(h.photo)) ? -0.5 : 0;
       if (diff+photoBonus < bestScore) { bestScore=diff+photoBonus; bestHole=h; }
     });
     if (!bestHole) return null;
 
-    if (!bestHole.photo || !bestHole.photo.startsWith('http')) {
+    if (!bestHole.photo || !_hasPhoto(bestHole.photo)) {
       await new Promise(resolve => {
         const overlay = document.createElement('div');
         overlay.style.cssText='position:fixed;inset:0;z-index:9700;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -6053,7 +6056,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     ctx.fillStyle = _C.bg; ctx.fillRect(0,0,W,H);
 
-    if (bestHole.photo && bestHole.photo.startsWith('http')) {
+    if (bestHole.photo && _hasPhoto(bestHole.photo)) {
       const img = await _loadImg(bestHole.photo);
       if (img) { _drawImgCover(ctx,img,0,0,W,H); }
     }
@@ -6358,7 +6361,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const total    = totals[pk];
       const holeData = _famHoles.map(h => ({
         hole: h.hole, par: h.par, score: h.scores[pk] || 0,
-        photo_url: (h.photo && h.photo.startsWith('http')) ? h.photo : null,
+        photo_url: (h.photo && _hasPhoto(h.photo)) ? h.photo : null,
       }));
       const roundObj = {
         date_played:  _famRound.date_played,
@@ -6387,7 +6390,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     try {
       const safeFamHoles = _famHoles.map(h => ({
         ...h,
-        photo: (h.photo && h.photo.startsWith('http')) ? h.photo : null,
+        photo: (h.photo && _hasPhoto(h.photo)) ? h.photo : null,
       }));
       await saveFamilyRound({
         date_played: _famRound.date_played,
