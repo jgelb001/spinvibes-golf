@@ -5781,194 +5781,201 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     return totals;
   }
 
-  // ── TEMPLATE 1: FULL SCORECARD ON COLLAGE BG ─────────────────
+  // ── SHARED CARD HELPERS ─────────────────────────────────────────
+
+  // Load SpinVibes logo once and cache it
+  let _svLogoCache = null;
+  async function _loadSvLogo() {
+    if (_svLogoCache) return _svLogoCache;
+    try { _svLogoCache = await _loadImg('/spinvibes_logo.png'); } catch(e) {}
+    return _svLogoCache;
+  }
+
+  // Draw logo top-right, gold frame, and top gradient vignette
+  async function _drawCardChrome(ctx, W, H, sf) {
+    // Subtle top vignette so logo reads on any photo
+    const topG = ctx.createLinearGradient(0, 0, 0, H * 0.22);
+    topG.addColorStop(0, 'rgba(0,0,0,0.45)');
+    topG.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = topG; ctx.fillRect(0, 0, W, H);
+
+    // Logo — top right
+    const logo = await _loadSvLogo();
+    if (logo) {
+      const logoW = Math.round(148 * sf);
+      const logoH  = Math.round(logoW * (logo.height / logo.width));
+      const pad    = Math.round(18 * sf);
+      ctx.drawImage(logo, W - logoW - pad, pad, logoW, logoH);
+    }
+
+    // Gold border frame
+    ctx.strokeStyle = '#c9a84c';
+    ctx.lineWidth   = Math.round(4 * sf);
+    const fi = Math.round(10 * sf);
+    ctx.strokeRect(fi, fi, W - fi * 2, H - fi * 2);
+  }
+
+  // Bottom gradient: starts at 60% (15% less than before)
+  function _bottomGrad(ctx, H) {
+    const g = ctx.createLinearGradient(0, H * 0.60, 0, H);
+    g.addColorStop(0, 'rgba(10,14,8,0)');
+    g.addColorStop(0.45, 'rgba(10,14,8,0.72)');
+    g.addColorStop(1, 'rgba(10,14,8,0.97)');
+    return g;
+  }
+
+  // Draw a player chip — name / big score / vs-par label
+  function _drawPlayerChip(ctx, pk, score, par, cx, cy, chipW, chipH, sf, isWinner) {
+    const p    = FAM_PLAYERS[pk] || {};
+    const diff = score - par;
+    const dStr = diff === 0 ? 'E' : (diff > 0 ? '+' + diff : String(diff));
+    const achv = diff <= -2 ? 'Eagle' : diff === -1 ? 'Birdie' : diff === 0 ? 'Par' : null;
+    const scoreColor = diff <= -2 ? '#a78bfa' : diff === -1 ? '#fbbf24' : diff === 0 ? '#6ec98a' : _C[pk] || _C.gold;
+
+    // Chip background
+    ctx.fillStyle = 'rgba(10,14,8,0.62)';
+    _rr(ctx, cx, cy, chipW, chipH, Math.round(10 * sf)); ctx.fill();
+
+    // Winner ring
+    if (isWinner) {
+      ctx.strokeStyle = _C[pk] || _C.gold;
+      ctx.lineWidth   = Math.round(2.5 * sf);
+      _rr(ctx, cx, cy, chipW, chipH, Math.round(10 * sf)); ctx.stroke();
+    }
+
+    ctx.textAlign = 'center';
+    const midX = cx + chipW / 2;
+
+    // Name
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.font = `500 ${Math.round(15 * sf)}px Outfit,Arial,sans-serif`;
+    ctx.fillText(p.name || pk, midX, cy + chipH * 0.28);
+
+    // Score
+    ctx.fillStyle = scoreColor;
+    ctx.font = `500 ${Math.round(44 * sf)}px "Bebas Neue",Impact,Arial,sans-serif`;
+    ctx.fillText(String(score), midX, cy + chipH * 0.70);
+
+    // Achievement or vs-par
+    const label = achv || dStr;
+    ctx.fillStyle = achv ? '#fbbf24' : 'rgba(255,255,255,0.4)';
+    ctx.font = `400 ${Math.round(12 * sf)}px Outfit,Arial,sans-serif`;
+    ctx.fillText(label, midX, cy + chipH * 0.90);
+  }
+
+  // Bottom text: course + date + optional winner line
+  function _drawBottomText(ctx, W, H, sf, courseName, date, winLine) {
+    const pad = Math.round(20 * sf);
+    ctx.textAlign = 'center';
+    if (winLine) {
+      ctx.fillStyle = _C.gold;
+      ctx.font = `500 ${Math.round(16 * sf)}px Outfit,Arial,sans-serif`;
+      ctx.fillText(winLine, W / 2, H - pad - Math.round(36 * sf));
+    }
+    ctx.fillStyle = 'rgba(255,255,255,0.38)';
+    ctx.font = `400 ${Math.round(13 * sf)}px Outfit,Arial,sans-serif`;
+    ctx.fillText(`${(courseName || '').toUpperCase()}  ·  ${date || ''}`, W / 2, H - pad);
+  }
+
+  // ── TEMPLATE 1: ROUND SUMMARY ─────────────────────────────────
   async function _buildScorecardCard() {
     const { W, H } = _cardDims();
-    const players  = _famRound.players||[];
+    const players  = _famRound.players || [];
     const totals   = _famTotals();
-    const totalPar = _famHoles.reduce((a,h)=>a+h.par,0);
-    const minScore = Math.min(...players.map(pk=>totals[pk]));
-    const winners  = players.filter(pk=>totals[pk]===minScore);
-    const winMsg   = winners.length===players.length?'Tied!'
-      :winners.map(pk=>FAM_PLAYERS[pk].name).join(' & ')+(winners.length===1?' wins!':' tie!');
+    const totalPar = _famHoles.reduce((a, h) => a + h.par, 0);
+    const minScore = Math.min(...players.map(pk => totals[pk]));
+    const winners  = players.filter(pk => totals[pk] === minScore);
+    const winLine  = winners.length === players.length ? 'All tied!' :
+      winners.map(pk => FAM_PLAYERS[pk]?.name || pk).join(' & ') +
+      (winners.length === 1 ? ' wins!' : ' tie!');
 
     const canvas = _makeCanvas(W, H);
     const ctx    = canvas.getContext('2d');
-    const isLS   = _shareOrientation === 'landscape';
     const sf     = _SF;
 
-    // --- Collage background ---
-    const photoUrls = _famHoles.map(h=>h.photo).filter(p=>_hasPhoto(p));
-    ctx.fillStyle = _C.bg; ctx.fillRect(0,0,W,H);
-    if (photoUrls.length) {
-      const imgs = await Promise.all(photoUrls.slice(0,6).map(u=>_loadImg(u)));
-      const validImgs = imgs.filter(Boolean);
-      if (validImgs.length) {
-        const cols = Math.ceil(Math.sqrt(validImgs.length));
-        const rows = Math.ceil(validImgs.length/cols);
-        const cw = W/cols, ch = H/rows;
-        validImgs.forEach((img,i) => {
-          const col=i%cols, row=Math.floor(i/cols);
-          ctx.save(); ctx.beginPath(); ctx.rect(col*cw, row*ch, cw, ch); ctx.clip();
-          _drawImgCover(ctx, img, col*cw, row*ch, cw, ch); ctx.restore();
-        });
-        ctx.fillStyle = 'rgba(16,10,5,0.82)'; ctx.fillRect(0,0,W,H);
-      }
+    // Background — best hole photo or solid dark
+    const photos = _famHoles.map(h => h.photo).filter(p => _hasPhoto(p));
+    ctx.fillStyle = '#0d1a0a'; ctx.fillRect(0, 0, W, H);
+    if (photos.length) {
+      const img = await _loadImg(photos[0]);
+      if (img) _drawImgCover(ctx, img, 0, 0, W, H);
     }
 
-    // Gold top/bottom bars
-    ctx.fillStyle = _gradBar(ctx,W); ctx.fillRect(0,0,W,5); ctx.fillRect(0,H-5,W,5);
+    // Bottom gradient
+    ctx.fillStyle = _bottomGrad(ctx, H); ctx.fillRect(0, 0, W, H);
 
-    const pad = Math.round(36*sf);
-    let y = pad;
+    // Player chips — 2 columns max
+    const cols    = Math.min(players.length, 2);
+    const rows    = Math.ceil(players.length / cols);
+    const chipW   = Math.round(Math.min(160 * sf, (W - Math.round(48 * sf)) / cols - 10));
+    const chipH   = Math.round(100 * sf);
+    const chipGap = 10;
+    const blockW  = cols * chipW + (cols - 1) * chipGap;
+    const blockH  = rows * chipH + (rows - 1) * chipGap;
+    const chipX0  = (W - blockW) / 2;
+    const chipY0  = H - Math.round(32 * sf) - Math.round(52 * sf) - blockH;
 
-    // Logo centered at top
-    const logoH = _drawLogoCenter(ctx, W/2, y, sf);
-    y += logoH + Math.round(18*sf);
-    ctx.strokeStyle='rgba(212,175,112,0.2)'; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke(); y += Math.round(18*sf);
-
-    // Course name
-    ctx.fillStyle=_C.cream; ctx.font=`bold ${Math.round(52*sf)}px "Bebas Neue",Impact,Arial,sans-serif`; ctx.textAlign='center';
-    ctx.fillText((_famRound.course_name||'').toUpperCase(), W/2, y+Math.round(40*sf)); y+=Math.round(52*sf);
-    ctx.fillStyle=_C.muted; ctx.font=`400 ${Math.round(22*sf)}px Outfit,Arial,sans-serif`;
-    ctx.fillText(`${_famRound.date_played}  ·  Par ${totalPar}`, W/2, y+Math.round(18*sf)); y+=Math.round(34*sf);
-    ctx.strokeStyle='rgba(212,175,112,0.15)';
-    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke(); y+=Math.round(18*sf);
-
-    // Player chips
-    const chipW = Math.min(Math.round(168*sf), (W-pad*2)/players.length - 10);
-    const chipH = Math.round(104*sf);
-    const chipX0 = (W-(players.length*(chipW+10)-10))/2;
-    players.forEach((pk,i) => {
-      const p = FAM_PLAYERS[pk]; if (!p) return;
-      const cx = chipX0+i*(chipW+10);
-      ctx.fillStyle=_C[pk+'Bg']||'rgba(255,255,255,0.08)';
-      _rr(ctx,cx,y,chipW,chipH,10); ctx.fill();
-      if (winners.includes(pk)) { ctx.strokeStyle=_C.gold; ctx.lineWidth=2; _rr(ctx,cx,y,chipW,chipH,10); ctx.stroke(); }
-      ctx.fillStyle=_C[pk]||_C.gold; ctx.font=`bold ${Math.round(44*sf)}px "Bebas Neue",Impact,Arial`;
-      ctx.textAlign='center'; ctx.fillText(String(totals[pk]??'?'), cx+chipW/2, y+chipH*0.70);
-      ctx.fillStyle=_C.cream; ctx.font=`500 ${Math.round(18*sf)}px Outfit,Arial`;
-      ctx.fillText(p.name, cx+chipW/2, y+chipH*0.90);
-    });
-    y += chipH + Math.round(12*sf);
-
-    // Winner line
-    ctx.fillStyle=_C.gold; ctx.font=`bold ${Math.round(28*sf)}px Outfit,Arial,sans-serif`; ctx.textAlign='center';
-    ctx.fillText(winMsg, W/2, y+Math.round(20*sf)); y += Math.round(36*sf);
-    ctx.strokeStyle='rgba(212,175,112,0.15)';
-    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke(); y += Math.round(14*sf);
-
-    // Scorecard table
-    const rowH  = isLS ? 28 : 32;
-    const col0W = isLS ? 90 : 100;
-    const colW  = (W-pad*2-col0W)/players.length;
-    const tblW  = W-pad*2;
-
-    ctx.fillStyle='rgba(212,175,112,0.12)'; ctx.fillRect(pad,y,tblW,rowH);
-    ctx.fillStyle=_C.muted; ctx.font=`600 ${Math.round(16*sf)}px Outfit,Arial,sans-serif`; ctx.textAlign='center';
-    ctx.fillText('HOLE', pad+col0W/2, y+rowH-8);
-    players.forEach((pk,i)=>{
-      ctx.fillStyle=_C[pk]||_C.gold;
-      ctx.fillText((FAM_PLAYERS[pk]?.name||pk).toUpperCase().slice(0,4), pad+col0W+i*colW+colW/2, y+rowH-8);
-    });
-    y+=rowH;
-
-    _famHoles.forEach((h,idx)=>{
-      if (y+rowH > H-48) return;
-      if(idx%2===0){ctx.fillStyle='rgba(255,255,255,0.03)';ctx.fillRect(pad,y,tblW,rowH);}
-      ctx.fillStyle=_C.muted; ctx.font=`400 ${Math.round(16*sf)}px Outfit,Arial`; ctx.textAlign='center';
-      ctx.fillText(`H${h.hole} P${h.par}`, pad+col0W/2, y+rowH-8);
-      players.forEach((pk,i)=>{
-        const s=h.scores[pk]||0, diff=s-h.par;
-        ctx.fillStyle=diff<=-1?'#fbbf24':diff===0?_C.cream:'#ef4444';
-        ctx.font=diff<=-1?`bold ${Math.round(16*sf)}px Outfit,Arial`:`400 ${Math.round(16*sf)}px Outfit,Arial`;
-        ctx.fillText(String(s), pad+col0W+i*colW+colW/2, y+rowH-8);
-      });
-      y+=rowH;
+    players.forEach((pk, i) => {
+      const col = i % cols, row = Math.floor(i / cols);
+      const cx  = chipX0 + col * (chipW + chipGap);
+      const cy  = chipY0 + row * (chipH + chipGap);
+      _drawPlayerChip(ctx, pk, totals[pk], totalPar, cx, cy, chipW, chipH, sf, winners.includes(pk));
     });
 
-    // Total row
-    ctx.fillStyle='rgba(212,175,112,0.14)'; ctx.fillRect(pad,y,tblW,rowH);
-    ctx.fillStyle=_C.gold; ctx.font=`bold ${Math.round(18*sf)}px Outfit,Arial`; ctx.textAlign='center';
-    ctx.fillText('TOTAL', pad+col0W/2, y+rowH-8);
-    players.forEach((pk,i)=>{
-      ctx.fillStyle=_C[pk]||_C.gold; ctx.font=`bold ${Math.round(18*sf)}px Outfit,Arial`;
-      ctx.fillText(String(totals[pk]), pad+col0W+i*colW+colW/2, y+rowH-8);
-    });
+    _drawBottomText(ctx, W, H, sf, _famRound.course_name, _famRound.date_played, winLine);
 
+    await _drawCardChrome(ctx, W, H, sf);
     return _canvasToBlob(canvas);
   }
 
-    // ── TEMPLATE 2: HOLE HIGHLIGHT ────────────────────────────────
+  // ── TEMPLATE 2: HOLE HIGHLIGHT ────────────────────────────────
   async function _buildHoleHighlightCard(h) {
     if (!h) return null;
     const { W, H } = _cardDims();
-    const canvas = _makeCanvas(W, H);
-    const ctx    = canvas.getContext('2d');
-    const players = _famRound.players||[];
-    const isLS    = _shareOrientation === 'landscape';
-    const sf      = _SF;
-    const SAFE    = _SAFE;
+    const canvas   = _makeCanvas(W, H);
+    const ctx      = canvas.getContext('2d');
+    const players  = _famRound.players || [];
+    const sf       = _SF;
+    const SAFE     = Math.round(18 * sf);
 
-    ctx.fillStyle = _C.bg; ctx.fillRect(0,0,W,H);
-
-    // Full-bleed photo
+    ctx.fillStyle = '#0d1a0a'; ctx.fillRect(0, 0, W, H);
     if (h.photo && _hasPhoto(h.photo)) {
       const img = await _loadImg(h.photo);
-      if (img) { _drawImgCover(ctx,img,0,0,W,H); }
+      if (img) _drawImgCover(ctx, img, 0, 0, W, H);
     }
 
-    // Gradient from bottom ~55% — photo shows as much as possible
-    const gH = ctx.createLinearGradient(0, H*0.38, 0, H);
-    gH.addColorStop(0,'rgba(16,10,5,0)'); gH.addColorStop(0.55,'rgba(16,10,5,0.72)'); gH.addColorStop(1,'rgba(16,10,5,0.96)');
-    ctx.fillStyle=gH; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = _bottomGrad(ctx, H); ctx.fillRect(0, 0, W, H);
 
-    // Hole badge top-left — inside SAFE zone
-    const bH = Math.round(44*sf);
-    ctx.fillStyle='rgba(16,10,5,0.62)'; _rr(ctx, SAFE, SAFE, Math.round(210*sf), bH, 10); ctx.fill();
-    ctx.fillStyle=_C.gold; ctx.font=`bold ${Math.round(18*sf)}px Outfit,Arial,sans-serif`; ctx.textAlign='left';
-    ctx.fillText(`HOLE ${h.hole}  ·  PAR ${h.par}`, SAFE+14, SAFE+bH*0.72);
+    // Hole badge top-left
+    const bH = Math.round(36 * sf);
+    ctx.fillStyle = 'rgba(10,14,8,0.58)';
+    _rr(ctx, SAFE, SAFE, Math.round(180 * sf), bH, 8); ctx.fill();
+    ctx.fillStyle = _C.gold;
+    ctx.font      = `500 ${Math.round(15 * sf)}px Outfit,Arial,sans-serif`;
+    ctx.textAlign = 'left';
+    ctx.fillText(`Hole ${h.hole}  ·  Par ${h.par}`, SAFE + 12, SAFE + bH * 0.70);
 
-    // Logo badge top-right — inside SAFE zone
-    _drawLogoBadge(ctx, W-SAFE, SAFE, sf);
+    // Player chips
+    const cols   = Math.min(players.length, 4);
+    const chipW  = Math.round(Math.min(148 * sf, (W - SAFE * 2 - (cols - 1) * 8) / cols));
+    const chipH  = Math.round(90 * sf);
+    const chipX0 = (W - (cols * chipW + (cols - 1) * 8)) / 2;
+    const chipY0 = H - SAFE - Math.round(44 * sf) - chipH;
+    const par    = h.par;
 
-    // Score chips — SAFE from bottom
-    const chipH2 = Math.round((isLS?124:140)*sf);
-    const chipW2 = Math.min(Math.round(208*sf), (W-SAFE*2-16)/players.length - 12);
-    const chipX2 = (W-(players.length*(chipW2+12)-12))/2;
-    const chipY2 = H - chipH2 - SAFE;
-
-    players.forEach((pk,i)=>{
-      const p=FAM_PLAYERS[pk]; if(!p) return;
-      const score=h.scores[pk]||0, diff=score-h.par;
-      const dStr=diff===0?'E':diff>0?`+${diff}`:String(diff);
-      const cx=chipX2+i*(chipW2+12);
-      ctx.fillStyle='rgba(16,10,5,0.70)'; _rr(ctx,cx,chipY2,chipW2,chipH2,14); ctx.fill();
-      ctx.strokeStyle=_C[pk]||_C.gold; ctx.lineWidth=3; _rr(ctx,cx,chipY2,chipW2,chipH2,14); ctx.stroke();
-      // No emoji — name then score
-      ctx.fillStyle=_C.cream; ctx.font=`500 ${Math.round(18*sf)}px Outfit,Arial`; ctx.textAlign='center';
-      ctx.fillText(p.name, cx+chipW2/2, chipY2+chipH2*0.35);
-      ctx.fillStyle=_C[pk]||_C.gold; ctx.font=`bold ${Math.round(52*sf)}px "Bebas Neue",Impact,Arial`;
-      ctx.fillText(String(score), cx+chipW2/2, chipY2+chipH2*0.72);
-      ctx.fillStyle=diff<0?'#fbbf24':diff===0?_C.muted:'#ef4444'; ctx.font=`400 ${Math.round(16*sf)}px Outfit,Arial`;
-      ctx.fillText(dStr, cx+chipW2/2, chipY2+chipH2*0.91);
+    players.forEach((pk, i) => {
+      _drawPlayerChip(ctx, pk, h.scores[pk] || 0, par,
+        chipX0 + i * (chipW + 8), chipY0, chipW, chipH, sf, false);
     });
 
-    // Course + date just above chips
-    ctx.fillStyle=_C.muted; ctx.font=`400 ${Math.round(16*sf)}px Outfit,Arial,sans-serif`; ctx.textAlign='center';
-    ctx.fillText(`${(_famRound.course_name||'').toUpperCase()}  ·  ${_famRound.date_played||''}`, W/2, chipY2-14);
-
-    // Gold photo frame drawn last — on top
-    _drawPhotoFrame(ctx, W, H);
-
+    _drawBottomText(ctx, W, H, sf, _famRound.course_name, _famRound.date_played, null);
+    await _drawCardChrome(ctx, W, H, sf);
     return _canvasToBlob(canvas);
   }
 
-    // ── TEMPLATE 3: BEST MOMENT ───────────────────────────────────
-  // Shows player picker first, then builds card for selected player's best hole
+  // ── TEMPLATE 3: BEST MOMENT ───────────────────────────────────
   function _showBestMomentPickerSheet() {
-    const players = _famRound.players||[];
+    const players = _famRound.players || [];
     const overlay = document.createElement('div');
     overlay.id = 'best-picker-overlay';
     overlay.style.cssText = 'position:fixed;inset:0;z-index:9600;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;';
@@ -5977,15 +5984,19 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     sheet.style.cssText = 'width:100%;background:var(--surface);border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));';
     const items = players.map(pk => {
       const p = FAM_PLAYERS[pk]; if (!p) return '';
-      let bestH=null, bestDiff=Infinity;
-      _famHoles.forEach(h=>{const d=(h.scores[pk]||0)-h.par,b=_hasPhoto(h.photo)?-0.5:0;if(d+b<bestDiff){bestDiff=d+b;bestH=h;}});
-      const diff = bestH ? (bestH.scores[pk]||0)-bestH.par : 0;
-      const ach  = diff<=-2?'Eagle':diff===-1?'Birdie':diff===0?'Par':'Best Hole';
-      return `<button onclick="pickPlayerAndShareBest('${pk}')" style="display:flex;align-items:center;gap:14px;width:100%;background:var(--surface2);border:1px solid rgba(212,175,112,0.15);border-radius:14px;padding:14px;cursor:pointer;color:var(--cream);margin-bottom:10px;">
-        <div style="width:36px;height:36px;border-radius:50%;background:${_C[pk+'Bg']||'rgba(255,255,255,0.08)'};border:2px solid ${_C[pk]||_C.gold};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;color:${_C[pk]||_C.gold};">${p.name.slice(0,2)}</div>
+      let bestH = null, bestScore = Infinity;
+      _famHoles.forEach(h => {
+        const diff = (h.scores[pk] || 0) - h.par;
+        const bonus = _hasPhoto(h.photo) ? -0.5 : 0;
+        if (diff + bonus < bestScore) { bestScore = diff + bonus; bestH = h; }
+      });
+      const diff = bestH ? (bestH.scores[pk] || 0) - bestH.par : 0;
+      const ach  = diff <= -2 ? 'Eagle' : diff === -1 ? 'Birdie' : diff === 0 ? 'Par' : 'Best Hole';
+      return `<button onclick="pickPlayerAndShareBest('${pk}')" style="display:flex;align-items:center;gap:14px;width:100%;background:var(--surface2);border:1px solid rgba(212,175,112,0.15);border-radius:14px;padding:14px;cursor:pointer;color:var(--cream);margin-bottom:10px;touch-action:manipulation;">
+        <div style="width:36px;height:36px;border-radius:50%;background:${_C[pk+'Bg']||'rgba(255,255,255,0.08)'};border:2px solid ${_C[pk]||_C.gold};display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.82rem;color:${_C[pk]||_C.gold};flex-shrink:0;">${p.name.slice(0,2)}</div>
         <div style="flex:1;text-align:left;">
           <div style="font-weight:700;font-size:0.92rem;">${p.name}</div>
-          <div style="font-size:0.75rem;color:var(--muted);margin-top:2px;">${bestH ? `Best: Hole ${bestH.hole} — ${ach}` : 'No data'}</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:2px;">${bestH ? 'Best: Hole ' + bestH.hole + ' — ' + ach : 'No data'}</div>
         </div>
         <div style="color:var(--gold);">›</div>
       </button>`;
@@ -6007,152 +6018,109 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const blob = await _buildBestMomentCard(playerKey);
       if (blob) await _doShare(blob);
     } catch(e) { console.warn('Best moment share error:', e); }
-    finally { if (btn) { btn.disabled = false; btn.textContent = 'Share'; } }
+    finally { if (btn) { btn.disabled = false; btn.textContent = '📤 Share'; } }
   }
 
-  // Draws a small level shield on canvas for kid share cards
   function _drawLevelShieldCanvas(ctx, cx, cy, size, level) {
     const lvl_stroke = { 1:'#B0A070', 2:'#5A9A30', 3:'#3070C0', 4:'#A07800' };
     const lvl_fill   = { 1:'#F5EDD8', 2:'#D0EAB8', 3:'#C0D8F8', 4:'#FAD860' };
     const lvl_bg     = { 1:'#E8E0D0', 2:'#B8D8A0', 3:'#A8C8F0', 4:'#F0C030' };
-    const lvl_text   = { 1:'#6a5c30', 2:'#1a5008', 3:'#083080', 4:'#503000' };
-    const stroke = lvl_stroke[level]||'#A07800', fill=lvl_fill[level]||'#FAD860';
-    const bg=lvl_bg[level]||'#F0C030', text=lvl_text[level]||'#503000';
-    const w=size, h=size*1.1;
-    // Outer shield
+    const tier = level <= 2 ? 1 : level <= 4 ? 2 : level <= 6 ? 3 : 4;
+    const sc = lvl_stroke[tier] || '#B0A070';
+    const fc = lvl_fill[tier]   || '#F5EDD8';
+    const bg = lvl_bg[tier]     || '#E8E0D0';
+    const pts = [
+      [cx, cy - size * 0.5], [cx + size * 0.45, cy - size * 0.18],
+      [cx + size * 0.28, cy + size * 0.46], [cx - size * 0.28, cy + size * 0.46],
+      [cx - size * 0.45, cy - size * 0.18],
+    ];
+    ctx.fillStyle = bg;
     ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(cx+w/2, cy+h*0.2);
-    ctx.lineTo(cx+w/2, cy+h*0.6);
-    ctx.quadraticCurveTo(cx+w/4, cy+h, cx, cy+h);
-    ctx.quadraticCurveTo(cx-w/4, cy+h, cx-w/2, cy+h*0.6);
-    ctx.lineTo(cx-w/2, cy+h*0.2);
-    ctx.closePath();
-    ctx.fillStyle=bg; ctx.fill();
-    ctx.strokeStyle=stroke; ctx.lineWidth=2; ctx.stroke();
-    // Inner fill
-    const i=size*0.12;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy+i);
-    ctx.lineTo(cx+w/2-i, cy+h*0.22);
-    ctx.lineTo(cx+w/2-i, cy+h*0.58);
-    ctx.quadraticCurveTo(cx+w/4, cy+h-i, cx, cy+h-i);
-    ctx.quadraticCurveTo(cx-w/4, cy+h-i, cx-w/2+i, cy+h*0.58);
-    ctx.lineTo(cx-w/2+i, cy+h*0.22);
-    ctx.closePath();
-    ctx.fillStyle=fill; ctx.fill();
-    // Text
-    ctx.textAlign='center';
-    ctx.fillStyle=text; ctx.font=`500 ${Math.round(size*0.22)}px Outfit,Arial,sans-serif`;
-    ctx.fillText('LVL', cx, cy+h*0.52);
-    ctx.font=`bold ${Math.round(size*0.40)}px "Bebas Neue",Impact,Arial`;
-    ctx.fillText(String(level), cx, cy+h*0.84);
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    pts.slice(1).forEach(p => ctx.lineTo(p[0], p[1]));
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = sc; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = sc;
+    ctx.font = `bold ${Math.round(size * 0.55)}px Outfit,Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText(String(level), cx, cy + size * 0.2);
   }
 
   async function _buildBestMomentCard(playerKey) {
-    const players = _famRound.players||[];
-    const pk = playerKey || players[0];
-    if (!pk) return null;
+    const pk = playerKey;
+    const p  = FAM_PLAYERS[pk];
+    if (!p) return null;
 
-    let bestHole = null, bestScore = Infinity;
+    let bestH = null, bestScore = Infinity;
     _famHoles.forEach(h => {
-      const diff = (h.scores[pk]||0)-h.par;
-      const photoBonus = (h.photo && _hasPhoto(h.photo)) ? -0.5 : 0;
-      if (diff+photoBonus < bestScore) { bestScore=diff+photoBonus; bestHole=h; }
+      const diff  = (h.scores[pk] || 0) - h.par;
+      const bonus = _hasPhoto(h.photo) ? -0.5 : 0;
+      if (diff + bonus < bestScore) { bestScore = diff + bonus; bestH = h; }
     });
-    if (!bestHole) return null;
-
-    if (!bestHole.photo || !_hasPhoto(bestHole.photo)) {
-      await new Promise(resolve => {
-        const overlay = document.createElement('div');
-        overlay.style.cssText='position:fixed;inset:0;z-index:9700;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;padding:20px;';
-        overlay.innerHTML=`<div style="background:var(--surface);border-radius:16px;padding:24px;max-width:320px;text-align:center;">
-          <div style="font-size:2rem;margin-bottom:10px;">★</div>
-          <div style="font-weight:700;color:var(--cream);margin-bottom:6px;">Best Hole: Hole ${bestHole.hole}</div>
-          <div style="font-size:0.85rem;color:var(--muted);margin-bottom:20px;">No photo for this hole. You can still share the card without a photo.</div>
-          <button onclick="this.closest('[style]').dataset.done='1';this.closest('[style]').click()" style="width:100%;padding:12px;background:var(--gold);border:none;border-radius:10px;color:var(--bg);font-weight:700;font-size:0.9rem;cursor:pointer;">Share anyway</button>
-        </div>`;
-        overlay.onclick = e => { if (e.target === overlay || overlay.dataset.done) { document.body.removeChild(overlay); resolve(); } };
-        document.body.appendChild(overlay);
-      });
-    }
-
-    const p = FAM_PLAYERS[pk];
-    const diff = (bestHole.scores[pk]||0)-bestHole.par;
-    const achievement = diff<=-2?'Eagle':diff===-1?'Birdie':diff===0?'Par':'Best Hole';
+    if (!bestH) return null;
 
     const { W, H } = _cardDims();
-    const canvas = _makeCanvas(W, H);
-    const ctx    = canvas.getContext('2d');
-    const isLS   = _shareOrientation === 'landscape';
-    const sf     = _SF;
-    const SAFE   = _SAFE;
+    const canvas   = _makeCanvas(W, H);
+    const ctx      = canvas.getContext('2d');
+    const sf       = _SF;
+    const score    = bestH.scores[pk] || 0;
+    const diff     = score - bestH.par;
+    const achv     = diff <= -2 ? 'EAGLE' : diff === -1 ? 'BIRDIE' : diff === 0 ? 'PAR' : null;
+    const scoreColor = diff <= -2 ? '#a78bfa' : diff === -1 ? '#fbbf24' : diff === 0 ? '#6ec98a' : _C[pk] || _C.gold;
 
-    ctx.fillStyle = _C.bg; ctx.fillRect(0,0,W,H);
-
-    if (bestHole.photo && _hasPhoto(bestHole.photo)) {
-      const img = await _loadImg(bestHole.photo);
-      if (img) { _drawImgCover(ctx,img,0,0,W,H); }
+    ctx.fillStyle = '#0d1a0a'; ctx.fillRect(0, 0, W, H);
+    if (bestH.photo && _hasPhoto(bestH.photo)) {
+      const img = await _loadImg(bestH.photo);
+      if (img) _drawImgCover(ctx, img, 0, 0, W, H);
     }
 
-    const gH = ctx.createLinearGradient(0, H*0.38, 0, H);
-    gH.addColorStop(0,'rgba(16,10,5,0)'); gH.addColorStop(0.55,'rgba(16,10,5,0.75)'); gH.addColorStop(1,'rgba(16,10,5,0.97)');
-    ctx.fillStyle=gH; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = _bottomGrad(ctx, H); ctx.fillRect(0, 0, W, H);
 
-    const aH = Math.round(44*sf);
-    ctx.fillStyle='rgba(16,10,5,0.62)'; _rr(ctx, SAFE, SAFE, Math.round(250*sf), aH, 10); ctx.fill();
-    ctx.fillStyle=diff<=-1?'#fbbf24':_C.gold; ctx.font=`bold ${Math.round(18*sf)}px Outfit,Arial,sans-serif`; ctx.textAlign='left';
-    ctx.fillText(`${achievement}  ·  Hole ${bestHole.hole}  ·  Par ${bestHole.par}`, SAFE+14, SAFE+aH*0.72);
+    // Center content
+    const midX = W / 2;
+    const midY = H * 0.42;
 
-    const bmW = Math.round(172*sf), bmH = Math.round(40*sf);
-    ctx.fillStyle=_C.gold; _rr(ctx, W-bmW-SAFE, SAFE, bmW, bmH, 20); ctx.fill();
-    ctx.fillStyle=_C.bg; ctx.font=`bold ${Math.round(18*sf)}px Outfit,Arial,sans-serif`; ctx.textAlign='center';
-    ctx.fillText('BEST HOLE', W-SAFE-bmW/2, SAFE+bmH*0.70);
+    // Player avatar circle
+    const r = Math.round(36 * sf);
+    ctx.fillStyle = _C[pk + 'Bg'] || 'rgba(255,255,255,0.1)';
+    ctx.beginPath(); ctx.arc(midX, midY - Math.round(60 * sf), r, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = _C[pk] || _C.gold; ctx.lineWidth = Math.round(2 * sf);
+    ctx.beginPath(); ctx.arc(midX, midY - Math.round(60 * sf), r, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = _C[pk] || _C.gold;
+    ctx.font      = `500 ${Math.round(18 * sf)}px Outfit,Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText(p.name, midX, midY - Math.round(60 * sf) + Math.round(6 * sf));
 
-    const chipH = Math.round((isLS?124:140)*sf);
-    const chipW = Math.round(232*sf);
-    const chipY = H - chipH - SAFE;
-    const chipX = (W-chipW)/2;
-    const score = bestHole.scores[pk]||0;
-    const d     = score-bestHole.par;
-    const dStr  = d===0?'E':d>0?`+${d}`:String(d);
+    // Hole info
+    ctx.fillStyle = 'rgba(255,255,255,0.42)';
+    ctx.font      = `400 ${Math.round(13 * sf)}px Outfit,Arial`;
+    ctx.fillText(`Hole ${bestH.hole}  ·  Par ${bestH.par}`, midX, midY);
 
-    const logoSpinF  = Math.round(26*0.72*sf);
-    const logoFamF   = Math.round(18*0.72*sf);
-    const logoGap    = Math.round(6*sf);
-    const logoTotalH = logoSpinF + logoGap + logoFamF;
-    const logoY      = chipY - 14 - logoTotalH;
-    ctx.textAlign='center';
-    ctx.fillStyle=_C.gold; ctx.font=`bold ${logoSpinF}px "Bebas Neue",Impact,Arial,sans-serif`;
-    ctx.fillText('SPINVIBES', W/2, logoY+logoSpinF);
-    ctx.fillStyle=_C.cream; ctx.font=`italic ${logoFamF}px Georgia,"Times New Roman",serif`;
-    ctx.fillText('Family Golf', W/2, logoY+logoSpinF+logoGap+logoFamF);
+    // Big score
+    ctx.fillStyle = scoreColor;
+    ctx.font      = `500 ${Math.round(96 * sf)}px "Bebas Neue",Impact,Arial`;
+    ctx.fillText(String(score), midX, midY + Math.round(80 * sf));
 
-    ctx.fillStyle=_C.muted; ctx.font=`400 ${Math.round(16*sf)}px Outfit,Arial,sans-serif`; ctx.textAlign='center';
-    ctx.fillText(`${(_famRound.course_name||'').toUpperCase()}  ·  ${_famRound.date_played||''}`, W/2, logoY-12);
+    // Achievement label
+    if (achv) {
+      ctx.fillStyle = '#fbbf24';
+      ctx.font      = `500 ${Math.round(22 * sf)}px Outfit,Arial`;
+      ctx.fillText(achv, midX, midY + Math.round(108 * sf));
+    }
 
-    ctx.fillStyle='rgba(16,10,5,0.70)'; _rr(ctx,chipX,chipY,chipW,chipH,14); ctx.fill();
-    ctx.strokeStyle=_C[pk]||_C.gold; ctx.lineWidth=3; _rr(ctx,chipX,chipY,chipW,chipH,14); ctx.stroke();
-    ctx.fillStyle=_C.cream; ctx.font=`500 ${Math.round(18*sf)}px Outfit,Arial`; ctx.textAlign='center';
-    ctx.fillText(p ? p.name : pk, chipX+chipW/2, chipY+chipH*0.35);
-    ctx.fillStyle=_C[pk]||_C.gold; ctx.font=`bold ${Math.round(52*sf)}px "Bebas Neue",Impact,Arial`;
-    ctx.fillText(String(score), chipX+chipW/2, chipY+chipH*0.72);
-    ctx.fillStyle=d<0?'#fbbf24':d===0?_C.muted:'#ef4444'; ctx.font=`400 ${Math.round(16*sf)}px Outfit,Arial`;
-    ctx.fillText(dStr, chipX+chipW/2, chipY+chipH*0.91);
-
-    // Level shield for kid players
+    // Level shield for kids
     if (pk === 'son' || pk === 'girl') {
-      const shieldSize = Math.round(36*sf);
-      _drawLevelShieldCanvas(ctx, chipX+chipW-shieldSize*0.6-8, chipY+10*sf, shieldSize, getKidLevel(pk==='son'?'son':'girl'));
+      const lvl = getKidLevel(pk);
+      _drawLevelShieldCanvas(ctx, midX + Math.round(52 * sf), midY + Math.round(58 * sf), Math.round(22 * sf), lvl);
     }
 
-    _drawPhotoFrame(ctx, W, H);
-
+    _drawBottomText(ctx, W, H, sf, _famRound.course_name, _famRound.date_played, null);
+    await _drawCardChrome(ctx, W, H, sf);
     return _canvasToBlob(canvas);
   }
 
 
-    function _roundRect(ctx, x, y, w, h, r) { _rr(ctx, x, y, w, h, r); }
+      function _roundRect(ctx, x, y, w, h, r) { _rr(ctx, x, y, w, h, r); }
 
 
   function renderFamSummary() {
