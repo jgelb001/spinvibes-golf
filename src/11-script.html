@@ -2727,8 +2727,9 @@
             ${ref.fix ? '<div style="margin-bottom:6px;"><i class="ti ti-tool" style="color:var(--muted);vertical-align:-1px;"></i> <em>' + ref.fix + '</em></div>' : ''}
             ${ref.best ? '<div style="margin-bottom:6px;"><i class="ti ti-trophy" style="color:var(--gold);vertical-align:-1px;"></i> <em>' + ref.best + '</em></div>' : ''}
             ${ref.worst ? '<div style="margin-bottom:6px;"><i class="ti ti-x" style="color:var(--red,#c0392b);vertical-align:-1px;"></i> <em>' + ref.worst + '</em></div>' : ''}
-            <div style="display:flex;gap:8px;margin-top:10px;">
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
               <button class="round-edit-btn" onclick="openRoundEditModal('${r.id}')">✎ Edit</button>
+              <button onclick="showDadSharePicker(${JSON.stringify(r).replace(/"/g,'&quot;')}, ${JSON.stringify((Array.isArray(r.holes)?r.holes:[]).map(h=>({hole:h.hole,par:h.par,score:h.score,photo:h.photo_url||h.photo||null,yds:h.yds||null}))).replace(/"/g,'&quot;')})" style="background:none;border:1px solid rgba(138,96,16,0.35);border-radius:8px;padding:6px 12px;color:var(--gold-l);font-size:0.78rem;font-weight:600;cursor:pointer;touch-action:manipulation;">📤 Share</button>
               <button class="round-delete-btn" style="margin-top:0;" onclick="confirmDeleteDadRound('${r.id}')">Delete Round</button>
             </div>
           </div>
@@ -5624,20 +5625,23 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   // ── SHARE TEMPLATE PICKER ────────────────────────────────────
   let _shareOrientation = 'portrait'; // 'portrait' | 'landscape'
 
-  function showDadSharePicker() {
-    // Map dad solo round into the family round format so all 3 share templates work
+  function showDadSharePicker(round, holes) {
+    // Can be called with a specific round from history, or defaults to current round
+    const r = round || _dadRound;
+    const hs = holes || _dadHoles || [];
     _famRound = {
-      course_name: _dadRound.course_name || 'Round',
-      date_played: _dadRound.date_played || new Date().toISOString().slice(0,10),
-      course_par:  _dadRound.course_par  || 72,
+      course_name: r.course_name || 'Round',
+      date_played: r.date_played || new Date().toISOString().slice(0,10),
+      course_par:  r.course_par  || 72,
       players:     ['dad'],
     };
-    _famHoles = (_dadHoles || []).map(h => ({
+    _famHoles = hs.map(h => ({
       hole:   h.hole,
       par:    h.par,
       yds:    h.yds || null,
+      photos: h.photo ? [h.photo] : [],
       photo:  h.photo || null,
-      scores: { dad: h.score || 0 },
+      scores: { dad: h.score || h.scores?.dad || 0 },
     }));
     showSharePicker();
   }
