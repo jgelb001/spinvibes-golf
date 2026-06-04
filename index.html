@@ -8102,15 +8102,11 @@
       return { ...h, approach_club: club || null, approach_yds: ydsRaw ? parseInt(ydsRaw, 10) : null };
     });
     try {
-      // Anon key has no UPDATE permission — delete + reinsert with updated holes
-      const { error: delErr } = await _sb.from('dad_rounds').delete().eq('id', _editingRoundId);
-      if (delErr) throw delErr;
-      const newRound = { ...r, holes };
-      delete newRound.id;
-      delete newRound.created_at;
-      const safeRound = { ...newRound, stars: Math.max(1, newRound.stars || 1) };
-      const { error: insErr } = await _sb.from('dad_rounds').insert([safeRound]);
-      if (insErr) throw insErr;
+      const { error } = await _sb.from('dad_rounds').update({ holes }).eq('id', _editingRoundId);
+      if (error) throw error;
+      // Update local cache so UI reflects change without a full reload
+      const cached = _dadLoadedRounds.find(r => r.id === _editingRoundId);
+      if (cached) cached.holes = holes;
       showToast('Round updated ✓');
       closeRoundEditModal();
       loadDadRoundsAndRender();
