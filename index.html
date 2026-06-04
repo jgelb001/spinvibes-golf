@@ -10928,49 +10928,174 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
   // ── TEMPLATE 1: ROUND SUMMARY ─────────────────────────────────
   async function _buildScorecardCard() {
-    const { W, H } = _cardDims();
+    const W = 720, H = 1280; // always portrait for scorecard
     const players  = _famRound.players || [];
     const totals   = _famTotals();
     const totalPar = _famHoles.reduce((a, h) => a + h.par, 0);
     const minScore = Math.min(...players.map(pk => totals[pk]));
     const winners  = players.filter(pk => totals[pk] === minScore);
-    const winLine  = winners.length === players.length ? 'All tied!' :
-      winners.map(pk => FAM_PLAYERS[pk]?.name || pk).join(' & ') +
-      (winners.length === 1 ? ' wins!' : ' tie!');
+    const front    = _famHoles.slice(0, 9);
+    const back     = _famHoles.slice(9, 18);
+    const frontPar = front.reduce((a,h) => a+h.par, 0);
+    const backPar  = back.reduce((a,h)  => a+h.par, 0);
+    const sf       = 0.76;
 
     const canvas = _makeCanvas(W, H);
     const ctx    = canvas.getContext('2d');
-    const sf     = _SF;
 
-    // Background — auto-grid collage of all hole photos
+    // ── PHOTO BACKGROUND (top ~38%) ──
     const photos = _famHoles.flatMap(h => h.photos?.length ? h.photos : (h.photo ? [h.photo] : [])).filter(p => _hasPhoto(p));
     ctx.fillStyle = '#0d1a0a'; ctx.fillRect(0, 0, W, H);
+    const photoH = Math.round(H * 0.38);
     if (photos.length) {
-      await _drawCollageBackground(ctx, W, H, photos);
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, photoH); ctx.clip();
+      await _drawCollageBackground(ctx, W, photoH, photos);
+      ctx.restore();
     }
 
-    // Bottom gradient
-    ctx.fillStyle = _bottomGrad(ctx, H); ctx.fillRect(0, 0, W, H);
+    // Gradient over photo into dark
+    const fadeG = ctx.createLinearGradient(0, photoH * 0.45, 0, photoH + 40);
+    fadeG.addColorStop(0, 'rgba(13,26,10,0)');
+    fadeG.addColorStop(1, 'rgba(13,26,10,1)');
+    ctx.fillStyle = fadeG; ctx.fillRect(0, 0, W, photoH + 40);
 
-    // Player chips — 2 columns max
-    const cols    = Math.min(players.length, 2);
-    const rows    = Math.ceil(players.length / cols);
-    const chipW   = Math.round(Math.min(190 * sf, (W - Math.round(48 * sf)) / cols - 10));
-    const chipH   = Math.round(118 * sf);
-    const chipGap = 10;
-    const blockW  = cols * chipW + (cols - 1) * chipGap;
-    const blockH  = rows * chipH + (rows - 1) * chipGap;
-    const chipX0  = (W - blockW) / 2;
-    const chipY0  = H - Math.round(32 * sf) - Math.round(52 * sf) - blockH;
+    // ── COURSE HEADER ──
+    const pad = 28;
+    let y = photoH - 10;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#f5f0e8';
+    ctx.font = `500 ${Math.round(42*sf)}px "Bebas Neue",Impact,Arial`;
+    ctx.fillText((_famRound.course_name||'').toUpperCase(), W/2, y);
+    y += Math.round(28*sf);
+    ctx.fillStyle = 'rgba(255,255,255,0.38)';
+    ctx.font = `400 ${Math.round(17*sf)}px Outfit,Arial`;
+    ctx.fillText(`${_famRound.date_played||''}  ·  Par ${totalPar}`, W/2, y);
+    y += Math.round(22*sf);
 
+    // ── SCORE GRID ──
+    // Helper: draw score cell with golf notation (circle=birdie, square=bogey)
+    function _scoreCell(cx, cy, cw, ch, score, par, color) {
+      const diff = score - par;
+      ctx.fillStyle = color;
+      ctx.font = `500 ${Math.round(13.5*sf)}px Outfit,Arial`;
+      ctx.textAlign = 'center';
+      const tx = cx + cw/2, ty = cy + ch*0.66;
+
+      if (diff <= -2) { // Eagle: double circle
+        ctx.beginPath(); ctx.arc(tx, cy+ch/2, Math.round(9.5*sf), 0, Math.PI*2); ctx.strokeStyle=color; ctx.lineWidth=1.2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(tx, cy+ch/2, Math.round(6.5*sf), 0, Math.PI*2); ctx.stroke();
+      } else if (diff === -1) { // Birdie: circle
+        ctx.beginPath(); ctx.arc(tx, cy+ch/2, Math.round(9*sf), 0, Math.PI*2); ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.stroke();
+      } else if (diff === 1) { // Bogey: square
+        const s=Math.round(10*sf); ctx.strokeStyle=color; ctx.lineWidth=1.5;
+        ctx.strokeRect(tx-s, cy+ch/2-s, s*2, s*2);
+      } else if (diff >= 2) { // Double+: double square
+        const s=Math.round(10*sf), s2=Math.round(13*sf); ctx.strokeStyle=color; ctx.lineWidth=1.2;
+        ctx.strokeRect(tx-s, cy+ch/2-s, s*2, s*2);
+        ctx.strokeRect(tx-s2, cy+ch/2-s2, s2*2, s2*2);
+      }
+      ctx.fillStyle = color;
+      ctx.fillText(String(score), tx, ty);
+    }
+
+    function drawGrid(holes, startY, sectionPar) {
+      const numCols = holes.length + 2; // holes + OUT/IN + TOT
+      const nameW   = Math.round(54*sf);
+      const totW    = Math.round(38*sf);
+      const subW    = Math.round(36*sf);
+      const holeW   = (W - pad*2 - nameW - subW - totW) / holes.length;
+      const rowH    = Math.round(26*sf);
+
+      // Header row (hole numbers)
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      ctx.fillRect(pad, startY, W-pad*2, rowH);
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.font = `400 ${Math.round(11*sf)}px Outfit,Arial`;
+      ctx.textAlign = 'center';
+      holes.forEach((h,i) => ctx.fillText(String(h.hole), pad+nameW+i*holeW+holeW/2, startY+rowH*0.70));
+      ctx.fillText(holes.length===9?'OUT':'', pad+nameW+holes.length*holeW+subW/2, startY+rowH*0.70);
+
+      // Par row
+      const parY = startY + rowH;
+      ctx.fillStyle = 'rgba(255,255,255,0.04)';
+      ctx.fillRect(pad, parY, W-pad*2, rowH);
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.font = `400 ${Math.round(11*sf)}px Outfit,Arial`;
+      ctx.textAlign = 'left';
+      ctx.fillText('PAR', pad+6, parY+rowH*0.70);
+      holes.forEach((h,i) => {
+        ctx.textAlign='center';
+        ctx.fillText(String(h.par), pad+nameW+i*holeW+holeW/2, parY+rowH*0.70);
+      });
+      ctx.fillText(String(sectionPar), pad+nameW+holes.length*holeW+subW/2, parY+rowH*0.70);
+
+      // Player rows
+      players.forEach((pk, pi) => {
+        const p    = FAM_PLAYERS[pk];
+        const rowY = parY + rowH*(pi+1);
+        if (pi%2===0) { ctx.fillStyle='rgba(255,255,255,0.03)'; ctx.fillRect(pad,rowY,W-pad*2,rowH); }
+
+        // Name
+        ctx.fillStyle = _C[pk]||_C.gold;
+        ctx.font = `500 ${Math.round(11.5*sf)}px Outfit,Arial`;
+        ctx.textAlign = 'left';
+        ctx.fillText(p.name, pad+5, rowY+rowH*0.70);
+
+        // Hole scores
+        holes.forEach((h,i) => {
+          const sc   = h.scores[pk]||0;
+          const diff = sc - h.par;
+          const col  = diff<=-1?'#60a5fa': diff===0?'rgba(255,255,255,0.75)': diff===1?'#f87171':'#ef4444';
+          _scoreCell(pad+nameW+i*holeW, rowY, holeW, rowH, sc, h.par, col);
+        });
+
+        // Section subtotal
+        const sub = holes.reduce((a,h)=>a+(h.scores[pk]||0),0);
+        const subDiff = sub - sectionPar;
+        const subColor = subDiff<0?'#60a5fa':subDiff===0?'rgba(255,255,255,0.6)':'#f87171';
+        ctx.fillStyle = subColor;
+        ctx.font = `500 ${Math.round(12.5*sf)}px Outfit,Arial`;
+        ctx.textAlign = 'center';
+        ctx.fillText(String(sub), pad+nameW+holes.length*holeW+subW/2, rowY+rowH*0.70);
+      });
+
+      return parY + rowH*(players.length+1);
+    }
+
+    // Divider line
+    ctx.strokeStyle = 'rgba(201,168,76,0.15)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W-pad, y); ctx.stroke();
+    y += 8;
+
+    // Front 9
+    const afterFront = drawGrid(front, y, frontPar);
+    y = afterFront + Math.round(6*sf);
+
+    // Back 9
+    const afterBack = back.length ? drawGrid(back, y, backPar) : y;
+    y = afterBack + Math.round(10*sf);
+
+    // Divider
+    ctx.strokeStyle = 'rgba(201,168,76,0.2)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W-pad, y); ctx.stroke();
+    y += Math.round(14*sf);
+
+    // ── TOTAL ROW — player chips ──
+    const chipW = Math.round(Math.min(155*sf, (W-pad*2-(players.length-1)*8)/players.length));
+    const chipH = Math.round(82*sf);
+    const chipX0 = (W-(players.length*chipW+(players.length-1)*8))/2;
     players.forEach((pk, i) => {
-      const col = i % cols, row = Math.floor(i / cols);
-      const cx  = chipX0 + col * (chipW + chipGap);
-      const cy  = chipY0 + row * (chipH + chipGap);
-      _drawPlayerChip(ctx, pk, totals[pk], totalPar, cx, cy, chipW, chipH, sf, winners.includes(pk));
+      _drawPlayerChip(ctx, pk, totals[pk], totalPar, chipX0+i*(chipW+8), y, chipW, chipH, sf, winners.includes(pk));
     });
+    y += chipH + Math.round(10*sf);
 
-    _drawBottomText(ctx, W, H, sf, _famRound.course_name, _famRound.date_played, winLine);
+    // Winner line
+    const winLine = winners.length===players.length?'All tied!':
+      winners.map(pk=>FAM_PLAYERS[pk]?.name||pk).join(' & ')+(winners.length===1?' wins!':' tie!');
+    ctx.fillStyle = _C.gold;
+    ctx.font = `500 ${Math.round(15*sf)}px Outfit,Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText(winLine, W/2, y + Math.round(14*sf));
 
     await _drawCardChrome(ctx, W, H, sf);
     return _canvasToBlob(canvas);
