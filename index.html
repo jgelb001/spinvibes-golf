@@ -6815,7 +6815,22 @@
   }
 
   // ── IN-PROGRESS ROUND PERSISTENCE ────────────────────────────
-  const _ROUND_DRAFT_KEY = 'spinvibes-round-scores';
+  const _ROUND_DRAFT_KEY     = 'spinvibes-round-scores';
+  const _FAM_DRAFT_KEY       = 'spinvibes-fam-round-draft';
+
+  function _saveFamDraft() {
+    try {
+      localStorage.setItem(_FAM_DRAFT_KEY, JSON.stringify({
+        round: _famRound, holes: _famHoles, holeIdx: _famHoleIdx, ts: Date.now()
+      }));
+    } catch(e) {}
+  }
+  function _clearFamDraft() {
+    try { localStorage.removeItem(_FAM_DRAFT_KEY); } catch(e) {}
+  }
+  function _loadFamDraft() {
+    try { return JSON.parse(localStorage.getItem(_FAM_DRAFT_KEY)); } catch(e) { return null; }
+  }
   function _saveDraftRound() {
     try {
       localStorage.setItem(_ROUND_DRAFT_KEY, JSON.stringify({
@@ -9805,17 +9820,42 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   }
 
   function _openFamilyModalUnlocked() {
-    _famRound   = {};
-    _famHoles   = [];
-    _famHoleIdx = 0;
     _lockBodyScroll();
     document.getElementById('family-modal').style.display = 'flex';
     document.getElementById('fam-running-bar').style.display = 'none';
     const footer = document.getElementById('fam-modal-footer');
     if (footer) footer.style.display = 'none';
-    // Show X button during setup (safe to exit)
     const closeBtn = document.getElementById('fam-modal-close-btn');
     if (closeBtn) closeBtn.style.display = '';
+
+    // Check for an in-progress family round
+    const draft = _loadFamDraft();
+    if (draft && draft.holes && draft.holes.length > 0 && draft.holeIdx < draft.holes.length) {
+      const ageMin = Math.round((Date.now() - (draft.ts || 0)) / 60000);
+      const ageStr = ageMin < 60 ? ageMin + ' min ago' : Math.round(ageMin/60) + 'h ago';
+      const holesPlayed = draft.holeIdx + 1;
+      const players = draft.round.players || [];
+      const totals  = players.map(pk => {
+        const t = draft.holes.slice(0, holesPlayed).reduce((a,h) => a + (h.scores?.[pk]||0), 0);
+        return (FAM_PLAYERS[pk]?.name || pk) + ': ' + t;
+      }).join(' · ');
+      if (confirm('Resume family round in progress?\n\n' + (draft.round.course_name||'Round') + ' · Hole ' + holesPlayed + ' of ' + draft.holes.length + '\n' + totals + '\nSaved ' + ageStr + '\n\nOK = resume · Cancel = new round')) {
+        _famRound   = draft.round;
+        _famHoles   = draft.holes;
+        _famHoleIdx = draft.holeIdx;
+        _famCaddieHistory = [];
+        _famCaddieOpen    = false;
+        document.getElementById('fam-running-bar').style.display = 'flex';
+        renderFamHole();
+        return;
+      } else {
+        _clearFamDraft();
+      }
+    }
+
+    _famRound   = {};
+    _famHoles   = [];
+    _famHoleIdx = 0;
     renderFamSetup();
   }
 
@@ -10415,8 +10455,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   }
 
   function famHoleNext() {
-    if (_famHoleIdx === _famHoles.length - 1) { renderFamSummary(); }
-    else { _famHoleIdx++; renderFamHole(); }
+    if (_famHoleIdx === _famHoles.length - 1) { _clearFamDraft(); renderFamSummary(); }
+    else { _famHoleIdx++; _saveFamDraft(); renderFamHole(); }
   }
 
   function famHoleBack() {
@@ -10424,7 +10464,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   }
 
   function confirmExitFamRound() {
-    if (confirm('Exit this round? Scores entered so far will be lost.')) {
+    if (confirm('Exit round? Progress is saved — tap Family Round to resume.')) {
+      _saveFamDraft();
       closeFamilyModal();
     }
   }
@@ -10578,15 +10619,39 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const course   = (_famRound.course_name||'round').replace(/\s+/g,'-').toLowerCase();
     const date     = _famRound.date_played || '';
     const filename = `spinvibes-${course}-${date}.png`;
-    try {
-      const file = new File([blob], filename, { type: 'image/png' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: `SpinVibes Golf — ${_famRound.course_name}` });
-        return;
-      }
-    } catch(e) { /* share cancelled */ }
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+    const objUrl   = URL.createObjectURL(blob);
+
+    // Show preview overlay first
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9800;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:14px;';
+    overlay.innerHTML = `
+      <img src="${objUrl}" style="max-width:100%;max-height:70dvh;border-radius:10px;object-fit:contain;">
+      <div style="display:flex;gap:10px;width:100%;max-width:360px;">
+        <button onclick="this.closest('div[style]').remove();URL.revokeObjectURL('${objUrl}')"
+          style="flex:1;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:14px;color:#fff;font-family:Outfit,sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;touch-action:manipulation;">
+          Cancel
+        </button>
+        <button id="sv-share-confirm-btn"
+          style="flex:2;background:#2d6a3f;border:none;border-radius:12px;padding:14px;color:#e8f5ec;font-family:Outfit,sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;touch-action:manipulation;">
+          Share →
+        </button>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    // Wire up the share button
+    document.getElementById('sv-share-confirm-btn').onclick = async () => {
+      overlay.remove();
+      try {
+        const file = new File([blob], filename, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: 'SpinVibes Golf — ' + (_famRound.course_name||'') });
+          URL.revokeObjectURL(objUrl); return;
+        }
+      } catch(e) { /* share cancelled or not supported */ }
+      const a = document.createElement('a');
+      a.href = objUrl; a.download = filename; a.click();
+      setTimeout(() => URL.revokeObjectURL(objUrl), 5000);
+    };
   }
 
   // ── CARD HELPERS ─────────────────────────────────────────────
@@ -10708,9 +10773,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     // Logo — top right
     const logo = await _loadSvLogo();
     if (logo) {
-      const logoW = Math.round(148 * sf);
+      const logoW = Math.round(200 * sf);
       const logoH  = Math.round(logoW * (logo.height / logo.width));
-      const pad    = Math.round(18 * sf);
+      const pad    = Math.round(22 * sf);
       ctx.drawImage(logo, W - logoW - pad, pad, logoW, logoH);
     }
 
@@ -10759,13 +10824,13 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     // Score
     ctx.fillStyle = scoreColor;
-    ctx.font = `500 ${Math.round(44 * sf)}px "Bebas Neue",Impact,Arial,sans-serif`;
+    ctx.font = `500 ${Math.round(52 * sf)}px "Bebas Neue",Impact,Arial,sans-serif`;
     ctx.fillText(String(score), midX, cy + chipH * 0.70);
 
     // Achievement or vs-par
     const label = achv || dStr;
     ctx.fillStyle = achv ? '#fbbf24' : 'rgba(255,255,255,0.4)';
-    ctx.font = `400 ${Math.round(12 * sf)}px Outfit,Arial,sans-serif`;
+    ctx.font = `400 ${Math.round(13 * sf)}px Outfit,Arial,sans-serif`;
     ctx.fillText(label, midX, cy + chipH * 0.90);
   }
 
@@ -10813,8 +10878,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     // Player chips — 2 columns max
     const cols    = Math.min(players.length, 2);
     const rows    = Math.ceil(players.length / cols);
-    const chipW   = Math.round(Math.min(160 * sf, (W - Math.round(48 * sf)) / cols - 10));
-    const chipH   = Math.round(100 * sf);
+    const chipW   = Math.round(Math.min(190 * sf, (W - Math.round(48 * sf)) / cols - 10));
+    const chipH   = Math.round(118 * sf);
     const chipGap = 10;
     const blockW  = cols * chipW + (cols - 1) * chipGap;
     const blockH  = rows * chipH + (rows - 1) * chipGap;
@@ -10863,8 +10928,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     // Player chips
     const cols   = Math.min(players.length, 4);
-    const chipW  = Math.round(Math.min(148 * sf, (W - SAFE * 2 - (cols - 1) * 8) / cols));
-    const chipH  = Math.round(90 * sf);
+    const chipW  = Math.round(Math.min(170 * sf, (W - SAFE * 2 - (cols - 1) * 8) / cols));
+    const chipH  = Math.round(108 * sf);
     const chipX0 = (W - (cols * chipW + (cols - 1) * 8)) / 2;
     const chipY0 = H - SAFE - Math.round(44 * sf) - chipH;
     const par    = h.par;
@@ -11004,7 +11069,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     // Big score
     ctx.fillStyle = scoreColor;
-    ctx.font      = `500 ${Math.round(96 * sf)}px "Bebas Neue",Impact,Arial`;
+    ctx.font      = `500 ${Math.round(110 * sf)}px "Bebas Neue",Impact,Arial`;
     ctx.fillText(String(score), midX, midY + Math.round(80 * sf));
 
     // Achievement label
@@ -11244,6 +11309,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
   async function saveFamRound(btn) {
     btn.disabled = true; btn.textContent = 'Saving...';
+    _clearFamDraft(); // round saved — clear in-progress draft
     const players  = _famRound.players;
     const statusEl = document.getElementById('fam-save-status');
     const saved = [], failed = [];
