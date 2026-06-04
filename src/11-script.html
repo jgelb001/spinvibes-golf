@@ -396,23 +396,31 @@
   // Upload any base64 hole photos to Supabase Storage and replace with public URLs
   async function uploadRoundPhotos(roundId) {
     for (const h of _famHoles) {
-      if (!h.photo || h.photo.startsWith('http')) continue; // skip nulls and already-uploaded URLs
-      try {
-        const res  = await fetch(h.photo);
-        const blob = await res.blob();
-        const path = `${roundId}/hole-${h.hole}.jpg`;
-        const { error } = await _sb.storage.from('round-photos').upload(path, blob, {
-          contentType: 'image/jpeg',
-          upsert: true,
-        });
-        if (!error) {
-          const { data } = _sb.storage.from('round-photos').getPublicUrl(path);
-          h.photo = data.publicUrl; // replace base64 with persistent URL
+      const rawPhotos = h.photos?.length ? h.photos : (h.photo ? [h.photo] : []);
+      const uploaded = [];
+      for (let i = 0; i < rawPhotos.length; i++) {
+        const p = rawPhotos[i];
+        if (!p || p.startsWith('http')) { uploaded.push(p); continue; }
+        try {
+          const res  = await fetch(p);
+          const blob = await res.blob();
+          const path = `${roundId}/hole-${h.hole}-${i}.jpg`;
+          const { error } = await _sb.storage.from('round-photos').upload(path, blob, {
+            contentType: 'image/jpeg', upsert: true,
+          });
+          if (!error) {
+            const { data } = _sb.storage.from('round-photos').getPublicUrl(path);
+            uploaded.push(data.publicUrl);
+          } else {
+            uploaded.push(p); // keep base64 if upload fails
+          }
+        } catch(e) {
+          console.warn('Photo upload failed for hole', h.hole, 'photo', i, e);
+          uploaded.push(p);
         }
-      } catch(e) {
-        console.warn('Photo upload failed for hole', h.hole, e);
-        // Non-fatal — photo won't persist but round saves fine
       }
+      h.photos = uploaded;
+      h.photo  = uploaded[0] || null; // backward compat
     }
   }
 
@@ -5283,7 +5291,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     _famHoles = (r.holes || []).map(h => ({
       ...h,
       scores: h.scores || {},
-      photo: h.photo || h.photo_url || null,
+      photos: h.photos || (h.photo || h.photo_url ? [h.photo || h.photo_url] : []),
+      photo:  h.photos?.[0] || h.photo || h.photo_url || null,
     }));
     // Open modal if not already visible
     const modal = document.getElementById('family-modal');
@@ -5359,7 +5368,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       // Per-player yardage for this hole
       const playerYds = {};
       players.forEach(pk => { playerYds[pk] = playerYardages[pk]?.[i] || null; });
-      return { hole: i+1, par, scores, photo: null, yds: playerYardages['dad']?.[i] || null, playerYds };
+      return { hole: i+1, par, scores, photos: [], yds: playerYardages['dad']?.[i] || null, playerYds };
     });
 
     document.getElementById('fam-running-bar').style.display = 'flex';
@@ -5440,26 +5449,25 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     }).join('');
 
     // Photo section: banner if photo exists, compact add-row if not
-    const photoBanner = h.photo
-      ? `<div style="margin:-16px -16px 0;height:190px;overflow:hidden;position:relative;border-radius:0;">
-           <img src="${h.photo}" style="width:100%;height:100%;object-fit:cover;cursor:pointer;" onclick="famViewPhoto()">
-           <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 45%,rgba(22,18,13,0.88) 100%);pointer-events:none;"></div>
-           <div style="position:absolute;bottom:10px;right:12px;display:flex;gap:6px;">
-             <button onclick="document.getElementById('fhpc').click()" style="background:rgba(16,10,5,0.65);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.18);border-radius:8px;padding:5px 11px;color:#fff;font-size:0.72rem;cursor:pointer;">📷 Retake</button>
-             <button onclick="document.getElementById('fhpr').click()" style="background:rgba(16,10,5,0.65);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.18);border-radius:8px;padding:5px 11px;color:#fff;font-size:0.72rem;cursor:pointer;">🖼️ Replace</button>
-           </div>
-         </div>`
-      : `<div style="display:flex;gap:7px;margin-bottom:4px;">
-           <button onclick="document.getElementById('fhpc').click()" style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:10px;padding:9px 6px;color:var(--muted);font-size:0.8rem;cursor:pointer;">📷 Camera</button>
-           <button onclick="document.getElementById('fhpr').click()" style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:10px;padding:9px 6px;color:var(--muted);font-size:0.8rem;cursor:pointer;">🖼️ Roll</button>
-         </div>`;
+    const hPhotos   = h.photos || (h.photo ? [h.photo] : []);
+    const photoBanner = `<div style="margin-bottom:8px;">
+      <div style="display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:2px 0 6px;scrollbar-width:none;">
+        ${hPhotos.map((p,i) => `
+          <div style="position:relative;flex-shrink:0;">
+            <img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid rgba(138,96,16,0.3);" onclick="_showPhotoOverlay('${p}')">
+            <button onclick="famRemoveHolePhoto(${i})" style="position:absolute;top:-4px;right:-4px;width:20px;height:20px;border-radius:50%;background:rgba(192,57,43,0.85);border:none;color:#fff;font-size:0.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">✕</button>
+          </div>`).join('')}
+        <button onclick="document.getElementById('fhpc').click()" style="flex-shrink:0;width:80px;height:80px;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:8px;color:var(--muted);font-size:0.75rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;touch-action:manipulation;"><span style="font-size:1.2rem;">📷</span>Camera</button>
+        <button onclick="document.getElementById('fhpr').click()" style="flex-shrink:0;width:80px;height:80px;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:8px;color:var(--muted);font-size:0.75rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;touch-action:manipulation;"><span style="font-size:1.2rem;">🖼️</span>Roll</button>
+      </div>
+    </div>`;
 
     document.getElementById('fam-modal-body').innerHTML = `
       ${photoBanner}
       <input type="file" id="fhpc" accept="image/*" capture="environment" style="display:none;" onchange="famLoadHolePhoto(this)">
       <input type="file" id="fhpr" accept="image/*" style="display:none;" onchange="famLoadHolePhoto(this)">
 
-      <div style="display:flex;align-items:baseline;justify-content:space-between;padding:${h.photo ? '12px' : '2px'} 0 8px;">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;padding:2px 0 8px;">
         <div style="display:flex;align-items:baseline;gap:10px;">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:2.6rem;color:var(--cream);line-height:1;">HOLE ${h.hole}</div>
           ${h.yds ? `<span style="font-size:0.78rem;color:var(--gold);font-weight:700;">${h.yds} yds</span>` : ''}
@@ -5543,10 +5551,18 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const reader = new FileReader();
     reader.onload = async e => {
       const resized = await famResizePhoto(e.target.result);
-      _famHoles[_famHoleIdx].photo = resized;
+      const h = _famHoles[_famHoleIdx];
+      if (!h.photos) h.photos = [];
+      h.photos.push(resized);
       renderFamHole();
     };
     reader.readAsDataURL(file);
+  }
+
+  function famRemoveHolePhoto(idx) {
+    const h = _famHoles[_famHoleIdx];
+    if (h.photos) h.photos.splice(idx, 1);
+    renderFamHole();
   }
 
   function _showPhotoOverlay(src) {
@@ -5562,12 +5578,12 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
   function famViewPhoto() {
     const h = _famHoles[_famHoleIdx];
-    if (h && h.photo) _showPhotoOverlay(h.photo);
+    if (h) { const p = h.photos?.[0] || h.photo; if (p) _showPhotoOverlay(p); }
   }
 
   function famViewScorecardPhoto(holeNum) {
     const h = _famHoles.find(x => x.hole === parseInt(holeNum));
-    if (h && h.photo) _showPhotoOverlay(h.photo);
+    if (h) { const p = h.photos?.[0] || h.photo; if (p) _showPhotoOverlay(p); }
   }
 
   function famHoleNext() {
@@ -5643,11 +5659,11 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       <div style="display:flex;flex-direction:column;gap:10px;">
         <button onclick="buildAndShare('scorecard')" style="background:var(--surface2);border:1px solid rgba(212,175,112,0.2);border-radius:14px;padding:16px;text-align:left;cursor:pointer;color:var(--cream);">
           <div style="font-weight:700;font-size:0.95rem;margin-bottom:3px;">📊 Full Scorecard</div>
-          <div style="font-size:0.78rem;color:var(--muted);">All holes, all players, winner — on a photo collage background</div>
+          <div style="font-size:0.78rem;color:var(--muted);">All hole photos as collage · all scores · winner</div>
         </button>
         <button onclick="buildAndShare('hole')" style="background:var(--surface2);border:1px solid rgba(212,175,112,0.2);border-radius:14px;padding:16px;text-align:left;cursor:pointer;color:var(--cream);">
           <div style="font-weight:700;font-size:0.95rem;margin-bottom:3px;">📸 Hole Highlight</div>
-          <div style="font-size:0.78rem;color:var(--muted);">Pick a hole photo — score overlaid on the image</div>
+          <div style="font-size:0.78rem;color:var(--muted);">Choose any hole with a photo · scores overlaid</div>
         </button>
         <button onclick="buildAndShare('best')" style="background:var(--surface2);border:1px solid rgba(212,175,110,0.2);border-radius:14px;padding:16px;text-align:left;cursor:pointer;color:var(--cream);">
           <div style="font-weight:700;font-size:0.95rem;margin-bottom:3px;">⭐ Best Moment</div>
@@ -5683,7 +5699,11 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   }
 
   function _showHolePickerSheet() {
-    const photoHoles = _famHoles.filter(h => h.photo && _hasPhoto(h.photo));
+    // Build flat list of all photos across all holes
+    const photoHoles = _famHoles.flatMap(h => {
+      const ps = h.photos?.length ? h.photos : (h.photo && _hasPhoto(h.photo) ? [h.photo] : []);
+      return ps.filter(_hasPhoto).map((p, pi) => ({...h, _photoIdx: pi, _photoSrc: p}));
+    });
     if (!photoHoles.length) {
       showToast('No hole photos to share yet', 'error'); return;
     }
@@ -5700,8 +5720,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         const dStr = diff===0?'E':diff>0?`+${diff}`:String(diff);
         return `<span style="color:${p.color};font-weight:700;font-size:0.72rem;">${p.emoji}${s}(${dStr})</span>`;
       }).join(' ');
-      return `<div onclick="pickHoleAndShare(${h.hole})" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;">
-        <img src="${h.photo}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0;">
+      return `<div onclick="pickHoleAndShare(${h.hole},${h._photoIdx||0})" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);cursor:pointer;">
+        <img src="${h._photoSrc||h.photos?.[0]||h.photo}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0;">
         <div style="flex:1;">
           <div style="font-weight:700;font-size:0.88rem;color:var(--cream);">Hole ${h.hole} &nbsp;&middot;&nbsp; Par ${h.par}</div>
           <div style="font-size:0.75rem;margin-top:3px;">${scores}</div>
@@ -5718,14 +5738,15 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     document.body.appendChild(overlay);
   }
 
-  async function pickHoleAndShare(holeNum) {
+  async function pickHoleAndShare(holeNum, photoIdx) {
     const overlay = document.getElementById('hole-picker-overlay');
     if (overlay) overlay.remove();
     const btn = document.getElementById('fam-share-btn');
     if (btn) { btn.disabled = true; btn.textContent = 'Building…'; }
     try {
-      const h = _famHoles.find(x => x.hole === holeNum);
-      const blob = await _buildHoleHighlightCard(h);
+      const h       = _famHoles.find(x => x.hole === holeNum);
+      const hCopy   = {...h, photo: (h.photos?.[photoIdx||0]) || h.photos?.[0] || h.photo};
+      const blob    = await _buildHoleHighlightCard(hCopy);
       if (blob) await _doShare(blob);
     } catch(e) {}
     finally { if (btn) { btn.disabled = false; btn.textContent = '📤 Share'; } }
@@ -5868,6 +5889,41 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     return totals;
   }
 
+  // Auto-grid collage — works for 1 to 18+ photos
+  async function _drawCollageBackground(ctx, W, H, allPhotos) {
+    // Cap at 9, pick evenly spread if more
+    const MAX = 9;
+    let photos = allPhotos;
+    if (photos.length > MAX) {
+      photos = Array.from({length: MAX}, (_, i) =>
+        allPhotos[Math.floor(i * allPhotos.length / MAX)]);
+    }
+    const count = photos.length;
+    const cols  = count === 1 ? 1 : count <= 4 ? 2 : 3;
+    const rows  = Math.ceil(count / cols);
+    const cw    = W / cols;
+    const ch    = H / rows;
+
+    // Load all images in parallel
+    const imgs = await Promise.all(photos.map(p => _loadImg(p)));
+
+    imgs.forEach((img, i) => {
+      if (!img) return;
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      // If last row is not full, center remaining cells
+      const rowStart = row * cols;
+      const inRow    = Math.min(cols, count - rowStart);
+      const offsetX  = inRow < cols ? (W - inRow * cw) / 2 : 0;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(offsetX + col * cw, row * ch, cw, ch);
+      ctx.clip();
+      _drawImgCover(ctx, img, offsetX + col * cw, row * ch, cw, ch);
+      ctx.restore();
+    });
+  }
+
   // ── SHARED CARD HELPERS ─────────────────────────────────────────
 
   // Load SpinVibes logo once and cache it
@@ -5980,12 +6036,11 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const ctx    = canvas.getContext('2d');
     const sf     = _SF;
 
-    // Background — best hole photo or solid dark
-    const photos = _famHoles.map(h => h.photo).filter(p => _hasPhoto(p));
+    // Background — auto-grid collage of all hole photos
+    const photos = _famHoles.flatMap(h => h.photos?.length ? h.photos : (h.photo ? [h.photo] : [])).filter(p => _hasPhoto(p));
     ctx.fillStyle = '#0d1a0a'; ctx.fillRect(0, 0, W, H);
     if (photos.length) {
-      const img = await _loadImg(photos[0]);
-      if (img) _drawImgCover(ctx, img, 0, 0, W, H);
+      await _drawCollageBackground(ctx, W, H, photos);
     }
 
     // Bottom gradient
@@ -6026,8 +6081,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const SAFE     = Math.round(18 * sf);
 
     ctx.fillStyle = '#0d1a0a'; ctx.fillRect(0, 0, W, H);
-    if (h.photo && _hasPhoto(h.photo)) {
-      const img = await _loadImg(h.photo);
+    const hlPhoto = h.photos?.[0] || h.photo;
+    if (hlPhoto && _hasPhoto(hlPhoto)) {
+      const img = await _loadImg(hlPhoto);
       if (img) _drawImgCover(ctx, img, 0, 0, W, H);
     }
 
@@ -6074,7 +6130,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       let bestH = null, bestScore = Infinity;
       _famHoles.forEach(h => {
         const diff = (h.scores[pk] || 0) - h.par;
-        const bonus = _hasPhoto(h.photo) ? -0.5 : 0;
+        const bonus = (h.photos?.length || h.photo) ? -0.5 : 0;
         if (diff + bonus < bestScore) { bestScore = diff + bonus; bestH = h; }
       });
       const diff = bestH ? (bestH.scores[pk] || 0) - bestH.par : 0;
@@ -6099,10 +6155,62 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   async function pickPlayerAndShareBest(playerKey) {
     const overlay = document.getElementById('best-picker-overlay');
     if (overlay) overlay.remove();
+
+    // Find best hole for this player
+    let bestH = null, bestScore = Infinity;
+    _famHoles.forEach(h => {
+      const diff  = (h.scores[playerKey] || 0) - h.par;
+      const bonus = (h.photos?.length || h.photo) ? -0.5 : 0;
+      if (diff + bonus < bestScore) { bestScore = diff + bonus; bestH = h; }
+    });
+    if (!bestH) return;
+
+    const allPhotos = bestH.photos?.length ? bestH.photos : (bestH.photo ? [bestH.photo] : []);
+
+    // If multiple photos on the best hole, ask which one to use
+    if (allPhotos.filter(_hasPhoto).length > 1) {
+      _showBestPhotoPickerSheet(playerKey, bestH, allPhotos.filter(_hasPhoto));
+      return;
+    }
+
+    // Single or no photo — build directly
     const btn = document.getElementById('fam-share-btn');
     if (btn) { btn.disabled = true; btn.textContent = 'Building...'; }
     try {
       const blob = await _buildBestMomentCard(playerKey);
+      if (blob) await _doShare(blob);
+    } catch(e) { console.warn('Best moment share error:', e); }
+    finally { if (btn) { btn.disabled = false; btn.textContent = '📤 Share'; } }
+  }
+
+  function _showBestPhotoPickerSheet(playerKey, bestH, photos) {
+    const p = FAM_PLAYERS[playerKey] || {};
+    const overlay = document.createElement('div');
+    overlay.id = 'best-photo-picker-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9700;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+    const sheet = document.createElement('div');
+    sheet.style.cssText = 'width:100%;background:var(--surface);border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));';
+    sheet.innerHTML = `
+      <div style="width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 14px;"></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--cream);margin-bottom:6px;">${p.name} — Hole ${bestH.hole}</div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-bottom:14px;">Pick which photo to use on the card</div>
+      <div style="display:flex;gap:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px;scrollbar-width:none;">
+        ${photos.map((src, i) => `
+          <div onclick="pickBestPhotoAndShare('${playerKey}', ${i}); this.closest('#best-photo-picker-overlay').remove();"
+            style="flex-shrink:0;cursor:pointer;touch-action:manipulation;">
+            <img src="${src}" style="width:110px;height:110px;object-fit:cover;border-radius:10px;border:2px solid rgba(138,96,16,0.3);">
+          </div>`).join('')}
+      </div>`;
+    overlay.appendChild(sheet);
+    document.body.appendChild(overlay);
+  }
+
+  async function pickBestPhotoAndShare(playerKey, photoIdx) {
+    const btn = document.getElementById('fam-share-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Building...'; }
+    try {
+      const blob = await _buildBestMomentCard(playerKey, photoIdx);
       if (blob) await _doShare(blob);
     } catch(e) { console.warn('Best moment share error:', e); }
     finally { if (btn) { btn.disabled = false; btn.textContent = '📤 Share'; } }
@@ -6133,7 +6241,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     ctx.fillText(String(level), cx, cy + size * 0.2);
   }
 
-  async function _buildBestMomentCard(playerKey) {
+  async function _buildBestMomentCard(playerKey, photoIdx) {
     const pk = playerKey;
     const p  = FAM_PLAYERS[pk];
     if (!p) return null;
@@ -6156,8 +6264,10 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const scoreColor = diff <= -2 ? '#a78bfa' : diff === -1 ? '#fbbf24' : diff === 0 ? '#6ec98a' : _C[pk] || _C.gold;
 
     ctx.fillStyle = '#0d1a0a'; ctx.fillRect(0, 0, W, H);
-    if (bestH.photo && _hasPhoto(bestH.photo)) {
-      const img = await _loadImg(bestH.photo);
+    const bmPhotos = bestH.photos?.length ? bestH.photos : (bestH.photo ? [bestH.photo] : []);
+    const bmPhoto  = (photoIdx != null ? bmPhotos[photoIdx] : null) || bmPhotos[0] || bestH.photo;
+    if (bmPhoto && _hasPhoto(bmPhoto)) {
+      const img = await _loadImg(bmPhoto);
       if (img) _drawImgCover(ctx, img, 0, 0, W, H);
     }
 
@@ -6227,7 +6337,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         return `<td><span class="${famScoreClass(diff)}">${h.scores[pk]||0}</span></td>`;
       }).join('');
       const photoThumb = h.photo
-        ? `<img src="${h.photo}" onclick="famViewScorecardPhoto('${h.hole}')" style="width:22px;height:22px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-left:4px;cursor:pointer;">`
+        ? `<img src="${h.photos?.[0]||h.photo}" onclick="famViewScorecardPhoto('${h.hole}')" style="width:22px;height:22px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-left:4px;cursor:pointer;">`
         : '';
       return `<tr><td>H${h.hole}&middot;P${h.par}${photoThumb}</td>${cells}</tr>`;
     }).join('');
@@ -6488,7 +6598,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     try {
       const safeFamHoles = _famHoles.map(h => ({
         ...h,
-        photo: (h.photo && _hasPhoto(h.photo)) ? h.photo : null,
+        photos: (h.photos || []).filter(_hasPhoto),
+        photo: (h.photos?.[0] && _hasPhoto(h.photos[0])) ? h.photos[0] : ((h.photo && _hasPhoto(h.photo)) ? h.photo : null),
       }));
       await saveFamilyRound({
         date_played: _famRound.date_played,
