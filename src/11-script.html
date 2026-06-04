@@ -5369,7 +5369,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       // Per-player yardage for this hole
       const playerYds = {};
       players.forEach(pk => { playerYds[pk] = playerYardages[pk]?.[i] || null; });
-      return { hole: i+1, par, scores, photos: [], yds: playerYardages['dad']?.[i] || null, playerYds };
+      return { hole: i+1, par, scores, photos: [], yds: playerYardages['dad']?.[i] || null, playerYds, putts: {}, fairway: {} };
     });
 
     document.getElementById('fam-running-bar').style.display = 'flex';
@@ -5432,20 +5432,44 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const ydsLabel  = playerYds ? `${playerYds}y` : '';
       const teeLabel  = teeName ? `${teeName} tee` : '';
       const subLine   = [ydsLabel, teeLabel].filter(Boolean).join(' · ');
-      return `<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-        <div style="width:38px;height:38px;border-radius:50%;background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">${p.emoji}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-weight:700;font-size:0.88rem;color:${p.color};">${p.name}</div>
-          <div style="display:flex;gap:6px;align-items:center;margin-top:2px;">
-            <div id="fvpar-${pk}" style="font-size:0.7rem;color:${famScoreColor(diff)};font-weight:600;">${dLbl}</div>
-            ${subLine ? `<div style="font-size:0.65rem;color:var(--muted);opacity:0.7;">${subLine}</div>` : ''}
+      // Level-gated stats rows
+      const kidLevel    = (pk === 'son' || pk === 'girl') ? getKidLevel(pk) : 0;
+      const showPutts   = kidLevel >= 3; // Straight Shooter+
+      const showFairway = kidLevel >= 4 && h.par > 3; // Par Machine+, par 4/5 only
+      const putt        = h.putts?.[pk] ?? 1;
+      const fw          = h.fairway?.[pk] || null;
+      const statsRow    = (showPutts || showFairway) ? `
+        <div style="display:flex;gap:10px;padding:6px 0 4px;border-top:1px solid rgba(255,255,255,0.04);margin-top:2px;flex-wrap:wrap;">
+          ${showPutts ? `<div style="display:flex;align-items:center;gap:5px;">
+            <span style="font-size:0.62rem;color:var(--muted);font-weight:600;letter-spacing:0.5px;">PUTTS</span>
+            <button onclick="famHolePuttAdj('${pk}',-1)" style="width:24px;height:24px;border-radius:6px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);color:var(--cream);font-size:0.9rem;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;">−</button>
+            <span id="fputts-${pk}" style="font-size:0.88rem;font-weight:700;color:var(--cream);min-width:14px;text-align:center;">${putt}</span>
+            <button onclick="famHolePuttAdj('${pk}',1)" style="width:24px;height:24px;border-radius:6px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);color:var(--cream);font-size:0.9rem;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;">+</button>
+          </div>` : ''}
+          ${showFairway ? `<div style="display:flex;align-items:center;gap:5px;">
+            <span style="font-size:0.62rem;color:var(--muted);font-weight:600;letter-spacing:0.5px;">FWY</span>
+            <button onclick="famHoleFairway('${pk}','yes')" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);font-size:0.68rem;font-weight:700;cursor:pointer;touch-action:manipulation;background:${fw==='yes'?'var(--green)':'var(--surface2)'};color:${fw==='yes'?'#e8f5ec':'var(--muted)'};">✓</button>
+            <button onclick="famHoleFairway('${pk}','no')" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);font-size:0.68rem;font-weight:700;cursor:pointer;touch-action:manipulation;background:${fw==='no'?'var(--red,#c0392b)':'var(--surface2)'};color:${fw==='no'?'#fff':'var(--muted)'};">✗</button>
+          </div>` : ''}
+        </div>` : '';
+
+      return `<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:38px;height:38px;border-radius:50%;background:${p.bg};display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">${p.emoji}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:0.88rem;color:${p.color};">${p.name}</div>
+            <div style="display:flex;gap:6px;align-items:center;margin-top:2px;">
+              <div id="fvpar-${pk}" style="font-size:0.7rem;color:${famScoreColor(diff)};font-weight:600;">${dLbl}</div>
+              ${subLine ? `<div style="font-size:0.65rem;color:var(--muted);opacity:0.7;">${subLine}</div>` : ''}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;">
+            <button onclick="famHoleScore('${pk}',-1)" style="width:46px;height:46px;border-radius:12px 0 0 12px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-right:none;color:var(--cream);font-size:1.5rem;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;">-</button>
+            <div id="fsc-${pk}" style="width:54px;height:46px;background:var(--surface);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.9rem;line-height:1;color:${famScoreColor(diff)};">${sc}</div>
+            <button onclick="famHoleScore('${pk}',1)" style="width:46px;height:46px;border-radius:0 12px 12px 0;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-left:none;color:var(--cream);font-size:1.4rem;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;">+</button>
           </div>
         </div>
-        <div style="display:flex;align-items:center;">
-          <button onclick="famHoleScore('${pk}',-1)" style="width:46px;height:46px;border-radius:12px 0 0 12px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-right:none;color:var(--cream);font-size:1.5rem;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;">-</button>
-          <div id="fsc-${pk}" style="width:54px;height:46px;background:var(--surface);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.9rem;line-height:1;color:${famScoreColor(diff)};">${sc}</div>
-          <button onclick="famHoleScore('${pk}',1)" style="width:46px;height:46px;border-radius:0 12px 12px 0;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-left:none;color:var(--cream);font-size:1.4rem;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;">+</button>
-        </div>
+        ${statsRow}
       </div>`;
     }).join('');
 
@@ -5509,6 +5533,21 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       </div>
     `;
     renderFamCaddieMessages();
+  }
+
+  function famHolePuttAdj(pk, delta) {
+    const h = _famHoles[_famHoleIdx];
+    if (!h.putts) h.putts = {};
+    h.putts[pk] = Math.max(0, (h.putts[pk] ?? 1) + delta);
+    const el = document.getElementById('fputts-' + pk);
+    if (el) el.textContent = h.putts[pk];
+  }
+
+  function famHoleFairway(pk, val) {
+    const h = _famHoles[_famHoleIdx];
+    if (!h.fairway) h.fairway = {};
+    h.fairway[pk] = h.fairway[pk] === val ? null : val; // toggle
+    renderFamHole();
   }
 
   function famHoleScore(pk, delta) {
