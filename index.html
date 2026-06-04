@@ -8325,125 +8325,159 @@
     if (_holeSub) _holeSub.style.display = 'none';
     const _closeBtn = document.getElementById('dad-modal-close-btn');
     if (_closeBtn) _closeBtn.style.display = '';
+    const _fff = document.getElementById('dad-modal-footer');
+    if (_fff) _fff.style.display = 'none';
+    _dadCourseId = null; _dadCourseData = null; _dadSelectedTee = null;
     const today = new Date().toISOString().split('T')[0];
-    const courseOpts = getAllCourses().map((c,i) => `<option value="${i}">${c.name} (par ${c.par})</option>`).join('');
+
     document.getElementById('dad-modal-body').innerHTML = `
       <label class="modal-label">Date</label>
       <input type="date" id="dm-date" class="modal-input" value="${today}">
+
       <label class="modal-label">Course</label>
-      <select id="dm-course" class="modal-input" onchange="dadCourseChange(this.value)">
-        ${courseOpts}
-      </select>
-      <div id="dm-custom-wrap" style="display:none;">
-        <input type="text" id="dm-custom-name" class="modal-input" placeholder="Course name">
-        <div style="display:flex;gap:10px;">
-          <input type="number" id="dm-custom-par" class="modal-input" placeholder="Par (e.g. 72)" style="flex:1;">
-          <select id="dm-custom-holes" class="modal-input" style="flex:1;">
-            <option value="18">18 holes</option>
-            <option value="9">9 holes</option>
-          </select>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input type="text" id="dm-search-input" class="modal-input" style="margin-bottom:0;flex:1;"
+          placeholder="Search course name..."
+          onkeydown="if(event.key==='Enter'){event.preventDefault();dadSearchCourse();}">
+        <button onclick="dadSearchCourse()" style="flex-shrink:0;background:var(--gold);border:none;border-radius:10px;padding:0 16px;color:#1a1300;font-weight:700;font-size:0.85rem;cursor:pointer;touch-action:manipulation;">Search</button>
+      </div>
+      <div id="dm-search-status" style="font-size:0.73rem;color:var(--muted);margin-bottom:6px;"></div>
+      <div id="dm-search-results" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+
+      <div id="dm-course-selected" style="display:none;background:rgba(138,96,16,0.12);border:1px solid rgba(138,96,16,0.4);border-radius:10px;padding:11px 14px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div><div id="dm-course-name" style="font-weight:700;font-size:0.9rem;color:var(--cream);"></div><div id="dm-course-sub" style="font-size:0.7rem;color:var(--muted);margin-top:2px;"></div></div>
+          <button onclick="dadClearCourse()" style="background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;touch-action:manipulation;">&#x2715;</button>
         </div>
       </div>
-      <label class="modal-label">Tee Color</label>
-      <div class="pill-row" id="dm-tee-pills">
-        <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="White">White</div>
-        <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="Gold">Gold</div>
-        <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="Red">Red</div>
-        <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="Sage">Sage</div>
-        <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="Blue">Blue</div>
-        <div class="pill" onclick="selectPill(this,'dm-tee-pills')" data-val="Resort">Resort</div>
+
+      <div id="dm-tee-wrap" style="display:none;margin-bottom:10px;">
+        <label class="modal-label">Tee Box</label>
+        <div id="dm-tee-pills" class="pill-row" style="flex-wrap:wrap;gap:6px;"></div>
       </div>
-      <button class="btn-ghost" style="width:100%;margin-top:8px;font-size:0.8rem;" onclick="openAddCourseOverlay('dad')">+ Add New Course</button>
+
       <label class="modal-label">Format</label>
       <div class="pill-row" id="dm-format-pills">
-        <div class="pill active" onclick="selectPill(this,'dm-format-pills')" data-val="regulation_18">⛳ 18-Hole</div>
-        <div class="pill" onclick="selectPill(this,'dm-format-pills')" data-val="nine_hole">🏌️ 9-Hole</div>
-        <div class="pill" onclick="selectPill(this,'dm-format-pills')" data-val="par3_exec">📍 Par-3</div>
+        <div class="pill active" onclick="selectPill(this,'dm-format-pills')" data-val="regulation_18">&#x26F3; 18-Hole</div>
+        <div class="pill" onclick="selectPill(this,'dm-format-pills')" data-val="nine_hole">&#x1F3CC; 9-Hole</div>
+        <div class="pill" onclick="selectPill(this,'dm-format-pills')" data-val="par3_exec">&#x1F4CD; Par-3</div>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:10px;">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:10px;">
         <span style="font-size:0.87rem;color:var(--cream);font-weight:600;">Round type</span>
         <div class="pill-row" id="dm-type-pills" style="margin:0;gap:6px;">
-          <div class="pill active" onclick="selectPill(this,'dm-type-pills')" data-val="scored">⛳ Scored</div>
-          <div class="pill" onclick="selectPill(this,'dm-type-pills')" data-val="practice">🏌️ Practice</div>
+          <div class="pill active" onclick="selectPill(this,'dm-type-pills')" data-val="scored">&#x26F3; Scored</div>
+          <div class="pill" onclick="selectPill(this,'dm-type-pills')" data-val="practice">&#x1F3CC;&#xFE0F; Practice</div>
         </div>
       </div>
-      <button class="btn-primary" style="width:100%;margin-top:10px;" onclick="dadStartRound()">Start Round →</button>
+      <button class="btn-primary" style="width:100%;margin-top:10px;touch-action:manipulation;" onclick="dadStartRound()">Start Round &#x2192;</button>
     `;
-    dadCourseChange(document.getElementById('dm-course').value);
   }
 
-  function dadCourseChange(val) {
-    const custom = document.getElementById('dm-custom-wrap');
-    const idx = parseInt(val);
-    custom.style.display = idx === getAllCourses().length - 1 ? 'block' : 'none';
-    const course = getAllCourses()[idx];
-
-    // Auto-select Format pill based on course par
-    if (course && course.par) {
-      let fmt = 'regulation_18';
-      if (course.par <= 36)  fmt = 'nine_hole';
-      else if (course.par <= 58) fmt = 'par3_exec';
-      const fmtPill = document.querySelector(`#dm-format-pills .pill[data-val="${fmt}"]`);
-      if (fmtPill) {
-        document.querySelectorAll('#dm-format-pills .pill').forEach(p => p.classList.remove('active'));
-        fmtPill.classList.add('active');
-      }
-    }
-
-    // Auto-select tee color matching the course's stored tee
-    if (course && course.teeColor) {
-      const pill = document.querySelector(`#dm-tee-pills .pill[data-val="${course.teeColor}"]`);
-      if (pill) {
-        document.querySelectorAll('#dm-tee-pills .pill').forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        return;
-      }
-    }
-    // Default to White if no match
-    const whitePill = document.querySelector('#dm-tee-pills .pill[data-val="White"]');
-    if (whitePill && !document.querySelector('#dm-tee-pills .pill.active')) {
-      whitePill.classList.add('active');
-    }
+  async function dadSearchCourse() {
+    const q = (document.getElementById('dm-search-input')?.value||'').trim();
+    const st = document.getElementById('dm-search-status'), re = document.getElementById('dm-search-results');
+    if (!q||q.length<2){if(st)st.textContent='Type at least 2 characters';return;}
+    if(st)st.textContent='Searching...'; if(re)re.innerHTML='';
+    try {
+      const resp = await fetch(CADDIE_URL+'/course-search',{method:'POST',headers:{'Content-Type':'application/json','X-SpinVibes-Token':WORKER_SECRET},body:JSON.stringify({query:q})});
+      const data = await resp.json();
+      if(!resp.ok||data.error){if(st)st.textContent=data.error||'Search failed';return;}
+      const courses=data.courses||[];
+      if(!courses.length){if(st)st.textContent='No courses found';return;}
+      if(st)st.textContent=courses.length+' found — tap to select';
+      re.innerHTML=courses.map(c=>{
+        const loc=[c.city,c.state].filter(Boolean).join(', ');
+        const sub=loc?'<div style="font-size:0.7rem;color:var(--muted);">'+loc+'</div>':'';
+        const safeName=(c.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        const safeLoc=loc.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        const safeCourse=(c.course||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        return '<div onclick="dadSelectCourse('+c.id+',\''+safeName+'\',\''+safeLoc+'\',\''+safeCourse+'\')" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;touch-action:manipulation;margin-bottom:4px;"><div style="font-size:0.88rem;font-weight:600;color:var(--cream);">'+c.name+'</div>'+sub+'</div>';
+      }).join('');
+    } catch(e){if(st)st.textContent='Network error';}
   }
 
-  function selectPill(el, groupId) {
-    document.querySelectorAll('#' + groupId + ' .pill').forEach(p => p.classList.remove('active'));
+  async function dadSelectCourse(courseId, clubName, location, courseName) {
+    const st=document.getElementById('dm-search-status'), re=document.getElementById('dm-search-results');
+    if(st)st.textContent='Loading tee data...'; if(re)re.innerHTML='';
+    try {
+      const resp=await fetch(CADDIE_URL+'/course-detail',{method:'POST',headers:{'Content-Type':'application/json','X-SpinVibes-Token':WORKER_SECRET},body:JSON.stringify({courseId,includeAllTeeHoles:true})});
+      const data=await resp.json();
+      if(!resp.ok||data.error){if(st)st.textContent=data.error||'Failed to load course';return;}
+      _dadCourseId=courseId; _dadCourseData=data.course;
+      if(st)st.textContent='';
+      const sd=document.getElementById('dm-course-selected');
+      if(sd)sd.style.display='';
+      const ne=document.getElementById('dm-course-name'); if(ne)ne.textContent=clubName+(courseName?' — '+courseName:'');
+      const se=document.getElementById('dm-course-sub'); if(se)se.textContent=(location||'')+(data.course.allTees?.length?' · Tees: '+data.course.allTees.map(t=>t.name).join(', '):'');
+      // Tee pills
+      const tees=data.course.allTees||[];
+      const tw=document.getElementById('dm-tee-wrap'), tp=document.getElementById('dm-tee-pills');
+      if(tees.length&&tw&&tp){
+        tw.style.display='';
+        _dadSelectedTee=tees[tees.length-1].name; // default to longest tee
+        tp.innerHTML=tees.map((t,i)=>`<div class="pill${_dadSelectedTee===t.name?' active':''}" onclick="dadSetTee(this,'${t.name.replace(/'/g,"\\'")}',${i})" data-val="${t.name}" style="touch-action:manipulation;">${t.name}${t.yards?' <span style=\'font-size:0.62rem;opacity:0.7;\'>'+(t.yards)+'y</span>':''}</div>`).join('');
+      }
+      // Auto-detect format from hole count
+      const holes=(data.course.allTees?.[0]?.holePars||[]).length||18;
+      let fmt='regulation_18'; if(holes<=9)fmt='nine_hole'; else if(data.course.par<=58)fmt='par3_exec';
+      const fmtPill=document.querySelector(`#dm-format-pills .pill[data-val="${fmt}"]`);
+      if(fmtPill){document.querySelectorAll('#dm-format-pills .pill').forEach(p=>p.classList.remove('active'));fmtPill.classList.add('active');}
+    } catch(e){if(st)st.textContent='Network error';}
+  }
+
+  function dadClearCourse() {
+    _dadCourseId=null; _dadCourseData=null; _dadSelectedTee=null;
+    const sd=document.getElementById('dm-course-selected'); if(sd)sd.style.display='none';
+    const tw=document.getElementById('dm-tee-wrap'); if(tw)tw.style.display='none';
+    const st=document.getElementById('dm-search-status'); if(st)st.textContent='';
+  }
+
+  function dadSetTee(el, name, idx) {
+    _dadSelectedTee=name;
+    document.querySelectorAll('#dm-tee-pills .pill').forEach(p=>p.classList.remove('active'));
     el.classList.add('active');
   }
 
+
+
   function dadStartRound() {
-    const courseIdx = parseInt(document.getElementById('dm-course').value);
-    let course = getAllCourses()[courseIdx];
-    let courseName = course.name;
-    let coursePar = course.par;
-    let numHoles = course.holes;
-    if (courseIdx === getAllCourses().length - 1) {
-      courseName = document.getElementById('dm-custom-name').value.trim() || 'Custom Course';
-      coursePar = parseInt(document.getElementById('dm-custom-par').value) || 72;
-      numHoles = parseInt(document.getElementById('dm-custom-holes').value) || 18;
-    }
-    const tee = document.querySelector('#dm-tee-pills .pill.active')?.dataset.val || 'White';
+    if (!_dadCourseData) { showToast('Search and select a course first', 'error'); return; }
+
+    const tee      = _dadSelectedTee || (_dadCourseData.allTees?.[_dadCourseData.allTees.length-1]?.name) || 'White';
+    const teeData  = _dadCourseData.allTees?.find(t => t.name === tee) || _dadCourseData.allTees?.[0] || {};
+    const holePars = teeData.holePars || _dadCourseData.holePars || [];
+    const yardages = teeData.yardages || _dadCourseData.yardages || [];
+    const roundType  = document.querySelector('#dm-format-pills .pill.active')?.dataset.val || 'regulation_18';
     const isPractice = document.querySelector('#dm-type-pills .pill.active')?.dataset.val === 'practice';
-    const roundType = document.querySelector('#dm-format-pills .pill.active')?.dataset.val || 'regulation_18';
+
+    // Determine hole count from format pill or course data
+    let numHoles = holePars.length || 18;
+    if (roundType === 'nine_hole') numHoles = Math.min(numHoles, 9);
+
+    const coursePar = holePars.slice(0, numHoles).reduce((a,b)=>a+b, 0) || _dadCourseData.par || 72;
+    const courseName = _dadCourseData.name + (_dadCourseData.course ? ' — ' + _dadCourseData.course : '');
+
     _dadRound = {
       date_played: document.getElementById('dm-date').value,
       course_name: courseName,
-      course_par: coursePar,
-      tee_color: tee,
+      course_par:  coursePar,
+      tee_color:   tee,
       total_score: 0,
       score_vs_par: 0,
       is_practice: isPractice,
-      round_type: roundType,
+      round_type:  roundType,
     };
     _dadHoles = [];
     _dadHoleIdx = 0;
     _dadLiveCaddieHistory = [];
     _dadLiveCaddieOpen    = false;
-    const defaultPar = course.blankPars ? 3 : Math.round(coursePar / numHoles);
+
+    const defaultPar = Math.round(coursePar / numHoles) || 4;
     for (let i = 1; i <= numHoles; i++) {
-      const holePar = (course.holePars && course.holePars[i-1]) ? course.holePars[i-1] : defaultPar;
-      const yds = course.yardages ? course.yardages[i - 1] : null;
-      _dadHoles.push({ hole: i, par: holePar, score: 1, fairway: 'no', gir: false, putts: 2, yds });
+      const holePar = holePars[i-1] || defaultPar;
+      const yds = yardages[i-1] || null;
+      _dadHoles.push({ hole: i, par: holePar, score: holePar, fairway: 'no', gir: false, putts: 2, yds });
     }
     document.getElementById('dad-running-total').style.display = '';
     _acquireWakeLock();
@@ -9811,6 +9845,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   let _famHoleIdx       = 0;
   let _famCaddieHistory = [];   // persists across hole navigation
   let _famCaddieOpen    = false;
+  let _dadCourseId   = null;  // GolfCourseAPI course ID for Dad solo round
+  let _dadCourseData = null;  // { name, allTees, holePars, yardages }
+  let _dadSelectedTee = null; // selected tee name
   let _famCourseId      = null; // GolfCourseAPI course ID
   let _famCourseData    = null; // { name, allTees: [{name, holePars, yardages}] }
   let _famPlayerTees    = {};   // { dad: 'Tournament', son: 'Resort', ... }
