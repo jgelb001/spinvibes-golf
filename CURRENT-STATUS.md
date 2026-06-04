@@ -1,7 +1,7 @@
 # SpinVibes Golf — Current Status
 > **Update this at the end of every Cowork session.** This is the first thing to read when starting a new session. It answers: where are we, what's broken, what's next.
 
-*Last updated: 2026-05-28 (session 21 — Sprint 5: Family Memories + Social Sharing)*
+*Last updated: 2026-05-29 (session 27 — kid badges, shot dispersion, share card for dad rounds, club distances fixed)*
 
 ---
 
@@ -11,9 +11,10 @@
 |------|--------|
 | spinvibes.com (PWA) | ✅ Live — GitHub Pages |
 | golf.spinvibes.com (guide builder) | ✅ Live — GitHub Pages |
-| Service worker | **v92 / cache v138** |
+| Service worker | **v103 / cache v149** |
 | Stable checkpoint | **`v1.0-stable`** tag on GitHub — safe rollback before file split |
-| Last commit | Session 22: Sprint 5B cleanup — share card redesign + language audit + milestones |
+| Last commit | Session 27: kid badges, shot dispersion, dad share card, club distance fixes |
+| CF Worker | Updated with `/course-search`, `/course-detail`, `/parse-scorecard` routes. `GOLF_COURSE_API_KEY` set. |
 | Supabase | ✅ Operational |
 | Caddie proxy (PWA) | ✅ CF Worker at `spinvibes-caddie.spinvibes.workers.dev` (WORKER_SECRET set) |
 | Caddie proxy (guide) | ✅ CF Worker — `golf.spinvibes.com` in ALLOWED_ORIGINS, deployed ✅ |
@@ -29,6 +30,46 @@
 | Next goal | Break 90 — 3 strokes away |
 | Bag | Callaway Driver + 7-wood. Vice Boost 4H + irons (Takomo still arriving). Callaway Opus 50°/56°/60° wedges. Odyssey Ai-ONE #7 putter ⚠️ weights too heavy — returning to lighter config |
 | Pin | 4417 |
+
+---
+
+## What Was Just Finished (Session 24 — May 29, 2026)
+
+### Composite Kid Leveling System ✅
+
+| Item | Result |
+|------|--------|
+| `KID_LEVEL_REQS` | Composite gate per level: rounds + range sessions + check-in + challenge |
+| `KID_CHALLENGES` | 3 PGA-guided challenges: Contact (Start Golf), Par (Prep Golf), Scoring (Play Golf) |
+| `KID_CHECKIN_QS` | 4 observable yes/no questions per level (need 3/4 to pass) — escalates L1→L4 |
+| `getKidRangeSessions` / `saveKidRangeSession` | localStorage range session log per kid |
+| `getKidReadiness(who, rounds)` | Composite readiness object with all gate statuses |
+| `autoCheckChallenge` | Auto-detects challenge completion from existing data, fires toast |
+| `showRangeLogSheet` | Bottom sheet: focus area picker + feel rating 1–5 + optional notes |
+| `showKidCheckin` | Full check-in overlay: 4 yes/no Qs, live score, save with pass/fail |
+| `saveKidCheckin` | Stores result to localStorage, re-renders level card |
+| `renderKidLevelCard` | Shows composite readiness checklist with ✓/○ gates + inline Log/Check-In buttons |
+| `adminLevelUp` | PROMOTE dialog lists any pending gates, account holder can still override |
+| `checkAutoLevelUp` | Now uses composite gate — toasts when ALL gates are met |
+| Range section header | "+ Log Session (N)" button shown to account holder next to level badge |
+| SW | v95 / cache v141 |
+
+---
+
+## What Was Just Finished (Session 23 — May 29, 2026)
+
+### Kid Badges + Level Shields ✅
+
+| Item | Result |
+|------|--------|
+| `KID_BADGES` array | 6 kid-specific achievements: First Par, First Birdie, Family Round, Consistent (3 rounds), Explorer (3 courses), Loves the Game (10 rounds) |
+| `renderKidBadges(who, rounds, color)` | Renders level shield (pinned) + kid badge shelf + shared badge shelf |
+| Level shield | Pentagon SVG, color-coded per level (tan/green/blue/gold), pinned above badge shelf in kid profile |
+| Son + Daughter profiles | Updated to use `renderKidBadges` instead of `renderBadges` |
+| Family round flag | `saveFamRound` now sets `sv-son-played-family` / `sv-girl-played-family` in localStorage |
+| `_drawLevelShieldCanvas` | Canvas helper for drawing level shield on share card |
+| Best Moment share card | When player is son/girl, small level shield drawn in top-right of chip |
+| SW | v93 / cache v139 |
 
 ---
 
@@ -318,3 +359,58 @@ All open questions from the roadmap resolved. Key decisions:
 
 **Rollback to stable:** `git checkout v1.0-stable` inside `spinvibes-golf/`
 **Git lock fix:** `rm "/Users/jeremygelbaum/Documents/SpinVibes/Golf/spinvibes-golf/.git/index.lock"`
+
+## What Was Just Finished (Session 27 — May 29, 2026)
+
+### Kid Badges + Shot Dispersion + Dad Share Card + Club Fixes ✅
+
+| Item | Result |
+|------|--------|
+| Kid badges — parallel track | 9 new badges: Bucket Emptier, Hat Trick, Road Warrior, Family Tradition (auto) + Rainmaker, Early Bird, Sunset Round, Sidekick, Dynamic Duo (manual — account holder taps to award/revoke) |
+| Badge descriptions | Visible under every badge name — no more guessing what "Rainmaker" means |
+| Shot dispersion tracking | Miss Direction (← Left / ✓ On / Right →) + Miss Depth (Short / Pin High / Long) in Details section of every live hole card. Saves to Supabase in holes JSON. |
+| Dispersion stats | Bar chart in Approach Stats showing % left/center/right and short/pin high/long + pattern callout after 3+ shots |
+| Dad share card | 📤 Share button on round reflection screen. Maps dad round to family format, all 3 templates work. |
+| Hole photos for dad rounds | 📷 Camera + 🖼 Roll buttons in hole Details section. Photos appear as collage background on share card. |
+| Scorecard photo OCR | Fixed (was dead Netlify URL) → now uses CF Worker + Claude Haiku vision |
+| Club distances fixed | 7-Wood: **180 yds**, 4-Hybrid: **175 yds** — updated in CLUBS, caddie system prompt, family yardage card, golf-reference.md |
+| Bag display bug fixed | Home screen bag dropdown was reading stale `sv-clubs` localStorage (50 yds old data). Now always reads confirmed distance from Settings/Supabase. |
+| SW | v103 / cache v149 |
+
+---
+
+## What Was Just Finished (Session 26 — May 29, 2026)
+
+### Caddie + Handicap + Course Search ✅
+
+| Item | Result |
+|------|--------|
+| Caddie system prompt | Rewritten — plays not just clubs, distance math, layup suggestions, trouble awareness, wind/lie factor |
+| Miss Tendency setting | Dropdown in Settings → My Profile. 6 options. Feeds caddie every session via `_caddieSystemWithCtx()` |
+| Handicap Index tracker | WHS calc: score differential per round, best N of last 20. Gold number + sparkline in Dad My Game |
+| TCI course rating/slope | Creek+Stonehouse, Creek+Oaks, Oaks+Creek: Rating 67.4 / Slope 124 baked in |
+| GolfCourseAPI.com | Free tier wired. CF Worker routes: `/course-search`, `/course-detail`, `/parse-scorecard` |
+| Add Course overlay | Search-first UI — type name → results → tap → full card auto-fills. Tee switcher included |
+| Scorecard photo OCR | Fixed (was dead Netlify URL) — now uses CF Worker + Claude Haiku vision |
+| Supabase `courses` table | `rating` + `slope` columns added. `loadCustomCourses()` includes them |
+| SW | v97 / cache v143 |
+
+---
+
+## What Was Just Finished (Session 25 — May 29, 2026)
+
+### 9-Level Kid Progression System ✅
+
+| Item | Result |
+|------|--------|
+| Level names | L0 Fresh Caddie → L1 Grip & Ripper → L2 Ball Finder → L3 Straight Shooter → L4 Par Machine → L5 Course Reader → L6 Shot Shaper → L7 Course Boss → L8 Tour Bound |
+| Activity points | Round = 3 pts, range/practice session = 1 pt |
+| KID_LEVEL_REQS | Points gates: 4→12→25→42→65→95→130→170, plus minRounds and withinPar for upper levels |
+| KID_CHALLENGES | Contact (L2→L3), First Par (L3→L4), Two-Par (L4→L5), Scoring +15 (L5→L6) |
+| KID_CHECKIN_QS | 8 transitions L0→L7, variable passing scores (1 question at L0, 5 at L6/L7) |
+| getKidActivityPoints | rounds×3 + range sessions |
+| getRangeContentLevel | Maps L0–L8 to 4 range content tiers |
+| migrateKidLevel | One-time migration from old 4-level system |
+| Defaults | Both kids default to L0 Fresh Caddie for new profiles |
+| Birdie | Bonus achievement only — not a gate |
+| SW | v95 / cache v141 |
