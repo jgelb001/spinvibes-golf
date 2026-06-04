@@ -5230,6 +5230,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
             <div style="color:var(--muted);font-size:0.9rem;">›</div>
           </div>
           ${photoStrip}
+          <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+            <button onclick="event.stopPropagation();viewFamRound(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="background:none;border:1px solid rgba(138,96,16,0.3);border-radius:8px;padding:5px 12px;color:var(--gold-l);font-size:0.75rem;font-weight:600;cursor:pointer;touch-action:manipulation;">Share ↗</button>
+          </div>
         </div>`;
       }).join('');
     } catch(e) {
@@ -5263,8 +5266,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
             <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;">${chips}</div>
             <div style="color:var(--muted);font-size:0.9rem;">›</div>
           </div>
-          <div style="text-align:right;margin-top:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
             <button class="round-delete-btn" onclick="confirmDeleteFamilyRound('${r.id}')">Delete Round</button>
+            <button onclick="event.stopPropagation();viewFamRound(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="background:none;border:1px solid rgba(138,96,16,0.3);border-radius:8px;padding:5px 12px;color:var(--gold-l);font-size:0.75rem;font-weight:600;cursor:pointer;touch-action:manipulation;">Share ↗</button>
           </div>
         </div>`;
       }).join('');
@@ -5274,17 +5278,35 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   }
 
   function viewFamRound(r) {
-    // Reconstruct _famRound and _famHoles from saved data to reuse renderFamSummary
-    _famRound = { date_played: r.date_played, course_name: r.course_name, course_par: r.course_par, players: r.players };
-    _famHoles = r.holes;
+    // Reconstruct _famRound and _famHoles from saved data
+    _famRound = { date_played: r.date_played, course_name: r.course_name, course_par: r.course_par, players: r.players || [] };
+    _famHoles = (r.holes || []).map(h => ({
+      ...h,
+      scores: h.scores || {},
+      photo: h.photo || h.photo_url || null,
+    }));
+    // Open modal if not already visible
+    const modal = document.getElementById('family-modal');
+    if (modal && modal.style.display !== 'flex') {
+      _lockBodyScroll();
+      modal.style.display = 'flex';
+    }
+    const footer = document.getElementById('fam-modal-footer');
+    if (footer) footer.style.display = 'none';
+    const closeBtn = document.getElementById('fam-modal-close-btn');
+    if (closeBtn) closeBtn.style.display = '';
+    const holeSub = document.getElementById('fam-modal-hole-sub');
+    if (holeSub) holeSub.style.display = 'none';
+    const label = document.getElementById('fam-modal-label');
+    if (label) label.textContent = r.course_name || 'Round';
     renderFamSummary();
-    // Override the save button — this is a read-only view
+    // Override buttons — read-only share view
     setTimeout(() => {
       const saveBtn = document.querySelector('#fam-modal-body .btn-primary');
       if (saveBtn) saveBtn.style.display = 'none';
-      const doneBtn = document.querySelector('#fam-modal-body .btn-ghost');
-      if (doneBtn) doneBtn.textContent = '\u2190 Back';
-      if (doneBtn) doneBtn.setAttribute('onclick','openFamilyModal()');
+      // Change Done to Back
+      const btns = document.querySelectorAll('#fam-modal-body .btn-ghost');
+      btns.forEach(b => { if (b.id !== 'fam-share-btn') { b.textContent = '\u2190 Back'; b.setAttribute('onclick','closeFamilyModal()'); } });
     }, 50);
   }
 
@@ -6246,22 +6268,30 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
 
   function famMidRoundScorecard() {
+    // Hide the Exit Round footer — Share is in the body
+    const footer = document.getElementById('fam-modal-footer');
+    if (footer) footer.style.display = 'none';
     renderFamSummary();
-    // Replace Save + Done buttons with a single Back-to-round button
     setTimeout(() => {
       const saveBtn = document.querySelector('#fam-modal-body .btn-primary');
       if (saveBtn) saveBtn.style.display = 'none';
       const doneBtn = document.querySelector('#fam-modal-body .btn-ghost');
       if (doneBtn) {
         doneBtn.textContent = '← Back to Hole ' + (_famHoleIdx + 1);
-        doneBtn.setAttribute('onclick', 'renderFamHole()');
+        doneBtn.setAttribute('onclick', 'famReturnToHole()');
       }
-      // Add in-progress badge so it's clear this isn't the final scorecard
       const label = document.getElementById('fam-modal-label');
       if (label) label.textContent = 'Scorecard · In Progress';
+      const sub = document.getElementById('fam-modal-hole-sub');
+      if (sub) sub.style.display = 'none';
     }, 30);
   }
 
+  function famReturnToHole() {
+    const footer = document.getElementById('fam-modal-footer');
+    if (footer) footer.style.display = '';
+    renderFamHole();
+  }
   function renderFamCaddieMessages(showTyping) {
     const el = document.getElementById('fam-caddie-msgs');
     if (!el) return;
