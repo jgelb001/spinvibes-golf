@@ -394,8 +394,8 @@
   }
 
   // Upload any base64 hole photos to Supabase Storage and replace with public URLs
-  async function uploadRoundPhotos(roundId) {
-    for (const h of _famHoles) {
+  async function _uploadHolePhotos(holesArr, roundId) {
+    for (const h of holesArr) {
       const rawPhotos = h.photos?.length ? h.photos : (h.photo ? [h.photo] : []);
       const uploaded = [];
       for (let i = 0; i < rawPhotos.length; i++) {
@@ -423,6 +423,12 @@
       h.photo  = uploaded[0] || null; // backward compat
     }
   }
+
+  // Family round photo upload
+  async function uploadRoundPhotos(roundId) { await _uploadHolePhotos(_famHoles, roundId); }
+
+  // Dad solo round photo upload
+  async function uploadDadRoundPhotos(roundId) { await _uploadHolePhotos(_dadHoles, roundId); }
 
   // ── CUSTOM COURSES (from Supabase) ───────────────────────────
   let _customCourses = [];
@@ -3771,6 +3777,16 @@
     const saveBtn = document.querySelector('#dad-modal-body .btn-primary');
     if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving...'; }
     try {
+      // Upload hole photos to Supabase Storage before saving
+      const dadRoundId = crypto.randomUUID();
+      const hasDadPhotos = _dadHoles.some(h => h.photo && !h.photo.startsWith('http'));
+      if (hasDadPhotos) {
+        if (saveBtn) saveBtn.textContent = 'Uploading photos...';
+        await uploadDadRoundPhotos(dadRoundId);
+        // Reflect uploaded URLs back into roundObj.holes
+        roundObj.holes = _dadHoles;
+        if (saveBtn) saveBtn.textContent = 'Saving...';
+      }
       await saveDadRound(roundObj);
       _clearDraftRound();
       showToast(_dadRound.is_practice ? 'Practice round saved! 🏌️' : 'Round saved! ✓');
