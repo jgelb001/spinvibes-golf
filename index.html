@@ -313,7 +313,13 @@
       font-size: 0.75rem;
       color: var(--muted);
       font-weight: 500;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
     }
+    .pill:active { opacity: 0.7; }
 
     .cue-box {
       background: rgba(138,96,16,0.07);
@@ -5550,6 +5556,13 @@
   // Pre-load custom courses on startup
   loadCustomCourses();
 
+  // ── PILL SELECTOR ────────────────────────────────────────────
+  // Shared by all pill groups across the app (round type, format, tee, fairway, miss direction, etc.)
+  function selectPill(el, groupId) {
+    document.querySelectorAll('#' + groupId + ' .pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+  }
+
   // ── TOAST ────────────────────────────────────────────────────
   function showToast(msg, type = 'success') {
     const t = document.createElement('div');
@@ -7005,6 +7018,7 @@
       `;
     }
 
+    document.getElementById('dad-modal-body').scrollTop = 0;
     renderDadLiveCaddieMessages();
     if (_manualYards !== null) {
       document.getElementById('live-yardage-input').value = _manualYards;
@@ -7234,6 +7248,7 @@
 
       <button class="btn-ghost" style="width:100%;margin-top:4px;" onclick="renderDadLiveHole()"><i class="ti ti-chevron-left" style="font-size:0.85rem;"></i> Back to Hole ${thru}</button>
     `;
+    document.getElementById('dad-modal-body').scrollTop = 0;
   }
 
 
@@ -10870,6 +10885,23 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   }
 
   function showSharePicker() {
+    // Build photo strip from all hole photos
+    const allPhotos = (_famHoles || []).flatMap(h => {
+      const ps = h.photos?.length ? h.photos : (h.photo && _hasPhoto(h.photo) ? [h.photo] : []);
+      return ps.filter(_hasPhoto).map(p => ({ src: p, hole: h.hole }));
+    });
+    const photoStrip = allPhotos.length ? `
+      <div style="margin-bottom:14px;">
+        <div style="font-size:0.58rem;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;">Round Photos (${allPhotos.length})</div>
+        <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+          ${allPhotos.map(({src, hole}) => `
+            <div style="flex-shrink:0;text-align:center;">
+              <img src="${src}" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid rgba(138,96,16,0.3);">
+              <div style="font-size:0.55rem;color:var(--muted);margin-top:2px;">H${hole}</div>
+            </div>`).join('')}
+        </div>
+      </div>` : '';
+
     const overlay = document.createElement('div');
     overlay.id = 'share-picker-overlay';
     overlay.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;';
@@ -10879,6 +10911,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     sheet.innerHTML = `
       <div style="width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 14px;"></div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:var(--cream);text-align:center;margin-bottom:16px;">Share Round</div>
+      ${photoStrip}
       <div style="display:flex;gap:8px;margin-bottom:18px;background:var(--surface2);border-radius:10px;padding:4px;">
         <button id="sp-portrait" onclick="setShareOrientation('portrait',this)" style="flex:1;border:none;border-radius:8px;padding:8px;font-size:0.82rem;font-weight:700;cursor:pointer;background:var(--gold);color:var(--bg);">◻ Portrait</button>
         <button id="sp-landscape" onclick="setShareOrientation('landscape',this)" style="flex:1;border:none;border-radius:8px;padding:8px;font-size:0.82rem;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);">▭ Landscape</button>
@@ -11688,7 +11721,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         const diff = (h.scores[pk]||0) - h.par;
         return `<td><span class="${famScoreClass(diff)}">${h.scores[pk]||0}</span></td>`;
       }).join('');
-      const photoThumb = h.photo
+      const photoThumb = (h.photos?.length || h.photo)
         ? `<img src="${h.photos?.[0]||h.photo}" onclick="famViewScorecardPhoto('${h.hole}')" style="width:22px;height:22px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-left:4px;cursor:pointer;">`
         : '';
       return `<tr><td>H${h.hole}&middot;P${h.par}${photoThumb}</td>${cells}</tr>`;

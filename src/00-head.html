@@ -313,7 +313,13 @@
       font-size: 0.75rem;
       color: var(--muted);
       font-weight: 500;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
     }
+    .pill:active { opacity: 0.7; }
 
     .cue-box {
       background: rgba(138,96,16,0.07);
