@@ -1986,22 +1986,6 @@
             <div style="font-size:1.6rem;font-weight:700;color:var(--cream);" id="dh-putts-big">${h.putts}</div>
             <button class="stepper-btn" onclick="dadHolePutts(1)" style="width:48px;height:48px;font-size:1.4rem;">+</button>
           </div>
-          <!-- Hole Photo -->
-          <label class="modal-label" style="margin-bottom:6px;">Hole Photo <span style="font-size:0.62rem;opacity:0.5;font-weight:400;">(appears on share card)</span></label>
-          <input type="file" id="dh-photo-input" accept="image/*" style="display:none;" onchange="dadHolePhotoSelected(this)">
-          <div id="dh-photo-wrap" style="margin-bottom:10px;">
-            ${h.photo
-              ? `<div style="position:relative;display:inline-block;">
-                  <img src="${h.photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;border:1px solid rgba(138,96,16,0.3);">
-                  <button onclick="_dadHoles[_dadHoleIdx].photo=null;renderDadLiveHole();" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);border:none;border-radius:50%;width:24px;height:24px;color:#fff;font-size:0.75rem;cursor:pointer;">✕</button>
-                </div>`
-              : `<div style="display:flex;gap:8px;">
-                  <button onclick="document.getElementById('dh-photo-input').setAttribute('capture','environment');document.getElementById('dh-photo-input').click()"
-                    style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:8px;padding:10px;color:var(--muted);font-size:0.8rem;cursor:pointer;">📷 Camera</button>
-                  <button onclick="document.getElementById('dh-photo-input').removeAttribute('capture');document.getElementById('dh-photo-input').click()"
-                    style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:8px;padding:10px;color:var(--muted);font-size:0.8rem;cursor:pointer;">🖼 Roll</button>
-                </div>`}
-          </div>
           <!-- Shot Dispersion -->
           <label class="modal-label" style="margin-bottom:6px;">Approach Miss <span style="font-size:0.62rem;opacity:0.5;font-weight:400;">(optional)</span></label>
           <div class="pill-row" id="dh-miss-dir-pills" style="margin-bottom:8px;">
@@ -2016,6 +2000,23 @@
           </div>
         </div>
       </div>
+
+      <!-- HOLE PHOTO — always visible, not buried in details -->
+      <input type="file" id="dh-photo-input" accept="image/*" style="display:none;" onchange="dadHolePhotoSelected(this)">
+      <div id="dh-photo-wrap" style="margin-bottom:12px;">
+        ${h.photo
+          ? `<div style="position:relative;">
+              <img src="${h.photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:10px;border:1px solid rgba(138,96,16,0.3);">
+              <button onclick="_dadHoles[_dadHoleIdx].photo=null;renderDadLiveHole();" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.65);border:none;border-radius:50%;width:26px;height:26px;color:#fff;font-size:0.78rem;cursor:pointer;touch-action:manipulation;">✕</button>
+            </div>`
+          : `<div style="display:flex;gap:8px;">
+              <button onclick="document.getElementById('dh-photo-input').setAttribute('capture','environment');document.getElementById('dh-photo-input').click()"
+                style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:10px;padding:11px;color:var(--muted);font-size:0.82rem;cursor:pointer;touch-action:manipulation;"><i class="ti ti-camera" style="vertical-align:-2px;margin-right:4px;"></i>Camera</button>
+              <button onclick="document.getElementById('dh-photo-input').removeAttribute('capture');document.getElementById('dh-photo-input').click()"
+                style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:10px;padding:11px;color:var(--muted);font-size:0.82rem;cursor:pointer;touch-action:manipulation;"><i class="ti ti-photo" style="vertical-align:-2px;margin-right:4px;"></i>Roll</button>
+            </div>`}
+      </div>
+
       <!-- CADDIE PANEL -->
       <div style="margin-bottom:16px;">
         <button onclick="toggleDadLiveCaddie()" id="dad-live-caddie-toggle"
@@ -3893,8 +3894,15 @@
       track.style.background = cb.checked ? 'var(--green)' : 'rgba(255,255,255,0.15)';
       thumb.style.transform = cb.checked ? 'translateX(20px)' : 'translateX(0)';
     });
-    // init thumb position
-    if (thumb) thumb.style.transform = 'translateX(20px)';
+    // Practice round with no course = test session, default to unsaved
+    const isTestSession = _dadRound?.is_practice && !_dadCourseData;
+    if (cb && isTestSession) {
+      cb.checked = false;
+      if (track) track.style.background = 'rgba(255,255,255,0.15)';
+      if (thumb) thumb.style.transform = 'translateX(0)';
+    } else {
+      if (thumb) thumb.style.transform = 'translateX(20px)';
+    }
   }
   function dadSetStar(n) {
     _dadStars = n;
