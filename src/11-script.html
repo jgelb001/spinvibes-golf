@@ -3694,21 +3694,25 @@
 
 
   function dadStartRound() {
-    if (!_dadCourseData) { showToast('Search and select a course first', 'error'); return; }
-
-    const tee      = _dadSelectedTee || (_dadCourseData.allTees?.[_dadCourseData.allTees.length-1]?.name) || 'White';
-    const teeData  = _dadCourseData.allTees?.find(t => t.name === tee) || _dadCourseData.allTees?.[0] || {};
-    const holePars = teeData.holePars || _dadCourseData.holePars || [];
-    const yardages = teeData.yardages || _dadCourseData.yardages || [];
     const roundType  = document.querySelector('#dm-format-pills .pill.active')?.dataset.val || 'regulation_18';
     const isPractice = document.querySelector('#dm-type-pills .pill.active')?.dataset.val === 'practice';
+
+    // Practice rounds don't require a course — use placeholder if none selected
+    if (!_dadCourseData && !isPractice) { showToast('Search and select a course first', 'error'); return; }
+
+    const tee      = _dadSelectedTee || (_dadCourseData?.allTees?.[_dadCourseData.allTees.length-1]?.name) || 'White';
+    const teeData  = _dadCourseData?.allTees?.find(t => t.name === tee) || _dadCourseData?.allTees?.[0] || {};
+    const holePars = teeData.holePars || _dadCourseData?.holePars || [];
+    const yardages = teeData.yardages || _dadCourseData?.yardages || [];
 
     // Determine hole count from format pill or course data
     let numHoles = holePars.length || 18;
     if (roundType === 'nine_hole') numHoles = Math.min(numHoles, 9);
 
-    const coursePar = holePars.slice(0, numHoles).reduce((a,b)=>a+b, 0) || _dadCourseData.par || 72;
-    const courseName = _dadCourseData.name + (_dadCourseData.course ? ' — ' + _dadCourseData.course : '');
+    const coursePar  = holePars.slice(0, numHoles).reduce((a,b)=>a+b, 0) || _dadCourseData?.par || (numHoles === 9 ? 36 : 72);
+    const courseName = _dadCourseData
+      ? _dadCourseData.name + (_dadCourseData.course ? ' — ' + _dadCourseData.course : '')
+      : 'Practice Session';
 
     _dadRound = {
       date_played: document.getElementById('dm-date').value,
