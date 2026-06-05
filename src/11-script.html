@@ -280,6 +280,157 @@
     },
   };
 
+  // ── DAILY BRIEF — home tab dynamic content, date-seeded ─────────────────
+  const DAILY_TIPS = {
+    dad: [
+      // Drills
+      { icon:'ti-target', tag:'drill', title:'Gate Drill — Putting', body:'Two tees just wider than your putter, 6 inches in front of the ball. Make 10 in a row from 6 feet without clipping them. Best stroke trainer you can do anywhere.' },
+      { icon:'ti-rotate', tag:'drill', title:'Towel Under Arms', body:'Tuck a towel under both armpits and hit half-shots with a 7-iron. If it falls, your arms disconnected from your body. This fixes 90% of over-the-top pulls.' },
+      { icon:'ti-clock', tag:'drill', title:'Clock Drill — Wedges', body:'From 20 yards, hit to 3, 6, 9, and 12 o\'clock around the hole. Forces distance control in all directions. 7 o\'clock backswing ≈ 35y. 9 o\'clock ≈ 65y. 11 o\'clock ≈ 90y.' },
+      { icon:'ti-flame', tag:'drill', title:'50% Driver Day', body:'On the range today: hit every driver at 50% effort. Focus on solid contact and finishing tall. You\'ll probably hit it just as far — and you\'ll find out how much of your miss comes from over-swinging.' },
+      { icon:'ti-activity', tag:'drill', title:'Tempo Count', body:'On your next range session, count 1-2-3 through every swing. 1 = takeaway, 2 = top of backswing, 3 = impact. Most amateurs rush from 2 to 3. That pause at the top is where the swing lives.' },
+      { icon:'ti-golf', tag:'drill', title:'One-Club Bucket', body:'Take just your 7-iron to the range today. Hit a full bucket — chips, full swings, punches, high shots. Forces creativity and builds real feel for the club. Best short-session drill there is.' },
+      { icon:'ti-target', tag:'drill', title:'9-Ball Short Game Circuit', body:'3 balls from 10 yards, 3 from 25, 3 from 40. Chip each to a single hole. Count total putts to finish. Par is 12. Beat it, and your short game is sharp enough to score with.' },
+      { icon:'ti-crosshair', tag:'drill', title:'Lag Putting Circuit', body:'5 balls from 20 feet, 5 from 30, 5 from 40. Goal: every ball inside 18 inches. No 3-putts. This is the cheapest stroke saver in the bag — most rounds are lost here, not on tee shots.' },
+      // Course strategy
+      { icon:'ti-brain', tag:'strategy', title:'Play to the Fat Side', body:'Every approach today: aim for the widest part of the green, not the pin. A 30-footer for birdie beats a chip from short-side rough every time. Course management beats hero shots.' },
+      { icon:'ti-map', tag:'strategy', title:'Par 5 Rule', body:'On every par 5: lay up to your best wedge distance — the one where you know exactly what\'s going to happen. For you, that\'s the 50° GW around 90-95 yards. Set it up perfectly.' },
+      { icon:'ti-refresh', tag:'strategy', title:'The Bounce-Back Rule', body:'After a bad hole: par the next one. That\'s it. A bad hole followed by a par is a good two-hole sequence. Reset, pick a conservative target, execute one shot.' },
+      { icon:'ti-wind', tag:'strategy', title:'Wind Adjustment', body:'Into the wind: take one more club, swing at 80%, keep it low. Downwind: same club, same swing — the wind will carry it. Crosswind: aim into it, let it come back. Never fight the wind.' },
+      { icon:'ti-pin', tag:'strategy', title:'Tee Height for Driver', body:'Ball should be teed so the top half is above the clubface at address. Higher tee = more upward strike = more carry, less spin. You\'re swinging up on it. Let the tee do the work.' },
+      // Mental
+      { icon:'ti-bulb', tag:'mental', title:'One Swing Thought Max', body:'Pick it before you leave the car. Stick with it all session — even if it\'s not working. Changing swing thoughts mid-round is the fastest way to make a bad day worse.' },
+      { icon:'ti-heart', tag:'mental', title:'Pre-Shot Routine', body:'Same 3 steps before every shot. Stand behind the ball, pick your target. Step in and align. One breath, then go. Takes 10 seconds. This is what separates consistent ball-strikers from streaky ones.' },
+      { icon:'ti-mood-smile', tag:'mental', title:'Miss Tendency Reset', body:'Every golfer has a pattern. Yours is a pull-draw when you over-rotate too fast. When you feel it starting: slower transition, feel the right elbow drop. Don\'t fix it — just feel the opposite.' },
+      // Family games
+      { icon:'ti-users', tag:'family game', title:'Putting Contest', body:'End of this round: everyone putts from 6 feet, same hole, 5 balls each. Count makes. Winner picks the next course, or picks someone\'s bag for the cart ride home. First game Son takes seriously.' },
+      { icon:'ti-trophy', tag:'family game', title:'Closest to the Pin — Par 3s', body:'Every par 3 this round: mark where everyone\'s ball lands. Closest to the pin gets a point. Track across 18 — pay out at the end. Keeps everyone dialed in on par 3s all round.' },
+      { icon:'ti-cards', tag:'family game', title:'Scramble Format', body:'Try a full scramble with Son: everyone hits, play the best shot. Takes the pressure off and makes the whole round feel collaborative. Great format when Son needs a confidence boost.' },
+      // Products
+      { icon:'ti-package', tag:'gear', title:'Vice Golf Pro Plus Ball', body:'Matches your swing speed well. Soft feel for short game, enough distance off the tee. Better than what most mid-handicaps play, without Tour ball pricing. Worth keeping a sleeve in the bag.' },
+      { icon:'ti-package', tag:'gear', title:'Alignment Sticks', body:'The cheapest best training aid in golf. Use them on the range for ball position, foot line, target line — all at once. Two sticks, under $15. No substitute for what they teach your eye.' },
+      { icon:'ti-calendar', tag:'reminder', title:'Book a Lesson This Month', body:'Every 4–6 weeks is the right cadence for where you are right now. Too often and the changes stack up. Not enough and you\'re guessing. One thing per lesson, one month to own it.' },
+      // Lefty specific
+      { icon:'ti-rotate-clockwise', tag:'lefty tip', title:'Lead Wrist at Impact', body:'As a lefty, your lead (right) wrist should be flat or slightly bowed at impact — not cupped. A cupped lead wrist causes fat shots and flips. Feel like you\'re holding the angle through the ball.' },
+      { icon:'ti-shopping-bag', tag:'gear', title:'Left-Handed Gear Sources', body:'leftiesonlygolf.com for specialty equipment. 2ndswing.com for quality used lefty clubs at real prices. GlobalGolf.com is worth checking too. Most big-box stores stock minimal lefty options.' },
+      { icon:'ti-chart-line', tag:'reminder', title:'Log Your Misses Today', body:'Every time you miss a green today, note which side — left, right, short, long. After 9 holes you\'ll have a pattern. That pattern tells you exactly what to work on at the range next session.' },
+    ],
+
+    son: [
+      { icon:'ti-trophy', tag:'challenge', title:'Closest to the Pin — 5 Balls', body:'Drop 5 balls at 10 yards from the practice green and chip. Count how many finish inside 3 feet. Beat your record next time. Write the number down somewhere.' },
+      { icon:'ti-flame', tag:'challenge', title:'Beat Dad on One Hole', body:'Pick one hole this round and go all-in: best tee shot you\'ve got, full focus all the way to the cup. Just one hole. You don\'t have to beat him all day — just once.' },
+      { icon:'ti-target', tag:'drill', title:'Count Your Makes', body:'On the putting green, count how many 3-footers you make in a row before you miss. Your record is the one to beat. 10 in a row means your stroke is dialed. Go get it.' },
+      { icon:'ti-golf', tag:'drill', title:'Fringe Chip Drill', body:'From the fringe, pick a spot 3 feet onto the green and try to land the ball exactly there. Every time you land it on the spot, it\'s a point. 7 out of 10 = consistent chipper.' },
+      { icon:'ti-run', tag:'challenge', title:'Drive Count — Straight Ones', body:'On the range today, hit 10 drivers and count how many go straight or draw slightly. That\'s your number. Try to beat it next session. Most juniors improve fast when they start tracking.' },
+      { icon:'ti-cards', tag:'family game', title:'Points Game This Round', body:'Birdie = 3 points, Par = 2, Bogey = 1, Double = 0. Play this scoring system this round. It rewards consistency over heroics — and you can beat Dad at it even when he shoots lower.' },
+      { icon:'ti-award', tag:'challenge', title:'3 Clubs Only', body:'For 3 holes today, use only your 7-iron, sand wedge, and putter. No driver, no fairway wood. Forces creativity and teaches you what each club can actually do. Best golf brain drill there is.' },
+      { icon:'ti-users', tag:'family game', title:'Caddie for a Hole', body:'On one hole this round, be Dad\'s caddie. Read the distance, suggest a club, read the putt. He has to take your advice. Whoever is right more often wins a Gatorade at the turn.' },
+      { icon:'ti-star', tag:'challenge', title:'Shoot Your Age', body:'On 9 holes today, try to shoot your age or under (8 or less). That means averaging under a bogey per hole. It\'s harder than it sounds. Write down your score and try to beat it next time.' },
+      { icon:'ti-bulb', tag:'tip', title:'Pre-Shot Routine — Start Now', body:'Before every shot on the range: stand behind the ball, pick a target, then step in. One look, one thought, swing. This habit at 8 years old is worth 5 years of lessons later.' },
+      { icon:'ti-clipboard-list', tag:'tip', title:'Learn One Rule This Week', body:'Ask Dad one rule of golf you\'ve wondered about. Drop zones, penalty strokes, out of bounds, casual water — knowing the rules makes you a real golfer and helps you score better.' },
+      { icon:'ti-trophy', tag:'family game', title:'Speed Putting Race', body:'Who makes 3 putts in a row first from 4 feet? Go head-to-head on the practice green before the round. Winner starts the round with bragging rights. Loser carries the bag to the first tee.' },
+      { icon:'ti-pin', tag:'challenge', title:'Hit the 50-Yard Marker', body:'On the range, try to land a ball as close to the 50-yard marker as possible using your sand wedge. 5 attempts. Closest one counts. Then try the 75-yard marker. Distance control is real scoring.' },
+      { icon:'ti-chart-bar', tag:'tip', title:'Map Your Clubs', body:'Today on the range: hit 5 balls with each iron and note the average distance. Write it in your phone. Knowing exactly how far each club goes is the #1 thing that improves scoring.' },
+      { icon:'ti-award', tag:'challenge', title:'Fairways in a Row', body:'Starting on hole 1, try to hit as many fairways in a row as you can before you miss. Track the streak. This teaches you to swing with a plan, not just as hard as possible.' },
+      { icon:'ti-users', tag:'family game', title:'Scramble with the Family', body:'Next family round: everyone hits, play the best shot. Takes the pressure off and makes bogey feel like a win. Great way to play a harder course together and still shoot a good number.' },
+      { icon:'ti-flame', tag:'challenge', title:'Forward Tee Challenge', body:'Play 9 holes from the shortest tees available. How low can you score? No excuses, no handicap. Play it straight and see what your real scoring potential looks like when the course opens up.' },
+      { icon:'ti-bulb', tag:'tip', title:'Turn and Fire', body:'Your one swing thought for today: TURN and FIRE. Full rotation back, full rotation through. Don\'t think about the club, the ball, or where it\'s going. Just turn and fire every single time.' },
+      { icon:'ti-heart', tag:'tip', title:'Shake It Off Fast', body:'When you hit a bad shot, you have exactly 5 seconds to be annoyed. Then it\'s done. Walk to the next shot thinking about the target, not the last miss. Best players forget bad shots instantly.' },
+      { icon:'ti-pin', tag:'family game', title:'Closest to the Fringe', body:'On the putting green, everyone putts from 30 feet trying to stop the ball as close to the edge as possible without going over. Whoever is closest wins. Distance control is everything in putting.' },
+    ],
+
+    girl: [
+      { icon:'ti-star', tag:'today\'s game', title:'Make 3 in a Row', body:'From 3 feet on the putting green, try to make 3 putts in a row. When you do, move back to 4 feet. Celebrate every single one. You\'ve got this.' },
+      { icon:'ti-heart', tag:'today\'s game', title:'Pick Your Favorite Shot', body:'Hit 5 balls and decide which one is your favorite. That\'s YOUR best swing. Show Dad. That\'s the swing to repeat next time.' },
+      { icon:'ti-award', tag:'challenge', title:'Give Dad a Putting Lesson', body:'Teach Dad how you putt. Show him exactly what you do. You might know something he doesn\'t — and teaching is how you get even better yourself.' },
+      { icon:'ti-leaf', tag:'today\'s game', title:'Watch It Roll', body:'From just off the green, try chipping the ball and watching it roll all the way to the hole. See how far you can get it to roll! The 9-iron makes it roll the furthest.' },
+      { icon:'ti-eye', tag:'today\'s game', title:'Spot the Ball Game', body:'Whoever sees the ball land first after someone hits gets a point. Play this the whole round. You\'re really good at spotting — this one is yours to win.' },
+      { icon:'ti-target', tag:'challenge', title:'10 Chip Challenge', body:'Drop 10 balls at the same spot and chip them all to a hole. Count how many end up inside 5 feet. Write your number down and try to beat it next time.' },
+      { icon:'ti-flame', tag:'today\'s game', title:'See How Far Without Trying', body:'Hit a ball as far as you can WITHOUT swinging hard. Just smooth and easy. It might go further than you think — and it feels so much better when you swing easy.' },
+      { icon:'ti-map', tag:'today\'s game', title:'Design Your Own Hole', body:'You pick the tee, you pick the target. Everyone plays YOUR hole your way. You\'re the course designer and the rules are whatever you decide.' },
+      { icon:'ti-users', tag:'family game', title:'Best Ball with Dad', body:'On each hole today, both of you hit, and you play whichever ball is in a better spot. It\'s a team — and sometimes your shot will be the one everyone plays. That feels amazing.' },
+      { icon:'ti-photo', tag:'today\'s game', title:'Find the Prettiest Spot', body:'Look for the most beautiful spot on the course today. Maybe it\'s a tree, a pond, a hill. When you find it, remember it. Golf is also about being somewhere beautiful.' },
+      { icon:'ti-run', tag:'today\'s game', title:'Quiet Hands Putting', body:'On the putting green, try keeping your wrists completely still — like your whole arm is one straight stick. Firm, quiet, smooth. See how many you can make with super quiet hands.' },
+      { icon:'ti-trophy', tag:'family game', title:'Fastest Putter', body:'Who can make 3 putts in a row first? Go head-to-head with Dad or Son. Set the clock, see who wins. If you win, you pick where the family gets lunch.' },
+      { icon:'ti-golf', tag:'challenge', title:'Try a New Club', body:'Today pick a club you don\'t usually use and hit 5 balls with it. Just explore. What happens? Does it go far? Does it go high? There\'s no wrong answer — just curious.' },
+      { icon:'ti-heart', tag:'today\'s game', title:'Celebrate Every Contact', body:'Every single shot that gets airborne today: celebrate it. Arms up, big smile. Because getting a golf ball in the air is actually really hard, and you do it every time.' },
+      { icon:'ti-bulb', tag:'tip', title:'Pick Up the Tee', body:'After a driver shot, walk up and pick up your tee from the ground. That\'s a real golfer move. Pros do it every time. You\'ll remember it forever once you start.' },
+      { icon:'ti-target', tag:'challenge', title:'Chip to a Towel', body:'Dad puts a towel on the ground at 15 yards. Try to land the ball on it. 3 balls, best of 3. Closer than the towel counts too. It\'s harder than it looks, and way more fun than just chipping.' },
+      { icon:'ti-award', tag:'today\'s game', title:'Longest Drive Contest', body:'Everyone tees up on the practice range. One swing each. Whoever\'s ball goes furthest wins. You might surprise everyone. Swing as smooth as you can.' },
+      { icon:'ti-refresh', tag:'tip', title:'9-Iron vs Pitching Wedge', body:'Try chipping from the same spot with your 9-iron and then your pitching wedge. Notice how one rolls more and one pops up higher. That\'s the difference. Both are useful. You\'re learning when to use each.' },
+      { icon:'ti-heart', tag:'reminder', title:'Dad\'s Rule — Leave Wanting More', body:'Whenever YOU are done, you are done. There\'s no pressure to stay longer. The best sessions are the ones that end while you still want to hit more. That\'s the secret.' },
+      { icon:'ti-users', tag:'family game', title:'Teach It Back', body:'Ask Dad for one tip today. Then at the end of the session, teach it back to him exactly. If you can teach it, you own it. You\'re going to be a great coach someday.' },
+    ],
+
+    mom: [
+      { icon:'ti-bulb', tag:'tip', title:'Look at the Hole — Short Putts', body:'For any putt inside 5 feet, try looking at the hole instead of the ball. Your instincts take over and the stroke smooths out. It works for most people the first time they try it.' },
+      { icon:'ti-heart', tag:'today\'s focus', title:'One Thing Only', body:'Pick one thing to focus on this session — just one. Ball position, keeping your eye on the ball, finishing tall. Everything else is background noise. One thing at a time is how this gets learned.' },
+      { icon:'ti-target', tag:'drill', title:'Bump and Run', body:'From just off the green, grab your 9-iron, put the ball back in your stance, weight forward, hands ahead, firm wrists. Push it like a long putt. It rolls to the hole. This is your most reliable short game shot.' },
+      { icon:'ti-mood-smile', tag:'tip', title:'Tee Up on Par 3s — Always', body:'No shame, more contact, better round. Even tour pros tee it up every time. The tee exists to help you — use it on every par 3 until you\'re consistently making solid contact without it.' },
+      { icon:'ti-users', tag:'family game', title:'Count Putts This Round', body:'Just track putts today — nothing else. Try for 36 or under (2 per hole). You might surprise yourself, and it completely changes what you focus on vs the full score.' },
+      { icon:'ti-golf', tag:'tip', title:'Three-Ball Warm-Up', body:'Every session, in this order: chip 3 balls to a practice hole, pitch 3 balls from 20 yards, putt 3 balls from 6 feet. That\'s enough. Short game first, every time. Sets your tempo for everything else.' },
+      { icon:'ti-flame', tag:'tip', title:'Happy Feet Drill', body:'After every shot, hold your finish until the ball lands — or until you could count to 3. If you\'re falling off balance, you\'re swinging too hard. Balance is the most honest feedback in golf.' },
+      { icon:'ti-map', tag:'strategy', title:'Walk the Hole First', body:'Before you hit, walk a few steps toward the target and look at the hole. Where\'s the trouble? Where\'s the safe side? Make a plan, then forget the trouble and aim for the safe side.' },
+      { icon:'ti-cards', tag:'family game', title:'No-Penalty Game', body:'For one round, pretend out-of-bounds doesn\'t exist. Play every ball where it lies, count strokes only. Takes the stress out and shows you exactly what your actual contact looks like without the penalty math.' },
+      { icon:'ti-pin', tag:'strategy', title:'Fairway Wood Off a Tee', body:'On the range today, tee up every fairway wood. Hit 10 balls and focus on solid contact only — not distance. The distance will come. Getting comfortable with the club is the whole game right now.' },
+      { icon:'ti-heart', tag:'tip', title:'Find Your Confidence Club', body:'Every golfer has one club that just feels right. Which one is yours? Hit 20 balls with it. Know what it does. That\'s your go-to under pressure, and it\'s worth knowing before you need it.' },
+      { icon:'ti-rotate', tag:'drill', title:'Ball First Drill', body:'Put a coin 2 inches behind the ball on the ground. Try to hit the ball without touching the coin. Ball first, ground second — that\'s the whole game. Do this 10 times on the range and feel the difference.' },
+      { icon:'ti-users', tag:'family game', title:'Closest to the Pin — Par 3s', body:'Every par 3 this round: mark where balls land, closest to the pin gets a point. Even if you don\'t win the hole, you can win the par 3 game. Track it separately.' },
+      { icon:'ti-chart-bar', tag:'tip', title:'Track One Stat', body:'Just fairways hit today — yes or no on every tee shot. No other stats. After the round you\'ll know exactly what percentage of the time you\'re starting holes with a clear fairway. That\'s information.' },
+      { icon:'ti-leaf', tag:'tip', title:'Preferred Lies', body:'For any bad lie in the fairway, move the ball to a better spot within one club length, no closer to the hole. It\'s called preferred lies and it\'s perfectly fine for recreational rounds. Don\'t punish yourself for course conditions.' },
+      { icon:'ti-bulb', tag:'tip', title:'Three-Putt Recovery', body:'If you three-putt, it\'s not a miss — it\'s a distance control lesson. The next time from that distance: look at the hole, feel the distance, stroke it. The lesson is free.' },
+      { icon:'ti-award', tag:'family game', title:'Scramble with the Kids', body:'Everyone hits, play the best ball. This format makes you feel like a great golfer even on a tough day, and the kids love being part of choosing the shot. Real team golf.' },
+      { icon:'ti-calendar', tag:'reminder', title:'Just the Front 9', body:'If you\'re tired or short on time, play just the front 9 at full pace — no rushing, no shortcuts. Nine unhurried holes is better than 18 hurried ones every time.' },
+      { icon:'ti-heart', tag:'reminder', title:'One Thing at a Time', body:'You don\'t have to fix everything at once. Nobody does. Pick one thing to improve this month. Own it. Then pick the next thing. That\'s exactly how every good golfer got good.' },
+      { icon:'ti-map', tag:'strategy', title:'Aim for Center of Green', body:'Every approach shot today: aim for the center of the green, no exceptions. Forget the pin. A 25-footer for birdie beats a chip from a nasty lie every time. The center is always the right answer.' },
+    ],
+
+    grandma: [
+      { icon:'ti-arrow-up', tag:'today\'s focus', title:'Finish Tall', body:'Today\'s one thought: finish tall. Stay upright through the entire swing, chest facing the target at the end. This is the most reliable swing fix for anyone returning to the game after time away.' },
+      { icon:'ti-circle', tag:'putting', title:'The Mark Six Inches Ahead', body:'On the putting green: pick a mark 6 inches in front of the ball on your target line. Roll it over that mark. Nothing else. This takes your attention off the hole and puts it where accuracy is actually created.' },
+      { icon:'ti-heart', tag:'reminder', title:'Your Confidence Club', body:'The most important club in your bag is the one that makes you feel confident. Use it often. There is no obligation to use clubs that make you uncomfortable. Golf is supposed to feel good.' },
+      { icon:'ti-rotate', tag:'tip', title:'Shorter Backswing, Fuller Turn', body:'Most of the power in a golf swing comes from rotation, not arm swing. A shorter backswing with a full shoulder turn will consistently outperform a long swing with minimal rotation. Quality over range.' },
+      { icon:'ti-map', tag:'strategy', title:'Walk the Hole First', body:'Before you play a hole, walk a few paces toward the target and observe where the trouble is. Note it, then play away from it. That simple habit saves 3 to 4 strokes per round without touching your swing.' },
+      { icon:'ti-leaf', tag:'tip', title:'First Tee Routine', body:'One practice swing, one slow breath, one clear target. That is enough preparation for every tee shot on every hole. Overthinking the first tee is what produces the first-tee shot. Keep it simple.' },
+      { icon:'ti-hand-stop', tag:'tip', title:'Soft Hands', body:'Throughout the entire swing, your grip should feel as though you are holding something fragile. Tight hands create tension in the arms and shoulders. Soft hands allow the club to do its job.' },
+      { icon:'ti-golf', tag:'drill', title:'9-Iron from the Fringe', body:'For most chip shots from just off the green: 9-iron, hands forward, firm wrists, and let the ball run. No need for a wedge unless there is something to carry. This is the most reliable chip in the bag.' },
+      { icon:'ti-pin', tag:'tip', title:'Ball Position Check', body:'Irons: ball in the center of your stance. Fairway wood: one ball forward of center. Driver: just inside the lead heel. These positions are worth confirming periodically — they quietly drift over time.' },
+      { icon:'ti-clock', tag:'strategy', title:'Pace Yourself After the Turn', body:'Most rounds are won or lost on the back nine, not the front. Take your time at the halfway point. A few minutes to sit, drink water, and reset your mind is worth at least two strokes on the back nine.' },
+      { icon:'ti-arrow-right', tag:'strategy', title:'The Best Recovery Shot', body:'When in trouble: one more club than you think, swing easier than you want to, aim for the center of the green. The goal of a recovery shot is to be on the green, not to make up for the missed shot.' },
+      { icon:'ti-circle-check', tag:'reminder', title:'Permission to Pick Up', body:'Give yourself full permission to pick up if a hole is going sideways. It protects your enjoyment of the rest of the round. No score is worth carrying the weight of a bad hole to the next tee.' },
+      { icon:'ti-repeat', tag:'drill', title:'6-Foot Putt Drill', body:'Make three putts in a row from the same spot at 6 feet. Then move to a new spot and repeat. The goal is to build confidence deliberately — not to practice missing from different locations.' },
+      { icon:'ti-bulb', tag:'tip', title:'Notice What Feels Easy', body:'Today, notice which shots feel genuinely easy — natural, unhurried, well-struck. That ease is exactly what you are trying to repeat. Your best golf happens when you are not trying to fix anything.' },
+      { icon:'ti-list', tag:'tip', title:'Warm Up in Order', body:'A reliable pre-round routine: ten chips to a practice hole, ten putts from 6 feet, two easy driver swings. In that order, always. Starting with the short game sets the right tempo for everything that follows.' },
+    ],
+  };
+
+  function renderDailyBrief(who) {
+    const el = document.getElementById('daily-brief-' + who);
+    if (!el) return;
+    const tips = DAILY_TIPS[who];
+    if (!tips?.length) return;
+
+    // Date-seed: picks 2 different tips that change daily
+    const seed = Math.floor(Date.now() / 86400000);
+    const i1   = seed % tips.length;
+    const i2   = (seed + Math.floor(tips.length * 0.6)) % tips.length;
+    const picks = i1 === i2 ? [tips[i1]] : [tips[i1], tips[i2]];
+
+    el.innerHTML = `
+      <div class="daily-brief">
+        <div class="daily-brief-label">Today</div>
+        ${picks.map(t => `
+          <div class="brief-card">
+            <div class="brief-card-top">
+              <i class="ti ${t.icon} brief-card-icon"></i>
+              <div class="brief-card-title">${t.title}</div>
+            </div>
+            <div class="brief-card-body">${t.body}</div>
+            <div class="brief-card-tag">${t.tag}</div>
+          </div>`).join('')}
+      </div>`;
+  }
+
   // ── CADDIE — swap this URL after deploying the Cloudflare Worker ──────────
   // Deploy: cd caddie-worker && wrangler secret put ANTHROPIC_API_KEY && wrangler deploy
   // Then replace the URL below with your workers.dev URL (or caddie.spinvibes.com)
@@ -884,8 +1035,9 @@
       loadRangeFocus();
       renderRangeAiTip();
     }
-    if (id === 'home' && currentProfile === 'dad') {
-      loadMemoriesGallery();
+    if (id === 'home') {
+      renderDailyBrief(currentProfile);
+      if (currentProfile === 'dad') loadMemoriesGallery();
     }
     if (id === 'mom-progress') {
       if (sessionStorage.getItem('sv-mom-unlocked') !== '1') {
@@ -1120,6 +1272,9 @@
 
   // Load best round for home hero — non-blocking, silent on failure
   loadDadBestRoundFromSupabase();
+
+  // Render daily brief on initial load
+  renderDailyBrief(currentProfile);
 
 
   // ── CLUB SYSTEM — defined at top of file (see line ~20) ──────
