@@ -11673,7 +11673,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     // Upload hole photos to Supabase Storage before saving
     const roundId   = crypto.randomUUID();
-    const hasPhotos = _famHoles.some(h => h.photo && !h.photo.startsWith('http'));
+    const hasPhotos = _famHoles.some(h =>
+      (h.photos?.length ? h.photos : (h.photo ? [h.photo] : [])).some(p => p && !p.startsWith('http'))
+    );
     if (hasPhotos) {
       btn.textContent = 'Uploading photos...';
       await uploadRoundPhotos(roundId);
@@ -11692,7 +11694,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const total    = totals[pk];
       const holeData = _famHoles.map(h => ({
         hole: h.hole, par: h.par, score: h.scores[pk] || 0,
-        photo_url: (h.photo && _hasPhoto(h.photo)) ? h.photo : null,
+        photo_url: _hasPhoto(h.photos?.[0]) ? h.photos[0] : (_hasPhoto(h.photo) ? h.photo : null),
       }));
       const roundObj = {
         date_played:  _famRound.date_played,
