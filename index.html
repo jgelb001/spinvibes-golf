@@ -287,6 +287,12 @@
     .card-body  { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
     .card-body strong { color: var(--cream); }
 
+    /* CADDIE QUICK-TAPS */
+    .caddie-chip { background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:6px 12px; font-size:0.76rem; font-weight:600; color:var(--muted); cursor:pointer; white-space:nowrap; touch-action:manipulation; font-family:inherit; transition:background 0.15s, color 0.15s; }
+    .caddie-chip:active { background:rgba(201,168,76,0.15); color:var(--gold); border-color:rgba(201,168,76,0.4); }
+    .caddie-yardage-chip { background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); border-radius:20px; padding:6px 14px; font-size:0.78rem; font-weight:700; color:var(--gold); cursor:pointer; white-space:nowrap; touch-action:manipulation; font-family:inherit; }
+    .caddie-yardage-chip:active { background:rgba(201,168,76,0.25); }
+
     /* DAILY BRIEF */
     .daily-brief { margin: 0 0 20px; }
     .daily-brief-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; opacity: 0.8; }
@@ -4182,11 +4188,27 @@
 
         <!-- Chat -->
         <div class="section">
-          <div id="caddie-messages" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;max-height:55vh;overflow-y:auto;padding-right:2px;"></div>
+          <div id="caddie-messages" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;max-height:45vh;overflow-y:auto;padding-right:2px;"></div>
+
+          <!-- Quick-tap chips -->
+          <div style="margin-bottom:10px;">
+            <div id="caddie-yardage-chips" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;"></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+              <button class="caddie-chip" onclick="caddieQuickTap('Wind into my face — how many extra yards?')">🌬 Into wind</button>
+              <button class="caddie-chip" onclick="caddieQuickTap('Downwind — do I club down?')">💨 Downwind</button>
+              <button class="caddie-chip" onclick="caddieQuickTap('Lay up or go for it?')">🤔 Lay up or go?</button>
+              <button class="caddie-chip" onclick="caddieQuickTap('I\'m short-sided — what\'s the smartest play from here?')">📍 Short-sided</button>
+              <button class="caddie-chip" onclick="caddieQuickTap('I\'m in a bunker — any tips for getting out clean?')">🏖 Bunker</button>
+              <button class="caddie-chip" onclick="caddieQuickTap('Heavy rough — should I club up?')">🌿 Thick rough</button>
+              <button class="caddie-chip" onclick="caddieQuickTap('Par 3 — any strategy notes?')">🎯 Par 3</button>
+              <button class="caddie-chip" onclick="caddieQuickTap('Remind me of my miss tendency and what to do about it.')">↩ My miss</button>
+            </div>
+          </div>
+
           <div style="display:flex;gap:8px;align-items:flex-end;">
             <textarea id="caddie-input"
               style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--cream);font-size:0.9rem;padding:10px 14px;resize:none;font-family:inherit;line-height:1.5;overflow-y:auto;"
-              placeholder="e.g. 'About 140 out, into the wind'" rows="2"
+              placeholder="e.g. '140 out, into the wind'" rows="2"
               onkeydown="caddieInputKeydown(event)"></textarea>
             <button id="caddie-mic-btn" onclick="toggleCaddieMic()"
               style="flex-shrink:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;width:44px;height:44px;color:var(--muted);font-size:1.1rem;cursor:pointer;align-self:flex-end;display:flex;align-items:center;justify-content:center;"><i class="ti ti-microphone"></i></button>
@@ -5934,6 +5956,7 @@
         return;
       }
       renderCaddieMessages(false);
+      renderCaddieYardageChips();
     }
     if (id === 'girl-progress') {
       if (sessionStorage.getItem('sv-girl-unlocked') !== '1') {
@@ -9849,6 +9872,27 @@ PLAYER YARDAGE CARDS:
 ${activePlayers}
 
 RULES: Always state which player you are advising. Use ONLY that player's yardage card — never mix up players' distances. Show distance math inline (e.g. "7-iron. 130-140 fits the 135 yd gap."). Name the club. One sentence strategy. 3 sentences max. If the user doesn't say who they're asking for, ask. If a player's distances are unknown, ask before recommending.`;
+  }
+
+  function renderCaddieYardageChips() {
+    const el = document.getElementById('caddie-yardage-chips');
+    if (!el) return;
+    // Build yardage chips from active clubs, skipping driver, sorted by distance asc
+    const clubs = getActiveClubs()
+      .filter(c => c.name !== 'Driver')
+      .sort((a, b) => a.dist - b.dist);
+    // Pick ~7 evenly spaced distances as tap targets
+    const step = Math.max(1, Math.floor(clubs.length / 7));
+    const picks = clubs.filter((_, i) => i % step === 0).slice(0, 8);
+    el.innerHTML = picks.map(c =>
+      `<button class="caddie-yardage-chip" onclick="caddieQuickTap('I\\'m ${c.dist} yards out — what\\'s the play?')">${c.dist}y</button>`
+    ).join('');
+  }
+
+  function caddieQuickTap(msg) {
+    const input = document.getElementById('caddie-input');
+    if (input) { input.value = msg; }
+    sendCaddieMessage();
   }
 
   function caddieInputKeydown(e) {

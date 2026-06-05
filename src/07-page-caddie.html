@@ -13,11 +13,27 @@
 
         <!-- Chat -->
         <div class="section">
-          <div id="caddie-messages" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;max-height:55vh;overflow-y:auto;padding-right:2px;"></div>
+          <div id="caddie-messages" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;max-height:45vh;overflow-y:auto;padding-right:2px;"></div>
+
+          <!-- Quick-tap chips -->
+          <div style="margin-bottom:10px;">
+            <div id="caddie-yardage-chips" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;"></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+              <button class="caddie-chip" onclick="caddieQuickTap('Wind into my face — how many extra yards?')">🌬 Into wind</button>
+              <button class="caddie-chip" onclick="caddieQuickTap('Downwind — do I club down?')">💨 Downwind</button>
+              <button class="caddie-chip" onclick="caddieQuickTap('Lay up or go for it?')">🤔 Lay up or go?</button>
+              <button class="caddie-chip" onclick="caddieQuickTap('I\'m short-sided — what\'s the smartest play from here?')">📍 Short-sided</button>
+              <button class="caddie-chip" onclick="caddieQuickTap('I\'m in a bunker — any tips for getting out clean?')">🏖 Bunker</button>
+              <button class="caddie-chip" onclick="caddieQuickTap('Heavy rough — should I club up?')">🌿 Thick rough</button>
+              <button class="caddie-chip" onclick="caddieQuickTap('Par 3 — any strategy notes?')">🎯 Par 3</button>
+              <button class="caddie-chip" onclick="caddieQuickTap('Remind me of my miss tendency and what to do about it.')">↩ My miss</button>
+            </div>
+          </div>
+
           <div style="display:flex;gap:8px;align-items:flex-end;">
             <textarea id="caddie-input"
               style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--cream);font-size:0.9rem;padding:10px 14px;resize:none;font-family:inherit;line-height:1.5;overflow-y:auto;"
-              placeholder="e.g. 'About 140 out, into the wind'" rows="2"
+              placeholder="e.g. '140 out, into the wind'" rows="2"
               onkeydown="caddieInputKeydown(event)"></textarea>
             <button id="caddie-mic-btn" onclick="toggleCaddieMic()"
               style="flex-shrink:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;width:44px;height:44px;color:var(--muted);font-size:1.1rem;cursor:pointer;align-self:flex-end;display:flex;align-items:center;justify-content:center;"><i class="ti ti-microphone"></i></button>
