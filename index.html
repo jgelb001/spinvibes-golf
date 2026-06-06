@@ -13,6 +13,7 @@
   <title>SpinVibes Golf</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/light/style.css">
   <script>
     // Runs before body renders — only restore profile if same browser session
     // sessionStorage clears when tab is closed, so fresh tabs always show landing
@@ -47,16 +48,17 @@
       --bg:        #ffffff;
       --surface:   #f8f9fa;
       --surface2:  #f0f0f0;
-      --surface3:  #e5e5e5;
-      --green:     #1a5c2e;
-      --green-b:   #2d7a40;
-      --gold:      #8a6010;
-      --gold-l:    #6b4a0c;
-      --cream:     #0f172a;
+      --surface3:  #e8e8e8;
+      --green:     #3DAA6B;
+      --green-b:   #2A9060;
+      --green-dark:#0D1F12;
+      --gold:      #D4A843;
+      --gold-l:    #b8922e;
+      --cream:     #0D1F12;
       --muted:     #64748b;
       --border:    rgba(0,0,0,0.08);
       --red:       #c0392b;
-      --nav-h:     44px;
+      --nav-h:     52px;
       --safe-b:    env(safe-area-inset-bottom, 0px);
     }
 
@@ -86,25 +88,27 @@
     /* ── TOP BAR ── */
     #topbar {
       flex-shrink: 0;
-      background: var(--surface);
-      border-bottom: 0.5px solid var(--border);
-      padding: 8px 20px 8px;
+      background: #0D1F12;
+      border-bottom: none;
+      padding: 8px 18px 8px;
       padding-top: calc(10px + env(safe-area-inset-top, 0px));
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
     }
     .topbar-logo {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.5rem;
-      letter-spacing: 2px;
-      color: var(--cream);
+      font-size: 1.35rem;
+      letter-spacing: 3px;
+      color: #D4A843;
       line-height: 1;
+      white-space: nowrap;
     }
-    .topbar-logo span { color: var(--gold); }
+    .topbar-logo span { color: rgba(255,255,255,0.5); }
     .topbar-sub {
-      font-size: 0.7rem;
-      color: var(--muted);
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.4);
       letter-spacing: 1px;
       text-transform: uppercase;
       margin-top: 1px;
@@ -146,15 +150,15 @@
       right: 0;
       z-index: 100;
       height: var(--nav-h);
-      background: var(--surface);
-      border-top: 0.5px solid var(--border);
+      background: #ffffff;
+      border-top: 0.5px solid #e8e8e8;
       display: flex;
       padding-bottom: env(safe-area-inset-bottom, 0px);
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;  /* Firefox */
+      scrollbar-width: none;
     }
-    #nav::-webkit-scrollbar { display: none; }  /* Chrome/Safari */
+    #nav::-webkit-scrollbar { display: none; }
     .nav-btn {
       flex: 1 1 0;
       min-width: 0;
@@ -165,47 +169,38 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 3px;
       border: none;
+      border-top: 2px solid transparent;
       background: none;
-      color: var(--muted);
+      color: #9ca3af;
       font-family: 'Outfit', sans-serif;
-      font-size: 0.5rem;
-      font-weight: 500;
-      letter-spacing: 0.5px;
+      font-size: 0.48rem;
+      font-weight: 700;
+      letter-spacing: 1px;
       text-transform: uppercase;
       cursor: pointer;
-      transition: color 0.15s;
-      padding-top: 6px;
+      transition: color 0.15s, border-color 0.15s;
     }
-    .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    /* Active nav: pill background + accent color */
+    .nav-btn i { font-size: 20px; line-height: 1; }
+    .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    /* Active nav: 2px underline at top, dark green, no pill */
     .nav-btn.active {
-      color: var(--green);
-      background: rgba(26,92,46,0.08);
-      border-radius: 10px;
+      color: #0D1F12;
+      background: none;
+      border-radius: 0;
+      border-top-color: #0D1F12;
     }
-    .nav-btn.active svg { stroke: var(--green); }
-    /* Profile-specific active nav color + pill tint */
-    body.son-mode     .nav-btn.active { color: #3B7CB8; background: rgba(59,124,184,0.1); }
-    body.son-mode     .nav-btn.active svg { stroke: #3B7CB8; }
-    body.girl-mode    .nav-btn.active { color: #B85490; background: rgba(184,84,144,0.1); }
-    body.girl-mode    .nav-btn.active svg { stroke: #B85490; }
-    body.mom-mode     .nav-btn.active { color: #B86530; background: rgba(184,101,48,0.1); }
-    body.mom-mode     .nav-btn.active svg { stroke: #B86530; }
-    body.grandma-mode .nav-btn.active { color: #9A8050; background: rgba(154,128,80,0.1); }
-    body.grandma-mode .nav-btn.active svg { stroke: #9A8050; }
-    /* Dark mode */
-    body.dark-mode .nav-btn.active,
-    body.dark-mode.son-mode .nav-btn.active,
-    body.dark-mode.girl-mode .nav-btn.active,
-    body.dark-mode.mom-mode .nav-btn.active,
-    body.dark-mode.grandma-mode .nav-btn.active { color: var(--gold); background: rgba(201,168,76,0.12); }
-    body.dark-mode .nav-btn.active svg,
-    body.dark-mode.son-mode .nav-btn.active svg,
-    body.dark-mode.girl-mode .nav-btn.active svg,
-    body.dark-mode.mom-mode .nav-btn.active svg,
-    body.dark-mode.grandma-mode .nav-btn.active svg { stroke: var(--gold); }
+    .nav-btn.active svg { stroke: #0D1F12; }
+    /* Profile-specific active underline */
+    body.son-mode     .nav-btn.active { color: #378ADD; border-top-color: #378ADD; }
+    body.son-mode     .nav-btn.active svg { stroke: #378ADD; }
+    body.girl-mode    .nav-btn.active { color: #D4537E; border-top-color: #D4537E; }
+    body.girl-mode    .nav-btn.active svg { stroke: #D4537E; }
+    body.mom-mode     .nav-btn.active { color: #7F77DD; border-top-color: #7F77DD; }
+    body.mom-mode     .nav-btn.active svg { stroke: #7F77DD; }
+    body.grandma-mode .nav-btn.active { color: #1D9E75; border-top-color: #1D9E75; }
+    body.grandma-mode .nav-btn.active svg { stroke: #1D9E75; }
 
     /* ── SHARED COMPONENTS ── */
     .page-header {
@@ -295,8 +290,8 @@
 
     /* DAILY BRIEF */
     .daily-brief { margin: 0 0 20px; }
-    .daily-brief-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; opacity: 0.8; }
-    .brief-card { border-left: 3px solid var(--gold); background: var(--surface2); border-radius: 0 12px 12px 0; padding: 14px 14px 14px 16px; margin-bottom: 10px; }
+    .daily-brief-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #3DAA6B; margin-bottom: 8px; opacity: 0.9; }
+    .brief-card { border-left: 3px solid #3DAA6B; background: var(--surface2); border-radius: 0 12px 12px 0; padding: 14px 14px 14px 16px; margin-bottom: 10px; }
     .brief-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
     .brief-card-icon { font-size: 1rem; color: var(--gold); flex-shrink: 0; }
     .brief-card-title { font-weight: 700; font-size: 0.9rem; color: var(--cream); }
@@ -322,7 +317,7 @@
     .pill:active { opacity: 0.7; }
 
     .cue-box {
-      background: rgba(138,96,16,0.07);
+      background: rgba(212,168,67,0.07);
       border-left: 3px solid var(--gold);
       border-radius: 0 8px 8px 0;
       padding: 8px 12px;
@@ -377,23 +372,17 @@
     /* ── HOME PAGE ── */
     /* Default hero (Dad — gold) */
     .home-hero {
-      background: #f5f1e8;
+      background: #FEFAF0;
       padding: 28px 20px 24px;
-      border-bottom: 2.5px solid #8a6010;
+      border-bottom: 2px solid #D4A843;
       position: relative;
       overflow: hidden;
     }
     /* Profile-specific hero tints */
-    body.son-mode     .home-hero { background: #EBF0F5; border-bottom-color: #3B7CB8; }
-    body.girl-mode    .home-hero { background: #F5EBF2; border-bottom-color: #B85490; }
-    body.mom-mode     .home-hero { background: #F5EDE8; border-bottom-color: #B86530; }
-    body.grandma-mode .home-hero { background: #EEECE8; border-bottom-color: #9A8050; }
-    /* Dark mode hero overrides */
-    body.dark-mode              .home-hero { background: linear-gradient(160deg, #0f2a16 0%, var(--bg) 100%); border-bottom-color: rgba(201,168,76,0.3); }
-    body.dark-mode.son-mode     .home-hero { background: linear-gradient(160deg, #0d2a5e 0%, var(--bg) 100%); }
-    body.dark-mode.girl-mode    .home-hero { background: linear-gradient(160deg, #2d0a3d 0%, var(--bg) 100%); }
-    body.dark-mode.mom-mode     .home-hero { background: linear-gradient(160deg, #2f1811 0%, var(--bg) 100%); }
-    body.dark-mode.grandma-mode .home-hero { background: linear-gradient(160deg, #1e0840 0%, var(--bg) 100%); }
+    body.son-mode     .home-hero { background: #EDF4FF; border-bottom-color: #378ADD; }
+    body.girl-mode    .home-hero { background: #FDF0F5; border-bottom-color: #D4537E; }
+    body.mom-mode     .home-hero { background: #F5F3FF; border-bottom-color: #7F77DD; }
+    body.grandma-mode .home-hero { background: #EFFAF5; border-bottom-color: #1D9E75; }
 
     .home-greeting {
       font-family: 'Bebas Neue', sans-serif;
@@ -401,13 +390,12 @@
       letter-spacing: 3px;
       text-transform: uppercase;
       margin-bottom: 6px;
-      /* Color set per profile below */
       color: var(--gold);
     }
-    body.son-mode     .home-greeting { color: #3B7CB8; }
-    body.girl-mode    .home-greeting { color: #B85490; }
-    body.mom-mode     .home-greeting { color: #B86530; }
-    body.grandma-mode .home-greeting { color: #9A8050; }
+    body.son-mode     .home-greeting { color: #378ADD; }
+    body.girl-mode    .home-greeting { color: #D4537E; }
+    body.mom-mode     .home-greeting { color: #7F77DD; }
+    body.grandma-mode .home-greeting { color: #1D9E75; }
 
     .home-title {
       font-family: 'Bebas Neue', sans-serif;
@@ -419,12 +407,12 @@
     .home-title span { color: var(--gold); }
     .home-goal {
       margin-top: 12px;
-      background: rgba(138,96,16,0.08);
-      border: 0.5px solid rgba(138,96,16,0.3);
+      background: rgba(212,168,67,0.1);
+      border: 0.5px solid rgba(212,168,67,0.3);
       border-radius: 10px;
       padding: 10px 14px;
       font-size: 0.83rem;
-      color: var(--gold-l);
+      color: var(--cream);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -662,8 +650,8 @@
       text-transform: uppercase;
     }
     .sss-rule {
-      background: rgba(138,96,16,0.07);
-      border: 0.5px solid rgba(138,96,16,0.3);
+      background: rgba(212,168,67,0.07);
+      border: 0.5px solid rgba(212,168,67,0.3);
       border-radius: 10px;
       padding: 14px 16px;
       text-align: center;
@@ -684,18 +672,18 @@
     /* ── MODE TOGGLE BUTTON ── */
     #modeToggle {
       background: none;
-      border: 1px solid rgba(138,96,16,0.35);
+      border: 1px solid rgba(255,255,255,0.2);
       border-radius: 20px;
       padding: 5px 10px;
       cursor: pointer;
       font-size: 0.95rem;
       line-height: 1;
-      color: var(--muted);
+      color: rgba(255,255,255,0.55);
       transition: border-color 0.2s, background 0.2s;
       display: flex;
       align-items: center;
       gap: 5px;
-      margin-right: 8px;
+      margin-right: 4px;
     }
     #modeToggle:active { opacity: 0.7; }
 
@@ -711,7 +699,7 @@
       letter-spacing:0.5px; text-transform:uppercase;
       min-height: 44px;
     }
-    .exp-trigger:active { background: rgba(138,96,16,0.15); }
+    .exp-trigger:active { background: rgba(212,168,67,0.15); }
     .exp-trigger svg { width:13px; height:13px; stroke:var(--gold); fill:none; stroke-width:2.5; transition:transform 0.25s; flex-shrink:0; }
     .exp-trigger.open svg { transform:rotate(180deg); }
     .exp-body { max-height:0; overflow:hidden; transition:max-height 0.45s ease; }
@@ -741,11 +729,7 @@
     body.dark-mode .diagram { background:rgba(255,255,255,0.04); }
     body.dark-mode .exp-mistake { background:rgba(214,79,58,0.12); }
 
-    /* Profile-specific topbar logo accents */
-    body.son-mode     .topbar-logo span { color: #3B7CB8; }
-    body.girl-mode    .topbar-logo span { color: #B85490; }
-    body.mom-mode     .topbar-logo span { color: #B86530; }
-    body.grandma-mode .topbar-logo span { color: #9A8050; }
+    /* Topbar logo always gold on dark green — no profile overrides */
 
     /* ── GIRL SECTION ── */
     .dad-sect, .son-sect, .girl-sect { width: 100%; }
@@ -777,34 +761,41 @@
 
     /* .landing-card-girl dark block removed — replaced below with light palette */
 
-    /* ── PROFILE SWITCHER ── */
+    /* ── PROFILE SWITCHER ── avatar circles on dark topbar */
     #profileSwitch {
       display: flex;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 3px;
-      gap: 2px;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: none;
+      padding: 0;
     }
     .profile-pill {
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.72rem;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
       font-weight: 700;
-      letter-spacing: 0.5px;
-      border: none;
-      background: none;
-      color: var(--muted);
-      padding: 4px 12px;
-      border-radius: 16px;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-      white-space: nowrap;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      touch-action: manipulation;
+      opacity: 0.5;
+      -webkit-tap-highlight-color: transparent;
     }
     .profile-pill.active {
-      background: var(--gold);
-      color: #000;
+      opacity: 1;
+      transform: scale(1.18);
+      box-shadow: 0 0 0 2.5px rgba(255,255,255,0.65);
     }
-    .profile-pill:not(.active):active { opacity: 0.7; }
+    .profile-pill:not(.active):active { opacity: 0.75; transform: scale(0.95); }
+    /* Per-profile circle colors */
+    #btnDad     { background: #D4A843; color: #0D1F12; }
+    #btnMom     { background: #7F77DD; color: #fff; }
+    #btnSon     { background: #378ADD; color: #fff; }
+    #btnGirl    { background: #D4537E; color: #fff; }
+    #btnGrandma { background: #1D9E75; color: #fff; }
 
     /* ── PROFILE SECTIONS ── */
     .dad-sect, .son-sect, .girl-sect { width: 100%; }
@@ -901,8 +892,8 @@
     }
     .landing-card:active { transform: scale(0.97); }
     .landing-card-dad {
-      background: #f5f1e8;
-      border-color: #8a6010;
+      background: #FEFAF0;
+      border-color: #D4A843;
     }
     /* Family grid cards — uniform base, accent border + name only */
     .landing-card-son,
@@ -912,15 +903,15 @@
       background: var(--surface);
       box-shadow: none;
     }
-    .landing-card-son      { border-color: #3B7CB8; }
-    .landing-card-son      .landing-card-name-sm { color: #3B7CB8; }
-    .landing-card-girl     { border-color: #B85490; }
-    .landing-card-girl     .landing-card-name-sm { color: #B85490; }
-    .landing-card-girl     .landing-card-name    { color: #B85490; }
-    .landing-card-mom      { border-color: #B86530; }  /* copper — clearly different from dad's gold */
-    .landing-card-mom      .landing-card-name-sm { color: #B86530; }
-    .landing-card-grandma  { border-color: #9A8050; }
-    .landing-card-grandma  .landing-card-name-sm { color: #9A8050; }
+    .landing-card-son      { border-color: #378ADD; }
+    .landing-card-son      .landing-card-name-sm { color: #378ADD; }
+    .landing-card-girl     { border-color: #D4537E; }
+    .landing-card-girl     .landing-card-name-sm { color: #D4537E; }
+    .landing-card-girl     .landing-card-name    { color: #D4537E; }
+    .landing-card-mom      { border-color: #7F77DD; }
+    .landing-card-mom      .landing-card-name-sm { color: #7F77DD; }
+    .landing-card-grandma  { border-color: #1D9E75; }
+    .landing-card-grandma  .landing-card-name-sm { color: #1D9E75; }
     /* Hover: subtle lift only — no glow */
     .landing-card-son:hover,
     .landing-card-girl:hover,
@@ -929,7 +920,7 @@
     .landing-avatar {
       width: 44px; height: 44px;
       border-radius: 50%;
-      background: rgba(138,96,16,0.12);
+      background: rgba(212,168,67,0.12);
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
@@ -941,7 +932,7 @@
       line-height: 1;
       margin-bottom: 4px;
     }
-    .landing-card-dad .landing-card-name { color: #8a6010; }
+    .landing-card-dad .landing-card-name { color: #D4A843; }
     .landing-card-desc {
       font-size: 0.72rem;
       letter-spacing: 1.5px;
@@ -983,8 +974,8 @@
       text-transform: uppercase;
       font-weight: 700;
       color: var(--gold);
-      background: rgba(138,96,16,0.12);
-      border: 1px solid rgba(138,96,16,0.3);
+      background: rgba(212,168,67,0.12);
+      border: 1px solid rgba(212,168,67,0.3);
       border-radius: 20px;
       padding: 3px 8px;
       white-space: nowrap;
@@ -1079,8 +1070,7 @@
     }
 
     /* ── LANDING CARD GRANDMA ── */
-    .landing-card-grandma .landing-card-name { color: #9A8050; }
-    .landing-card-grandma .landing-card-desc { color: #6a5a40; }
+    .landing-card-grandma .landing-card-name { color: #1D9E75; }
 
 
     /* ── MOM SECTION ── */
@@ -1161,12 +1151,7 @@
         justify-content: center;
         gap: 0;
       }
-      /* Compact profile pills on small screens */
-      .profile-pill {
-        font-size: 0.58rem;
-        padding: 4px 5px;
-        letter-spacing: 0;
-      }
+      /* Avatar circles already compact on small screens — no override needed */
 
       /* Nav scrolls horizontally — all tabs visible, no hiding needed */
     }
@@ -1213,7 +1198,6 @@
       .topbar-logo { white-space: nowrap; font-size: 1.2rem; }
       .topbar-sub { display: none; }
       #offlineBadge { display: none; }
-      .profile-pill { font-size: 0.62rem; padding: 4px 7px; }
 
       /* Cards — slightly more padding */
       .card { padding: 16px 18px; }
@@ -1253,7 +1237,6 @@
       .topbar-logo { font-size: 1.4rem; }
       .topbar-sub { display: none; }
       #offlineBadge { display: none; }
-      .profile-pill { font-size: 0.68rem; padding: 5px 10px; }
 
       /* Pages area — second row, fills remaining height */
       #pages {
@@ -1270,7 +1253,7 @@
         width: 180px;
         height: calc(100dvh - var(--desktop-topbar-h));
         border-top: none;
-        border-right: 1px solid rgba(138,96,16,0.15);
+        border-right: 1px solid rgba(212,168,67,0.15);
         padding: 12px 8px 24px;
         padding-bottom: 24px; /* no safe-area needed on desktop */
         overflow-y: auto;
@@ -1447,7 +1430,7 @@
       user-select: none;
       -webkit-user-select: none;
     }
-    .stepper-btn:active  { background: rgba(138,96,16,0.25); transform: scale(0.92); }
+    .stepper-btn:active  { background: rgba(212,168,67,0.25); transform: scale(0.92); }
     .stepper-btn:disabled { opacity: 0.3; pointer-events: none; }
     .score-val {
       font-family: 'Bebas Neue', sans-serif;
@@ -1499,8 +1482,8 @@
       border-radius: 10px;
       line-height: 1.1;
     }
-    .round-badge.green { background: rgba(26,92,46,0.1); color: #1a5c2e; }
-    .round-badge.gold  { background: rgba(138,96,16,0.2);  color: var(--gold); }
+    .round-badge.green { background: rgba(61,170,107,0.1); color: #3DAA6B; }
+    .round-badge.gold  { background: rgba(212,168,67,0.2);  color: var(--gold); }
     .round-badge.red   { background: rgba(214,79,58,0.2);   color: #f87171; }
     .round-card-expand { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; padding: 0 16px; }
     .round-card-expand.open { max-height: 800px; padding: 0 16px 14px; }
@@ -1599,8 +1582,8 @@
 
     /* Score summary card */
     .score-summary-card {
-      background: linear-gradient(135deg, rgba(138,96,16,0.12), rgba(26,92,46,0.05));
-      border: 1px solid rgba(138,96,16,0.3);
+      background: linear-gradient(135deg, rgba(212,168,67,0.12), rgba(61,170,107,0.05));
+      border: 1px solid rgba(212,168,67,0.3);
       border-radius: 14px;
       padding: 20px;
       text-align: center;
@@ -1617,7 +1600,7 @@
 
     /* Interactive pill selectors (modal: tee, fairway, GIR) */
     .pill.active {
-      background: rgba(138,96,16,0.2);
+      background: rgba(212,168,67,0.2);
       border-color: var(--gold);
       color: var(--gold);
     }
@@ -1636,7 +1619,7 @@
     /* ── LIVE GPS SCORECARD ── */
     .live-distance-card {
       background: var(--surface2);
-      border: 1px solid rgba(138,96,16,0.25);
+      border: 1px solid rgba(212,168,67,0.25);
       border-radius: 14px; padding: 16px 14px 12px; margin-bottom: 14px;
     }
     .live-yards {
@@ -1651,13 +1634,13 @@
     }
     .yardage-pill.sv-active { background: var(--gold); color: var(--bg); border-color: var(--gold); }
     .mark-ball-btn {
-      background: var(--surface3); border: 1px solid rgba(138,96,16,0.3);
+      background: var(--surface3); border: 1px solid rgba(212,168,67,0.3);
       border-radius: 10px; padding: 10px 12px; color: var(--gold-l);
       font-size: 0.82rem; font-weight: 600; cursor: pointer;
       white-space: nowrap; flex-shrink: 0; transition: all 0.15s;
     }
     .mark-ball-btn.marked {
-      background: rgba(26,92,46,0.1); border-color: var(--green-b); color: var(--green);
+      background: rgba(61,170,107,0.1); border-color: var(--green-b); color: var(--green);
     }
     .live-club-card {
       background: var(--surface2);
@@ -1679,10 +1662,10 @@
       user-select: none; -webkit-user-select: none;
     }
     .club-chip.used {
-      background: rgba(26,92,46,0.1); border-color: var(--green); color: var(--green);
+      background: rgba(61,170,107,0.1); border-color: var(--green); color: var(--green);
     }
     .club-chip.suggested {
-      border-color: var(--gold); color: var(--gold-l); background: rgba(138,96,16,0.07);
+      border-color: var(--gold); color: var(--gold-l); background: rgba(212,168,67,0.07);
     }
     .gps-dot {
       display: inline-block; width: 7px; height: 7px; border-radius: 50%;
@@ -1722,7 +1705,7 @@
       touch-action: manipulation;
     }
     .pin-key:active {
-      background: rgba(138,96,16,0.25);
+      background: rgba(212,168,67,0.25);
       transform: scale(0.92);
     }
     .pin-key-empty {
@@ -1817,7 +1800,7 @@
     .fam-sc-table td:first-child { text-align: left; color: var(--muted); font-size: 0.7rem; }
     .fam-sc-table tr.total-row td {
       background: var(--surface3); font-weight: 700; color: var(--cream);
-      border-top: 1px solid rgba(138,96,16,0.35); font-size: 0.85rem;
+      border-top: 1px solid rgba(212,168,67,0.35); font-size: 0.85rem;
     }
     .fam-sc-table tr.total-row td:first-child { color: var(--gold); }
     /* ── GOLF SCORE CHIPS (industry standard) ──────────────────────
@@ -1834,9 +1817,9 @@
       line-height: 1; position: relative;
     }
     .sc-eagle {
-      color: #8a6010;
-      border: 2px solid #8a6010;
-      outline: 2px solid #8a6010;
+      color: #D4A843;
+      border: 2px solid #D4A843;
+      outline: 2px solid #D4A843;
       outline-offset: 3px;
       border-radius: 50%;
     }
@@ -1868,7 +1851,7 @@
       outline-offset: 2px;
     }
     /* Legacy aliases for family scorecard */
-    .fam-eagle  { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:0.78rem;font-weight:700;color:#8a6010;border:2px solid #8a6010;outline:2px solid #8a6010;outline-offset:2px; }
+    .fam-eagle  { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:0.78rem;font-weight:700;color:#D4A843;border:2px solid #D4A843;outline:2px solid #D4A843;outline-offset:2px; }
     .fam-birdie { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:0.78rem;font-weight:700;color:#1E7A3A;border:2px solid #1E7A3A; }
     .fam-par    { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:0.78rem;font-weight:600;color:var(--muted);border:1px solid var(--border); }
     .fam-bogey  { display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:3px;font-size:0.78rem;font-weight:700;color:#c0392b;border:2px solid #c0392b; }
@@ -2170,7 +2153,7 @@
   <!-- Primary / Owner card -->
   <div class="landing-cards" style="margin-bottom:14px;">
     <div class="landing-card landing-card-dad" onclick="enterProfile('dad')">
-      <div class="landing-avatar"><i class="ti ti-golf" style="font-size:1.6rem;color:#8a6010;"></i></div>
+      <div class="landing-avatar" style="background:#D4A843;"><i class="ti ti-golf" style="font-size:1.6rem;color:#0D1F12;"></i></div>
       <div class="landing-card-info">
         <div class="landing-card-name">Dad</div>
         <div class="landing-card-desc">Lefty · Sub-90 Journey</div>
@@ -2187,7 +2170,7 @@
   <div class="landing-family-grid">
 
     <div class="landing-card landing-card-sm landing-card-son" onclick="enterProfile('son')">
-      <div class="landing-avatar-sm" style="background:#EBF0F5;color:#3B7CB8;">S</div>
+      <div class="landing-avatar-sm" style="background:#378ADD;color:#fff;">S</div>
       <div class="landing-card-info">
         <div class="landing-card-name-sm" style="color:#3B7CB8;">Son</div>
         <div class="landing-card-desc-sm">Righty · Junior</div>
@@ -2196,7 +2179,7 @@
     </div>
 
     <div class="landing-card landing-card-sm landing-card-girl" onclick="enterProfile('girl')">
-      <div class="landing-avatar-sm" style="background:#F5EBF2;color:#B85490;">D</div>
+      <div class="landing-avatar-sm" style="background:#D4537E;color:#fff;">D</div>
       <div class="landing-card-info">
         <div class="landing-card-name-sm" style="color:#B85490;">Daughter</div>
         <div class="landing-card-desc-sm">Lefty · Age 5</div>
@@ -2205,7 +2188,7 @@
     </div>
 
     <div class="landing-card landing-card-sm landing-card-mom" onclick="enterProfile('mom')">
-      <div class="landing-avatar-sm" style="background:#F5EDE8;color:#B86530;">M</div>
+      <div class="landing-avatar-sm" style="background:#7F77DD;color:#fff;">M</div>
       <div class="landing-card-info">
         <div class="landing-card-name-sm" style="color:#B86530;">Mom</div>
         <div class="landing-card-desc-sm">Righty · Beginner</div>
@@ -2214,7 +2197,7 @@
     </div>
 
     <div class="landing-card landing-card-sm landing-card-grandma" onclick="enterProfile('grandma')">
-      <div class="landing-avatar-sm" style="background:#EEECE8;color:#9A8050;">G</div>
+      <div class="landing-avatar-sm" style="background:#1D9E75;color:#fff;">G</div>
       <div class="landing-card-info">
         <div class="landing-card-name-sm" style="color:#9A8050;">Grandma</div>
         <div class="landing-card-desc-sm">Righty · Welcome Back</div>
@@ -2236,11 +2219,11 @@
       <div class="topbar-sub" id="topbarSub">Lefty · Sub-90 Journey</div>
     </div>
     <div id="profileSwitch">
-      <button id="btnDad" class="profile-pill active" onclick="switchProfile('dad')">Dad</button>
-      <button id="btnMom" class="profile-pill" onclick="switchProfile('mom')">Mom</button>
-      <button id="btnSon" class="profile-pill" onclick="switchProfile('son')">Son</button>
-      <button id="btnGirl" class="profile-pill" onclick="switchProfile('girl')">Daughter</button>
-      <button id="btnGrandma" class="profile-pill" onclick="switchProfile('grandma')">Grandma</button>
+      <button id="btnDad" class="profile-pill active" onclick="switchProfile('dad')" title="Dad">D</button>
+      <button id="btnMom" class="profile-pill" onclick="switchProfile('mom')" title="Mom">M</button>
+      <button id="btnSon" class="profile-pill" onclick="switchProfile('son')" title="Son">S</button>
+      <button id="btnGirl" class="profile-pill" onclick="switchProfile('girl')" title="Daughter">D</button>
+      <button id="btnGrandma" class="profile-pill" onclick="switchProfile('grandma')" title="Grandma">G</button>
     </div>
     <div style="display:flex;align-items:center;">
       <button id="modeToggle" onclick="toggleMode()" title="Toggle light/dark mode"><i class="ti ti-moon" style="font-size:1.1rem;"></i></button>
@@ -2269,10 +2252,10 @@
             <div style="font-size:0.75rem;">Lefty beginner · Full bag ✅ May 2026</div>
           </div>
         </div>
-        <div class="home-goal" style="margin-top:8px;border-color:rgba(26,92,46,0.25);background:rgba(26,92,46,0.06);">
-          <div class="home-goal-num" style="color:#1a5c2e;font-size:1.6rem;">&lt;90</div>
+        <div class="home-goal" style="margin-top:8px;border-color:rgba(61,170,107,0.3);background:rgba(61,170,107,0.07);">
+          <div class="home-goal-num" style="color:#3DAA6B;font-size:1.6rem;">&lt;90</div>
           <div>
-            <div style="font-weight:700;color:#1a5c2e;font-size:0.85rem;">Next Target</div>
+            <div style="font-weight:700;color:#3DAA6B;font-size:0.85rem;">Next Target</div>
             <div id="dad-home-best" style="font-size:0.75rem;">Best: loading…</div>
           </div>
         </div>
@@ -2347,8 +2330,8 @@
         </div>
         <!-- Player filter pills -->
         <div id="mem-filter-pills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
-          <div class="pill selected" data-val="all" onclick="memFilterPill(this)" style="background:rgba(138,96,16,0.18);color:var(--gold);border:1px solid rgba(138,96,16,0.3);border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;">All</div>
-          <div class="pill" data-val="dad" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(138,96,16,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">🏌 Dad</div>
+          <div class="pill selected" data-val="all" onclick="memFilterPill(this)" style="background:rgba(212,168,67,0.18);color:var(--gold);border:1px solid rgba(212,168,67,0.3);border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;">All</div>
+          <div class="pill" data-val="dad" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(212,168,67,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">🏌 Dad</div>
           <div class="pill" data-val="son" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(96,165,250,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">⛳ Son</div>
           <div class="pill" data-val="girl" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(244,114,182,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">🌸 Daughter</div>
           <div class="pill" data-val="mom" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(242,200,121,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">🌺 Mom</div>
@@ -2694,7 +2677,7 @@
 
       <!-- TODAY'S FOCUS CARD -->
       <div class="section" id="range-focus-section">
-        <div class="card" style="border-color:rgba(138,96,16,0.4);background:rgba(138,96,16,0.06);">
+        <div class="card" style="border-color:rgba(212,168,67,0.4);background:rgba(212,168,67,0.06);">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
             <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:6px;">
               <i class="ti ti-target" style="font-size:0.9rem;"></i> Today's Focus
@@ -2703,7 +2686,7 @@
           </div>
           <div id="range-focus-display"></div>
           <!-- AI Tip from last round — injected by renderRangeAiTip() -->
-          <div id="range-ai-tip-row" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(138,96,16,0.2);">
+          <div id="range-ai-tip-row" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(212,168,67,0.2);">
             <div style="font-size:0.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">🤖 AI Tip</div>
             <div id="range-ai-tip-text" style="font-size:0.85rem;color:var(--cream);line-height:1.4;"></div>
             <div id="range-ai-tip-date" style="font-size:0.7rem;color:var(--muted);margin-top:3px;"></div>
@@ -2912,7 +2895,7 @@
         <div class="card" style="padding:12px 14px;">
           <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
             <thead>
-              <tr style="border-bottom:1px solid rgba(138,96,16,0.3);">
+              <tr style="border-bottom:1px solid rgba(212,168,67,0.3);">
                 <th style="text-align:left;padding:5px 4px;color:var(--gold-l);font-weight:600;">Club</th>
                 <th style="text-align:center;padding:5px 4px;color:var(--gold-l);font-weight:600;">Distance</th>
                 <th style="text-align:right;padding:5px 4px;color:var(--gold-l);font-weight:600;">Status</th>
@@ -3764,7 +3747,7 @@
             <div class="stat"><div class="stat-num">10</div><div class="stat-lbl">Min Routine</div></div>
             <div class="stat"><div class="stat-num">Sub</div><div class="stat-lbl">90 Won Here</div></div>
           </div>
-          <div class="card" style="border-color:rgba(138,96,16,0.3);background:rgba(138,96,16,0.06);">
+          <div class="card" style="border-color:rgba(212,168,67,0.3);background:rgba(212,168,67,0.06);">
             <div class="card-body" style="text-align:center;font-size:0.85rem;line-height:1.7;">Nearly <strong>43% of all strokes</strong> happen within 50 yards of the hole.<br><strong style="color:var(--gold-l);">Sub-90 is won and lost on the short game.</strong></div>
           </div>
         </div>
@@ -3842,7 +3825,7 @@
 
         <div class="section">
           <div class="section-title">Pre-Round Routine ⏱ 10 min</div>
-          <div class="card" style="border-color:rgba(138,96,16,0.3);">
+          <div class="card" style="border-color:rgba(212,168,67,0.3);">
             <div class="card-body" style="margin-bottom:10px;font-size:0.82rem;color:var(--gold-l);">Do this every single time before a round. Not full swings — short game only. This dials in your touch for <em>this specific green on this specific day.</em></div>
             <div class="check-row"><span>🏌️ <strong>5 putts to the fringe</strong> — no hole. Feel the speed of this green today, not your last round.</span></div>
             <div class="check-row"><span>🎯 <strong>5 × 3-footers</strong> — build confidence, not mechanics. Make them all before moving on.</span></div>
@@ -4078,7 +4061,7 @@
 
         <!-- Resume Round banner — shown by JS when a draft round exists -->
         <div id="dad-resume-banner" style="display:none;" class="section">
-          <button onclick="openDadModal()" style="width:100%;background:rgba(138,96,16,0.15);border:1px solid rgba(138,96,16,0.5);border-radius:12px;padding:14px 18px;color:var(--gold);font-size:0.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;text-align:left;touch-action:manipulation;">
+          <button onclick="openDadModal()" style="width:100%;background:rgba(212,168,67,0.15);border:1px solid rgba(212,168,67,0.5);border-radius:12px;padding:14px 18px;color:var(--gold);font-size:0.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;text-align:left;touch-action:manipulation;">
             <i class="ti ti-player-play" style="font-size:1.3rem;flex-shrink:0;"></i>
             <div>
               <div style="font-size:1rem;font-weight:800;letter-spacing:0.3px;">Resume Round in Progress</div>
@@ -4089,12 +4072,12 @@
 
         <div class="section" style="display:flex;gap:10px;">
           <button class="btn-primary" onclick="openDadModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;"><i class="ti ti-flag-2" style="font-size:1rem;"></i> Start New Round</button>
-          <button onclick="lockDadProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(138,96,16,0.35);border-radius:10px;padding:0 14px;color:var(--gold-l);font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;"><i class="ti ti-lock" style="font-size:1.1rem;"></i></button>
+          <button onclick="lockDadProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(212,168,67,0.35);border-radius:10px;padding:0 14px;color:var(--gold-l);font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;"><i class="ti ti-lock" style="font-size:1.1rem;"></i></button>
         </div>
         <div class="section" style="margin-top:-4px;display:flex;gap:10px;">
           <button onclick="openFamilyModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--cream);font-size:0.9rem;font-weight:600;cursor:pointer;box-shadow:var(--c-shadow);"><i class="ti ti-users" style="font-size:1rem;color:var(--gold);"></i> Family Round</button>
           <button onclick="showPage('caddie')" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--cream);font-size:0.9rem;font-weight:600;cursor:pointer;box-shadow:var(--c-shadow);"><i class="ti ti-message-circle" style="font-size:1rem;color:var(--gold);"></i> Caddie</button>
-          <button onclick="openSettings()" title="Settings" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(138,96,16,0.35);border-radius:10px;padding:0 14px;color:var(--gold-l);font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;"><i class="ti ti-settings" style="font-size:1.1rem;"></i></button>
+          <button onclick="openSettings()" title="Settings" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(212,168,67,0.35);border-radius:10px;padding:0 14px;color:var(--gold-l);font-size:1rem;font-weight:600;cursor:pointer;display:flex;align-items:center;"><i class="ti ti-settings" style="font-size:1.1rem;"></i></button>
         </div>
 
         <div id="dad-stats-bar" style="display:none;" class="section">
@@ -4113,7 +4096,7 @@
             <span style="display:flex;align-items:center;gap:8px;"><i class="ti ti-chess-knight" style="font-size:1rem;opacity:0.8;"></i> Game Plan</span>
             <span class="arrow">▼</span>
           </button>
-          <div style="display:none; background:var(--surface2); border:1px solid rgba(138,96,16,0.2); border-radius:0 0 10px 10px; padding:16px;">
+          <div style="display:none; background:var(--surface2); border:1px solid rgba(212,168,67,0.2); border-radius:0 0 10px 10px; padding:16px;">
 
             <p style="font-size:13px; color:var(--muted); margin:0 0 12px;">Pre-round mental checklist. One thought per shot. Trust the process.</p>
 
@@ -4159,7 +4142,7 @@
 
             <!-- Dad Round Entry Modal -->
       <div id="dad-modal" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);flex-direction:column;padding-top:env(safe-area-inset-top,0px);">
-        <div id="dad-modal-header" style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(138,96,16,0.2);touch-action:none;">
+        <div id="dad-modal-header" style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(212,168,67,0.2);touch-action:none;">
           <div style="display:flex;flex-direction:column;gap:0;">
             <div id="dad-modal-step-label" style="font-family:'Bebas Neue',sans-serif;font-size:2rem;line-height:1;color:var(--gold);">Round Setup</div>
             <div id="dad-modal-hole-sub" style="font-size:0.65rem;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;display:none;"></div>
@@ -4280,9 +4263,9 @@
 
       <div class="section">
         <div class="section-title"><i class="ti ti-ban" style="font-size:0.9rem;vertical-align:-1px;margin-right:6px;"></i>The 3 Rules That Save Shots</div>
-        <div class="card" style="margin-bottom:8px;border-color:rgba(138,96,16,0.4);"><div class="card-body"><strong>1.</strong> Never attempt a shot you haven't practiced. The course is not the place to try something for the first time.</div></div>
-        <div class="card" style="margin-bottom:8px;border-color:rgba(138,96,16,0.4);"><div class="card-body"><strong>2.</strong> Plan your miss before you swing. Know which side of the trouble is the easy side. Aim away from the hole that costs you.</div></div>
-        <div class="card" style="border-color:rgba(138,96,16,0.4);"><div class="card-body"><strong>3.</strong> Breathe on the first tee, last hole, and anything over water. That's where adrenaline eats strokes. Slow down exactly there.</div></div>
+        <div class="card" style="margin-bottom:8px;border-color:rgba(212,168,67,0.4);"><div class="card-body"><strong>1.</strong> Never attempt a shot you haven't practiced. The course is not the place to try something for the first time.</div></div>
+        <div class="card" style="margin-bottom:8px;border-color:rgba(212,168,67,0.4);"><div class="card-body"><strong>2.</strong> Plan your miss before you swing. Know which side of the trouble is the easy side. Aim away from the hole that costs you.</div></div>
+        <div class="card" style="border-color:rgba(212,168,67,0.4);"><div class="card-body"><strong>3.</strong> Breathe on the first tee, last hole, and anything over water. That's where adrenaline eats strokes. Slow down exactly there.</div></div>
       </div>
     </div><!-- /page-strategy -->
 
@@ -4369,7 +4352,7 @@
 
       <!-- Son Round Entry Modal -->
       <div id="son-modal" style="display:none;position:fixed;inset:0;z-index:300;background:var(--bg);overflow-y:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(80px + env(safe-area-inset-bottom,0px));">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(138,96,16,0.2);">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(212,168,67,0.2);">
           <div id="son-modal-step-label" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--gold);">Round Setup</div>
           <div style="display:flex;align-items:center;gap:12px;">
             <div id="son-running-total" style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--cream);display:none;">0</div>
@@ -4883,39 +4866,39 @@
   </div><!-- /settings-overlay -->
   <nav id="nav">
     <button class="nav-btn active" onclick="showPage('home')" id="nav-home">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <i class="ph-light ph-house"></i>
       Home
     </button>
     <button class="nav-btn" onclick="showPage('range')" id="nav-range">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      <i class="ph-light ph-target"></i>
       Range
     </button>
     <button class="nav-btn" onclick="showPage('stretches')" id="nav-stretches">
-      <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 100 10A5 5 0 0012 2zM6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+      <i class="ph-light ph-person-simple-run"></i>
       Stretch
     </button>
     <button class="nav-btn" onclick="showPage('shortgame')" id="nav-shortgame">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="19" r="2"/><path d="M12 17V9"/><path d="M8 13l4-4 4 4"/></svg>
+      <i class="ph-light ph-flag"></i>
       Short Game
     </button>
     <button class="nav-btn dad-sect" onclick="showPage('dad-progress')" id="nav-dad-progress">
-      <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      <i class="ph-light ph-chart-bar"></i>
       My Game
     </button>
     <button class="nav-btn son-sect" onclick="showPage('son-progress')" id="nav-son-progress">
-      <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      <i class="ph-light ph-chart-bar"></i>
       My Game
     </button>
     <button class="nav-btn girl-sect" onclick="showPage('girl-progress')" id="nav-girl-progress">
-      <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      <i class="ph-light ph-chart-bar"></i>
       My Game
     </button>
     <button class="nav-btn mom-sect" onclick="showPage('mom-progress')" id="nav-mom-progress">
-      <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      <i class="ph-light ph-chart-bar"></i>
       My Game
     </button>
     <button class="nav-btn grandma-sect" onclick="showPage('grandma-progress')" id="nav-grandma-progress">
-      <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>
+      <i class="ph-light ph-chart-bar"></i>
       My Game
     </button>
 
@@ -4969,7 +4952,7 @@
     { id:'first_birdie',name:'Birdie!',    desc:'First birdie on any hole',       color:'#1E7A3A',
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.1"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="28" r="18" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.4"/><text x="28" y="33" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="16" fill="{{c}}">−1</text></svg>`,
       check:(rounds)=>rounds.some(r=>{const hs=Array.isArray(r.holes)?r.holes:JSON.parse(r.holes||'[]');return hs.some(h=>(h.score-h.par)===-1);}) },
-    { id:'par_round',   name:'Par Round',  desc:'Shot even par or better',        color:'#8a6010',
+    { id:'par_round',   name:'Par Round',  desc:'Shot even par or better',        color:'#D4A843',
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="48" height="48" rx="8" fill="{{c}}" opacity="0.1"/><rect x="4" y="4" width="48" height="48" rx="8" fill="none" stroke="{{c}}" stroke-width="2.5"/><text x="28" y="24" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="11" fill="{{c}}" opacity="0.7">EVEN</text><text x="28" y="38" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="18" fill="{{c}}">PAR</text></svg>`,
       check:(rounds)=>rounds.some(r=>r.score_vs_par!==undefined?r.score_vs_par<=0:false) },
     { id:'five_rounds', name:'5 Rounds',   desc:'Played 5 rounds',                color:'#7C5CBF',
@@ -4984,7 +4967,7 @@
     { id:'putting_pro', name:'Putt Pro',   desc:'1-putt 3 holes in a round',      color:'#2A7EA8',
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="48" height="48" rx="8" fill="{{c}}" opacity="0.08"/><rect x="4" y="4" width="48" height="48" rx="8" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="28" cy="25" r="9" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="25" r="4" fill="{{c}}" opacity="0.7"/><line x1="16" y1="40" x2="40" y2="40" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/><line x1="28" y1="34" x2="28" y2="40" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/></svg>`,
       check:(rounds)=>rounds.some(r=>{const hs=Array.isArray(r.holes)?r.holes:JSON.parse(r.holes||'[]');return hs.filter(h=>h.putts===1).length>=3;}) },
-    { id:'ten_rounds',  name:'10 Rounds',  desc:'Played 10 rounds',               color:'#8a6010',
+    { id:'ten_rounds',  name:'10 Rounds',  desc:'Played 10 rounds',               color:'#D4A843',
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.15"/><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2.5"/><text x="28" y="34" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="18" fill="{{c}}">10</text></svg>`,
       check:(rounds)=>rounds.length>=10 },
   ];
@@ -5892,15 +5875,15 @@
     const selected = data.items || [];
     chipsEl.innerHTML = _FOCUS_SUGGESTIONS.map(s => {
       const isOn = selected.includes(s);
-      return `<button onclick="toggleFocusChip(this,'${s.replace(/'/g,"\\'")}')" style="padding:5px 10px;border-radius:20px;border:1px solid ${isOn ? 'var(--gold)' : 'rgba(138,96,16,0.3)'};background:${isOn ? 'rgba(138,96,16,0.2)' : 'transparent'};color:${isOn ? 'var(--gold)' : 'var(--muted)'};font-size:0.75rem;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-focus="${s.replace(/"/g,'&quot;')}" data-on="${isOn ? '1' : '0'}">${s}</button>`;
+      return `<button onclick="toggleFocusChip(this,'${s.replace(/'/g,"\\'")}')" style="padding:5px 10px;border-radius:20px;border:1px solid ${isOn ? 'var(--gold)' : 'rgba(212,168,67,0.3)'};background:${isOn ? 'rgba(212,168,67,0.2)' : 'transparent'};color:${isOn ? 'var(--gold)' : 'var(--muted)'};font-size:0.75rem;cursor:pointer;-webkit-tap-highlight-color:transparent;" data-focus="${s.replace(/"/g,'&quot;')}" data-on="${isOn ? '1' : '0'}">${s}</button>`;
     }).join('');
     document.getElementById('range-focus-custom').value = '';
   }
   function toggleFocusChip(btn, text) {
     const isOn = btn.dataset.on === '1';
     btn.dataset.on = isOn ? '0' : '1';
-    btn.style.borderColor = !isOn ? 'var(--gold)' : 'rgba(138,96,16,0.3)';
-    btn.style.background  = !isOn ? 'rgba(138,96,16,0.2)' : 'transparent';
+    btn.style.borderColor = !isOn ? 'var(--gold)' : 'rgba(212,168,67,0.3)';
+    btn.style.background  = !isOn ? 'rgba(212,168,67,0.2)' : 'transparent';
     btn.style.color       = !isOn ? 'var(--gold)' : 'var(--muted)';
   }
   function saveRangeFocus() {
@@ -6956,29 +6939,29 @@
       <div id="dh-photo-wrap" style="margin-bottom:12px;">
         ${h.photo
           ? `<div style="position:relative;">
-              <img src="${h.photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:10px;border:1px solid rgba(138,96,16,0.3);">
+              <img src="${h.photo}" style="width:100%;max-height:140px;object-fit:cover;border-radius:10px;border:1px solid rgba(212,168,67,0.3);">
               <button onclick="_dadHoles[_dadHoleIdx].photo=null;renderDadLiveHole();" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.65);border:none;border-radius:50%;width:26px;height:26px;color:#fff;font-size:0.78rem;cursor:pointer;touch-action:manipulation;">✕</button>
             </div>`
           : `<div style="display:flex;gap:8px;">
               <button onclick="document.getElementById('dh-photo-input').setAttribute('capture','environment');document.getElementById('dh-photo-input').click()"
-                style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:10px;padding:11px;color:var(--muted);font-size:0.82rem;cursor:pointer;touch-action:manipulation;"><i class="ti ti-camera" style="vertical-align:-2px;margin-right:4px;"></i>Camera</button>
+                style="flex:1;background:var(--surface2);border:1px dashed rgba(212,168,67,0.3);border-radius:10px;padding:11px;color:var(--muted);font-size:0.82rem;cursor:pointer;touch-action:manipulation;"><i class="ti ti-camera" style="vertical-align:-2px;margin-right:4px;"></i>Camera</button>
               <button onclick="document.getElementById('dh-photo-input').removeAttribute('capture');document.getElementById('dh-photo-input').click()"
-                style="flex:1;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:10px;padding:11px;color:var(--muted);font-size:0.82rem;cursor:pointer;touch-action:manipulation;"><i class="ti ti-photo" style="vertical-align:-2px;margin-right:4px;"></i>Roll</button>
+                style="flex:1;background:var(--surface2);border:1px dashed rgba(212,168,67,0.3);border-radius:10px;padding:11px;color:var(--muted);font-size:0.82rem;cursor:pointer;touch-action:manipulation;"><i class="ti ti-photo" style="vertical-align:-2px;margin-right:4px;"></i>Roll</button>
             </div>`}
       </div>
 
       <!-- CADDIE PANEL -->
       <div style="margin-bottom:16px;">
         <button onclick="toggleDadLiveCaddie()" id="dad-live-caddie-toggle"
-          style="width:100%;background:var(--surface2);border:1px solid rgba(138,96,16,0.25);border-radius:10px;padding:12px 16px;color:var(--gold-l);font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;">
+          style="width:100%;background:var(--surface2);border:1px solid rgba(212,168,67,0.25);border-radius:10px;padding:12px 16px;color:var(--gold-l);font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;">
           <span><i class="ti ti-message-circle" style="font-size:0.9rem;vertical-align:-1px;margin-right:6px;"></i>Ask Caddie — Hole ${h.hole}, Par ${h.par}</span>
           <span id="dad-live-caddie-caret">${_dadLiveCaddieOpen ? '▲' : '▼'}</span>
         </button>
-        <div id="dad-live-caddie-panel" style="display:${_dadLiveCaddieOpen ? 'block' : 'none'};background:var(--surface);border:1px solid rgba(138,96,16,0.15);border-top:none;border-radius:0 0 10px 10px;padding:12px 14px;">
+        <div id="dad-live-caddie-panel" style="display:${_dadLiveCaddieOpen ? 'block' : 'none'};background:var(--surface);border:1px solid rgba(212,168,67,0.15);border-top:none;border-radius:0 0 10px 10px;padding:12px 14px;">
           <div id="dad-live-caddie-msgs" style="max-height:200px;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;font-size:0.83rem;line-height:1.5;"></div>
           <div style="display:flex;gap:8px;align-items:flex-end;">
             <textarea id="dad-live-caddie-input" rows="2"
-              style="flex:1;background:var(--surface2);border:1px solid rgba(138,96,16,0.25);border-radius:8px;padding:8px 10px;color:var(--cream);font-family:'Outfit',sans-serif;font-size:0.85rem;resize:none;"
+              style="flex:1;background:var(--surface2);border:1px solid rgba(212,168,67,0.25);border-radius:8px;padding:8px 10px;color:var(--cream);font-family:'Outfit',sans-serif;font-size:0.85rem;resize:none;"
               placeholder="How far to the pin? What's your lie?"
               onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDadLiveCaddieMsg();}"></textarea>
             <button onclick="sendDadLiveCaddieMsg()" id="dad-live-caddie-send"
@@ -7096,7 +7079,7 @@
       const wrap = document.getElementById('dh-photo-wrap');
       if (wrap) wrap.innerHTML = `
         <div style="position:relative;">
-          <img src="${dataUrl}" style="width:100%;max-height:140px;object-fit:cover;border-radius:10px;border:1px solid rgba(138,96,16,0.3);">
+          <img src="${dataUrl}" style="width:100%;max-height:140px;object-fit:cover;border-radius:10px;border:1px solid rgba(212,168,67,0.3);">
           <button onclick="_dadHoles[_dadHoleIdx].photo=null;renderDadLiveHole();" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.65);border:none;border-radius:50%;width:26px;height:26px;color:#fff;font-size:0.78rem;cursor:pointer;touch-action:manipulation;">✕</button>
         </div>`;
     };
@@ -7145,7 +7128,7 @@
         const isThru = _dadHoles.indexOf(h) < thru;
         const isCur  = _dadHoles.indexOf(h) === _dadHoleIdx;
         const chip   = isThru ? scoreChip(h.score, h.par) : `<span style="font-size:0.72rem;color:var(--border);font-weight:600;">·</span>`;
-        const cur    = isCur ? `style="background:rgba(138,96,16,0.08);border-radius:4px;"` : '';
+        const cur    = isCur ? `style="background:rgba(212,168,67,0.08);border-radius:4px;"` : '';
         return `<td ${cur} style="text-align:center;padding:4px 2px;">${chip}</td>`;
       }).join('');
 
@@ -7401,9 +7384,9 @@
         <td style="text-align:right;"><span style="color:var(--cream);">${carry}</span> <span style="color:var(--muted);font-size:0.72rem;">yds</span><br>${carryBadge}</td>
       </tr>`;
     }).join('') + `<tr>
-      <td style="padding:6px 4px;border-top:1px solid rgba(138,96,16,0.15);"><strong>Putter</strong><div style="font-size:0.65rem;color:var(--muted);line-height:1.3;margin-top:2px;">Odyssey Ai-ONE #7 · 2×30g weights · Installed Apr 2026</div></td>
-      <td style="text-align:center;border-top:1px solid rgba(138,96,16,0.15);color:var(--muted);">—</td>
-      <td style="text-align:right;border-top:1px solid rgba(138,96,16,0.15);"><span style="font-size:0.68rem;color:var(--muted);">on green only</span></td>
+      <td style="padding:6px 4px;border-top:1px solid rgba(212,168,67,0.15);"><strong>Putter</strong><div style="font-size:0.65rem;color:var(--muted);line-height:1.3;margin-top:2px;">Odyssey Ai-ONE #7 · 2×30g weights · Installed Apr 2026</div></td>
+      <td style="text-align:center;border-top:1px solid rgba(212,168,67,0.15);color:var(--muted);">—</td>
+      <td style="text-align:right;border-top:1px solid rgba(212,168,67,0.15);"><span style="font-size:0.68rem;color:var(--muted);">on green only</span></td>
     </tr>`;
   }
   function updatePinDots(who, count) {
@@ -7731,7 +7714,7 @@
       const sparkBars = sparkRounds.map((r,i) => {
         const pct = 100 - Math.round(((r.total_score - sparkMin) / sparkRange) * 70);
         const isLast = i === sparkRounds.length - 1;
-        return `<div style="flex:1;height:${pct}%;min-height:15%;background:${isLast ? '#8a6010' : 'var(--border)'};border-radius:2px 2px 0 0;"></div>`;
+        return `<div style="flex:1;height:${pct}%;min-height:15%;background:${isLast ? '#D4A843' : 'var(--border)'};border-radius:2px 2px 0 0;"></div>`;
       }).join('');
 
       const deltaColor = scoreDelta === null ? 'var(--muted)' : scoreDelta < 0 ? '#1E7A3A' : scoreDelta > 0 ? '#c0392b' : 'var(--muted)';
@@ -7793,7 +7776,7 @@
     const dadBadgesHtml = scoredRounds.length >= 1 ? `
       <div class="section" style="padding-top:4px;padding-bottom:4px;">
         <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:var(--gold);margin-bottom:8px;">ACHIEVEMENTS</div>
-        ${renderBadges(scoredRounds, '#8a6010')}
+        ${renderBadges(scoredRounds, '#D4A843')}
       </div>` : '';
 
     // Legacy hardcoded cards removed — all rounds now loaded from Supabase
@@ -7848,7 +7831,7 @@
             ${ref.worst ? '<div style="margin-bottom:6px;"><i class="ti ti-x" style="color:var(--red,#c0392b);vertical-align:-1px;"></i> <em>' + ref.worst + '</em></div>' : ''}
             <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
               <button class="round-edit-btn" onclick="openRoundEditModal('${r.id}')">✎ Edit</button>
-              <button onclick="showDadSharePicker(${JSON.stringify(r).replace(/"/g,'&quot;')}, ${JSON.stringify((Array.isArray(r.holes)?r.holes:[]).map(h=>({hole:h.hole,par:h.par,score:h.score,photo:h.photo_url||h.photo||null,yds:h.yds||null}))).replace(/"/g,'&quot;')})" style="background:none;border:1px solid rgba(138,96,16,0.35);border-radius:8px;padding:6px 12px;color:var(--gold-l);font-size:0.78rem;font-weight:600;cursor:pointer;touch-action:manipulation;">📤 Share</button>
+              <button onclick="showDadSharePicker(${JSON.stringify(r).replace(/"/g,'&quot;')}, ${JSON.stringify((Array.isArray(r.holes)?r.holes:[]).map(h=>({hole:h.hole,par:h.par,score:h.score,photo:h.photo_url||h.photo||null,yds:h.yds||null}))).replace(/"/g,'&quot;')})" style="background:none;border:1px solid rgba(212,168,67,0.35);border-radius:8px;padding:6px 12px;color:var(--gold-l);font-size:0.78rem;font-weight:600;cursor:pointer;touch-action:manipulation;">📤 Share</button>
               <button class="round-delete-btn" style="margin-top:0;" onclick="confirmDeleteDadRound('${r.id}')">Delete Round</button>
             </div>
           </div>
@@ -7938,7 +7921,7 @@
       const pct = 100 - Math.round(((d.diff - dMin) / dRange) * 70);
       const isLast = i === recent.length - 1;
       const col = d.diff < hc.index ? '#1E7A3A' : 'var(--border)';
-      return `<div title="${d.diff}" style="flex:1;height:${pct}%;min-height:15%;background:${isLast ? '#8a6010' : col};border-radius:2px 2px 0 0;"></div>`;
+      return `<div title="${d.diff}" style="flex:1;height:${pct}%;min-height:15%;background:${isLast ? '#D4A843' : col};border-radius:2px 2px 0 0;"></div>`;
     }).join('');
 
     const indexColor = hc.index <= 18 ? 'var(--gold)' : hc.index <= 25 ? '#a78bfa' : 'var(--cream)';
@@ -8074,7 +8057,7 @@
           <div style="font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:8px;">Round by Round</div>
           <table style="width:100%;border-collapse:collapse;">
             <thead>
-              <tr style="border-bottom:1px solid rgba(138,96,16,0.2);">
+              <tr style="border-bottom:1px solid rgba(212,168,67,0.2);">
                 <th style="text-align:left;font-size:0.65rem;color:var(--muted);font-weight:600;padding-bottom:5px;text-transform:uppercase;letter-spacing:0.4px;">Date</th>
                 <th style="text-align:left;font-size:0.65rem;color:var(--muted);font-weight:600;padding-bottom:5px;text-transform:uppercase;letter-spacing:0.4px;">Course</th>
                 <th style="text-align:center;font-size:0.65rem;color:var(--muted);font-weight:600;padding-bottom:5px;text-transform:uppercase;letter-spacing:0.4px;">Shots</th>
@@ -8094,7 +8077,7 @@
         <span>🏌️‍♂️ Approach Stats</span>
         <span class="arrow">▼</span>
       </button>
-      <div style="display:none;background:var(--surface2);border:1px solid rgba(138,96,16,0.2);border-radius:0 0 10px 10px;padding:16px;">
+      <div style="display:none;background:var(--surface2);border:1px solid rgba(212,168,67,0.2);border-radius:0 0 10px 10px;padding:16px;">
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:12px;">
           ${totalApproachHoles} approach${totalApproachHoles !== 1 ? 'es' : ''} tracked across ${roundsWithData} round${roundsWithData !== 1 ? 's' : ''}
           &nbsp;·&nbsp; avg <span style="color:${overallColor};font-weight:700;">${overallStr}</span> vs par on approach holes
@@ -8102,7 +8085,7 @@
         ${bestClubHtml}
         <table style="width:100%;border-collapse:collapse;">
           <thead>
-            <tr style="border-bottom:1px solid rgba(138,96,16,0.25);">
+            <tr style="border-bottom:1px solid rgba(212,168,67,0.25);">
               <th style="text-align:left;font-size:0.68rem;color:var(--muted);font-weight:600;padding-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">Club</th>
               <th style="text-align:center;font-size:0.68rem;color:var(--muted);font-weight:600;padding-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">Used</th>
               <th style="text-align:center;font-size:0.68rem;color:var(--muted);font-weight:600;padding-bottom:7px;text-transform:uppercase;letter-spacing:0.5px;">Avg Yds</th>
@@ -8203,7 +8186,7 @@
           </div>
         </div>
 
-        <div style="background:rgba(138,96,16,0.1);border:1px solid rgba(138,96,16,0.2);border-radius:8px;padding:8px 12px;font-size:0.76rem;color:var(--cream);line-height:1.5;">
+        <div style="background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.2);border-radius:8px;padding:8px 12px;font-size:0.76rem;color:var(--cream);line-height:1.5;">
           <strong style="color:var(--gold);">Pattern:</strong> ${tip} Typical depth: <strong>${dominantDepth}</strong>.
         </div>
       </div>`;
@@ -8568,7 +8551,7 @@
       <div id="dm-search-status" style="font-size:0.73rem;color:var(--muted);margin-bottom:6px;"></div>
       <div id="dm-search-results" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
 
-      <div id="dm-course-selected" style="display:none;background:rgba(138,96,16,0.12);border:1px solid rgba(138,96,16,0.4);border-radius:10px;padding:11px 14px;margin-bottom:10px;">
+      <div id="dm-course-selected" style="display:none;background:rgba(212,168,67,0.12);border:1px solid rgba(212,168,67,0.4);border-radius:10px;padding:11px 14px;margin-bottom:10px;">
         <div style="display:flex;align-items:center;justify-content:space-between;">
           <div><div id="dm-course-name" style="font-weight:700;font-size:0.9rem;color:var(--cream);"></div><div id="dm-course-sub" style="font-size:0.7rem;color:var(--muted);margin-top:2px;"></div></div>
           <button onclick="dadClearCourse()" style="background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;touch-action:manipulation;">&#x2715;</button>
@@ -9983,14 +9966,14 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   function renderCaddieMessages(showTyping) {
     const el = document.getElementById('caddie-messages');
     if (!el) return;
-    const welcome = `<div style="background:rgba(138,96,16,0.08);border:1px solid rgba(138,96,16,0.2);border-radius:12px;padding:14px 16px;font-size:0.85rem;color:var(--cream);line-height:1.6;"><i class="ti ti-microphone" style="color:var(--gold);vertical-align:-1px;"></i> <strong>On the bag.</strong> Just say your distance and situation — I'll pick the club. Try: <em>"About 140 out, slight headwind"</em> or <em>"Tee shot, tight fairway."</em></div>`;
+    const welcome = `<div style="background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.2);border-radius:12px;padding:14px 16px;font-size:0.85rem;color:var(--cream);line-height:1.6;"><i class="ti ti-microphone" style="color:var(--gold);vertical-align:-1px;"></i> <strong>On the bag.</strong> Just say your distance and situation — I'll pick the club. Try: <em>"About 140 out, slight headwind"</em> or <em>"Tee shot, tight fairway."</em></div>`;
     const msgs = _caddieHistory.map(m => {
       const isUser = m.role === 'user';
       return `<div style="
         align-self:${isUser ? 'flex-end' : 'flex-start'};
         max-width:88%;
-        background:${isUser ? 'rgba(138,96,16,0.15)' : 'var(--surface2)'};
-        border:1px solid ${isUser ? 'rgba(138,96,16,0.3)' : 'var(--border)'};
+        background:${isUser ? 'rgba(212,168,67,0.15)' : 'var(--surface2)'};
+        border:1px solid ${isUser ? 'rgba(212,168,67,0.3)' : 'var(--border)'};
         border-radius:${isUser ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};
         padding:10px 14px;font-size:0.87rem;color:var(--cream);line-height:1.55;white-space:pre-wrap;word-break:break-word;
       ">${m.content}</div>`;
@@ -10089,7 +10072,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   // ── FAMILY SCORECARD ──────────────────────────────────────────
 
   const FAM_PLAYERS = {
-    dad:     { key:'dad',     name:'Dad',     emoji:'\uD83C\uDFCC', color:'#8a6010', bg:'rgba(138,96,16,0.12)',   saveFn: r => saveDadRound({...r, tee_color:'White'}) },
+    dad:     { key:'dad',     name:'Dad',     emoji:'\uD83C\uDFCC', color:'#D4A843', bg:'rgba(212,168,67,0.12)',   saveFn: r => saveDadRound({...r, tee_color:'White'}) },
     son:     { key:'son',     name:'Son',    emoji:'\u26F3',        color:'#60a5fa', bg:'rgba(96,165,250,0.12)',   saveFn: r => saveSonRound(r)     },
     girl:    { key:'girl',    name:'Daughter',emoji:'\uD83C\uDF38',  color:'#f472b6', bg:'rgba(244,114,182,0.12)', saveFn: r => saveGirlRound(r)    },
     mom:     { key:'mom',     name:'Mom',     emoji:'\uD83C\uDF3A',  color:'#f2c879', bg:'rgba(242,200,121,0.12)', saveFn: r => saveMomRound(r)     },
@@ -10196,7 +10179,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       <div id="fm-search-status" style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;"></div>
       <div id="fm-search-results" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
 
-      <div id="fm-course-selected" style="display:none;background:rgba(138,96,16,0.12);border:1px solid rgba(138,96,16,0.4);border-radius:10px;padding:12px 14px;margin-bottom:12px;">
+      <div id="fm-course-selected" style="display:none;background:rgba(212,168,67,0.12);border:1px solid rgba(212,168,67,0.4);border-radius:10px;padding:12px 14px;margin-bottom:12px;">
         <div style="display:flex;align-items:center;justify-content:space-between;">
           <div>
             <div id="fm-course-name" style="font-weight:700;font-size:0.9rem;color:var(--cream);"></div>
@@ -10218,7 +10201,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
           <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
             <div class="fam-checkbox-card${p.key==='dad'||p.key==='son'?' selected':''}" data-player="${p.key}"
               onclick="famTogglePlayer(this,'${p.key}')"
-              style="flex-shrink:0;width:56px;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:12px;border:1.5px solid ${p.key==='dad'||p.key==='son'?'rgba(138,96,16,0.5)':'rgba(255,255,255,0.1)'};background:${p.key==='dad'||p.key==='son'?'rgba(138,96,16,0.15)':'var(--surface2)'};cursor:pointer;touch-action:manipulation;">
+              style="flex-shrink:0;width:56px;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:12px;border:1.5px solid ${p.key==='dad'||p.key==='son'?'rgba(212,168,67,0.5)':'rgba(255,255,255,0.1)'};background:${p.key==='dad'||p.key==='son'?'rgba(212,168,67,0.15)':'var(--surface2)'};cursor:pointer;touch-action:manipulation;">
               <span style="font-size:1.4rem;">${p.emoji}</span>
               <span style="font-size:0.58rem;font-weight:700;color:var(--muted);letter-spacing:0.5px;">${p.name.toUpperCase()}</span>
             </div>
@@ -10361,8 +10344,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   function famTogglePlayer(el, pk) {
     el.classList.toggle('selected');
     const isSelected = el.classList.contains('selected');
-    el.style.background   = isSelected ? 'rgba(138,96,16,0.15)' : 'var(--surface2)';
-    el.style.borderColor  = isSelected ? 'rgba(138,96,16,0.5)'  : 'rgba(255,255,255,0.1)';
+    el.style.background   = isSelected ? 'rgba(212,168,67,0.15)' : 'var(--surface2)';
+    el.style.borderColor  = isSelected ? 'rgba(212,168,67,0.5)'  : 'rgba(255,255,255,0.1)';
     const selectorEl = document.getElementById('fam-tee-selector-' + pk);
     if (selectorEl) {
       selectorEl.style.display = isSelected ? 'block' : 'none';
@@ -10390,8 +10373,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const active = p === el;
       p.classList.toggle('selected', active);
       p.style.color    = active ? 'var(--gold)' : 'var(--muted)';
-      p.style.background = active ? 'rgba(138,96,16,0.18)' : p.style.background.replace('0.18','0.08');
-      p.style.borderColor = active ? 'rgba(138,96,16,0.3)' : 'rgba(255,255,255,0.08)';
+      p.style.background = active ? 'rgba(212,168,67,0.18)' : p.style.background.replace('0.18','0.08');
+      p.style.borderColor = active ? 'rgba(212,168,67,0.3)' : 'rgba(255,255,255,0.08)';
     });
     loadMemoriesGallery();
   }
@@ -10425,7 +10408,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         const photoStrip = photos.length ? `
           <div style="display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
             ${photos.map(src => `<img src="${src}" loading="lazy"
-              style="width:72px;height:72px;object-fit:cover;border-radius:8px;flex-shrink:0;border:1px solid rgba(138,96,16,0.25);cursor:pointer;"
+              style="width:72px;height:72px;object-fit:cover;border-radius:8px;flex-shrink:0;border:1px solid rgba(212,168,67,0.25);cursor:pointer;"
               onclick="event.stopPropagation();_showPhotoOverlay('${src}')">`).join('')}
           </div>` : '';
         return `<div style="background:var(--surface);border-radius:12px;padding:12px 14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.05);">
@@ -10439,7 +10422,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
           </div>
           ${photoStrip}
           <div style="display:flex;justify-content:flex-end;margin-top:8px;">
-            <button onclick="event.stopPropagation();viewFamRound(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="background:none;border:1px solid rgba(138,96,16,0.3);border-radius:8px;padding:5px 12px;color:var(--gold-l);font-size:0.75rem;font-weight:600;cursor:pointer;touch-action:manipulation;">Share ↗</button>
+            <button onclick="event.stopPropagation();viewFamRound(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="background:none;border:1px solid rgba(212,168,67,0.3);border-radius:8px;padding:5px 12px;color:var(--gold-l);font-size:0.75rem;font-weight:600;cursor:pointer;touch-action:manipulation;">Share ↗</button>
           </div>
         </div>`;
       }).join('');
@@ -10476,7 +10459,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
             <button class="round-delete-btn" onclick="confirmDeleteFamilyRound('${r.id}')">Delete Round</button>
-            <button onclick="event.stopPropagation();viewFamRound(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="background:none;border:1px solid rgba(138,96,16,0.3);border-radius:8px;padding:5px 12px;color:var(--gold-l);font-size:0.75rem;font-weight:600;cursor:pointer;touch-action:manipulation;">Share ↗</button>
+            <button onclick="event.stopPropagation();viewFamRound(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="background:none;border:1px solid rgba(212,168,67,0.3);border-radius:8px;padding:5px 12px;color:var(--gold-l);font-size:0.75rem;font-weight:600;cursor:pointer;touch-action:manipulation;">Share ↗</button>
           </div>
         </div>`;
       }).join('');
@@ -10678,11 +10661,11 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       <div style="display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:2px 0 6px;scrollbar-width:none;">
         ${hPhotos.map((p,i) => `
           <div style="position:relative;flex-shrink:0;">
-            <img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid rgba(138,96,16,0.3);" onclick="_showPhotoOverlay('${p}')">
+            <img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid rgba(212,168,67,0.3);" onclick="_showPhotoOverlay('${p}')">
             <button onclick="famRemoveHolePhoto(${i})" style="position:absolute;top:-4px;right:-4px;width:20px;height:20px;border-radius:50%;background:rgba(192,57,43,0.85);border:none;color:#fff;font-size:0.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">✕</button>
           </div>`).join('')}
-        <button onclick="document.getElementById('fhpc').click()" style="flex-shrink:0;width:80px;height:80px;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:8px;color:var(--muted);font-size:0.75rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;touch-action:manipulation;"><span style="font-size:1.2rem;">📷</span>Camera</button>
-        <button onclick="document.getElementById('fhpr').click()" style="flex-shrink:0;width:80px;height:80px;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:8px;color:var(--muted);font-size:0.75rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;touch-action:manipulation;"><span style="font-size:1.2rem;">🖼️</span>Roll</button>
+        <button onclick="document.getElementById('fhpc').click()" style="flex-shrink:0;width:80px;height:80px;background:var(--surface2);border:1px dashed rgba(212,168,67,0.3);border-radius:8px;color:var(--muted);font-size:0.75rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;touch-action:manipulation;"><span style="font-size:1.2rem;">📷</span>Camera</button>
+        <button onclick="document.getElementById('fhpr').click()" style="flex-shrink:0;width:80px;height:80px;background:var(--surface2);border:1px dashed rgba(212,168,67,0.3);border-radius:8px;color:var(--muted);font-size:0.75rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;touch-action:manipulation;"><span style="font-size:1.2rem;">🖼️</span>Roll</button>
       </div>
     </div>`;
 
@@ -10714,15 +10697,15 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
       <div style="margin-top:10px;">
         <button onclick="toggleFamCaddie()" id="fam-caddie-toggle"
-          style="width:100%;background:var(--surface2);border:1px solid rgba(138,96,16,0.25);border-radius:10px;padding:10px 16px;color:var(--gold-l);font-size:0.84rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;">
+          style="width:100%;background:var(--surface2);border:1px solid rgba(212,168,67,0.25);border-radius:10px;padding:10px 16px;color:var(--gold-l);font-size:0.84rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;">
           <span>🎙️ Caddie — H${h.hole} P${h.par}</span>
           <span id="fam-caddie-caret">${_famCaddieOpen ? '▲' : '▼'}</span>
         </button>
-        <div id="fam-caddie-panel" style="display:${_famCaddieOpen ? 'block' : 'none'};background:var(--surface);border:1px solid rgba(138,96,16,0.15);border-top:none;border-radius:0 0 10px 10px;padding:12px 14px;">
+        <div id="fam-caddie-panel" style="display:${_famCaddieOpen ? 'block' : 'none'};background:var(--surface);border:1px solid rgba(212,168,67,0.15);border-top:none;border-radius:0 0 10px 10px;padding:12px 14px;">
           <div id="fam-caddie-msgs" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;font-size:0.83rem;line-height:1.5;"></div>
           <div style="display:flex;gap:8px;align-items:flex-end;">
             <textarea id="fam-caddie-input" rows="2"
-              style="flex:1;background:var(--surface2);border:1px solid rgba(138,96,16,0.25);border-radius:8px;padding:8px 10px;color:var(--cream);font-family:'Outfit',sans-serif;font-size:0.85rem;resize:none;"
+              style="flex:1;background:var(--surface2);border:1px solid rgba(212,168,67,0.25);border-radius:8px;padding:8px 10px;color:var(--cream);font-family:'Outfit',sans-serif;font-size:0.85rem;resize:none;"
               placeholder="Yardage? Lie? Wind?"
               onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendFamCaddieMsg();}"></textarea>
             <button onclick="sendFamCaddieMsg()" id="fam-caddie-send"
@@ -10896,7 +10879,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
           ${allPhotos.map(({src, hole}) => `
             <div style="flex-shrink:0;text-align:center;">
-              <img src="${src}" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid rgba(138,96,16,0.3);">
+              <img src="${src}" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid rgba(212,168,67,0.3);">
               <div style="font-size:0.55rem;color:var(--muted);margin-top:2px;">H${hole}</div>
             </div>`).join('')}
         </div>
@@ -11053,7 +11036,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
   // ── CARD HELPERS ─────────────────────────────────────────────
   const _C = {
-    bg:'#16120d', surf:'#231c14', gold:'#d4af70', goldDim:'#8a6010', cream:'#f5f0e8', muted:'#8a7a5a',
+    bg:'#16120d', surf:'#231c14', gold:'#d4af70', goldDim:'#D4A843', cream:'#f5f0e8', muted:'#8a7a5a',
     dad:'#d4a520', son:'#60a5fa', girl:'#f472b6', mom:'#f2c879', grandma:'#d4af70',
     dadBg:'rgba(212,165,32,0.13)', sonBg:'rgba(96,165,250,0.13)', girlBg:'rgba(244,114,182,0.13)',
     momBg:'rgba(242,200,121,0.13)', grandmaBg:'rgba(212,175,112,0.13)',
@@ -11584,7 +11567,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         ${photos.map((src, i) => `
           <div onclick="pickBestPhotoAndShare('${playerKey}', ${i}); this.closest('#best-photo-picker-overlay').remove();"
             style="flex-shrink:0;cursor:pointer;touch-action:manipulation;">
-            <img src="${src}" style="width:110px;height:110px;object-fit:cover;border-radius:10px;border:2px solid rgba(138,96,16,0.3);">
+            <img src="${src}" style="width:110px;height:110px;object-fit:cover;border-radius:10px;border:2px solid rgba(212,168,67,0.3);">
           </div>`).join('')}
       </div>`;
     overlay.appendChild(sheet);
@@ -11792,14 +11775,14 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     if (!el) return;
     const h = _famHoles[_famHoleIdx];
     const holeCtx = h ? `Hole ${h.hole}, Par ${h.par}` : '';
-    const welcome = `<div style="background:rgba(138,96,16,0.08);border:1px solid rgba(138,96,16,0.2);border-radius:10px;padding:12px 14px;font-size:0.82rem;color:var(--cream);line-height:1.55;"><i class="ti ti-microphone" style="color:var(--gold);vertical-align:-1px;"></i> <strong>Caddie ready.</strong> ${holeCtx ? 'You\'re on ' + holeCtx + '.' : ''} Ask anything — club, layup vs. go, wind adjustments.</div>`;
+    const welcome = `<div style="background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.2);border-radius:10px;padding:12px 14px;font-size:0.82rem;color:var(--cream);line-height:1.55;"><i class="ti ti-microphone" style="color:var(--gold);vertical-align:-1px;"></i> <strong>Caddie ready.</strong> ${holeCtx ? 'You\'re on ' + holeCtx + '.' : ''} Ask anything — club, layup vs. go, wind adjustments.</div>`;
     const msgs = _famCaddieHistory.map(m => {
       const isUser = m.role === 'user';
       return `<div style="
         align-self:${isUser ? 'flex-end' : 'flex-start'};
         max-width:90%;
-        background:${isUser ? 'rgba(138,96,16,0.15)' : 'var(--surface2)'};
-        border:1px solid ${isUser ? 'rgba(138,96,16,0.3)' : 'var(--border)'};
+        background:${isUser ? 'rgba(212,168,67,0.15)' : 'var(--surface2)'};
+        border:1px solid ${isUser ? 'rgba(212,168,67,0.3)' : 'var(--border)'};
         border-radius:${isUser ? '14px 14px 4px 14px' : '14px 14px 14px 4px'};
         padding:9px 13px;font-size:0.83rem;color:var(--cream);line-height:1.5;white-space:pre-wrap;word-break:break-word;
       ">${m.content}</div>`;
@@ -11817,7 +11800,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     if (!el) return;
     const welcome = `<div style="color:var(--muted);font-size:0.8rem;">Tell me the yardage and I'll pick your club.</div>`;
     const msgs = _dadLiveCaddieHistory.map(m => {
-      const bg = m.role === 'user' ? 'var(--surface2)' : 'rgba(26,92,46,0.1)';
+      const bg = m.role === 'user' ? 'var(--surface2)' : 'rgba(61,170,107,0.1)';
       const align = m.role === 'user' ? 'flex-end' : 'flex-start';
       return `<div style="display:flex;justify-content:${align};"><div style="background:${bg};border-radius:10px;padding:7px 11px;max-width:90%;color:var(--cream);">${m.content}</div></div>`;
     }).join('');
@@ -12122,11 +12105,11 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       </div>
       <input type="file" id="ac-photo-input" accept="image/*" capture="environment" style="display:none;" onchange="acPhotoSelected(this)">
       <button onclick="document.getElementById('ac-photo-input').click()"
-        style="width:100%;background:var(--surface2);border:1px dashed rgba(138,96,16,0.3);border-radius:12px;padding:18px;color:var(--muted);font-size:0.88rem;cursor:pointer;margin-bottom:10px;">
+        style="width:100%;background:var(--surface2);border:1px dashed rgba(212,168,67,0.3);border-radius:12px;padding:18px;color:var(--muted);font-size:0.88rem;cursor:pointer;margin-bottom:10px;">
         📸 Take Photo or Upload Scorecard
       </button>
       <div id="ac-photo-preview" style="display:none;margin-bottom:10px;">
-        <img id="ac-preview-img" style="width:100%;border-radius:10px;border:1px solid rgba(138,96,16,0.2);">
+        <img id="ac-preview-img" style="width:100%;border-radius:10px;border:1px solid rgba(212,168,67,0.2);">
       </div>
       <button id="ac-parse-btn" onclick="acParseScorecard()" style="display:none;width:100%;margin-bottom:14px;" class="btn-gold">
         Read Scorecard with AI →
@@ -12179,7 +12162,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
                       loc ? `<div style="font-size:0.72rem;color:var(--muted);">${loc}</div>` : '';
           return `<div onclick="acSelectSearchResult(${c.id})"
             style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color 0.15s;"
-            onmouseenter="this.style.borderColor='rgba(138,96,16,0.5)'" onmouseleave="this.style.borderColor='var(--border)'">
+            onmouseenter="this.style.borderColor='rgba(212,168,67,0.5)'" onmouseleave="this.style.borderColor='var(--border)'">
             <div style="font-size:0.88rem;font-weight:600;color:var(--cream);">${c.name}</div>
             ${sub}
           </div>`;
