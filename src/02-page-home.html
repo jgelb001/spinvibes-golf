@@ -21,24 +21,24 @@
 
       <div class="guide-grid">
         <a class="guide-card" onclick="showPage('range')">
-          <span class="guide-card-icon"><i class="ti ti-flag-2"></i></span>
-          <div class="guide-card-title">Range Session</div>
-          <div class="guide-card-sub">65-ball plan</div>
+          <span class="guide-card-icon"><i class="ph-light ph-target"></i></span>
+          <div class="guide-card-body"><div class="guide-card-title">Range Session</div><div class="guide-card-sub">65-ball plan</div></div>
+          <span class="guide-card-arrow">›</span>
         </a>
         <a class="guide-card" onclick="showPage('stretches')">
-          <span class="guide-card-icon"><i class="ti ti-heart-rate"></i></span>
-          <div class="guide-card-title">Pre-Range Stretches</div>
-          <div class="guide-card-sub">5–7 min warmup</div>
+          <span class="guide-card-icon"><i class="ph-light ph-person-simple-run"></i></span>
+          <div class="guide-card-body"><div class="guide-card-title">Pre-Round Stretches</div><div class="guide-card-sub">5–7 min warmup</div></div>
+          <span class="guide-card-arrow">›</span>
         </a>
         <a class="guide-card" onclick="showPage('shortgame')">
-          <span class="guide-card-icon"><i class="ti ti-target"></i></span>
-          <div class="guide-card-title">Short Game</div>
-          <div class="guide-card-sub">Chipping &amp; putting</div>
+          <span class="guide-card-icon"><i class="ph-light ph-flag"></i></span>
+          <div class="guide-card-body"><div class="guide-card-title">Short Game</div><div class="guide-card-sub">Chipping &amp; putting</div></div>
+          <span class="guide-card-arrow">›</span>
         </a>
         <a class="guide-card dad-sect" onclick="showPage('strategy')">
-          <span class="guide-card-icon"><i class="ti ti-brain"></i></span>
-          <div class="guide-card-title">Course Strategy</div>
-          <div class="guide-card-sub">Break 90 checklist</div>
+          <span class="guide-card-icon"><i class="ph-light ph-compass"></i></span>
+          <div class="guide-card-body"><div class="guide-card-title">Course Strategy</div><div class="guide-card-sub">Break 90 checklist</div></div>
+          <span class="guide-card-arrow">›</span>
         </a>
       </div>
 
@@ -89,10 +89,10 @@
         <!-- Player filter pills -->
         <div id="mem-filter-pills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
           <div class="pill selected" data-val="all" onclick="memFilterPill(this)" style="background:rgba(212,168,67,0.18);color:var(--gold);border:1px solid rgba(212,168,67,0.3);border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;">All</div>
-          <div class="pill" data-val="dad" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(212,168,67,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">🏌 Dad</div>
-          <div class="pill" data-val="son" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(96,165,250,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">⛳ Son</div>
+          <div class="pill" data-val="dad" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(212,168,67,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">Dad</div>
+          <div class="pill" data-val="son" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(96,165,250,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">Son</div>
           <div class="pill" data-val="girl" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(244,114,182,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">🌸 Daughter</div>
-          <div class="pill" data-val="mom" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(242,200,121,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">🌺 Mom</div>
+          <div class="pill" data-val="mom" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(242,200,121,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">Mom</div>
         </div>
         <div id="fam-memories-list">
           <div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px 0;">Loading memories…</div>
@@ -117,14 +117,19 @@
 
         <div class="guide-grid">
           <a class="guide-card" onclick="showPage('range')">
-            <span class="guide-card-icon"><i class="ti ti-flag-2"></i></span>
-            <div class="guide-card-title">Range Session</div>
-            <div class="guide-card-sub">30 balls · 3 phases</div>
+            <span class="guide-card-icon"><i class="ph-light ph-target"></i></span>
+            <div class="guide-card-body"><div class="guide-card-title">Range Session</div><div class="guide-card-sub">30 balls · 3 phases</div></div>
+            <span class="guide-card-arrow">›</span>
           </a>
           <a class="guide-card" onclick="showPage('stretches')">
-            <span class="guide-card-icon"><i class="ti ti-heart-rate"></i></span>
-            <div class="guide-card-title">Warm Up Moves</div>
-            <div class="guide-card-sub">6 stretches</div>
+            <span class="guide-card-icon"><i class="ph-light ph-person-simple-run"></i></span>
+            <div class="guide-card-body"><div class="guide-card-title">Warm Up Moves</div><div class="guide-card-sub">6 stretches</div></div>
+            <span class="guide-card-arrow">›</span>
+          </a>
+          <a class="guide-card" onclick="showPage('shortgame')">
+            <span class="guide-card-icon"><i class="ph-light ph-flag"></i></span>
+            <div class="guide-card-body"><div class="guide-card-title">Short Game</div><div class="guide-card-sub">Chipping &amp; putting</div></div>
+            <span class="guide-card-arrow">›</span>
           </a>
         </div>
 
@@ -179,7 +184,7 @@
           <div class="stat-row">
             <div class="stat"><div class="stat-num" style="color:#ec4899;">5</div><div class="stat-lbl">Clubs</div></div>
             <div class="stat"><div class="stat-num" style="color:#14b8a6;">15</div><div class="stat-lbl">Min Max</div></div>
-            <div class="stat"><div class="stat-num" style="color:#ec4899;">😄</div><div class="stat-lbl">Always</div></div>
+            <div class="stat"><div class="stat-num" style="color:#D4537E;">♥</div><div class="stat-lbl">Always</div></div>
             <div class="stat"><div class="stat-num" style="color:#14b8a6;">L</div><div class="stat-lbl">Lefty</div></div>
           </div>
         </div>
@@ -187,29 +192,29 @@
         <div id="daily-brief-girl"></div>
 
         <div class="section">
-          <div class="section-title">Daughter's Bag 🎒</div>
+          <div class="section-title">Daughter's Bag</div>
           <div class="card" style="border-color:rgba(236,72,153,0.3);">
             <div class="card-title">Top Flite Girls Set · Ages 5–8 · Teal/Pink</div>
             <div class="card-body">
-              <div class="check-row" style="border:none;padding:4px 0;"><span>🏌️ <strong>Driver</strong> — Big head, easy to hit, great for tee shots</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>🌿 <strong>Hybrid</strong> — Easy club that goes a long way</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>⛳ <strong>7-Iron</strong> — Her go-to club for most shots</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>💨 <strong>Sand Wedge</strong> — Gets the ball up and out</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>🎯 <strong>Putter</strong> — Roll it into the hole!</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>👜 <strong>Stand Bag</strong> — Pink & teal, all hers</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>Driver</strong> — Big head, easy to hit, great for tee shots</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>Hybrid</strong> — Easy club that goes a long way</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>7-Iron</strong> — Her go-to club for most shots</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>Sand Wedge</strong> — Gets the ball up and out</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>Putter</strong> — Roll it into the hole!</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>Stand Bag</strong> — Pink & teal, all hers</span></div>
             </div>
             <div class="cue-box" style="border-color:#ec4899;color:#f9a8d4;">Graphite shafts on all clubs — lightweight and built for her swing speed</div>
           </div>
         </div>
 
         <div class="section">
-          <div class="section-title">Goals 🌟</div>
+          <div class="section-title">Goals</div>
           <div class="card" style="border-color:rgba(20,184,166,0.3);">
             <div class="card-body" style="font-size:1.05rem;line-height:1.8;">
-              🥇 Make contact with the ball<br>
-              😂 Laugh at least once per swing<br>
-              🎉 Want to come back next time<br>
-              🌱 Build a foundation for life
+              Make contact with the ball<br>
+              Laugh at least once per swing<br>
+              Want to come back next time<br>
+              Build a foundation for life
             </div>
             <div class="cue-box" style="border-color:#14b8a6;color:#5eead4;margin-top:12px;">
               <strong>Dad's Rule:</strong> Stop BEFORE she's tired of it. Always leave her wanting more.
@@ -218,13 +223,13 @@
         </div>
 
         <div class="section">
-          <div class="section-title">Session Tips for Age 5 👨‍👧</div>
+          <div class="section-title">Session Tips for Age 5</div>
           <div class="card">
-            <div class="check-row"><span>⏱ <strong>10–15 minutes max</strong> — attention spans are short, that's totally fine</span></div>
-            <div class="check-row"><span>🎯 <strong>One thing at a time</strong> — one thought, one club, one goal per trip</span></div>
-            <div class="check-row"><span>🌈 <strong>Follow her lead</strong> — if she wants to putt all day, putt all day</span></div>
-            <div class="check-row"><span>🚫 <strong>No swing fixes mid-swing</strong> — wait until she asks or keep it super positive</span></div>
-            <div class="check-row"><span>🏆 <strong>Celebrate everything</strong> — any contact = amazing, any attempt = brave</span></div>
+            <div class="check-row"><span><strong>10–15 minutes max</strong> — attention spans are short, that's totally fine</span></div>
+            <div class="check-row"><span><strong>One thing at a time</strong> — one thought, one club, one goal per trip</span></div>
+            <div class="check-row"><span><strong>Follow her lead</strong> — if she wants to putt all day, putt all day</span></div>
+            <div class="check-row"><span><strong>No swing fixes mid-swing</strong> — wait until she asks or keep it super positive</span></div>
+            <div class="check-row"><span><strong>Celebrate everything</strong> — any contact = amazing, any attempt = brave</span></div>
           </div>
         </div>
 
@@ -235,95 +240,71 @@
         <div class="home-hero">
           <div class="home-greeting">Welcome Back</div>
           <div class="home-title">Getting Back<br><span>Out There</span></div>
-          <div class="home-goal" style="border-color:rgba(212,175,112,0.4);background:rgba(212,175,112,0.08);color:var(--gold);font-size:0.75rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;padding:6px 14px;border-radius:20px;display:inline-block;margin-top:8px;">EASY · ENJOY · PLAY</div>
-        </div>
-
-        <div style="display:flex;gap:10px;margin-bottom:16px;">
-          <div class="stat-box" style="flex:1;text-align:center;">
-            <div class="stat-num">9</div>
-            <div class="stat-lbl">Holes Today</div>
-          </div>
-          <div class="stat-box" style="flex:1;text-align:center;">
-            <div class="stat-num">Easy</div>
-            <div class="stat-lbl">Pace</div>
-          </div>
-          <div class="stat-box" style="flex:1;text-align:center;">
-            <div class="stat-num">Fun</div>
-            <div class="stat-lbl">Goal</div>
+          <div class="home-goal" style="border-color:rgba(29,158,117,0.3);background:rgba(29,158,117,0.07);">
+            <div class="home-goal-num" style="color:#1D9E75;font-size:1.4rem;">9</div>
+            <div>
+              <div style="font-weight:700;color:var(--cream);font-size:0.85rem;">Easy · Enjoy · Play</div>
+              <div style="font-size:0.75rem;">Holes at your pace. No score pressure.</div>
+            </div>
           </div>
         </div>
 
-        <div class="home-section-title">Getting Back Out There</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-          <div class="guide-card" onclick="showPage('shortgame')">
-            <div class="guide-card-icon"><svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><line x1='12' y1='8' x2='12' y2='16'/><line x1='8' y1='12' x2='16' y2='12'/></svg></div>
-            <div class="guide-card-title">Short Game</div>
-            <div class="guide-card-sub">Putting focus</div>
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" style="color:#1D9E75;">9</div><div class="stat-lbl">Holes</div></div>
+            <div class="stat"><div class="stat-num">Easy</div><div class="stat-lbl">Pace</div></div>
+            <div class="stat"><div class="stat-num">Fun</div><div class="stat-lbl">Goal</div></div>
           </div>
-          <div class="guide-card" onclick="showPage('stretch')">
-            <div class="guide-card-icon"><svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M18 8h1a4 4 0 0 1 0 8h-1'/><path d='M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z'/><line x1='6' y1='1' x2='6' y2='4'/><line x1='10' y1='1' x2='10' y2='4'/><line x1='14' y1='1' x2='14' y2='4'/></svg></div>
-            <div class="guide-card-title">Stretch</div>
-            <div class="guide-card-sub">Gentle prep</div>
-          </div>
+        </div>
+
+        <div class="guide-grid">
+          <a class="guide-card" onclick="showPage('shortgame')">
+            <span class="guide-card-icon"><i class="ph-light ph-flag"></i></span>
+            <div class="guide-card-body"><div class="guide-card-title">Short Game</div><div class="guide-card-sub">Putting focus</div></div>
+            <span class="guide-card-arrow">›</span>
+          </a>
+          <a class="guide-card" onclick="showPage('stretches')">
+            <span class="guide-card-icon"><i class="ph-light ph-person-simple-run"></i></span>
+            <div class="guide-card-body"><div class="guide-card-title">Gentle Stretch</div><div class="guide-card-sub">Easy prep</div></div>
+            <span class="guide-card-arrow">›</span>
+          </a>
+          <a class="guide-card" onclick="showPage('range')">
+            <span class="guide-card-icon"><i class="ph-light ph-target"></i></span>
+            <div class="guide-card-body"><div class="guide-card-title">Range Warmup</div><div class="guide-card-sub">Half-swings only</div></div>
+            <span class="guide-card-arrow">›</span>
+          </a>
         </div>
 
         <div id="daily-brief-grandma"></div>
 
-        <div class="home-section-title">Your Bag — Lynx Lady Regalia</div>
-        <div class="guide-card" style="margin-bottom:16px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:0.82rem;">
-            <div style="color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">Driver</strong><br>Fairway or skip it — no pressure</div>
-            <div style="color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">7-Wood</strong><br>Your best friend off the tee</div>
-            <div style="color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">Hybrid</strong><br>When you need to advance it</div>
-            <div style="color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">9-Iron</strong><br>Reliable approach club</div>
-            <div style="color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">Pitching Wedge</strong><br>Around the green</div>
-            <div style="color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">Putter</strong><br>Take your time, enjoy the green</div>
+        <div class="section">
+          <div class="section-title">Your Bag — Lynx Lady Regalia</div>
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" style="font-size:1rem;">7W</div><div class="stat-lbl">Best Friend</div></div>
+            <div class="stat"><div class="stat-num" style="font-size:1rem;">Hyb</div><div class="stat-lbl">Advance</div></div>
+            <div class="stat"><div class="stat-num" style="font-size:1rem;">9i</div><div class="stat-lbl">Approach</div></div>
+            <div class="stat"><div class="stat-num" style="font-size:1rem;">PW</div><div class="stat-lbl">Around Green</div></div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <strong>Driver</strong> — Fairway or skip it, no pressure<br>
+              <strong>7-Wood</strong> — Your most reliable long club<br>
+              <strong>9-Iron</strong> — Dependable approach<br>
+              <strong>Putter</strong> — Take your time, enjoy the green
+            </div>
           </div>
         </div>
 
-        <div class="home-section-title">Session Guide</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-
-          <div class="guide-card">
-            <div style="font-size:0.6rem;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Before You Start</div>
-            <div style="font-size:0.8rem;color:var(--muted);line-height:1.5;">
-              5 min of gentle stretching<br>
-              Hydrate before you head out<br>
-              Comfortable, supportive shoes<br>
-              No rush — warm up slowly
+        <div class="section">
+          <div class="section-title">Session Guide</div>
+          <div class="card">
+            <div class="card-body" style="line-height:1.9;">
+              <strong>Before:</strong> 5 min gentle stretch, water, comfortable shoes<br>
+              <strong>Range:</strong> Start with putts and chips, easy half-swings only<br>
+              <strong>Course:</strong> Pick up after 3 shots, use a cart, play preferred lies<br>
+              <strong>Checklist:</strong> Water bottle, light snack, sunscreen, charged phone
             </div>
           </div>
-
-          <div class="guide-card">
-            <div style="font-size:0.6rem;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">On the Range</div>
-            <div style="font-size:0.8rem;color:var(--muted);line-height:1.5;">
-              Start with putts and chips<br>
-              Easy half-swings only<br>
-              Notice what feels good<br>
-              Stop if anything aches
-            </div>
-          </div>
-
-          <div class="guide-card">
-            <div style="font-size:0.6rem;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">On the Course</div>
-            <div style="font-size:0.8rem;color:var(--muted);line-height:1.5;">
-              Pick up after 3 shots on a hole<br>
-              Use a cart — enjoy the ride<br>
-              Play preferred lies<br>
-              Focus on the fun, not the score
-            </div>
-          </div>
-
-          <div class="guide-card">
-            <div style="font-size:0.6rem;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">The Checklist</div>
-            <div style="font-size:0.8rem;color:var(--muted);line-height:1.5;">
-              Water bottle in the cart<br>
-              Light snack for the turn<br>
-              Sunscreen applied<br>
-              Phone charged for photos
-            </div>
-          </div>
-
         </div>
 
       </div><!-- /grandma-sect home -->
@@ -334,7 +315,7 @@
           <div class="home-greeting">Mom</div>
           <div class="home-title">Welcome to<br><span>the Range</span></div>
           <div class="home-goal" style="border-color:rgba(242,200,121,0.4);background:rgba(242,200,121,0.08);">
-            <div class="home-goal-num" style="color:#f2c879;">🌺</div>
+            <div class="home-goal-num" style="color:#7F77DD;font-size:1.4rem;">M</div>
             <div>
               <div style="font-weight:700;color:var(--cream);font-size:0.85rem;">The Goal</div>
               <div style="font-size:0.75rem;">Make contact. Just connect the club with the ball.</div>
@@ -346,7 +327,7 @@
           <div class="stat-row">
             <div class="stat"><div class="stat-num" style="color:#f2c879;">R</div><div class="stat-lbl">Righty</div></div>
             <div class="stat"><div class="stat-num" style="color:#e88868;">1st</div><div class="stat-lbl">Season</div></div>
-            <div class="stat"><div class="stat-num" style="color:#f2c879;">🌱</div><div class="stat-lbl">Beginner</div></div>
+            <div class="stat"><div class="stat-num" style="color:#7F77DD;">1st</div><div class="stat-lbl">Beginner</div></div>
             <div class="stat"><div class="stat-num" style="color:#e88868;">9</div><div class="stat-lbl">Clubs</div></div>
           </div>
         </div>
@@ -354,7 +335,7 @@
         <div id="daily-brief-mom"></div>
 
         <div class="section">
-          <div class="section-title">The One Big Idea 🌺</div>
+          <div class="section-title">The One Big Idea</div>
           <div class="card" style="border-color:rgba(242,200,121,0.4);background:rgba(242,200,121,0.06);">
             <div class="mom-badge">Ball First, Ground Second</div>
             <div class="card-body">
@@ -365,29 +346,29 @@
         </div>
 
         <div class="section">
-          <div class="section-title">Mom's Bag 🌺</div>
+          <div class="section-title">Mom's Bag</div>
           <div class="card" style="border-color:rgba(217,119,87,0.3);">
             <div class="card-title">Used Set · 9 Clubs · Righty</div>
             <div class="card-body">
-              <div class="check-row" style="border:none;padding:4px 0;"><span>🌺 <strong>3-Wood</strong> — Longest fairway club. Trickiest for beginners.</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>⭐ <strong>3-Hybrid</strong> — The most forgiving long club. Start here.</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>⛳ <strong>5-Iron</strong> — Medium-long shots</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>⛳ <strong>6-Iron</strong> — Medium shots</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>⛳ <strong>8-Iron</strong> — A bit shorter, easier to hit</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>⭐ <strong>9-Iron</strong> — Your starting club. Shortest, easiest to hit cleanly.</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>💨 <strong>Pitching Wedge</strong> — Short, high shots</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>🎯 <strong>Putter</strong> — On the green</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>3-Wood</strong> — Longest fairway club. Trickiest for beginners.</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>3-Hybrid</strong> — The most forgiving long club. Start here.</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>5-Iron</strong> — Medium-long shots</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>6-Iron</strong> — Medium shots</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>8-Iron</strong> — A bit shorter, easier to hit</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>9-Iron</strong> — Your starting club. Shortest, easiest to hit cleanly.</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>Pitching Wedge</strong> — Short, high shots</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>Putter</strong> — On the green</span></div>
             </div>
             <div class="cue-box" style="border-color:#f2c879;color:#f6d89a;">Higher number = shorter distance, but easier to hit cleanly. Start with the 9-iron.</div>
           </div>
         </div>
 
         <div class="section">
-          <div class="section-title">Goals 🌺</div>
+          <div class="section-title">Goals</div>
           <div class="card" style="border-color:rgba(242,200,121,0.3);">
             <div class="card-body" style="font-size:1.05rem;line-height:1.8;">
-              🎯 Make clean contact with the ball<br>
-              🌺 Swing smooth — trust the club, don't force it<br>
+              Make clean contact with the ball<br>
+              Swing smooth — trust the club, don't force it<br>
               😊 Keep it fun — every solid hit is a win<br>
               📈 Build the habit before worrying about distance
             </div>
@@ -398,13 +379,13 @@
         </div>
 
         <div class="section">
-          <div class="section-title">Session Tips 🌱</div>
+          <div class="section-title">Session Tips</div>
           <div class="card">
-            <div class="check-row"><span>⏱ <strong>20–30 minutes is plenty</strong> — stop before it stops being fun</span></div>
-            <div class="check-row"><span>🌺 <strong>Always start with the 9-iron</strong> — warm into the swing</span></div>
+            <div class="check-row"><span><strong>20–30 minutes is plenty</strong> — stop before it stops being fun</span></div>
+            <div class="check-row"><span><strong>Always start with the 9-iron</strong> — warm into the swing</span></div>
             <div class="check-row"><span>🎵 <strong>One swing thought per session</strong> — never change mid-session</span></div>
             <div class="check-row"><span>🤲 <strong>Light grip pressure</strong> — firm but not crushing, like holding toothpaste</span></div>
-            <div class="check-row"><span>🏆 <strong>Celebrate every clean hit</strong> — that's the whole point right now</span></div>
+            <div class="check-row"><span><strong>Celebrate every clean hit</strong> — that's the whole point right now</span></div>
           </div>
         </div>
 

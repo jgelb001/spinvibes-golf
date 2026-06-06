@@ -58,7 +58,7 @@
       --muted:     #64748b;
       --border:    rgba(0,0,0,0.08);
       --red:       #c0392b;
-      --nav-h:     52px;
+      --nav-h:     44px;
       --safe-b:    env(safe-area-inset-bottom, 0px);
     }
 
@@ -424,26 +424,43 @@
       line-height: 1;
     }
 
+    /* ── NAV LIST (replaces grid) ── */
     .guide-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
     }
     .guide-card {
-      background: var(--surface);
-      border-radius: 14px;
-      padding: 16px 14px;
-      border: 0.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      background: var(--bg);
+      border: none;
+      border-bottom: 0.5px solid var(--border);
       cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
+      transition: background 0.12s;
       text-align: left;
       text-decoration: none;
+      border-radius: 0;
+      -webkit-tap-highlight-color: transparent;
     }
-    .guide-card:active { background: var(--surface2); transform: scale(0.97); }
-    .guide-card-icon { font-size: 1.4rem; margin-bottom: 8px; display: block; color: var(--green); }
-    .guide-card-title { font-weight: 600; font-size: 0.85rem; color: var(--cream); margin-bottom: 3px; }
-    .guide-card-sub { font-size: 0.7rem; color: var(--muted); }
+    .guide-card:active { background: var(--surface2); }
+    .guide-card:last-child { border-bottom: none; }
+    .guide-card-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+      color: var(--green-dark, #0D1F12);
+    }
+    .guide-card-icon i { font-size: 18px; }
+    .guide-card-body { flex: 1; min-width: 0; }
+    .guide-card-title { font-weight: 600; font-size: 0.88rem; color: var(--cream); margin-bottom: 2px; }
+    .guide-card-sub { font-size: 0.72rem; color: var(--muted); }
+    .guide-card-arrow { font-size: 0.9rem; color: var(--muted); opacity: 0.4; flex-shrink: 0; }
 
     /* ── PROGRESS PAGE ── */
     .progress-bar-wrap {
@@ -561,14 +578,24 @@
       --surface:   #111f15;
       --surface2:  #1a2f1e;
       --surface3:  #223828;
-      --green:     #2d6a3f;
-      --green-b:   #3d8a52;
-      --gold:      #c9a84c;
+      --green:     #3DAA6B;
+      --green-b:   #2A9060;
+      --gold:      #D4A843;
       --gold-l:    #e8cc7a;
       --cream:     #f0ead8;
       --muted:     #6a8a6e;
       --border:    rgba(255,255,255,0.08);
     }
+    /* Dark mode — fix hardcoded whites */
+    body.dark-mode #nav {
+      background: var(--surface);
+      border-top-color: var(--border);
+    }
+    body.dark-mode .nav-btn { color: #5a7a5e; }
+    body.dark-mode .nav-btn.active { color: var(--gold); border-top-color: var(--gold); }
+    body.dark-mode .nav-btn.active svg { stroke: var(--gold); }
+    body.dark-mode .home-hero { border-bottom-color: rgba(212,168,67,0.3) !important; }
+    body.dark-mode body { background: var(--bg); }
     body.dark-mode .card,
     body.dark-mode .guide-card,
     body.dark-mode .stat-row,
@@ -687,21 +714,27 @@
     }
     #modeToggle:active { opacity: 0.7; }
 
-    /* ── EXPANDABLE CARDS ── */
+    /* ── EXPANDABLE SECTIONS — full-width hairline, no card ── */
     .exp-trigger {
       display:flex; align-items:center; justify-content:space-between;
       cursor:pointer; user-select:none; -webkit-user-select:none;
-      margin-top:12px; padding:10px 12px;
-      border-radius: 8px;
+      /* Break out of section padding to span full width */
+      margin: 8px -20px 0;
+      padding: 11px 20px;
+      border-radius: 0;
       background: var(--surface2);
-      border:0.5px solid var(--border);
-      font-size:0.75rem; color:var(--gold); font-weight:600;
-      letter-spacing:0.5px; text-transform:uppercase;
+      border: none;
+      border-top: 0.5px solid var(--border);
+      border-bottom: 0.5px solid var(--border);
+      font-size:0.72rem; color:var(--cream); font-weight:700;
+      letter-spacing:1.5px; text-transform:uppercase;
       min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
     }
-    .exp-trigger:active { background: rgba(212,168,67,0.15); }
-    .exp-trigger svg { width:13px; height:13px; stroke:var(--gold); fill:none; stroke-width:2.5; transition:transform 0.25s; flex-shrink:0; }
+    .exp-trigger:active { background: var(--surface3); }
+    .exp-trigger svg { width:13px; height:13px; stroke:var(--muted); fill:none; stroke-width:2.5; transition:transform 0.25s; flex-shrink:0; }
     .exp-trigger.open svg { transform:rotate(180deg); }
+    .exp-trigger i { font-size:15px; color:var(--muted); }
     .exp-body { max-height:0; overflow:hidden; transition:max-height 0.45s ease; }
     .exp-body.open { max-height:1600px; }
     .exp-inner { padding-top:14px; display:flex; flex-direction:column; gap:10px; }
@@ -710,29 +743,27 @@
     .exp-list { list-style:none; padding:0; margin:0; }
     .exp-list li { font-size:0.8rem; color:var(--muted); line-height:1.65; padding-left:14px; position:relative; }
     .exp-list li::before { content:'›'; color:var(--gold); position:absolute; left:0; font-weight:700; }
-    .exp-mistake { background:rgba(214,79,58,0.08); border-left:2px solid var(--red); border-radius:0 6px 6px 0; padding:8px 10px; }
+    .exp-mistake { background:rgba(214,79,58,0.06); border-left:2px solid var(--red); border-radius:0 4px 4px 0; padding:8px 10px; }
     .exp-mistake .em-lbl { font-size:0.65rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--red); margin-bottom:2px; }
     .exp-mistake p { font-size:0.79rem; color:var(--muted); line-height:1.5; margin:0; }
-    .diagram { background:var(--surface2); border-radius:10px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:6px; }
+    .diagram { background:rgba(0,0,0,0.04); border-radius:8px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:6px; }
     .diagram-lbl { font-size:0.63rem; color:var(--gold); font-weight:600; text-transform:uppercase; letter-spacing:1.5px; }
     .exp-close {
       display:flex; align-items:center; justify-content:center; gap:6px;
-      width:100%; padding:8px 0; margin-top:2px;
-      background:none; border:0.5px solid var(--border); border-radius:8px;
+      width:100%; padding:8px 0; margin-top:8px;
+      background:none; border:none; border-top: 0.5px solid var(--border);
       color:var(--muted); font-family:'Outfit',sans-serif; font-size:0.75rem; cursor:pointer;
     }
     .exp-close:active { opacity:0.7; }
-    .exp-trigger { border-top-color:rgba(0,0,0,0.08); }
-    .diagram { background:rgba(0,0,0,0.04); }
-    .exp-mistake { background:rgba(214,79,58,0.06); }
-    body.dark-mode .exp-trigger { border-top-color:rgba(255,255,255,0.08); }
     body.dark-mode .diagram { background:rgba(255,255,255,0.04); }
     body.dark-mode .exp-mistake { background:rgba(214,79,58,0.12); }
 
     /* Topbar logo always gold on dark green — no profile overrides */
 
+    /* ── PROFILE SECTION WIDTH (page sections only, not nav buttons) ── */
+    .page .dad-sect, .page .son-sect, .page .girl-sect,
+    .page .mom-sect, .page .grandma-sect { width: 100%; }
     /* ── GIRL SECTION ── */
-    .dad-sect, .son-sect, .girl-sect { width: 100%; }
     .girl-sect { display: none; }
 
     /* ── GIRL STEP BADGE ── */
@@ -798,7 +829,6 @@
     #btnGrandma { background: #1D9E75; color: #fff; }
 
     /* ── PROFILE SECTIONS ── */
-    .dad-sect, .son-sect, .girl-sect { width: 100%; }
     .son-sect { display: none; }
     .girl-sect { display: none; }
 
@@ -1053,7 +1083,7 @@
 
 
     /* ── GRANDMA SECTION ── */
-    .grandma-sect { display: none; width: 100%; }
+    .grandma-sect { display: none; }
 
     /* ── GRANDMA BADGE ── */
     .grandma-badge {
@@ -1074,7 +1104,7 @@
 
 
     /* ── MOM SECTION ── */
-    .mom-sect { display: none; width: 100%; }
+    .mom-sect { display: none; }
 
     /* ── MOM BADGE ── */
     .mom-badge {
@@ -2263,24 +2293,24 @@
 
       <div class="guide-grid">
         <a class="guide-card" onclick="showPage('range')">
-          <span class="guide-card-icon"><i class="ti ti-flag-2"></i></span>
-          <div class="guide-card-title">Range Session</div>
-          <div class="guide-card-sub">65-ball plan</div>
+          <span class="guide-card-icon"><i class="ph-light ph-target"></i></span>
+          <div class="guide-card-body"><div class="guide-card-title">Range Session</div><div class="guide-card-sub">65-ball plan</div></div>
+          <span class="guide-card-arrow">›</span>
         </a>
         <a class="guide-card" onclick="showPage('stretches')">
-          <span class="guide-card-icon"><i class="ti ti-heart-rate"></i></span>
-          <div class="guide-card-title">Pre-Range Stretches</div>
-          <div class="guide-card-sub">5–7 min warmup</div>
+          <span class="guide-card-icon"><i class="ph-light ph-person-simple-run"></i></span>
+          <div class="guide-card-body"><div class="guide-card-title">Pre-Round Stretches</div><div class="guide-card-sub">5–7 min warmup</div></div>
+          <span class="guide-card-arrow">›</span>
         </a>
         <a class="guide-card" onclick="showPage('shortgame')">
-          <span class="guide-card-icon"><i class="ti ti-target"></i></span>
-          <div class="guide-card-title">Short Game</div>
-          <div class="guide-card-sub">Chipping &amp; putting</div>
+          <span class="guide-card-icon"><i class="ph-light ph-flag"></i></span>
+          <div class="guide-card-body"><div class="guide-card-title">Short Game</div><div class="guide-card-sub">Chipping &amp; putting</div></div>
+          <span class="guide-card-arrow">›</span>
         </a>
         <a class="guide-card dad-sect" onclick="showPage('strategy')">
-          <span class="guide-card-icon"><i class="ti ti-brain"></i></span>
-          <div class="guide-card-title">Course Strategy</div>
-          <div class="guide-card-sub">Break 90 checklist</div>
+          <span class="guide-card-icon"><i class="ph-light ph-compass"></i></span>
+          <div class="guide-card-body"><div class="guide-card-title">Course Strategy</div><div class="guide-card-sub">Break 90 checklist</div></div>
+          <span class="guide-card-arrow">›</span>
         </a>
       </div>
 
@@ -2331,10 +2361,10 @@
         <!-- Player filter pills -->
         <div id="mem-filter-pills" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
           <div class="pill selected" data-val="all" onclick="memFilterPill(this)" style="background:rgba(212,168,67,0.18);color:var(--gold);border:1px solid rgba(212,168,67,0.3);border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;">All</div>
-          <div class="pill" data-val="dad" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(212,168,67,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">🏌 Dad</div>
-          <div class="pill" data-val="son" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(96,165,250,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">⛳ Son</div>
+          <div class="pill" data-val="dad" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(212,168,67,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">Dad</div>
+          <div class="pill" data-val="son" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(96,165,250,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">Son</div>
           <div class="pill" data-val="girl" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(244,114,182,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">🌸 Daughter</div>
-          <div class="pill" data-val="mom" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(242,200,121,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">🌺 Mom</div>
+          <div class="pill" data-val="mom" onclick="memFilterPill(this)" style="border-radius:20px;padding:5px 14px;font-size:0.78rem;cursor:pointer;background:rgba(242,200,121,0.08);color:var(--muted);border:1px solid rgba(255,255,255,0.08);">Mom</div>
         </div>
         <div id="fam-memories-list">
           <div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px 0;">Loading memories…</div>
@@ -2359,14 +2389,19 @@
 
         <div class="guide-grid">
           <a class="guide-card" onclick="showPage('range')">
-            <span class="guide-card-icon"><i class="ti ti-flag-2"></i></span>
-            <div class="guide-card-title">Range Session</div>
-            <div class="guide-card-sub">30 balls · 3 phases</div>
+            <span class="guide-card-icon"><i class="ph-light ph-target"></i></span>
+            <div class="guide-card-body"><div class="guide-card-title">Range Session</div><div class="guide-card-sub">30 balls · 3 phases</div></div>
+            <span class="guide-card-arrow">›</span>
           </a>
           <a class="guide-card" onclick="showPage('stretches')">
-            <span class="guide-card-icon"><i class="ti ti-heart-rate"></i></span>
-            <div class="guide-card-title">Warm Up Moves</div>
-            <div class="guide-card-sub">6 stretches</div>
+            <span class="guide-card-icon"><i class="ph-light ph-person-simple-run"></i></span>
+            <div class="guide-card-body"><div class="guide-card-title">Warm Up Moves</div><div class="guide-card-sub">6 stretches</div></div>
+            <span class="guide-card-arrow">›</span>
+          </a>
+          <a class="guide-card" onclick="showPage('shortgame')">
+            <span class="guide-card-icon"><i class="ph-light ph-flag"></i></span>
+            <div class="guide-card-body"><div class="guide-card-title">Short Game</div><div class="guide-card-sub">Chipping &amp; putting</div></div>
+            <span class="guide-card-arrow">›</span>
           </a>
         </div>
 
@@ -2421,7 +2456,7 @@
           <div class="stat-row">
             <div class="stat"><div class="stat-num" style="color:#ec4899;">5</div><div class="stat-lbl">Clubs</div></div>
             <div class="stat"><div class="stat-num" style="color:#14b8a6;">15</div><div class="stat-lbl">Min Max</div></div>
-            <div class="stat"><div class="stat-num" style="color:#ec4899;">😄</div><div class="stat-lbl">Always</div></div>
+            <div class="stat"><div class="stat-num" style="color:#D4537E;">♥</div><div class="stat-lbl">Always</div></div>
             <div class="stat"><div class="stat-num" style="color:#14b8a6;">L</div><div class="stat-lbl">Lefty</div></div>
           </div>
         </div>
@@ -2429,29 +2464,29 @@
         <div id="daily-brief-girl"></div>
 
         <div class="section">
-          <div class="section-title">Daughter's Bag 🎒</div>
+          <div class="section-title">Daughter's Bag</div>
           <div class="card" style="border-color:rgba(236,72,153,0.3);">
             <div class="card-title">Top Flite Girls Set · Ages 5–8 · Teal/Pink</div>
             <div class="card-body">
-              <div class="check-row" style="border:none;padding:4px 0;"><span>🏌️ <strong>Driver</strong> — Big head, easy to hit, great for tee shots</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>🌿 <strong>Hybrid</strong> — Easy club that goes a long way</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>⛳ <strong>7-Iron</strong> — Her go-to club for most shots</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>💨 <strong>Sand Wedge</strong> — Gets the ball up and out</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>🎯 <strong>Putter</strong> — Roll it into the hole!</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>👜 <strong>Stand Bag</strong> — Pink & teal, all hers</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>Driver</strong> — Big head, easy to hit, great for tee shots</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>Hybrid</strong> — Easy club that goes a long way</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>7-Iron</strong> — Her go-to club for most shots</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>Sand Wedge</strong> — Gets the ball up and out</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>Putter</strong> — Roll it into the hole!</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>Stand Bag</strong> — Pink & teal, all hers</span></div>
             </div>
             <div class="cue-box" style="border-color:#ec4899;color:#f9a8d4;">Graphite shafts on all clubs — lightweight and built for her swing speed</div>
           </div>
         </div>
 
         <div class="section">
-          <div class="section-title">Goals 🌟</div>
+          <div class="section-title">Goals</div>
           <div class="card" style="border-color:rgba(20,184,166,0.3);">
             <div class="card-body" style="font-size:1.05rem;line-height:1.8;">
-              🥇 Make contact with the ball<br>
-              😂 Laugh at least once per swing<br>
-              🎉 Want to come back next time<br>
-              🌱 Build a foundation for life
+              Make contact with the ball<br>
+              Laugh at least once per swing<br>
+              Want to come back next time<br>
+              Build a foundation for life
             </div>
             <div class="cue-box" style="border-color:#14b8a6;color:#5eead4;margin-top:12px;">
               <strong>Dad's Rule:</strong> Stop BEFORE she's tired of it. Always leave her wanting more.
@@ -2460,13 +2495,13 @@
         </div>
 
         <div class="section">
-          <div class="section-title">Session Tips for Age 5 👨‍👧</div>
+          <div class="section-title">Session Tips for Age 5</div>
           <div class="card">
-            <div class="check-row"><span>⏱ <strong>10–15 minutes max</strong> — attention spans are short, that's totally fine</span></div>
-            <div class="check-row"><span>🎯 <strong>One thing at a time</strong> — one thought, one club, one goal per trip</span></div>
-            <div class="check-row"><span>🌈 <strong>Follow her lead</strong> — if she wants to putt all day, putt all day</span></div>
-            <div class="check-row"><span>🚫 <strong>No swing fixes mid-swing</strong> — wait until she asks or keep it super positive</span></div>
-            <div class="check-row"><span>🏆 <strong>Celebrate everything</strong> — any contact = amazing, any attempt = brave</span></div>
+            <div class="check-row"><span><strong>10–15 minutes max</strong> — attention spans are short, that's totally fine</span></div>
+            <div class="check-row"><span><strong>One thing at a time</strong> — one thought, one club, one goal per trip</span></div>
+            <div class="check-row"><span><strong>Follow her lead</strong> — if she wants to putt all day, putt all day</span></div>
+            <div class="check-row"><span><strong>No swing fixes mid-swing</strong> — wait until she asks or keep it super positive</span></div>
+            <div class="check-row"><span><strong>Celebrate everything</strong> — any contact = amazing, any attempt = brave</span></div>
           </div>
         </div>
 
@@ -2477,95 +2512,71 @@
         <div class="home-hero">
           <div class="home-greeting">Welcome Back</div>
           <div class="home-title">Getting Back<br><span>Out There</span></div>
-          <div class="home-goal" style="border-color:rgba(212,175,112,0.4);background:rgba(212,175,112,0.08);color:var(--gold);font-size:0.75rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;padding:6px 14px;border-radius:20px;display:inline-block;margin-top:8px;">EASY · ENJOY · PLAY</div>
-        </div>
-
-        <div style="display:flex;gap:10px;margin-bottom:16px;">
-          <div class="stat-box" style="flex:1;text-align:center;">
-            <div class="stat-num">9</div>
-            <div class="stat-lbl">Holes Today</div>
-          </div>
-          <div class="stat-box" style="flex:1;text-align:center;">
-            <div class="stat-num">Easy</div>
-            <div class="stat-lbl">Pace</div>
-          </div>
-          <div class="stat-box" style="flex:1;text-align:center;">
-            <div class="stat-num">Fun</div>
-            <div class="stat-lbl">Goal</div>
+          <div class="home-goal" style="border-color:rgba(29,158,117,0.3);background:rgba(29,158,117,0.07);">
+            <div class="home-goal-num" style="color:#1D9E75;font-size:1.4rem;">9</div>
+            <div>
+              <div style="font-weight:700;color:var(--cream);font-size:0.85rem;">Easy · Enjoy · Play</div>
+              <div style="font-size:0.75rem;">Holes at your pace. No score pressure.</div>
+            </div>
           </div>
         </div>
 
-        <div class="home-section-title">Getting Back Out There</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-          <div class="guide-card" onclick="showPage('shortgame')">
-            <div class="guide-card-icon"><svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'/><line x1='12' y1='8' x2='12' y2='16'/><line x1='8' y1='12' x2='16' y2='12'/></svg></div>
-            <div class="guide-card-title">Short Game</div>
-            <div class="guide-card-sub">Putting focus</div>
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" style="color:#1D9E75;">9</div><div class="stat-lbl">Holes</div></div>
+            <div class="stat"><div class="stat-num">Easy</div><div class="stat-lbl">Pace</div></div>
+            <div class="stat"><div class="stat-num">Fun</div><div class="stat-lbl">Goal</div></div>
           </div>
-          <div class="guide-card" onclick="showPage('stretch')">
-            <div class="guide-card-icon"><svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M18 8h1a4 4 0 0 1 0 8h-1'/><path d='M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z'/><line x1='6' y1='1' x2='6' y2='4'/><line x1='10' y1='1' x2='10' y2='4'/><line x1='14' y1='1' x2='14' y2='4'/></svg></div>
-            <div class="guide-card-title">Stretch</div>
-            <div class="guide-card-sub">Gentle prep</div>
-          </div>
+        </div>
+
+        <div class="guide-grid">
+          <a class="guide-card" onclick="showPage('shortgame')">
+            <span class="guide-card-icon"><i class="ph-light ph-flag"></i></span>
+            <div class="guide-card-body"><div class="guide-card-title">Short Game</div><div class="guide-card-sub">Putting focus</div></div>
+            <span class="guide-card-arrow">›</span>
+          </a>
+          <a class="guide-card" onclick="showPage('stretches')">
+            <span class="guide-card-icon"><i class="ph-light ph-person-simple-run"></i></span>
+            <div class="guide-card-body"><div class="guide-card-title">Gentle Stretch</div><div class="guide-card-sub">Easy prep</div></div>
+            <span class="guide-card-arrow">›</span>
+          </a>
+          <a class="guide-card" onclick="showPage('range')">
+            <span class="guide-card-icon"><i class="ph-light ph-target"></i></span>
+            <div class="guide-card-body"><div class="guide-card-title">Range Warmup</div><div class="guide-card-sub">Half-swings only</div></div>
+            <span class="guide-card-arrow">›</span>
+          </a>
         </div>
 
         <div id="daily-brief-grandma"></div>
 
-        <div class="home-section-title">Your Bag — Lynx Lady Regalia</div>
-        <div class="guide-card" style="margin-bottom:16px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:0.82rem;">
-            <div style="color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">Driver</strong><br>Fairway or skip it — no pressure</div>
-            <div style="color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">7-Wood</strong><br>Your best friend off the tee</div>
-            <div style="color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">Hybrid</strong><br>When you need to advance it</div>
-            <div style="color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">9-Iron</strong><br>Reliable approach club</div>
-            <div style="color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">Pitching Wedge</strong><br>Around the green</div>
-            <div style="color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);"><strong style="color:var(--text);">Putter</strong><br>Take your time, enjoy the green</div>
+        <div class="section">
+          <div class="section-title">Your Bag — Lynx Lady Regalia</div>
+          <div class="stat-row">
+            <div class="stat"><div class="stat-num" style="font-size:1rem;">7W</div><div class="stat-lbl">Best Friend</div></div>
+            <div class="stat"><div class="stat-num" style="font-size:1rem;">Hyb</div><div class="stat-lbl">Advance</div></div>
+            <div class="stat"><div class="stat-num" style="font-size:1rem;">9i</div><div class="stat-lbl">Approach</div></div>
+            <div class="stat"><div class="stat-num" style="font-size:1rem;">PW</div><div class="stat-lbl">Around Green</div></div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <strong>Driver</strong> — Fairway or skip it, no pressure<br>
+              <strong>7-Wood</strong> — Your most reliable long club<br>
+              <strong>9-Iron</strong> — Dependable approach<br>
+              <strong>Putter</strong> — Take your time, enjoy the green
+            </div>
           </div>
         </div>
 
-        <div class="home-section-title">Session Guide</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-
-          <div class="guide-card">
-            <div style="font-size:0.6rem;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Before You Start</div>
-            <div style="font-size:0.8rem;color:var(--muted);line-height:1.5;">
-              5 min of gentle stretching<br>
-              Hydrate before you head out<br>
-              Comfortable, supportive shoes<br>
-              No rush — warm up slowly
+        <div class="section">
+          <div class="section-title">Session Guide</div>
+          <div class="card">
+            <div class="card-body" style="line-height:1.9;">
+              <strong>Before:</strong> 5 min gentle stretch, water, comfortable shoes<br>
+              <strong>Range:</strong> Start with putts and chips, easy half-swings only<br>
+              <strong>Course:</strong> Pick up after 3 shots, use a cart, play preferred lies<br>
+              <strong>Checklist:</strong> Water bottle, light snack, sunscreen, charged phone
             </div>
           </div>
-
-          <div class="guide-card">
-            <div style="font-size:0.6rem;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">On the Range</div>
-            <div style="font-size:0.8rem;color:var(--muted);line-height:1.5;">
-              Start with putts and chips<br>
-              Easy half-swings only<br>
-              Notice what feels good<br>
-              Stop if anything aches
-            </div>
-          </div>
-
-          <div class="guide-card">
-            <div style="font-size:0.6rem;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">On the Course</div>
-            <div style="font-size:0.8rem;color:var(--muted);line-height:1.5;">
-              Pick up after 3 shots on a hole<br>
-              Use a cart — enjoy the ride<br>
-              Play preferred lies<br>
-              Focus on the fun, not the score
-            </div>
-          </div>
-
-          <div class="guide-card">
-            <div style="font-size:0.6rem;font-weight:700;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">The Checklist</div>
-            <div style="font-size:0.8rem;color:var(--muted);line-height:1.5;">
-              Water bottle in the cart<br>
-              Light snack for the turn<br>
-              Sunscreen applied<br>
-              Phone charged for photos
-            </div>
-          </div>
-
         </div>
 
       </div><!-- /grandma-sect home -->
@@ -2576,7 +2587,7 @@
           <div class="home-greeting">Mom</div>
           <div class="home-title">Welcome to<br><span>the Range</span></div>
           <div class="home-goal" style="border-color:rgba(242,200,121,0.4);background:rgba(242,200,121,0.08);">
-            <div class="home-goal-num" style="color:#f2c879;">🌺</div>
+            <div class="home-goal-num" style="color:#7F77DD;font-size:1.4rem;">M</div>
             <div>
               <div style="font-weight:700;color:var(--cream);font-size:0.85rem;">The Goal</div>
               <div style="font-size:0.75rem;">Make contact. Just connect the club with the ball.</div>
@@ -2588,7 +2599,7 @@
           <div class="stat-row">
             <div class="stat"><div class="stat-num" style="color:#f2c879;">R</div><div class="stat-lbl">Righty</div></div>
             <div class="stat"><div class="stat-num" style="color:#e88868;">1st</div><div class="stat-lbl">Season</div></div>
-            <div class="stat"><div class="stat-num" style="color:#f2c879;">🌱</div><div class="stat-lbl">Beginner</div></div>
+            <div class="stat"><div class="stat-num" style="color:#7F77DD;">1st</div><div class="stat-lbl">Beginner</div></div>
             <div class="stat"><div class="stat-num" style="color:#e88868;">9</div><div class="stat-lbl">Clubs</div></div>
           </div>
         </div>
@@ -2596,7 +2607,7 @@
         <div id="daily-brief-mom"></div>
 
         <div class="section">
-          <div class="section-title">The One Big Idea 🌺</div>
+          <div class="section-title">The One Big Idea</div>
           <div class="card" style="border-color:rgba(242,200,121,0.4);background:rgba(242,200,121,0.06);">
             <div class="mom-badge">Ball First, Ground Second</div>
             <div class="card-body">
@@ -2607,29 +2618,29 @@
         </div>
 
         <div class="section">
-          <div class="section-title">Mom's Bag 🌺</div>
+          <div class="section-title">Mom's Bag</div>
           <div class="card" style="border-color:rgba(217,119,87,0.3);">
             <div class="card-title">Used Set · 9 Clubs · Righty</div>
             <div class="card-body">
-              <div class="check-row" style="border:none;padding:4px 0;"><span>🌺 <strong>3-Wood</strong> — Longest fairway club. Trickiest for beginners.</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>⭐ <strong>3-Hybrid</strong> — The most forgiving long club. Start here.</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>⛳ <strong>5-Iron</strong> — Medium-long shots</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>⛳ <strong>6-Iron</strong> — Medium shots</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>⛳ <strong>8-Iron</strong> — A bit shorter, easier to hit</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>⭐ <strong>9-Iron</strong> — Your starting club. Shortest, easiest to hit cleanly.</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>💨 <strong>Pitching Wedge</strong> — Short, high shots</span></div>
-              <div class="check-row" style="border:none;padding:4px 0;"><span>🎯 <strong>Putter</strong> — On the green</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>3-Wood</strong> — Longest fairway club. Trickiest for beginners.</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>3-Hybrid</strong> — The most forgiving long club. Start here.</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>5-Iron</strong> — Medium-long shots</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>6-Iron</strong> — Medium shots</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>8-Iron</strong> — A bit shorter, easier to hit</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>9-Iron</strong> — Your starting club. Shortest, easiest to hit cleanly.</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>Pitching Wedge</strong> — Short, high shots</span></div>
+              <div class="check-row" style="border:none;padding:4px 0;"><span><strong>Putter</strong> — On the green</span></div>
             </div>
             <div class="cue-box" style="border-color:#f2c879;color:#f6d89a;">Higher number = shorter distance, but easier to hit cleanly. Start with the 9-iron.</div>
           </div>
         </div>
 
         <div class="section">
-          <div class="section-title">Goals 🌺</div>
+          <div class="section-title">Goals</div>
           <div class="card" style="border-color:rgba(242,200,121,0.3);">
             <div class="card-body" style="font-size:1.05rem;line-height:1.8;">
-              🎯 Make clean contact with the ball<br>
-              🌺 Swing smooth — trust the club, don't force it<br>
+              Make clean contact with the ball<br>
+              Swing smooth — trust the club, don't force it<br>
               😊 Keep it fun — every solid hit is a win<br>
               📈 Build the habit before worrying about distance
             </div>
@@ -2640,13 +2651,13 @@
         </div>
 
         <div class="section">
-          <div class="section-title">Session Tips 🌱</div>
+          <div class="section-title">Session Tips</div>
           <div class="card">
-            <div class="check-row"><span>⏱ <strong>20–30 minutes is plenty</strong> — stop before it stops being fun</span></div>
-            <div class="check-row"><span>🌺 <strong>Always start with the 9-iron</strong> — warm into the swing</span></div>
+            <div class="check-row"><span><strong>20–30 minutes is plenty</strong> — stop before it stops being fun</span></div>
+            <div class="check-row"><span><strong>Always start with the 9-iron</strong> — warm into the swing</span></div>
             <div class="check-row"><span>🎵 <strong>One swing thought per session</strong> — never change mid-session</span></div>
             <div class="check-row"><span>🤲 <strong>Light grip pressure</strong> — firm but not crushing, like holding toothpaste</span></div>
-            <div class="check-row"><span>🏆 <strong>Celebrate every clean hit</strong> — that's the whole point right now</span></div>
+            <div class="check-row"><span><strong>Celebrate every clean hit</strong> — that's the whole point right now</span></div>
           </div>
         </div>
 
@@ -4275,7 +4286,7 @@
     <div class="page" id="page-son-progress">
       <!-- PIN Overlay -->
       <div id="son-pin-overlay" style="position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;padding-top:calc(32px + env(safe-area-inset-top,0px));overflow-y:auto;">
-        <div style="font-size:2.5rem;margin-bottom:12px;">🔒</div>
+        <div style="font-size:2.5rem;margin-bottom:12px;"></div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:#3b82f6;letter-spacing:2px;margin-bottom:6px;">Son's Progress</div>
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:28px;">Enter PIN to continue</div>
         <div id="son-pin-dots" style="display:flex;gap:12px;margin-bottom:28px;">
@@ -4304,21 +4315,21 @@
       <!-- Page Content -->
       <div id="son-progress-content">
         <div class="page-header">
-          <div class="page-tag">SON · PRIVATE 🔒</div>
+          <div class="PAGE-TAG">Son </div>
           <div class="page-title">My Scores</div>
-          <div class="page-icon">🏌️</div>
+          <div class="page-icon"></div>
         </div>
 
         <!-- Level card — injected by renderKidLevelCard('son') -->
         <div id="son-level-card"></div>
 
         <div class="section" style="display:flex;gap:10px;">
-          <button class="btn-primary" onclick="openSonModal()" style="flex:1;">⛳ Start New Round</button>
-          <button onclick="lockSonProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(59,130,246,0.35);border-radius:10px;padding:0 14px;color:#93c5fd;font-size:1.1rem;font-weight:600;cursor:pointer;">🔒</button>
+          <button class="btn-primary" onclick="openSonModal()" style="flex:1;">Start New Round</button>
+          <button onclick="lockSonProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(59,130,246,0.35);border-radius:10px;padding:0 14px;color:#93c5fd;font-size:1.1rem;font-weight:600;cursor:pointer;"></button>
         </div>
 
         <div class="section">
-          <div class="section-title">🏆 Milestones</div>
+          <div class="section-title">Milestones</div>
 
           <div class="round-card" style="border-color:rgba(59,130,246,0.6);margin-bottom:10px;">
             <div class="round-card-header" onclick="toggleRoundExpand('son-milestone-par1')">
@@ -4334,7 +4345,7 @@
               <div style="margin-bottom:8px;color:#93c5fd;font-weight:700;">🎉 Son's 1st Par — Hole 14!</div>
               <div style="margin-bottom:6px;">Welk Resort SD — Oaks par 3 · Blue tees</div>
               <div style="margin-bottom:6px;">Par 3 · 105 yards · Score: 3</div>
-              <div style="font-size:0.82rem;color:var(--muted);">Played with Dad. Ball signed and put on his shelf. 🏌️</div>
+              <div style="font-size:0.82rem;color:var(--muted);">Played with Dad. Ball signed and put on his shelf. </div>
             </div>
           </div>
 
@@ -4432,14 +4443,14 @@
       </div>
       <div id="mom-progress-content">
         <div class="page-header" style="background:linear-gradient(160deg,rgba(184,101,48,0.15) 0%,var(--bg) 100%);">
-          <div class="page-tag" style="color:#B86530;">MOM · MY GAME 🔒</div>
+          <div class="page-tag" style="color:#B86530;">MOM · MY GAME </div>
           <div class="page-title" style="color:#e8a070;">My Progress</div>
         </div>
         <div class="section" style="display:flex;gap:10px;">
           <button class="btn-primary" onclick="openMomRoundModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#B86530;">
             <i class="ti ti-flag-2" style="font-size:1rem;"></i> Log a Round
           </button>
-          <button onclick="lockMomProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(184,101,48,0.35);border-radius:10px;padding:0 14px;color:#e8a070;font-size:1.1rem;font-weight:600;cursor:pointer;">🔒</button>
+          <button onclick="lockMomProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(184,101,48,0.35);border-radius:10px;padding:0 14px;color:#e8a070;font-size:1.1rem;font-weight:600;cursor:pointer;"></button>
         </div>
         <div class="section">
           <div class="section-title">Round History</div>
@@ -4489,14 +4500,14 @@
       </div>
       <div id="grandma-progress-content">
         <div class="page-header" style="background:linear-gradient(160deg,rgba(154,128,80,0.15) 0%,var(--bg) 100%);">
-          <div class="page-tag" style="color:#9A8050;">GRANDMA · MY GAME 🔒</div>
+          <div class="page-tag" style="color:#9A8050;">GRANDMA · MY GAME </div>
           <div class="page-title" style="color:#c4a870;">My Progress</div>
         </div>
         <div class="section" style="display:flex;gap:10px;">
           <button class="btn-primary" onclick="openGrandmaRoundModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#9A8050;">
             <i class="ti ti-flag-2" style="font-size:1rem;"></i> Log a Round
           </button>
-          <button onclick="lockGrandmaProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(154,128,80,0.35);border-radius:10px;padding:0 14px;color:#c4a870;font-size:1.1rem;font-weight:600;cursor:pointer;">🔒</button>
+          <button onclick="lockGrandmaProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(154,128,80,0.35);border-radius:10px;padding:0 14px;color:#c4a870;font-size:1.1rem;font-weight:600;cursor:pointer;"></button>
         </div>
         <div class="section">
           <div class="section-title">Round History</div>
@@ -5580,7 +5591,7 @@
     document.querySelectorAll('.girl-sect')   .forEach(el => el.style.display = isGirl    ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
     document.querySelectorAll('.grandma-sect').forEach(el => el.style.display = isGrandma ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
     document.querySelectorAll('.mom-sect')    .forEach(el => el.style.display = isMom     ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
-    const subs = { dad: '⛳ Lefty · Sub-90 Journey', son: '⛳ Righty · Junior · Have Fun!', girl: '⛳ Lefty · Age 5 · Pure Fun!', grandma: '⛳ Righty · Welcome Back · Lynx Lady', mom: '⛳ Righty · Beginner · Welcome to the Range' };
+    const subs = { dad: 'Lefty · Sub-90 Journey', son: 'Righty · Junior', girl: 'Lefty · Age 5', grandma: 'Righty · Welcome Back', mom: 'Righty · Beginner' };
     document.getElementById('topbarSub').textContent = subs[who];
     document.getElementById('btnDad')    .classList.toggle('active', isDad);
     document.getElementById('btnSon')    .classList.toggle('active', isSon);
@@ -5739,7 +5750,7 @@
     const el = document.getElementById('son-sessionHistory');
     if (!el) return;
     if (!sessions.length) {
-      el.innerHTML = '<div style="font-size:0.82rem;color:var(--muted);text-align:center;padding:20px 0;">No sessions yet.<br>Hit the range and come back! 🏌️</div>';
+      el.innerHTML = '<div style="font-size:0.82rem;color:var(--muted);text-align:center;padding:20px 0;">No sessions yet.<br>Hit the range and log your sessions here.</div>';
       return;
     }
     el.innerHTML = sessions.map(s => {
@@ -5895,7 +5906,7 @@
     document.getElementById('range-focus-edit').style.display = 'none';
     document.getElementById('range-focus-display').style.display = '';
     loadRangeFocus();
-    showToast('Focus saved! Go get it 🎯');
+    showToast('Focus saved');
   }
 
   // ── EXPANDABLE CARDS ─────────────────────────────────────────
@@ -6862,7 +6873,7 @@
     const fp3 = h.par === 3         ? 'active' : '';
     const gy  = h.gir               ? 'active' : '';
     const gn  = !h.gir              ? 'active' : '';
-    const parLabel  = h.par === 3 ? 'Par 3 🏹' : h.par === 5 ? 'Par 5 💪' : 'Par 4 ⛳';
+    const parLabel  = h.par === 3 ? 'Par 3' : h.par === 5 ? 'Par 5' : 'Par 4';
     const nextLabel = isLast ? 'Finish Round →' : 'Next Hole →';
     const backAttr  = _dadHoleIdx === 0 ? 'disabled style="opacity:0.3;"' : '';
 

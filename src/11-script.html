@@ -654,7 +654,7 @@
     document.querySelectorAll('.girl-sect')   .forEach(el => el.style.display = isGirl    ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
     document.querySelectorAll('.grandma-sect').forEach(el => el.style.display = isGrandma ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
     document.querySelectorAll('.mom-sect')    .forEach(el => el.style.display = isMom     ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
-    const subs = { dad: '⛳ Lefty · Sub-90 Journey', son: '⛳ Righty · Junior · Have Fun!', girl: '⛳ Lefty · Age 5 · Pure Fun!', grandma: '⛳ Righty · Welcome Back · Lynx Lady', mom: '⛳ Righty · Beginner · Welcome to the Range' };
+    const subs = { dad: 'Lefty · Sub-90 Journey', son: 'Righty · Junior', girl: 'Lefty · Age 5', grandma: 'Righty · Welcome Back', mom: 'Righty · Beginner' };
     document.getElementById('topbarSub').textContent = subs[who];
     document.getElementById('btnDad')    .classList.toggle('active', isDad);
     document.getElementById('btnSon')    .classList.toggle('active', isSon);
@@ -813,7 +813,7 @@
     const el = document.getElementById('son-sessionHistory');
     if (!el) return;
     if (!sessions.length) {
-      el.innerHTML = '<div style="font-size:0.82rem;color:var(--muted);text-align:center;padding:20px 0;">No sessions yet.<br>Hit the range and come back! 🏌️</div>';
+      el.innerHTML = '<div style="font-size:0.82rem;color:var(--muted);text-align:center;padding:20px 0;">No sessions yet.<br>Hit the range and log your sessions here.</div>';
       return;
     }
     el.innerHTML = sessions.map(s => {
@@ -969,7 +969,7 @@
     document.getElementById('range-focus-edit').style.display = 'none';
     document.getElementById('range-focus-display').style.display = '';
     loadRangeFocus();
-    showToast('Focus saved! Go get it 🎯');
+    showToast('Focus saved');
   }
 
   // ── EXPANDABLE CARDS ─────────────────────────────────────────
@@ -1936,7 +1936,7 @@
     const fp3 = h.par === 3         ? 'active' : '';
     const gy  = h.gir               ? 'active' : '';
     const gn  = !h.gir              ? 'active' : '';
-    const parLabel  = h.par === 3 ? 'Par 3 🏹' : h.par === 5 ? 'Par 5 💪' : 'Par 4 ⛳';
+    const parLabel  = h.par === 3 ? 'Par 3' : h.par === 5 ? 'Par 5' : 'Par 4';
     const nextLabel = isLast ? 'Finish Round →' : 'Next Hole →';
     const backAttr  = _dadHoleIdx === 0 ? 'disabled style="opacity:0.3;"' : '';
 

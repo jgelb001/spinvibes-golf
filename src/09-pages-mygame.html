@@ -2,7 +2,7 @@
     <div class="page" id="page-son-progress">
       <!-- PIN Overlay -->
       <div id="son-pin-overlay" style="position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;padding-top:calc(32px + env(safe-area-inset-top,0px));overflow-y:auto;">
-        <div style="font-size:2.5rem;margin-bottom:12px;">🔒</div>
+        <div style="font-size:2.5rem;margin-bottom:12px;"></div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:#3b82f6;letter-spacing:2px;margin-bottom:6px;">Son's Progress</div>
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:28px;">Enter PIN to continue</div>
         <div id="son-pin-dots" style="display:flex;gap:12px;margin-bottom:28px;">
@@ -31,21 +31,21 @@
       <!-- Page Content -->
       <div id="son-progress-content">
         <div class="page-header">
-          <div class="page-tag">SON · PRIVATE 🔒</div>
+          <div class="PAGE-TAG">Son </div>
           <div class="page-title">My Scores</div>
-          <div class="page-icon">🏌️</div>
+          <div class="page-icon"></div>
         </div>
 
         <!-- Level card — injected by renderKidLevelCard('son') -->
         <div id="son-level-card"></div>
 
         <div class="section" style="display:flex;gap:10px;">
-          <button class="btn-primary" onclick="openSonModal()" style="flex:1;">⛳ Start New Round</button>
-          <button onclick="lockSonProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(59,130,246,0.35);border-radius:10px;padding:0 14px;color:#93c5fd;font-size:1.1rem;font-weight:600;cursor:pointer;">🔒</button>
+          <button class="btn-primary" onclick="openSonModal()" style="flex:1;">Start New Round</button>
+          <button onclick="lockSonProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(59,130,246,0.35);border-radius:10px;padding:0 14px;color:#93c5fd;font-size:1.1rem;font-weight:600;cursor:pointer;"></button>
         </div>
 
         <div class="section">
-          <div class="section-title">🏆 Milestones</div>
+          <div class="section-title">Milestones</div>
 
           <div class="round-card" style="border-color:rgba(59,130,246,0.6);margin-bottom:10px;">
             <div class="round-card-header" onclick="toggleRoundExpand('son-milestone-par1')">
@@ -61,7 +61,7 @@
               <div style="margin-bottom:8px;color:#93c5fd;font-weight:700;">🎉 Son's 1st Par — Hole 14!</div>
               <div style="margin-bottom:6px;">Welk Resort SD — Oaks par 3 · Blue tees</div>
               <div style="margin-bottom:6px;">Par 3 · 105 yards · Score: 3</div>
-              <div style="font-size:0.82rem;color:var(--muted);">Played with Dad. Ball signed and put on his shelf. 🏌️</div>
+              <div style="font-size:0.82rem;color:var(--muted);">Played with Dad. Ball signed and put on his shelf. </div>
             </div>
           </div>
 
@@ -159,14 +159,14 @@
       </div>
       <div id="mom-progress-content">
         <div class="page-header" style="background:linear-gradient(160deg,rgba(184,101,48,0.15) 0%,var(--bg) 100%);">
-          <div class="page-tag" style="color:#B86530;">MOM · MY GAME 🔒</div>
+          <div class="page-tag" style="color:#B86530;">MOM · MY GAME </div>
           <div class="page-title" style="color:#e8a070;">My Progress</div>
         </div>
         <div class="section" style="display:flex;gap:10px;">
           <button class="btn-primary" onclick="openMomRoundModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#B86530;">
             <i class="ti ti-flag-2" style="font-size:1rem;"></i> Log a Round
           </button>
-          <button onclick="lockMomProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(184,101,48,0.35);border-radius:10px;padding:0 14px;color:#e8a070;font-size:1.1rem;font-weight:600;cursor:pointer;">🔒</button>
+          <button onclick="lockMomProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(184,101,48,0.35);border-radius:10px;padding:0 14px;color:#e8a070;font-size:1.1rem;font-weight:600;cursor:pointer;"></button>
         </div>
         <div class="section">
           <div class="section-title">Round History</div>
@@ -216,14 +216,14 @@
       </div>
       <div id="grandma-progress-content">
         <div class="page-header" style="background:linear-gradient(160deg,rgba(154,128,80,0.15) 0%,var(--bg) 100%);">
-          <div class="page-tag" style="color:#9A8050;">GRANDMA · MY GAME 🔒</div>
+          <div class="page-tag" style="color:#9A8050;">GRANDMA · MY GAME </div>
           <div class="page-title" style="color:#c4a870;">My Progress</div>
         </div>
         <div class="section" style="display:flex;gap:10px;">
           <button class="btn-primary" onclick="openGrandmaRoundModal()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#9A8050;">
             <i class="ti ti-flag-2" style="font-size:1rem;"></i> Log a Round
           </button>
-          <button onclick="lockGrandmaProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(154,128,80,0.35);border-radius:10px;padding:0 14px;color:#c4a870;font-size:1.1rem;font-weight:600;cursor:pointer;">🔒</button>
+          <button onclick="lockGrandmaProgress()" title="Lock & sign out" style="flex:0 0 auto;background:var(--surface3);border:1px solid rgba(154,128,80,0.35);border-radius:10px;padding:0 14px;color:#c4a870;font-size:1.1rem;font-weight:600;cursor:pointer;"></button>
         </div>
         <div class="section">
           <div class="section-title">Round History</div>

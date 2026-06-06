@@ -58,7 +58,7 @@
       --muted:     #64748b;
       --border:    rgba(0,0,0,0.08);
       --red:       #c0392b;
-      --nav-h:     52px;
+      --nav-h:     44px;
       --safe-b:    env(safe-area-inset-bottom, 0px);
     }
 
@@ -424,26 +424,43 @@
       line-height: 1;
     }
 
+    /* ── NAV LIST (replaces grid) ── */
     .guide-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
     }
     .guide-card {
-      background: var(--surface);
-      border-radius: 14px;
-      padding: 16px 14px;
-      border: 0.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      background: var(--bg);
+      border: none;
+      border-bottom: 0.5px solid var(--border);
       cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
+      transition: background 0.12s;
       text-align: left;
       text-decoration: none;
+      border-radius: 0;
+      -webkit-tap-highlight-color: transparent;
     }
-    .guide-card:active { background: var(--surface2); transform: scale(0.97); }
-    .guide-card-icon { font-size: 1.4rem; margin-bottom: 8px; display: block; color: var(--green); }
-    .guide-card-title { font-weight: 600; font-size: 0.85rem; color: var(--cream); margin-bottom: 3px; }
-    .guide-card-sub { font-size: 0.7rem; color: var(--muted); }
+    .guide-card:active { background: var(--surface2); }
+    .guide-card:last-child { border-bottom: none; }
+    .guide-card-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+      color: var(--green-dark, #0D1F12);
+    }
+    .guide-card-icon i { font-size: 18px; }
+    .guide-card-body { flex: 1; min-width: 0; }
+    .guide-card-title { font-weight: 600; font-size: 0.88rem; color: var(--cream); margin-bottom: 2px; }
+    .guide-card-sub { font-size: 0.72rem; color: var(--muted); }
+    .guide-card-arrow { font-size: 0.9rem; color: var(--muted); opacity: 0.4; flex-shrink: 0; }
 
     /* ── PROGRESS PAGE ── */
     .progress-bar-wrap {
@@ -561,14 +578,24 @@
       --surface:   #111f15;
       --surface2:  #1a2f1e;
       --surface3:  #223828;
-      --green:     #2d6a3f;
-      --green-b:   #3d8a52;
-      --gold:      #c9a84c;
+      --green:     #3DAA6B;
+      --green-b:   #2A9060;
+      --gold:      #D4A843;
       --gold-l:    #e8cc7a;
       --cream:     #f0ead8;
       --muted:     #6a8a6e;
       --border:    rgba(255,255,255,0.08);
     }
+    /* Dark mode — fix hardcoded whites */
+    body.dark-mode #nav {
+      background: var(--surface);
+      border-top-color: var(--border);
+    }
+    body.dark-mode .nav-btn { color: #5a7a5e; }
+    body.dark-mode .nav-btn.active { color: var(--gold); border-top-color: var(--gold); }
+    body.dark-mode .nav-btn.active svg { stroke: var(--gold); }
+    body.dark-mode .home-hero { border-bottom-color: rgba(212,168,67,0.3) !important; }
+    body.dark-mode body { background: var(--bg); }
     body.dark-mode .card,
     body.dark-mode .guide-card,
     body.dark-mode .stat-row,
@@ -687,21 +714,27 @@
     }
     #modeToggle:active { opacity: 0.7; }
 
-    /* ── EXPANDABLE CARDS ── */
+    /* ── EXPANDABLE SECTIONS — full-width hairline, no card ── */
     .exp-trigger {
       display:flex; align-items:center; justify-content:space-between;
       cursor:pointer; user-select:none; -webkit-user-select:none;
-      margin-top:12px; padding:10px 12px;
-      border-radius: 8px;
+      /* Break out of section padding to span full width */
+      margin: 8px -20px 0;
+      padding: 11px 20px;
+      border-radius: 0;
       background: var(--surface2);
-      border:0.5px solid var(--border);
-      font-size:0.75rem; color:var(--gold); font-weight:600;
-      letter-spacing:0.5px; text-transform:uppercase;
+      border: none;
+      border-top: 0.5px solid var(--border);
+      border-bottom: 0.5px solid var(--border);
+      font-size:0.72rem; color:var(--cream); font-weight:700;
+      letter-spacing:1.5px; text-transform:uppercase;
       min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
     }
-    .exp-trigger:active { background: rgba(212,168,67,0.15); }
-    .exp-trigger svg { width:13px; height:13px; stroke:var(--gold); fill:none; stroke-width:2.5; transition:transform 0.25s; flex-shrink:0; }
+    .exp-trigger:active { background: var(--surface3); }
+    .exp-trigger svg { width:13px; height:13px; stroke:var(--muted); fill:none; stroke-width:2.5; transition:transform 0.25s; flex-shrink:0; }
     .exp-trigger.open svg { transform:rotate(180deg); }
+    .exp-trigger i { font-size:15px; color:var(--muted); }
     .exp-body { max-height:0; overflow:hidden; transition:max-height 0.45s ease; }
     .exp-body.open { max-height:1600px; }
     .exp-inner { padding-top:14px; display:flex; flex-direction:column; gap:10px; }
@@ -710,29 +743,27 @@
     .exp-list { list-style:none; padding:0; margin:0; }
     .exp-list li { font-size:0.8rem; color:var(--muted); line-height:1.65; padding-left:14px; position:relative; }
     .exp-list li::before { content:'›'; color:var(--gold); position:absolute; left:0; font-weight:700; }
-    .exp-mistake { background:rgba(214,79,58,0.08); border-left:2px solid var(--red); border-radius:0 6px 6px 0; padding:8px 10px; }
+    .exp-mistake { background:rgba(214,79,58,0.06); border-left:2px solid var(--red); border-radius:0 4px 4px 0; padding:8px 10px; }
     .exp-mistake .em-lbl { font-size:0.65rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--red); margin-bottom:2px; }
     .exp-mistake p { font-size:0.79rem; color:var(--muted); line-height:1.5; margin:0; }
-    .diagram { background:var(--surface2); border-radius:10px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:6px; }
+    .diagram { background:rgba(0,0,0,0.04); border-radius:8px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:6px; }
     .diagram-lbl { font-size:0.63rem; color:var(--gold); font-weight:600; text-transform:uppercase; letter-spacing:1.5px; }
     .exp-close {
       display:flex; align-items:center; justify-content:center; gap:6px;
-      width:100%; padding:8px 0; margin-top:2px;
-      background:none; border:0.5px solid var(--border); border-radius:8px;
+      width:100%; padding:8px 0; margin-top:8px;
+      background:none; border:none; border-top: 0.5px solid var(--border);
       color:var(--muted); font-family:'Outfit',sans-serif; font-size:0.75rem; cursor:pointer;
     }
     .exp-close:active { opacity:0.7; }
-    .exp-trigger { border-top-color:rgba(0,0,0,0.08); }
-    .diagram { background:rgba(0,0,0,0.04); }
-    .exp-mistake { background:rgba(214,79,58,0.06); }
-    body.dark-mode .exp-trigger { border-top-color:rgba(255,255,255,0.08); }
     body.dark-mode .diagram { background:rgba(255,255,255,0.04); }
     body.dark-mode .exp-mistake { background:rgba(214,79,58,0.12); }
 
     /* Topbar logo always gold on dark green — no profile overrides */
 
+    /* ── PROFILE SECTION WIDTH (page sections only, not nav buttons) ── */
+    .page .dad-sect, .page .son-sect, .page .girl-sect,
+    .page .mom-sect, .page .grandma-sect { width: 100%; }
     /* ── GIRL SECTION ── */
-    .dad-sect, .son-sect, .girl-sect { width: 100%; }
     .girl-sect { display: none; }
 
     /* ── GIRL STEP BADGE ── */
@@ -798,7 +829,6 @@
     #btnGrandma { background: #1D9E75; color: #fff; }
 
     /* ── PROFILE SECTIONS ── */
-    .dad-sect, .son-sect, .girl-sect { width: 100%; }
     .son-sect { display: none; }
     .girl-sect { display: none; }
 
@@ -1053,7 +1083,7 @@
 
 
     /* ── GRANDMA SECTION ── */
-    .grandma-sect { display: none; width: 100%; }
+    .grandma-sect { display: none; }
 
     /* ── GRANDMA BADGE ── */
     .grandma-badge {
@@ -1074,7 +1104,7 @@
 
 
     /* ── MOM SECTION ── */
-    .mom-sect { display: none; width: 100%; }
+    .mom-sect { display: none; }
 
     /* ── MOM BADGE ── */
     .mom-badge {
