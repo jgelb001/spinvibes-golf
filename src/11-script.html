@@ -6271,6 +6271,11 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         <button id="sp-landscape" onclick="setShareOrientation('landscape',this)" style="flex:1;border:none;border-radius:8px;padding:8px;font-size:0.82rem;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);">▭ Landscape</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
+        ${_famRound.game_mode === 'team_scramble' ? `
+        <button onclick="buildAndShare('team_scramble')" style="background:rgba(29,158,117,0.1);border:1px solid rgba(29,158,117,0.35);border-radius:14px;padding:16px;text-align:left;cursor:pointer;color:var(--cream);">
+          <div style="display:flex;align-items:center;gap:7px;font-weight:700;font-size:0.95rem;margin-bottom:3px;"><i class="ph-light ph-handshake" style="color:#1D9E75;"></i> Team Scramble Recap</div>
+          <div style="font-size:0.78rem;color:var(--muted);">${_famRound.game_mode_data?.teamNames?.a || 'Team A'} vs ${_famRound.game_mode_data?.teamNames?.b || 'Team B'} · best-ball totals · winner</div>
+        </button>` : ''}
         <button onclick="buildAndShare('scorecard')" style="background:var(--surface2);border:1px solid rgba(212,175,112,0.2);border-radius:14px;padding:16px;text-align:left;cursor:pointer;color:var(--cream);">
           <div style="font-weight:700;font-size:0.95rem;margin-bottom:3px;">Full Scorecard</div>
           <div style="font-size:0.78rem;color:var(--muted);">All hole photos as collage · all scores · winner</div>
@@ -6307,6 +6312,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     try {
       let blob;
       if (template === 'scorecard') blob = await _buildScorecardCard();
+      if (template === 'team_scramble') blob = await _buildTeamScrambleCard();
       if (blob) await _doShare(blob);
     } catch(e) { console.warn('Share error:', e); }
     finally { if (btn) { btn.disabled = false; btn.textContent = '📤 Share'; } }
@@ -6804,6 +6810,112 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     ctx.font = `500 ${Math.round(15*sf)}px Outfit,Arial`;
     ctx.textAlign = 'center';
     ctx.fillText(winLine, W/2, y + Math.round(14*sf));
+
+    await _drawCardChrome(ctx, W, H, sf);
+    return _canvasToBlob(canvas);
+  }
+
+  // ── TEMPLATE 1b: TEAM SCRAMBLE RECAP — team names front and center, best-ball totals ──
+  async function _buildTeamScrambleCard() {
+    if (_famRound.game_mode !== 'team_scramble' || !_famRound.game_mode_data) return null;
+    const W = 720, H = 1280;
+    const gm = _famRound.game_mode_data;
+    const totalPar = _famHoles.reduce((a, h) => a + h.par, 0);
+    const sf = 0.76;
+    const teamColor = { a: '#378ADD', b: '#D4537E' };
+
+    const teamTotal = (teamKey) => {
+      const members = gm.teams[teamKey] || [];
+      return _famHoles.reduce((sum, h) => {
+        const scores = members.map(pk => h.scores[pk]).filter(s => typeof s === 'number' && s > 0);
+        return sum + (scores.length ? Math.min(...scores) : 0);
+      }, 0);
+    };
+    const totalA = teamTotal('a');
+    const totalB = teamTotal('b');
+    const winnerKey = totalA === totalB ? null : (totalA < totalB ? 'a' : 'b');
+
+    const canvas = _makeCanvas(W, H);
+    const ctx    = canvas.getContext('2d');
+
+    // ── PHOTO BACKGROUND (top ~38%) ──
+    const photos = _famHoles.flatMap(h => h.photos?.length ? h.photos : (h.photo ? [h.photo] : [])).filter(p => _hasPhoto(p));
+    ctx.fillStyle = '#0d1a0a'; ctx.fillRect(0, 0, W, H);
+    const photoH = Math.round(H * 0.34);
+    if (photos.length) {
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, photoH); ctx.clip();
+      await _drawCollageBackground(ctx, W, photoH, photos);
+      ctx.restore();
+    }
+    const fadeG = ctx.createLinearGradient(0, photoH * 0.45, 0, photoH + 40);
+    fadeG.addColorStop(0, 'rgba(13,26,10,0)');
+    fadeG.addColorStop(1, 'rgba(13,26,10,1)');
+    ctx.fillStyle = fadeG; ctx.fillRect(0, 0, W, photoH + 40);
+
+    // ── HEADER: course + "Team Scramble" badge ──
+    const pad = 28;
+    let y = photoH - 6;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(29,158,117,0.9)';
+    ctx.font = `500 ${Math.round(15*sf)}px Outfit,Arial`;
+    ctx.fillText('TEAM SCRAMBLE · BEST BALL', W/2, y - Math.round(34*sf));
+    ctx.fillStyle = '#f5f0e8';
+    ctx.font = `500 ${Math.round(42*sf)}px "Bebas Neue",Impact,Arial`;
+    ctx.fillText((_famRound.course_name||'').toUpperCase(), W/2, y);
+    y += Math.round(28*sf);
+    ctx.fillStyle = 'rgba(255,255,255,0.38)';
+    ctx.font = `400 ${Math.round(17*sf)}px Outfit,Arial`;
+    ctx.fillText(`${_famRound.date_played||''}  ·  Par ${totalPar}`, W/2, y);
+    y += Math.round(50*sf);
+
+    // ── TEAM CARDS — name, members, big total ──
+    const cardW = Math.round((W - pad*2 - 18) / 2);
+    const cardH = Math.round(220*sf);
+    ['a','b'].forEach((teamKey, i) => {
+      const cx = pad + i*(cardW+18);
+      const color = teamColor[teamKey];
+      const total = teamKey === 'a' ? totalA : totalB;
+      const diff  = total - totalPar;
+      const dStr  = diff === 0 ? 'E' : (diff > 0 ? '+'+diff : String(diff));
+      const isWinner = winnerKey === teamKey;
+      const members = (gm.teams[teamKey]||[]).map(pk => FAM_PLAYERS[pk]?.name || pk).join(' & ');
+
+      ctx.fillStyle = `${color}20`;
+      _rr(ctx, cx, y, cardW, cardH, Math.round(14*sf)); ctx.fill();
+      if (isWinner) {
+        ctx.strokeStyle = color; ctx.lineWidth = Math.round(2.5*sf);
+        _rr(ctx, cx, y, cardW, cardH, Math.round(14*sf)); ctx.stroke();
+      }
+      ctx.textAlign = 'center';
+      const midX = cx + cardW/2;
+      ctx.fillStyle = color;
+      ctx.font = `500 ${Math.round(20*sf)}px "Bebas Neue",Impact,Arial`;
+      ctx.fillText((gm.teamNames[teamKey]||'').toUpperCase(), midX, y + cardH*0.26);
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.font = `400 ${Math.round(12.5*sf)}px Outfit,Arial`;
+      ctx.fillText(members, midX, y + cardH*0.40);
+      ctx.fillStyle = '#f5f0e8';
+      ctx.font = `500 ${Math.round(54*sf)}px "Bebas Neue",Impact,Arial`;
+      ctx.fillText(String(total), midX, y + cardH*0.74);
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.font = `400 ${Math.round(13*sf)}px Outfit,Arial`;
+      ctx.fillText(dStr, midX, y + cardH*0.90);
+      if (isWinner) {
+        ctx.fillStyle = _C.gold;
+        ctx.font = `500 ${Math.round(11*sf)}px Outfit,Arial`;
+        ctx.fillText('🏆 WINNER', midX, y - Math.round(8*sf));
+      }
+    });
+    y += cardH + Math.round(34*sf);
+
+    // ── Result line ──
+    const resultLine = winnerKey
+      ? `${gm.teamNames[winnerKey]} wins by ${Math.abs(totalA-totalB)}!`
+      : `${gm.teamNames.a} & ${gm.teamNames.b} tied!`;
+    ctx.fillStyle = _C.gold;
+    ctx.font = `500 ${Math.round(17*sf)}px Outfit,Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText(resultLine, W/2, y);
 
     await _drawCardChrome(ctx, W, H, sf);
     return _canvasToBlob(canvas);
