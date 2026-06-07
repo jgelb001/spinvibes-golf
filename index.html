@@ -10090,6 +10090,44 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     grandma: { key:'grandma', name:'Grandma',  emoji:'G', color:'#1D9E75', bg:'rgba(29,158,117,0.12)',  saveFn: r => saveGrandmaRound(r) },
   };
 
+  // Family game modes — light, kid-inclusive formats for whole-family rounds.
+  // Adult-only formats (Scramble, Wolf, Match Play, etc.) intentionally excluded —
+  // those are for serious tracking, not for keeping the family loose on the course.
+  const GAME_MODES = {
+    none: {
+      key: 'none', name: 'Just Track Scores', icon: 'ph-light ph-flag', color: '#888780', status: 'ready',
+      blurb: 'Standard family round — everyone plays their own ball, scores tracked as usual.',
+      howTo: 'No special rules. Play your own ball on every hole and post your score like normal.'
+    },
+    junior_scramble: {
+      key: 'junior_scramble', name: 'Junior Scramble', icon: 'ph-light ph-rocket-launch', color: '#378ADD', status: 'ready',
+      blurb: 'Adults play it straight — but each kid gets one "bomb drive" per 9 holes to rescue the team.',
+      howTo: 'Adults play their own ball as normal. Each kid gets ONE "bomb drive" per 9 holes — on that hole, the team plays from the kid\'s tee shot instead, no matter where it lands. Use it to save a tough hole or just for fun. The team score for that hole becomes the best ball from there. Track who saves the day!'
+    },
+    parents_vs_kids: {
+      key: 'parents_vs_kids', name: 'Parents vs. Kids', icon: 'ph-light ph-users-three', color: '#7F77DD', status: 'soon',
+      blurb: 'Adults vs. kids, with scores auto-adjusted by age so it stays a fair fight.',
+      howTo: 'Coming soon — teams split by generation, with a built-in handicap so a 6-year-old and a grown-up are evenly matched on every hole.'
+    },
+    hole_challenge: {
+      key: 'hole_challenge', name: 'Hole Challenge', icon: 'ph-light ph-medal', color: '#D4537E', status: 'soon',
+      blurb: 'A different mini-challenge each hole — closest to the pin, fewest putts, longest drive.',
+      howTo: 'Coming soon — every hole gets its own side bet (closest to the pin, fewest putts, hit the fairway) that anyone can win, no matter their score for the hole.'
+    },
+    kid_birdie_bomb: {
+      key: 'kid_birdie_bomb', name: 'Kid Birdie Bomb', icon: 'ph-light ph-confetti', color: '#D4A843', status: 'soon',
+      blurb: 'When a kid scores par or better, their team wins the hole outright — bonus excitement.',
+      howTo: 'Coming soon — if a kid posts par or better on a hole (with a friendly adjusted target), their team wins that hole outright, regardless of anyone else\'s score.'
+    },
+    team_captain: {
+      key: 'team_captain', name: 'Team Captain', icon: 'ph-light ph-flag-checkered', color: '#1D9E75', status: 'soon',
+      blurb: 'The kid is captain — they pick which adult\'s shot the team plays from each hole.',
+      howTo: 'Coming soon — the kid is team captain for the round. After everyone tees off, the captain picks whose ball the team plays from. Captain duties rotate hole to hole.'
+    },
+  };
+  let _famGameMode      = 'none';   // selected key from GAME_MODES
+  let _famGmExplainerOpen = false;
+
   let _famRound         = {};
   let _famHoles         = [];
   let _famHoleIdx       = 0;
@@ -10174,6 +10212,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     _famCourseId   = null;
     _famCourseData = null;
     _famPlayerTees = { dad: null, son: null, girl: null, mom: null, grandma: null };
+    _famGameMode   = 'none';
+    _famGmExplainerOpen = false;
     const today = new Date().toISOString().split('T')[0];
 
     document.getElementById('fam-modal-body').innerHTML = `
@@ -10223,6 +10263,33 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
               </div>
             </div>
           </div>`).join('')}
+      </div>
+
+      <label class="modal-label" style="margin-top:14px;">Game mode <span style="font-weight:400;color:var(--muted);">— keep it light</span></label>
+      <div id="fm-gamemode-wrap" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px;">
+        ${Object.values(GAME_MODES).map(gm => `
+          <div class="fm-gamemode-card${gm.key==='none'?' selected':''}${gm.status==='soon'?' soon':''}" data-mode="${gm.key}"
+            onclick="${gm.status==='soon' ? '' : `famSelectGameMode('${gm.key}')`}"
+            style="display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:12px;border:1.5px solid ${gm.key==='none'?'rgba(212,168,67,0.5)':'rgba(255,255,255,0.08)'};background:${gm.key==='none'?'rgba(212,168,67,0.12)':'var(--surface2)'};cursor:${gm.status==='soon'?'default':'pointer'};opacity:${gm.status==='soon'?'0.55':'1'};touch-action:manipulation;">
+            <div style="width:36px;height:36px;border-radius:50%;background:${gm.color}22;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="${gm.icon}" style="font-size:1.05rem;color:${gm.color};"></i>
+            </div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:0.86rem;font-weight:700;color:var(--cream);display:flex;align-items:center;gap:6px;">
+                ${gm.name}
+                ${gm.status==='soon' ? '<span style="font-size:0.6rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);background:rgba(255,255,255,0.06);border-radius:6px;padding:2px 6px;">Coming soon</span>' : ''}
+              </div>
+              <div style="font-size:0.72rem;color:var(--muted);line-height:1.35;margin-top:2px;">${gm.blurb}</div>
+            </div>
+            ${gm.status!=='soon' ? `<i class="ph-light ph-check-circle" style="font-size:1.2rem;color:${gm.key===_famGameMode?'var(--gold)':'rgba(255,255,255,0.15)'};flex-shrink:0;"></i>` : ''}
+          </div>`).join('')}
+      </div>
+      <div id="fm-gamemode-howto" onclick="famToggleGmExplainer()" style="display:${_famGameMode==='none'?'none':'flex'};align-items:center;gap:7px;padding:9px 12px;cursor:pointer;color:var(--gold);font-size:0.78rem;font-weight:600;touch-action:manipulation;">
+        <i class="ph-light ph-info"></i> <span>How does ${GAME_MODES[_famGameMode]?.name || ''} work?</span>
+        <i class="ph-light ph-caret-${_famGmExplainerOpen?'up':'down'}" style="margin-left:auto;color:var(--muted);"></i>
+      </div>
+      <div id="fm-gamemode-howto-body" style="display:${_famGmExplainerOpen && _famGameMode!=='none'?'block':'none'};background:rgba(255,255,255,0.04);border-radius:10px;padding:12px 14px;margin:-2px 0 10px;font-size:0.78rem;line-height:1.5;color:var(--cream);">
+        ${GAME_MODES[_famGameMode]?.howTo || ''}
       </div>
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:10px;">
@@ -10364,6 +10431,43 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     }
   }
 
+  function famSelectGameMode(key) {
+    if (!GAME_MODES[key] || GAME_MODES[key].status === 'soon') return;
+    _famGameMode = key;
+    _famGmExplainerOpen = false;
+    document.querySelectorAll('#fm-gamemode-wrap .fm-gamemode-card').forEach(card => {
+      const ck = card.dataset.mode;
+      const isSel = ck === key;
+      card.classList.toggle('selected', isSel);
+      card.style.borderColor = isSel ? 'rgba(212,168,67,0.5)' : 'rgba(255,255,255,0.08)';
+      card.style.background  = isSel ? 'rgba(212,168,67,0.12)' : 'var(--surface2)';
+      const check = card.querySelector('.ph-check-circle');
+      if (check) check.style.color = isSel ? 'var(--gold)' : 'rgba(255,255,255,0.15)';
+    });
+    const howtoTrigger = document.getElementById('fm-gamemode-howto');
+    const howtoBody    = document.getElementById('fm-gamemode-howto-body');
+    if (howtoTrigger) {
+      howtoTrigger.style.display = key === 'none' ? 'none' : 'flex';
+      const span = howtoTrigger.querySelector('span');
+      if (span) span.textContent = `How does ${GAME_MODES[key].name} work?`;
+      const caret = howtoTrigger.querySelector('[class*="ph-caret"]');
+      if (caret) caret.className = 'ph-light ph-caret-down';
+    }
+    if (howtoBody) {
+      howtoBody.style.display = 'none';
+      howtoBody.textContent = GAME_MODES[key].howTo;
+    }
+  }
+
+  function famToggleGmExplainer() {
+    if (_famGameMode === 'none') return;
+    _famGmExplainerOpen = !_famGmExplainerOpen;
+    const body  = document.getElementById('fm-gamemode-howto-body');
+    const caret = document.querySelector('#fm-gamemode-howto [class*="ph-caret"]');
+    if (body)  body.style.display = _famGmExplainerOpen ? 'block' : 'none';
+    if (caret) caret.className = _famGmExplainerOpen ? 'ph-light ph-caret-up' : 'ph-light ph-caret-down';
+  }
+
   async function confirmDeleteFamilyRound(id) {
     if (!confirm('Delete this family round?')) return;
     try {
@@ -10481,7 +10585,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
   function viewFamRound(r) {
     // Reconstruct _famRound and _famHoles from saved data
-    _famRound = { date_played: r.date_played, course_name: r.course_name, course_par: r.course_par, players: r.players || [] };
+    _famRound = { date_played: r.date_played, course_name: r.course_name, course_par: r.course_par, players: r.players || [], game_mode: r.game_mode || null, game_mode_data: r.game_mode_data || null };
     _famHoles = (r.holes || []).map(h => ({
       ...h,
       scores: h.scores || {},
@@ -10542,6 +10646,21 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       return;
     }
 
+    // Game mode setup — additive, backward-compatible. 'none' stores game_mode:null
+    // so older readers / standard rounds are unaffected.
+    const gmKey = _famGameMode || 'none';
+    const gameMode = gmKey === 'none' ? null : gmKey;
+    let gameModeData = null;
+    if (gmKey === 'junior_scramble') {
+      // Each kid gets one bomb-drive rescue per 9 holes. Track usage + which holes were rescued.
+      const kidKeys = players.filter(pk => pk === 'son' || pk === 'girl');
+      gameModeData = {
+        kids: kidKeys,
+        bombDrivesUsed: Object.fromEntries(kidKeys.map(pk => [pk, []])),   // [{hole, front9: bool}]
+        rescuedHoles:   {},   // { holeNum: kidKey }
+      };
+    }
+
     _famRound = {
       date_played: dateVal,
       course_name: courseName,
@@ -10550,6 +10669,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       is_practice: famIsPractice,
       player_tees: Object.fromEntries(players.map(pk => [pk, _famPlayerTees[pk] || null])),
       course_id:   _famCourseId,
+      game_mode:      gameMode,
+      game_mode_data: gameModeData,
     };
     _famHoleIdx       = 0;
     _famCaddieHistory = [];
@@ -10595,6 +10716,73 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const total = _famHoles.slice(0, _famHoleIdx + 1).reduce((a, h) => a + (h.scores[pk] || 0), 0);
       return `<span class="fam-running-chip" style="background:${p.bg};color:${p.color};">${p.emoji} ${total}</span>`;
     }).join('');
+  }
+
+  // Junior Scramble: builds the per-hole banner showing rescue status + bomb-drive buttons.
+  // Each kid gets ONE rescue per 9 holes (front 9 / back 9 tracked separately).
+  function famJuniorScrambleBanner(h) {
+    if (_famRound.game_mode !== 'junior_scramble' || !_famRound.game_mode_data) return '';
+    const gm = _famRound.game_mode_data;
+    const holeNum = h.hole;
+    const isFront9 = holeNum <= 9;
+    const rescuedBy = gm.rescuedHoles[holeNum];
+
+    if (rescuedBy) {
+      const p = FAM_PLAYERS[rescuedBy];
+      return `<div style="display:flex;align-items:center;gap:10px;background:${p.color}1c;border:1px solid ${p.color}55;border-radius:12px;padding:11px 14px;margin-bottom:10px;">
+        <i class="ph-light ph-rocket-launch" style="font-size:1.3rem;color:${p.color};"></i>
+        <div style="flex:1;">
+          <div style="font-size:0.84rem;font-weight:700;color:${p.color};">Bomb drive used — ${p.name}'s carrying the team!</div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:1px;">Team plays from ${p.name}'s tee shot on this hole.</div>
+        </div>
+        <button onclick="famUndoBombDrive(${holeNum})" style="background:none;border:none;color:var(--muted);font-size:0.68rem;text-decoration:underline;cursor:pointer;flex-shrink:0;touch-action:manipulation;">Undo</button>
+      </div>`;
+    }
+
+    const kidButtons = (gm.kids || []).map(pk => {
+      const p = FAM_PLAYERS[pk];
+      const used = (gm.bombDrivesUsed[pk] || []);
+      const usedThisHalf = used.some(u => (u.front9 ?? true) === isFront9);
+      if (usedThisHalf) {
+        return `<div style="display:flex;align-items:center;gap:6px;font-size:0.72rem;color:var(--muted);padding:7px 12px;background:var(--surface2);border-radius:20px;opacity:0.6;">
+          <i class="ph-light ph-rocket-launch" style="color:${p.color};"></i> ${p.name}'s bomb drive used this ${isFront9?'front':'back'} 9
+        </div>`;
+      }
+      return `<button onclick="famUseBombDrive('${pk}')" style="display:flex;align-items:center;gap:6px;font-size:0.74rem;font-weight:700;color:${p.color};padding:8px 14px;background:${p.color}18;border:1.5px solid ${p.color}55;border-radius:20px;cursor:pointer;touch-action:manipulation;">
+        <i class="ph-light ph-rocket-launch"></i> ${p.name}: use bomb drive
+      </button>`;
+    }).join('');
+
+    if (!kidButtons) return '';
+    return `<div style="margin-bottom:10px;">
+      <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Junior Scramble — ${isFront9?'Front':'Back'} 9 rescue available</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">${kidButtons}</div>
+    </div>`;
+  }
+
+  function famUseBombDrive(pk) {
+    const h = _famHoles[_famHoleIdx];
+    const gm = _famRound.game_mode_data;
+    if (!gm || !gm.kids?.includes(pk)) return;
+    const isFront9 = h.hole <= 9;
+    const used = gm.bombDrivesUsed[pk] || (gm.bombDrivesUsed[pk] = []);
+    if (used.some(u => (u.front9 ?? true) === isFront9)) { showToast(`${FAM_PLAYERS[pk].name} already used their ${isFront9?'front':'back'}-9 bomb drive`, 'error'); return; }
+    used.push({ hole: h.hole, front9: isFront9 });
+    gm.rescuedHoles[h.hole] = pk;
+    _saveFamDraft();
+    renderFamHole();
+    showToast(`🚀 ${FAM_PLAYERS[pk].name}'s bomb drive is in play!`);
+  }
+
+  function famUndoBombDrive(holeNum) {
+    const gm = _famRound.game_mode_data;
+    if (!gm) return;
+    const pk = gm.rescuedHoles[holeNum];
+    if (!pk) return;
+    delete gm.rescuedHoles[holeNum];
+    gm.bombDrivesUsed[pk] = (gm.bombDrivesUsed[pk] || []).filter(u => u.hole !== holeNum);
+    _saveFamDraft();
+    renderFamHole();
   }
 
   function renderFamHole() {
@@ -10681,6 +10869,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     </div>`;
 
     document.getElementById('fam-modal-body').innerHTML = `
+      ${famJuniorScrambleBanner(h)}
       ${photoBanner}
       <input type="file" id="fhpc" accept="image/*" capture="environment" style="display:none;" onchange="famLoadHolePhoto(this)">
       <input type="file" id="fhpr" accept="image/*" style="display:none;" onchange="famLoadHolePhoto(this)">
@@ -11699,6 +11888,41 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       function _roundRect(ctx, x, y, w, h, r) { _rr(ctx, x, y, w, h, r); }
 
 
+  // Junior Scramble: kid-friendly results card for the round summary —
+  // who used their bomb drives, which holes got rescued, and a "carried the team" callout.
+  function famJuniorScrambleSummaryCard() {
+    if (_famRound.game_mode !== 'junior_scramble' || !_famRound.game_mode_data) return '';
+    const gm = _famRound.game_mode_data;
+    const rescuedEntries = Object.entries(gm.rescuedHoles || {});
+
+    const kidLines = (gm.kids || []).map(pk => {
+      const p = FAM_PLAYERS[pk];
+      const used = gm.bombDrivesUsed[pk] || [];
+      const holesUsed = used.map(u => `Hole ${u.hole}`).join(', ');
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <div style="width:34px;height:34px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:0.95rem;flex-shrink:0;">${p.emoji}</div>
+        <div style="flex:1;">
+          <div style="font-size:0.82rem;font-weight:700;color:${p.color};">${p.name}</div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:1px;">${used.length ? `Bomb drive used on ${holesUsed} — saved the team!` : 'Saved both bomb drives — held them in reserve.'}</div>
+        </div>
+        <i class="ph-light ph-rocket-launch" style="font-size:1.15rem;color:${used.length ? p.color : 'rgba(255,255,255,0.15)'};flex-shrink:0;"></i>
+      </div>`;
+    }).join('');
+
+    const heroLine = rescuedEntries.length
+      ? `<div style="font-size:0.8rem;color:var(--gold);font-weight:700;margin-bottom:4px;">🚀 ${rescuedEntries.length} hole${rescuedEntries.length>1?'s':''} rescued by bomb drives this round!</div>`
+      : `<div style="font-size:0.8rem;color:var(--muted);margin-bottom:4px;">No bomb drives used — the team played it straight all the way.</div>`;
+
+    return `<div class="card" style="border-color:rgba(55,138,221,0.35);background:rgba(55,138,221,0.08);padding:14px 16px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <i class="ph-light ph-rocket-launch" style="font-size:1.1rem;color:#378ADD;"></i>
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#378ADD;">Junior Scramble Recap</div>
+      </div>
+      ${heroLine}
+      ${kidLines}
+    </div>`;
+  }
+
   function renderFamSummary() {
     document.getElementById('fam-modal-label').textContent = 'Scorecard';
     document.getElementById('fam-running-bar').style.display = 'none';
@@ -11737,6 +11961,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         <div style="font-size:0.8rem;color:var(--muted);">${_famRound.date_played} &middot; Par ${totalPar}</div>
         <div style="font-size:1.15rem;margin-top:10px;">${winMsg}</div>
       </div>
+      ${famJuniorScrambleSummaryCard()}
       <div class="fam-scroll-wrap">
         <table class="fam-sc-table">
           <thead><tr><th>Hole</th>${hdrCells}</tr></thead>
@@ -11990,6 +12215,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         holes:       safeFamHoles,
         totals:      totals,
         is_practice: _famRound.is_practice || false,
+        game_mode:      _famRound.game_mode || null,
+        game_mode_data: _famRound.game_mode_data || null,
       });
     } catch(e) { /* non-fatal \u2014 individual saves already done */ }
 
