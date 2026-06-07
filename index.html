@@ -10099,6 +10099,11 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       blurb: 'Standard family round — everyone plays their own ball, scores tracked as usual.',
       howTo: 'No special rules. Play your own ball on every hole and post your score like normal.'
     },
+    team_scramble: {
+      key: 'team_scramble', name: 'Team Scramble', icon: 'ph-light ph-handshake', color: '#1D9E75', status: 'ready',
+      blurb: 'Split into two teams of two — pick teammates, name your squads, and play best ball.',
+      howTo: 'Split the group into two teams (pairs work best — e.g. Dad + one kid vs. Mom + the other). Name your teams for fun. On every hole, each team\'s score is its BEST BALL — whichever teammate scores lower, that\'s the team\'s score for the hole. Everyone still posts their own score; the team score is just the better of the two. Lowest total wins for the team!'
+    },
     junior_scramble: {
       key: 'junior_scramble', name: 'Junior Scramble', icon: 'ph-light ph-rocket-launch', color: '#378ADD', status: 'ready',
       blurb: 'Adults play it straight — but each kid gets one "bomb drive" per 9 holes to rescue the team.',
@@ -10127,6 +10132,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   };
   let _famGameMode      = 'none';   // selected key from GAME_MODES
   let _famGmExplainerOpen = false;
+  // Team Scramble setup state — { pk: 'a'|'b' } assignments + custom team names
+  let _famTeamAssign    = {};
+  let _famTeamNames     = { a: 'Team A', b: 'Team B' };
 
   let _famRound         = {};
   let _famHoles         = [];
@@ -10214,6 +10222,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     _famPlayerTees = { dad: null, son: null, girl: null, mom: null, grandma: null };
     _famGameMode   = 'none';
     _famGmExplainerOpen = false;
+    _famTeamAssign = {};
+    _famTeamNames  = { a: 'Team A', b: 'Team B' };
     const today = new Date().toISOString().split('T')[0];
 
     document.getElementById('fam-modal-body').innerHTML = `
@@ -10291,6 +10301,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       <div id="fm-gamemode-howto-body" style="display:${_famGmExplainerOpen && _famGameMode!=='none'?'block':'none'};background:rgba(255,255,255,0.04);border-radius:10px;padding:12px 14px;margin:-2px 0 10px;font-size:0.78rem;line-height:1.5;color:var(--cream);">
         ${GAME_MODES[_famGameMode]?.howTo || ''}
       </div>
+      <div id="fm-teams-wrap"></div>
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:10px;">
         <span style="font-size:0.87rem;color:var(--cream);font-weight:600;">Round type</span>
@@ -10307,6 +10318,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       </div>
     `;
     loadFamHistory();
+    famRenderTeamPicker();
   }
 
   async function famSearchCourse() {
@@ -10429,6 +10441,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       selectorEl.style.display = isSelected ? 'block' : 'none';
       if (isSelected && _famCourseData) famRefreshTeePills();
     }
+    famRenderTeamPicker();
   }
 
   function famSelectGameMode(key) {
@@ -10457,6 +10470,68 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       howtoBody.style.display = 'none';
       howtoBody.textContent = GAME_MODES[key].howTo;
     }
+    famRenderTeamPicker();
+  }
+
+  // Team Scramble: renders the team-assignment picker (names + per-player A/B toggle)
+  // into #fm-teams-wrap. Re-run whenever the game mode or player selection changes.
+  function famRenderTeamPicker() {
+    const wrap = document.getElementById('fm-teams-wrap');
+    if (!wrap) return;
+    if (_famGameMode !== 'team_scramble') { wrap.innerHTML = ''; return; }
+
+    const selectedPlayers = Array.from(document.querySelectorAll('#fam-modal-body .fam-checkbox-card.selected')).map(c => c.dataset.player);
+    // Default-assign any newly-selected player to whichever team is smaller (keeps it balanced)
+    selectedPlayers.forEach(pk => {
+      if (!_famTeamAssign[pk]) {
+        const aCount = selectedPlayers.filter(k => _famTeamAssign[k] === 'a').length;
+        const bCount = selectedPlayers.filter(k => _famTeamAssign[k] === 'b').length;
+        _famTeamAssign[pk] = aCount <= bCount ? 'a' : 'b';
+      }
+    });
+    // Drop assignments for players no longer selected
+    Object.keys(_famTeamAssign).forEach(pk => { if (!selectedPlayers.includes(pk)) delete _famTeamAssign[pk]; });
+
+    if (selectedPlayers.length < 2) {
+      wrap.innerHTML = `<div style="font-size:0.75rem;color:var(--muted);padding:10px 0;">Pick at least 2 players to set up teams.</div>`;
+      return;
+    }
+
+    const teamRow = (teamKey, color) => {
+      const members = selectedPlayers.filter(pk => _famTeamAssign[pk] === teamKey);
+      return `<div style="background:${color}12;border:1px solid ${color}45;border-radius:12px;padding:11px 13px;margin-bottom:8px;">
+        <input type="text" value="${_famTeamNames[teamKey]}" maxlength="18" oninput="famSetTeamName('${teamKey}', this.value)"
+          style="width:100%;background:transparent;border:none;border-bottom:1.5px solid ${color}55;color:${color};font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.5px;padding:2px 0 5px;margin-bottom:8px;">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          ${members.length ? members.map(pk => {
+            const p = FAM_PLAYERS[pk];
+            return `<div onclick="famAssignTeam('${pk}','${teamKey==='a'?'b':'a'}')" style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-radius:20px;cursor:pointer;touch-action:manipulation;">
+              <div style="width:22px;height:22px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:0.7rem;flex-shrink:0;">${p.emoji}</div>
+              <span style="font-size:0.76rem;font-weight:600;color:var(--cream);">${p.name}</span>
+              <i class="ph-light ph-arrows-left-right" style="font-size:0.85rem;color:var(--muted);"></i>
+            </div>`;
+          }).join('') : `<div style="font-size:0.7rem;color:var(--muted);padding:4px 0;">No one yet — tap a player on the other team to move them here.</div>`}
+        </div>
+      </div>`;
+    };
+
+    wrap.innerHTML = `
+      <label class="modal-label" style="margin-top:12px;">Set your teams <span style="font-weight:400;color:var(--muted);">— tap a player to swap sides</span></label>
+      ${teamRow('a', '#378ADD')}
+      ${teamRow('b', '#D4537E')}
+      <div style="font-size:0.68rem;color:var(--muted);text-align:center;margin:-2px 0 10px;">📸 Tip: name your teams something fun — it'll show up when you share photos from the round.</div>
+    `;
+  }
+
+  function famAssignTeam(pk, teamKey) {
+    _famTeamAssign[pk] = teamKey;
+    famRenderTeamPicker();
+  }
+
+  function famSetTeamName(teamKey, val) {
+    // Store the live value as typed — don't re-render (would steal input focus).
+    // Empty/default fallback is applied at round-start time in startFamRound().
+    _famTeamNames[teamKey] = val;
   }
 
   function famToggleGmExplainer() {
@@ -10660,6 +10735,18 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         rescuedHoles:   {},   // { holeNum: kidKey }
       };
     }
+    if (gmKey === 'team_scramble') {
+      const teamA = players.filter(pk => _famTeamAssign[pk] === 'a');
+      const teamB = players.filter(pk => _famTeamAssign[pk] === 'b');
+      if (!teamA.length || !teamB.length) { showToast('Each team needs at least one player', 'error'); return; }
+      gameModeData = {
+        teamNames: {
+          a: (_famTeamNames.a || '').trim() || 'Team A',
+          b: (_famTeamNames.b || '').trim() || 'Team B',
+        },
+        teams: { a: teamA, b: teamB },
+      };
+    }
 
     _famRound = {
       date_played: dateVal,
@@ -10785,6 +10872,26 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     renderFamHole();
   }
 
+  function famTeamScrambleBanner(h) {
+    if (_famRound.game_mode !== 'team_scramble' || !_famRound.game_mode_data) return '';
+    const gm = _famRound.game_mode_data;
+    const teamRow = (teamKey, color) => {
+      const members = gm.teams[teamKey] || [];
+      const scores = members.map(pk => h.scores[pk]).filter(s => typeof s === 'number' && s > 0);
+      const best = scores.length ? Math.min(...scores) : null;
+      const names = members.map(pk => FAM_PLAYERS[pk]?.name || pk).join(' & ');
+      return `<div style="flex:1;background:${color}14;border:1px solid ${color}45;border-radius:11px;padding:9px 12px;">
+        <div style="font-size:0.66rem;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:${color};margin-bottom:2px;">${gm.teamNames[teamKey]}</div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px;">${names}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--text);">${best !== null ? best : '—'}</div>
+      </div>`;
+    };
+    return `<div style="margin-bottom:10px;">
+      <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Team Scramble — best ball this hole</div>
+      <div style="display:flex;gap:8px;">${teamRow('a', '#378ADD')}${teamRow('b', '#D4537E')}</div>
+    </div>`;
+  }
+
   function renderFamHole() {
     const h      = _famHoles[_famHoleIdx];
     const isLast = _famHoleIdx === _famHoles.length - 1;
@@ -10870,6 +10977,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     document.getElementById('fam-modal-body').innerHTML = `
       ${famJuniorScrambleBanner(h)}
+      ${famTeamScrambleBanner(h)}
       ${photoBanner}
       <input type="file" id="fhpc" accept="image/*" capture="environment" style="display:none;" onchange="famLoadHolePhoto(this)">
       <input type="file" id="fhpr" accept="image/*" style="display:none;" onchange="famLoadHolePhoto(this)">
@@ -11923,6 +12031,57 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     </div>`;
   }
 
+  // Team Scramble: cumulative best-ball totals per team across the round, with a winner banner.
+  function famTeamScrambleSummaryCard() {
+    if (_famRound.game_mode !== 'team_scramble' || !_famRound.game_mode_data) return '';
+    const gm = _famRound.game_mode_data;
+    const teamTotal = (teamKey) => {
+      const members = gm.teams[teamKey] || [];
+      return _famHoles.reduce((sum, h) => {
+        const scores = members.map(pk => h.scores[pk]).filter(s => typeof s === 'number' && s > 0);
+        return sum + (scores.length ? Math.min(...scores) : 0);
+      }, 0);
+    };
+    const totalA = teamTotal('a');
+    const totalB = teamTotal('b');
+    const totalPar = _famHoles.reduce((a, h) => a + h.par, 0);
+
+    const teamLine = (teamKey, color, total) => {
+      const members = gm.teams[teamKey] || [];
+      const names = members.map(pk => FAM_PLAYERS[pk]?.name || pk).join(' & ');
+      const diff = total - totalPar;
+      const diffStr = diff === 0 ? 'E' : (diff > 0 ? '+'+diff : ''+diff);
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <div style="flex:1;">
+          <div style="font-size:0.82rem;font-weight:700;color:${color};">${gm.teamNames[teamKey]}</div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:1px;">${names}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--text);">${total}</div>
+          <div style="font-size:0.68rem;color:var(--muted);">${diffStr}</div>
+        </div>
+      </div>`;
+    };
+
+    let heroLine;
+    if (totalA === totalB) {
+      heroLine = `<div style="font-size:0.8rem;color:var(--gold);font-weight:700;margin-bottom:4px;">🤝 ${gm.teamNames.a} & ${gm.teamNames.b} tied!</div>`;
+    } else {
+      const winnerKey = totalA < totalB ? 'a' : 'b';
+      heroLine = `<div style="font-size:0.8rem;color:var(--gold);font-weight:700;margin-bottom:4px;">🏆 ${gm.teamNames[winnerKey]} wins best ball!</div>`;
+    }
+
+    return `<div class="card" style="border-color:rgba(29,158,117,0.35);background:rgba(29,158,117,0.08);padding:14px 16px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <i class="ph-light ph-handshake" style="font-size:1.1rem;color:#1D9E75;"></i>
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#1D9E75;">Team Scramble Recap — Best Ball</div>
+      </div>
+      ${heroLine}
+      ${teamLine('a', '#378ADD', totalA)}
+      ${teamLine('b', '#D4537E', totalB)}
+    </div>`;
+  }
+
   function renderFamSummary() {
     document.getElementById('fam-modal-label').textContent = 'Scorecard';
     document.getElementById('fam-running-bar').style.display = 'none';
@@ -11962,6 +12121,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         <div style="font-size:1.15rem;margin-top:10px;">${winMsg}</div>
       </div>
       ${famJuniorScrambleSummaryCard()}
+      ${famTeamScrambleSummaryCard()}
       <div class="fam-scroll-wrap">
         <table class="fam-sc-table">
           <thead><tr><th>Hole</th>${hdrCells}</tr></thead>
