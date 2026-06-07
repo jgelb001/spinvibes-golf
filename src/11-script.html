@@ -649,7 +649,7 @@
     document.body.classList.toggle('girl-mode',    isGirl);
     document.body.classList.toggle('grandma-mode', isGrandma);
     document.body.classList.toggle('mom-mode',     isMom);
-    document.querySelectorAll('.dad-sect')    .forEach(el => el.style.display = isDad     ? 'block' : 'none');
+    document.querySelectorAll('.dad-sect')    .forEach(el => el.style.display = isDad     ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
     document.querySelectorAll('.son-sect')    .forEach(el => el.style.display = isSon     ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
     document.querySelectorAll('.girl-sect')   .forEach(el => el.style.display = isGirl    ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
     document.querySelectorAll('.grandma-sect').forEach(el => el.style.display = isGrandma ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');

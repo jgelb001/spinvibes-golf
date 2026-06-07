@@ -559,7 +559,7 @@
       padding: 10px 12px;
       color: var(--cream);
       font-family: 'Outfit', sans-serif;
-      font-size: 0.85rem;
+      font-size: 16px; /* iOS auto-zooms inputs below 16px — must not be smaller. Was 0.85rem (~13.6px), beat .modal-input's 16px via specificity. */
       margin-bottom: 10px;
     }
     input:focus, select:focus { outline: none; border-color: var(--gold); }

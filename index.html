@@ -559,7 +559,7 @@
       padding: 10px 12px;
       color: var(--cream);
       font-family: 'Outfit', sans-serif;
-      font-size: 0.85rem;
+      font-size: 16px; /* iOS auto-zooms inputs below 16px — must not be smaller. Was 0.85rem (~13.6px), beat .modal-input's 16px via specificity. */
       margin-bottom: 10px;
     }
     input:focus, select:focus { outline: none; border-color: var(--gold); }
@@ -5586,7 +5586,7 @@
     document.body.classList.toggle('girl-mode',    isGirl);
     document.body.classList.toggle('grandma-mode', isGrandma);
     document.body.classList.toggle('mom-mode',     isMom);
-    document.querySelectorAll('.dad-sect')    .forEach(el => el.style.display = isDad     ? 'block' : 'none');
+    document.querySelectorAll('.dad-sect')    .forEach(el => el.style.display = isDad     ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
     document.querySelectorAll('.son-sect')    .forEach(el => el.style.display = isSon     ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
     document.querySelectorAll('.girl-sect')   .forEach(el => el.style.display = isGirl    ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
     document.querySelectorAll('.grandma-sect').forEach(el => el.style.display = isGrandma ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
