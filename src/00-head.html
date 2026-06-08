@@ -141,6 +141,13 @@
       pointer-events: all;
       transform: translateY(0);
     }
+    /* Fix: .page's `transform` creates a new containing block for position:fixed
+       descendants (like #dad-modal, which lives inside .page.dad-progress).
+       That made the modal scroll/position relative to .page instead of the
+       viewport, letting the Round History list bleed through behind the
+       in-round CARD/scorecard view. Neutralize the transform while any
+       full-screen modal nested in a .page is open. */
+    html.modal-open .page { transform: none !important; }
 
     /* ── BOTTOM NAV ── */
     #nav {

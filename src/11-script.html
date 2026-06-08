@@ -1,5 +1,11 @@
 <script>
 
+  // ── iOS Safari :active fix — Safari only applies :active styles on tap when
+  // a touch listener exists somewhere in the document. This no-op listener
+  // makes .pill:active, .btn:active, etc. fire immediately on tap (fixes
+  // "pills not highlighting on tap" bug). Must be registered before any UI renders.
+  document.addEventListener('touchstart', function(){}, { passive: true });
+
   // ── SPRINT 3: Profile state — declared FIRST (before any code that could throw) ──
   let _activePin     = '4417';   // overridden at boot from Supabase
   let _activeClubs   = null;     // null = fall back to hardcoded CLUBS const
@@ -3518,6 +3524,12 @@
     document.body.style.position = 'fixed';
     document.body.style.top = `-${scrollY}px`;
     document.body.style.width = '100%';
+    // .page has a `transform` (for page-switch animation) which creates a new
+    // containing block for position:fixed descendants — #dad-modal lives inside
+    // .page.dad-progress, so without this the modal positions relative to .page
+    // and the Round History list bleeds through behind the CARD view. Neutralize
+    // the transform for the duration of the modal.
+    document.documentElement.classList.add('modal-open');
   }
   function _unlockBodyScroll() {
     const scrollY = parseInt(document.body.dataset.scrollY || '0');
@@ -3526,6 +3538,7 @@
     document.body.style.top = '';
     document.body.style.width = '';
     window.scrollTo(0, scrollY);
+    document.documentElement.classList.remove('modal-open');
   }
 
   function openDadModal() {
@@ -3665,6 +3678,35 @@
     } catch(e){if(st)st.textContent='Network error';}
   }
 
+  // Temecula Creek fix: GolfCourseAPI has no "Sage" tee for this course (only
+  // Blue/White/Red, none matching Jeremy's physical scorecard — confirmed by
+  // probing /course-detail directly). Inject the verified Sage tee from the
+  // local COURSES list (scorecard-sourced) so it's selectable alongside
+  // whatever the API returns, keyed off the API's course/sub-layout name.
+  function _injectSageTee(courseData, clubName, courseName) {
+    if (!/temecula creek/i.test(clubName||'')) return courseData;
+    const already = (courseData.allTees||[]).some(t => /sage/i.test(t.name||''));
+    if (already) return courseData;
+    const cn = (courseName||'').toLowerCase();
+    const hasCreek = cn.includes('creek'), hasStone = cn.includes('stone'), hasOaks = cn.includes('oaks');
+    const nineOnly = !cn.includes('/');
+    let match = null;
+    if (nineOnly && hasCreek)      match = COURSES.find(c => c.name === 'TCI — Creek (9 holes)');
+    else if (nineOnly && hasStone) match = COURSES.find(c => c.name === 'TCI — Stonehouse (9 holes)');
+    else if (nineOnly && hasOaks)  match = COURSES.find(c => c.name === 'TCI — Oaks (9 holes)');
+    else if (hasCreek && hasStone) match = COURSES.find(c => c.name === 'TCI — Creek + Stonehouse');
+    else if (hasOaks && hasCreek && cn.indexOf('oaks') < cn.indexOf('creek')) match = COURSES.find(c => c.name === 'TCI — Oaks + Creek');
+    else if (hasCreek && hasOaks)  match = COURSES.find(c => c.name === 'TCI — Creek + Oaks');
+    if (!match) return courseData;
+    const sageTee = {
+      name: 'Sage', rating: match.rating||null, slope: match.slope||null,
+      yards: match.yardages.reduce((a,y)=>a+y,0), par: match.par,
+      holePars: match.holePars, yardages: match.yardages,
+    };
+    courseData.allTees = [sageTee, ...(courseData.allTees||[])];
+    return courseData;
+  }
+
   async function dadSelectCourse(courseId, clubName, location, courseName) {
     const st=document.getElementById('dm-search-status'), re=document.getElementById('dm-search-results');
     if(st)st.textContent='Loading tee data...'; if(re)re.innerHTML='';
@@ -3672,7 +3714,7 @@
       const resp=await fetch(CADDIE_URL+'/course-detail',{method:'POST',headers:{'Content-Type':'application/json','X-SpinVibes-Token':WORKER_SECRET},body:JSON.stringify({courseId,includeAllTeeHoles:true})});
       const data=await resp.json();
       if(!resp.ok||data.error){if(st)st.textContent=data.error||'Failed to load course';return;}
-      _dadCourseId=courseId; _dadCourseData=data.course;
+      _dadCourseId=courseId; _dadCourseData=_injectSageTee(data.course, clubName, courseName);
       if(st)st.textContent='';
       const sd=document.getElementById('dm-course-selected');
       if(sd)sd.style.display='';
@@ -3683,7 +3725,8 @@
       const tw=document.getElementById('dm-tee-wrap'), tp=document.getElementById('dm-tee-pills');
       if(tees.length&&tw&&tp){
         tw.style.display='';
-        _dadSelectedTee=tees[tees.length-1].name; // default to longest tee
+        const sage = tees.find(t=>/sage/i.test(t.name||''));
+        _dadSelectedTee = sage ? sage.name : tees[tees.length-1].name; // prefer Sage (Jeremy's tee), else longest
         tp.innerHTML=tees.map((t,i)=>`<div class="pill${_dadSelectedTee===t.name?' active':''}" onclick="dadSetTee(this,'${t.name.replace(/'/g,"\\'")}',${i})" data-val="${t.name}" style="touch-action:manipulation;">${t.name}${t.yards?' <span style=\'font-size:0.62rem;opacity:0.7;\'>'+(t.yards)+'y</span>':''}</div>`).join('');
       }
       // Auto-detect format from hole count
