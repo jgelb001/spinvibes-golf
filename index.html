@@ -10356,8 +10356,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:10px;">
         <span style="font-size:0.87rem;color:var(--cream);font-weight:600;">Round type</span>
         <div class="pill-row" id="fm-type-pills" style="margin:0;gap:6px;">
-          <div class="pill active" onclick="selectPill(this,'fm-type-pills')" data-val="scored">&#x26F3; Scored</div>
-          <div class="pill" onclick="selectPill(this,'fm-type-pills')" data-val="practice">&#x1F3CC; Practice</div>
+          <div class="pill active" onclick="selectPill(this,'fm-type-pills');famOnTypeChange()" data-val="scored">&#x26F3; Scored</div>
+          <div class="pill" onclick="selectPill(this,'fm-type-pills');famOnTypeChange()" data-val="fun">&#x1F389; Just for Fun</div>
+          <div class="pill" onclick="selectPill(this,'fm-type-pills');famOnTypeChange()" data-val="practice">&#x1F3CC; Practice</div>
         </div>
       </div>
       <button class="btn-primary" style="width:100%;margin-top:10px;touch-action:manipulation;" onclick="startFamRound()">Start Round &#x2192;</button>
@@ -10492,6 +10493,13 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       if (isSelected && _famCourseData) famRefreshTeePills();
     }
     famRenderTeamPicker();
+  }
+
+  // Called whenever the round-type pill changes — hides game mode for fun/practice rounds.
+  function famOnTypeChange() {
+    const val = document.querySelector('#fm-type-pills .pill.active')?.dataset.val;
+    const gmWrap = document.getElementById('fm-gamemode-wrap');
+    if (gmWrap) gmWrap.style.display = (val === 'scored') ? 'flex' : 'none';
   }
 
   function famSelectGameMode(key) {
@@ -10681,17 +10689,25 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         return;
       }
       listEl.innerHTML = rounds.map(r => {
-        const totals  = r.totals || {};
-        const players = r.players || [];
-        const chips   = players.map(pk => {
-          const p = FAM_PLAYERS[pk];
-          if (!p) return '';
-          return `<span style="background:${p.bg};color:${p.color};padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:700;">${p.emoji} ${totals[pk] ?? '?'}</span>`;
-        }).join('');
+        const totals   = r.totals || {};
+        const players  = r.players || [];
+        const isFun    = r.game_mode === 'fun';
+        const chips    = isFun
+          ? players.map(pk => {
+              const p = FAM_PLAYERS[pk];
+              if (!p) return '';
+              return `<span style="background:${p.bg};color:${p.color};padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:700;">${p.emoji} ${p.name}</span>`;
+            }).join('')
+          : players.map(pk => {
+              const p = FAM_PLAYERS[pk];
+              if (!p) return '';
+              return `<span style="background:${p.bg};color:${p.color};padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:700;">${p.emoji} ${totals[pk] ?? '?'}</span>`;
+            }).join('');
+        const funBadge = isFun ? `<span style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gold);border:1px solid var(--gold);border-radius:4px;padding:1px 5px;margin-left:6px;">Fun</span>` : '';
         return `<div style="background:var(--surface);border-radius:10px;padding:12px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.05);">
           <div onclick="viewFamRound(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="display:flex;align-items:center;gap:10px;cursor:pointer;">
             <div style="flex:1;">
-              <div style="font-weight:700;font-size:0.88rem;color:var(--cream);">${r.course_name}</div>
+              <div style="font-weight:700;font-size:0.88rem;color:var(--cream);">${r.course_name}${funBadge}</div>
               <div style="font-size:0.72rem;color:var(--muted);margin-top:2px;">${r.date_played}</div>
             </div>
             <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;">${chips}</div>
@@ -10710,7 +10726,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
   function viewFamRound(r) {
     // Reconstruct _famRound and _famHoles from saved data
-    _famRound = { date_played: r.date_played, course_name: r.course_name, course_par: r.course_par, players: r.players || [], game_mode: r.game_mode || null, game_mode_data: r.game_mode_data || null };
+    _famRound = { date_played: r.date_played, course_name: r.course_name, course_par: r.course_par, players: r.players || [], game_mode: r.game_mode || null, game_mode_data: r.game_mode_data || null, is_fun_round: r.game_mode === 'fun', is_practice: r.is_practice || false };
     _famHoles = (r.holes || []).map(h => ({
       ...h,
       scores: h.scores || {},
@@ -10747,7 +10763,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
                          .map(c => c.dataset.player);
     if (!players.length) { showToast('Pick at least one player', 'error'); return; }
 
-    const famIsPractice = document.querySelector('#fm-type-pills .pill.active')?.dataset.val === 'practice';
+    const famType       = document.querySelector('#fm-type-pills .pill.active')?.dataset.val || 'scored';
+    const famIsPractice = famType === 'practice';
+    const famIsFun      = famType === 'fun';
     const dateVal = document.getElementById('fm-date').value;
 
     let courseName, coursePar, numHoles, holePars, playerYardages;
@@ -10759,21 +10777,27 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       numHoles   = (dadTee.holePars || _famCourseData.holePars || []).length || 18;
       holePars   = dadTee.holePars || _famCourseData.holePars || Array(numHoles).fill(4);
       coursePar  = holePars.reduce((a,b) => a+b, 0);
-      // Build per-player yardage lookup: { dad: [412, 380, ...], son: [340, 310, ...] }
       playerYardages = {};
       players.forEach(pk => {
         const tee = _famCourseData.allTees?.find(t => t.name === _famPlayerTees[pk]);
         playerYardages[pk] = tee?.yardages || null;
       });
+    } else if (famIsFun) {
+      // Fun round — course selection optional; use typed name if available
+      const typed = (document.getElementById('fm-search-input')?.value || '').trim();
+      courseName = typed || 'Golf Course';
+      numHoles   = 18;
+      holePars   = Array(18).fill(4);
+      coursePar  = 72;
+      playerYardages = {};
     } else {
-      // No API course — require manual fallback not yet implemented; prompt to search
       showToast('Please search and select a course first', 'error');
       return;
     }
 
+    // Fun rounds use game_mode:'fun' (no schema change needed — reuses existing column)
     // Game mode setup — additive, backward-compatible. 'none' stores game_mode:null
-    // so older readers / standard rounds are unaffected.
-    const gmKey = _famGameMode || 'none';
+    const gmKey = famIsFun ? 'fun' : (_famGameMode || 'none');
     const gameMode = gmKey === 'none' ? null : gmKey;
     let gameModeData = null;
     if (gmKey === 'junior_scramble') {
@@ -10803,9 +10827,10 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       course_name: courseName,
       course_par:  coursePar,
       players,
-      is_practice: famIsPractice,
-      player_tees: Object.fromEntries(players.map(pk => [pk, _famPlayerTees[pk] || null])),
-      course_id:   _famCourseId,
+      is_practice:  famIsPractice,
+      is_fun_round: famIsFun,
+      player_tees:  Object.fromEntries(players.map(pk => [pk, _famPlayerTees[pk] || null])),
+      course_id:    _famCourseId,
       game_mode:      gameMode,
       game_mode_data: gameModeData,
     };
@@ -10816,15 +10841,14 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     _famHoles = Array.from({length: numHoles}, (_, i) => {
       const par    = holePars[i] || 4;
       const scores = {};
-      players.forEach(p => { scores[p] = par; });
-      // Per-player yardage for this hole
+      if (!famIsFun) players.forEach(p => { scores[p] = par; }); // fun rounds start with no scores
       const playerYds = {};
       players.forEach(pk => { playerYds[pk] = playerYardages[pk]?.[i] || null; });
-      return { hole: i+1, par, scores, photos: [], yds: playerYardages['dad']?.[i] || null, playerYds, putts: {}, fairway: {} };
+      return { hole: i+1, par, scores, photos: [], highlights: [], yds: playerYardages['dad']?.[i] || null, playerYds, putts: {}, fairway: {} };
     });
 
-    document.getElementById('fam-running-bar').style.display = 'flex';
-    renderFamHole();
+    document.getElementById('fam-running-bar').style.display = famIsFun ? 'none' : 'flex';
+    _renderFamCurrentHole();
   }
 
     function famScoreColor(diff) {
@@ -10850,7 +10874,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     if (!bar) return;
     bar.innerHTML = _famRound.players.map(pk => {
       const p = FAM_PLAYERS[pk];
-      const total = _famHoles.slice(0, _famHoleIdx + 1).reduce((a, h) => a + (h.scores[pk] || 0), 0);
+      const total = _famHoles.slice(0, _famHoleIdx + 1).reduce((a, h) => {
+        const sc = h.scores?.[pk] ?? null; return a + (sc !== null ? sc : 0);
+      }, 0);
       return `<span class="fam-running-chip" style="background:${p.bg};color:${p.color};">${p.emoji} ${total}</span>`;
     }).join('');
   }
@@ -10962,9 +10988,11 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     const playerRows = _famRound.players.map(pk => {
       const p    = FAM_PLAYERS[pk];
-      const sc   = h.scores[pk];
-      const diff = sc - h.par;
-      const dLbl = diff === 0 ? 'E' : (diff > 0 ? `+${diff}` : `${diff}`);
+      const sc    = h.scores[pk] ?? null;
+      const isNA  = sc === null;
+      const diff  = isNA ? 0 : (sc - h.par);
+      const dLbl  = isNA ? 'N/A' : (diff === 0 ? 'E' : (diff > 0 ? `+${diff}` : `${diff}`));
+      const scCol = isNA ? 'var(--muted)' : famScoreColor(diff);
       const playerYds = h.playerYds?.[pk] || null;
       const teeName   = _famRound.player_tees?.[pk] || null;
       const ydsLabel  = playerYds ? `${playerYds}y` : '';
@@ -10997,13 +11025,13 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
           <div style="flex:1;min-width:0;">
             <div style="font-weight:700;font-size:0.88rem;color:${p.color};">${p.name}</div>
             <div style="display:flex;gap:6px;align-items:center;margin-top:2px;">
-              <div id="fvpar-${pk}" style="font-size:0.7rem;color:${famScoreColor(diff)};font-weight:600;">${dLbl}</div>
+              <div id="fvpar-${pk}" style="font-size:0.7rem;color:${scCol};font-weight:600;">${isNA ? 'N/A' : dLbl}</div>
               ${subLine ? `<div style="font-size:0.65rem;color:var(--muted);opacity:0.7;">${subLine}</div>` : ''}
             </div>
           </div>
           <div style="display:flex;align-items:center;">
             <button onclick="famHoleScore('${pk}',-1)" style="width:46px;height:46px;border-radius:12px 0 0 12px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-right:none;color:var(--cream);font-size:1.5rem;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;">-</button>
-            <div id="fsc-${pk}" style="width:54px;height:46px;background:var(--surface);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.9rem;line-height:1;color:${famScoreColor(diff)};">${sc}</div>
+            <div id="fsc-${pk}" style="width:54px;height:46px;background:var(--surface);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.9rem;line-height:1;color:${scCol};">${isNA ? '—' : sc}</div>
             <button onclick="famHoleScore('${pk}',1)" style="width:46px;height:46px;border-radius:0 12px 12px 0;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-left:none;color:var(--cream);font-size:1.4rem;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;">+</button>
           </div>
         </div>
@@ -11091,15 +11119,21 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   }
 
   function famHoleScore(pk, delta) {
-    const h = _famHoles[_famHoleIdx];
-    h.scores[pk] = Math.max(1, (h.scores[pk] || h.par) + delta);
-    const sc   = h.scores[pk];
-    const diff = sc - h.par;
-    const dLbl = diff === 0 ? 'E' : (diff > 0 ? '+'+diff : ''+diff);
+    const h   = _famHoles[_famHoleIdx];
+    const cur = h.scores[pk] ?? null;
+    // N/A sits to the left of 1: decrement from 1 → null, increment from null → 1
+    let next;
+    if (cur === null) { next = delta > 0 ? 1 : null; }
+    else { next = cur + delta; if (next < 1) next = null; }
+    h.scores[pk] = next;
+    const isNA    = next === null;
+    const diff    = isNA ? 0 : (next - h.par);
+    const dLbl    = isNA ? 'N/A' : (diff === 0 ? 'E' : (diff > 0 ? '+'+diff : ''+diff));
+    const color   = isNA ? 'var(--muted)' : famScoreColor(diff);
     const scoreEl = document.getElementById('fsc-' + pk);
     const vparEl  = document.getElementById('fvpar-' + pk);
-    if (scoreEl) { scoreEl.textContent = sc; scoreEl.style.color = famScoreColor(diff); }
-    if (vparEl)  { vparEl.textContent = dLbl + ' this hole'; vparEl.style.color = famScoreColor(diff); }
+    if (scoreEl) { scoreEl.textContent = isNA ? '—' : next; scoreEl.style.color = color; }
+    if (vparEl)  { vparEl.textContent  = isNA ? 'N/A' : (dLbl + ' this hole'); vparEl.style.color = color; }
     updateFamRunningBar();
   }
 
@@ -11166,13 +11200,17 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     if (h) { const p = h.photos?.[0] || h.photo; if (p) _showPhotoOverlay(p); }
   }
 
+  function _renderFamCurrentHole() {
+    if (_famRound?.is_fun_round) renderFamFunHole(); else renderFamHole();
+  }
+
   function famHoleNext() {
     if (_famHoleIdx === _famHoles.length - 1) { _clearFamDraft(); renderFamSummary(); }
-    else { _famHoleIdx++; _saveFamDraft(); renderFamHole(); }
+    else { _famHoleIdx++; _saveFamDraft(); _renderFamCurrentHole(); }
   }
 
   function famHoleBack() {
-    if (_famHoleIdx > 0) { _famHoleIdx--; renderFamHole(); }
+    if (_famHoleIdx > 0) { _famHoleIdx--; _renderFamCurrentHole(); }
   }
 
   function confirmExitFamRound() {
@@ -11258,6 +11296,11 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         <button id="sp-landscape" onclick="setShareOrientation('landscape',this)" style="flex:1;border:none;border-radius:8px;padding:8px;font-size:0.82rem;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);">▭ Landscape</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
+        ${_famRound.is_fun_round ? `
+        <button onclick="buildAndShare('outing')" style="background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.4);border-radius:14px;padding:16px;text-align:left;cursor:pointer;color:var(--cream);">
+          <div style="font-weight:700;font-size:0.95rem;margin-bottom:3px;">🎉 Family Outing Card</div>
+          <div style="font-size:0.78rem;color:var(--muted);">Course name · player names · photo collage · no scores</div>
+        </button>` : `
         ${_famRound.game_mode === 'team_scramble' ? `
         <button onclick="buildAndShare('team_scramble')" style="background:rgba(29,158,117,0.1);border:1px solid rgba(29,158,117,0.35);border-radius:14px;padding:16px;text-align:left;cursor:pointer;color:var(--cream);">
           <div style="display:flex;align-items:center;gap:7px;font-weight:700;font-size:0.95rem;margin-bottom:3px;"><i class="ph-light ph-handshake" style="color:#1D9E75;"></i> Team Scramble Recap</div>
@@ -11274,7 +11317,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         <button onclick="buildAndShare('best')" style="background:var(--surface2);border:1px solid rgba(212,175,110,0.2);border-radius:14px;padding:16px;text-align:left;cursor:pointer;color:var(--cream);">
           <div style="font-weight:700;font-size:0.95rem;margin-bottom:3px;">Best Moment</div>
           <div style="font-size:0.78rem;color:var(--muted);">Auto-picks your best hole — with photo or prompts to add one</div>
-        </button>
+        </button>`}
       </div>
     `;
     overlay.appendChild(sheet);
@@ -11298,8 +11341,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     if (btn) { btn.disabled = true; btn.textContent = 'Building…'; }
     try {
       let blob;
-      if (template === 'scorecard') blob = await _buildScorecardCard();
+      if (template === 'scorecard')    blob = await _buildScorecardCard();
       if (template === 'team_scramble') blob = await _buildTeamScrambleCard();
+      if (template === 'outing')       blob = await _buildFamilyOutingCard();
       if (blob) await _doShare(blob);
     } catch(e) { console.warn('Share error:', e); }
     finally { if (btn) { btn.disabled = false; btn.textContent = '📤 Share'; } }
@@ -11492,7 +11536,10 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   function _famTotals() {
     const players = _famRound.players||[], totals={};
     players.forEach(pk => { totals[pk]=0; });
-    _famHoles.forEach(h => players.forEach(pk => { totals[pk]+=(h.scores[pk]||0); }));
+    _famHoles.forEach(h => players.forEach(pk => {
+      const sc = h.scores[pk] ?? null;
+      if (sc !== null) totals[pk] += sc; // N/A holes don't count
+    }));
     return totals;
   }
 
@@ -11908,6 +11955,178 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     return _canvasToBlob(canvas);
   }
 
+  // ── TEMPLATE: FAMILY OUTING (fun rounds) ─────────────────────
+  async function _buildFamilyOutingCard() {
+    const W = 720, H = 1280;
+    const canvas = _makeCanvas(W, H);
+    const ctx    = canvas.getContext('2d');
+
+    // Dark gradient background
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#0D1B0F');
+    bg.addColorStop(1, '#0A0F0A');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+    // Subtle diagonal texture lines
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,0.025)'; ctx.lineWidth = 1;
+    for (let i = -H; i < W + H; i += 40) {
+      ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i + H, H); ctx.stroke();
+    }
+    ctx.restore();
+
+    // Top accent bar
+    const topBar = ctx.createLinearGradient(0, 0, W, 0);
+    topBar.addColorStop(0, 'rgba(212,168,67,0.0)');
+    topBar.addColorStop(0.5, 'rgba(212,168,67,0.6)');
+    topBar.addColorStop(1, 'rgba(212,168,67,0.0)');
+    ctx.fillStyle = topBar; ctx.fillRect(0, 0, W, 3);
+
+    // ── Photo collage ────────────────────────────────────────────
+    const allPhotos = _famHoles.flatMap(h =>
+      (h.photos?.length ? h.photos : (h.photo ? [h.photo] : [])).filter(_hasPhoto)
+    );
+    const photoCount = Math.min(allPhotos.length, 6);
+    const collageTop  = 80;
+    const collageH    = 480;
+    if (photoCount > 0) {
+      // Draw up to 6 photos in a grid: rows of 3 or 2+1
+      const cols = photoCount <= 2 ? photoCount : 3;
+      const rows = Math.ceil(photoCount / cols);
+      const gutter = 6;
+      const cellW = Math.floor((W - gutter * (cols + 1)) / cols);
+      const cellH = Math.floor((collageH - gutter * (rows + 1)) / rows);
+      const imgs = await Promise.all(allPhotos.slice(0, photoCount).map(src => new Promise(res => {
+        const img = new Image(); img.crossOrigin = 'anonymous';
+        img.onload = () => res(img); img.onerror = () => res(null);
+        img.src = src;
+      })));
+      imgs.forEach((img, idx) => {
+        if (!img) return;
+        const col = idx % cols, row = Math.floor(idx / cols);
+        const x = gutter + col * (cellW + gutter);
+        const y = collageTop + gutter + row * (cellH + gutter);
+        ctx.save();
+        ctx.beginPath();
+        const r = 12;
+        ctx.moveTo(x + r, y); ctx.lineTo(x + cellW - r, y);
+        ctx.quadraticCurveTo(x + cellW, y, x + cellW, y + r);
+        ctx.lineTo(x + cellW, y + cellH - r);
+        ctx.quadraticCurveTo(x + cellW, y + cellH, x + cellW - r, y + cellH);
+        ctx.lineTo(x + r, y + cellH);
+        ctx.quadraticCurveTo(x, y + cellH, x, y + cellH - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath(); ctx.clip();
+        // Draw image cover-fit
+        const scale = Math.max(cellW / img.width, cellH / img.height);
+        const dw = img.width * scale, dh = img.height * scale;
+        ctx.drawImage(img, x + (cellW - dw) / 2, y + (cellH - dh) / 2, dw, dh);
+        ctx.restore();
+      });
+    } else {
+      // Placeholder grass texture
+      ctx.fillStyle = 'rgba(29,64,29,0.3)';
+      _roundRect(ctx, 6, collageTop, W - 12, collageH, 12);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(212,168,67,0.25)';
+      ctx.font = 'bold 48px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('⛳', W / 2, collageTop + collageH / 2 + 16);
+    }
+
+    // Semi-transparent overlay on bottom of collage for legibility
+    const fadeY = collageTop + collageH - 120;
+    const fade = ctx.createLinearGradient(0, fadeY, 0, collageTop + collageH);
+    fade.addColorStop(0, 'rgba(13,27,15,0)');
+    fade.addColorStop(1, 'rgba(13,27,15,0.85)');
+    ctx.fillStyle = fade; ctx.fillRect(0, fadeY, W, 120);
+
+    // ── Content area ─────────────────────────────────────────────
+    let y = collageTop + collageH + 30;
+
+    // "FAMILY OUTING" eyebrow
+    ctx.font = '700 22px "Outfit", sans-serif';
+    ctx.fillStyle = 'rgba(212,168,67,0.75)';
+    ctx.textAlign = 'center';
+    ctx.letterSpacing = '3px';
+    ctx.fillText('FAMILY OUTING', W / 2, y);
+    y += 52;
+
+    // Course name
+    const courseName = (_famRound.course_name || 'Golf Course').toUpperCase();
+    ctx.fillStyle = '#EDE3C8';
+    ctx.textAlign = 'center';
+    // Responsive font size
+    let courseFontSize = 72;
+    ctx.font = `900 ${courseFontSize}px "Bebas Neue", sans-serif`;
+    while (ctx.measureText(courseName).width > W - 60 && courseFontSize > 36) {
+      courseFontSize -= 4;
+      ctx.font = `900 ${courseFontSize}px "Bebas Neue", sans-serif`;
+    }
+    ctx.fillText(courseName, W / 2, y);
+    y += courseFontSize * 0.3 + 18;
+
+    // Date
+    ctx.font = '400 28px "Outfit", sans-serif';
+    ctx.fillStyle = 'rgba(237,227,200,0.5)';
+    ctx.fillText(_famRound.date_played || '', W / 2, y);
+    y += 52;
+
+    // Divider
+    const divGrad = ctx.createLinearGradient(W * 0.2, 0, W * 0.8, 0);
+    divGrad.addColorStop(0, 'rgba(212,168,67,0)');
+    divGrad.addColorStop(0.5, 'rgba(212,168,67,0.4)');
+    divGrad.addColorStop(1, 'rgba(212,168,67,0)');
+    ctx.strokeStyle = divGrad; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(W * 0.2, y); ctx.lineTo(W * 0.8, y); ctx.stroke();
+    y += 30;
+
+    // Player name chips
+    const players = _famRound.players || [];
+    const chipH = 44, chipR = 22, chipGap = 10;
+    const chipLabels = players.map(pk => {
+      const p = FAM_PLAYERS[pk];
+      return p ? `${p.emoji} ${p.name}` : pk;
+    });
+    // Measure total width and wrap if needed
+    ctx.font = '700 22px "Outfit", sans-serif';
+    const chipWidths = chipLabels.map(lbl => ctx.measureText(lbl).width + 36);
+    const totalW = chipWidths.reduce((a, b) => a + b, 0) + chipGap * (chipLabels.length - 1);
+    const startX = totalW <= W - 40 ? (W - totalW) / 2 : 20;
+    let cx = startX;
+    players.forEach((pk, i) => {
+      const p    = FAM_PLAYERS[pk];
+      const bg   = p ? p.bg   : 'rgba(212,168,67,0.15)';
+      const col  = p ? p.color : '#EDE3C8';
+      const lbl  = chipLabels[i];
+      const cw   = chipWidths[i];
+      // Wrap to next row if overflow
+      if (cx + cw > W - 20 && i > 0) { cx = 20; y += chipH + 10; }
+      ctx.fillStyle = bg;
+      ctx.beginPath();
+      ctx.roundRect?.(cx, y, cw, chipH, chipR) ||
+        _roundRect(ctx, cx, y, cw, chipH, chipR);
+      ctx.fill();
+      ctx.font = '700 22px "Outfit", sans-serif';
+      ctx.fillStyle = col;
+      ctx.textAlign = 'left';
+      ctx.fillText(lbl, cx + 18, y + chipH * 0.67);
+      cx += cw + chipGap;
+    });
+    y += chipH + 36;
+
+    // SpinVibes branding
+    ctx.textAlign = 'center';
+    ctx.font = '700 28px "Bebas Neue", sans-serif';
+    ctx.fillStyle = 'rgba(212,168,67,0.6)';
+    ctx.fillText('SPINVIBES', W / 2, H - 56);
+    ctx.font = '400 18px "Outfit", sans-serif';
+    ctx.fillStyle = 'rgba(212,168,67,0.35)';
+    ctx.fillText('spinvibes.com', W / 2, H - 30);
+
+    return _canvasToBlob(canvas);
+  }
+
   // ── TEMPLATE 2: HOLE HIGHLIGHT ────────────────────────────────
   async function _buildHoleHighlightCard(h) {
     if (!h) return null;
@@ -12244,21 +12463,172 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     </div>`;
   }
 
+  // ── Just for Fun: hole screen ────────────────────────────────────────────────
+  const FUN_HIGHLIGHT_PILLS = [
+    'Great drive', 'Hit the green', 'Made a par', 'Hit the fairway',
+    'Closest to the pin', 'Longest drive', 'Made a putt',
+    'Kid\'s moment', 'Best shot of the day', 'Everyone had fun'
+  ];
+
+  function renderFamFunHole() {
+    const h      = _famHoles[_famHoleIdx];
+    const isLast = _famHoleIdx === _famHoles.length - 1;
+    document.getElementById('fam-modal-label').textContent = `HOLE ${h.hole}`;
+    const famSub = document.getElementById('fam-modal-hole-sub');
+    if (famSub) { famSub.textContent = `of ${_famHoles.length} · Just for Fun`; famSub.style.display = ''; }
+    const famClose = document.getElementById('fam-modal-close-btn');
+    if (famClose) famClose.style.display = 'none';
+    const famFooter = document.getElementById('fam-modal-footer');
+    if (famFooter) {
+      famFooter.style.display = '';
+      famFooter.innerHTML = `<button onclick="confirmExitFamRound()" style="width:100%;background:none;border:1px solid rgba(192,57,43,0.35);border-radius:10px;padding:9px;color:rgba(192,57,43,0.8);font-size:0.78rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;touch-action:manipulation;">EXIT ROUND — Tap to confirm</button>`;
+    }
+
+    const hPhotos    = h.photos?.length ? h.photos : (h.photo ? [h.photo] : []);
+    const highlights = h.highlights || [];
+
+    const photoStrip = `<div style="display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:2px 0 10px;scrollbar-width:none;">
+      ${hPhotos.map((p,i) => `
+        <div style="position:relative;flex-shrink:0;">
+          <img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid rgba(212,168,67,0.3);" onclick="_showPhotoOverlay('${p}')">
+          <button onclick="famRemoveHolePhoto(${i})" style="position:absolute;top:-4px;right:-4px;width:20px;height:20px;border-radius:50%;background:rgba(192,57,43,0.85);border:none;color:#fff;font-size:0.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">✕</button>
+        </div>`).join('')}
+      <button onclick="document.getElementById('ffpc').click()" style="flex-shrink:0;width:80px;height:80px;background:var(--surface2);border:1px dashed rgba(212,168,67,0.3);border-radius:8px;color:var(--muted);font-size:0.75rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;touch-action:manipulation;"><span style="font-size:1.2rem;">📷</span>Camera</button>
+      <button onclick="document.getElementById('ffpr').click()" style="flex-shrink:0;width:80px;height:80px;background:var(--surface2);border:1px dashed rgba(212,168,67,0.3);border-radius:8px;color:var(--muted);font-size:0.75rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;touch-action:manipulation;"><span style="font-size:1.2rem;">🖼️</span>Roll</button>
+    </div>`;
+
+    const highlightList = highlights.length ? `<div style="margin-bottom:10px;">
+      ${highlights.map((hl, i) => `
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+          <div style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;"></div>
+          <span style="flex:1;font-size:0.88rem;color:var(--cream);line-height:1.4;">${hl}</span>
+          <button onclick="famFunRemoveHighlight(${i})" style="background:none;border:none;color:var(--muted);font-size:0.85rem;cursor:pointer;padding:4px;touch-action:manipulation;">✕</button>
+        </div>`).join('')}
+    </div>` : '';
+
+    const pillsHtml = FUN_HIGHLIGHT_PILLS.map(p =>
+      `<button onclick="famFunAddHighlight('${p.replace(/'/g, "\\'")}')"
+        style="background:var(--surface2);border:1px solid rgba(212,168,67,0.2);border-radius:20px;padding:6px 12px;color:var(--cream);font-size:0.78rem;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;">${p}</button>`
+    ).join('');
+
+    document.getElementById('fam-modal-body').innerHTML = `
+      ${photoStrip}
+      <input type="file" id="ffpc" accept="image/*" capture="environment" style="display:none;" onchange="famLoadHolePhoto(this)">
+      <input type="file" id="ffpr" accept="image/*" style="display:none;" onchange="famLoadHolePhoto(this)">
+
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:2.6rem;color:var(--cream);line-height:1;padding:4px 0 10px;">HOLE ${h.hole}</div>
+
+      <div style="font-size:0.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Highlights this hole</div>
+      ${highlightList}
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">${pillsHtml}</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <input id="fam-fun-note" type="text" placeholder="Add your own moment…"
+          style="flex:1;background:var(--surface2);border:1px solid rgba(212,168,67,0.2);border-radius:10px;padding:10px 12px;color:var(--cream);font-family:'Outfit',sans-serif;font-size:0.88rem;outline:none;"
+          onkeydown="if(event.key==='Enter'){famFunAddNote();event.preventDefault();}">
+        <button onclick="famFunAddNote()" style="background:var(--gold);border:none;border-radius:10px;padding:10px 14px;color:var(--bg);font-weight:700;font-size:0.88rem;cursor:pointer;flex-shrink:0;touch-action:manipulation;">Add</button>
+      </div>
+
+      <div class="modal-nav-row" style="margin-top:4px;gap:7px;">
+        <button class="btn-ghost" onclick="famHoleBack()" ${_famHoleIdx===0?'disabled style="opacity:0.3;"':''} style="padding:12px 14px;touch-action:manipulation;">←</button>
+        <button class="btn-gold" onclick="famHoleNext()" style="flex:1;padding:12px;touch-action:manipulation;">${isLast ? 'See Recap →' : 'Next →'}</button>
+      </div>
+    `;
+  }
+
+  function famFunAddHighlight(text) {
+    const h = _famHoles[_famHoleIdx];
+    if (!h.highlights) h.highlights = [];
+    h.highlights.push(text);
+    _saveFamDraft();
+    renderFamFunHole();
+  }
+  function famFunRemoveHighlight(idx) {
+    const h = _famHoles[_famHoleIdx];
+    h.highlights = (h.highlights || []).filter((_, i) => i !== idx);
+    _saveFamDraft();
+    renderFamFunHole();
+  }
+  function famFunAddNote() {
+    const el = document.getElementById('fam-fun-note');
+    const text = (el?.value || '').trim();
+    if (!text) return;
+    famFunAddHighlight(text);
+    // input is wiped by renderFamFunHole re-render
+  }
+
+  // ── Just for Fun: summary screen ─────────────────────────────────────────────
+  function renderFamFunSummary() {
+    document.getElementById('fam-modal-label').textContent = 'Round Recap';
+    document.getElementById('fam-running-bar').style.display = 'none';
+    const famSub = document.getElementById('fam-modal-hole-sub');
+    if (famSub) famSub.style.display = 'none';
+    const famClose = document.getElementById('fam-modal-close-btn');
+    if (famClose) famClose.style.display = 'none';
+    const famFooter = document.getElementById('fam-modal-footer');
+    if (famFooter) famFooter.style.display = 'none';
+
+    const players  = _famRound.players;
+    const allPhotos = _famHoles.flatMap(h => (h.photos?.length ? h.photos : (h.photo ? [h.photo] : [])).filter(_hasPhoto));
+    const allHighlights = _famHoles.flatMap(h =>
+      (h.highlights || []).map(hl => ({ hole: h.hole, text: hl }))
+    );
+
+    const photoGrid = allPhotos.length ? `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border-radius:12px;overflow:hidden;margin-bottom:14px;">
+        ${allPhotos.slice(0,9).map(p => `<img src="${p}" style="width:100%;aspect-ratio:1;object-fit:cover;" onclick="_showPhotoOverlay('${p}')">`).join('')}
+      </div>` : `<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;margin-bottom:14px;">No photos this round</div>`;
+
+    const highlightSection = allHighlights.length ? `
+      <div style="background:var(--surface);border-radius:12px;padding:14px;margin-bottom:14px;">
+        <div style="font-size:0.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Highlights</div>
+        ${allHighlights.map(({hole, text}) => `
+          <div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+            <span style="font-size:0.65rem;font-weight:700;color:var(--gold);min-width:24px;padding-top:2px;">H${hole}</span>
+            <span style="font-size:0.85rem;color:var(--cream);flex:1;">${text}</span>
+          </div>`).join('')}
+      </div>` : '';
+
+    const playerNames = players.map(pk => FAM_PLAYERS[pk]?.name || pk).join(', ');
+
+    document.getElementById('fam-modal-body').innerHTML = `
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--cream);">${_famRound.course_name}</div>
+        <div style="font-size:0.8rem;color:var(--muted);">${_famRound.date_played} · ${_famRound.players.length} player${_famRound.players.length>1?'s':''}</div>
+        <div style="display:flex;justify-content:center;gap:8px;margin-top:8px;">
+          ${players.map(pk => `<span style="background:${FAM_PLAYERS[pk].bg};color:${FAM_PLAYERS[pk].color};border-radius:20px;padding:3px 10px;font-size:0.78rem;font-weight:700;">${FAM_PLAYERS[pk].emoji} ${FAM_PLAYERS[pk].name}</span>`).join('')}
+        </div>
+      </div>
+      ${photoGrid}
+      ${highlightSection}
+      <div id="fam-save-status" style="margin-top:4px;"></div>
+      <button class="btn-primary" style="width:100%;margin-top:10px;" onclick="saveFamRound(this)">Save Memories ✓</button>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn-ghost" style="flex:1;" onclick="closeFamilyModal()">Done</button>
+        <button class="btn-ghost" style="flex:1;" id="fam-share-btn" onclick="showSharePicker()">📤 Share</button>
+      </div>
+    `;
+  }
+
   function renderFamSummary() {
+    if (_famRound?.is_fun_round) { renderFamFunSummary(); return; }
     document.getElementById('fam-modal-label').textContent = 'Scorecard';
     document.getElementById('fam-running-bar').style.display = 'none';
 
     const players = _famRound.players;
     const totals  = {};
     players.forEach(pk => { totals[pk] = 0; });
-    _famHoles.forEach(h => players.forEach(pk => { totals[pk] += h.scores[pk] || 0; }));
+    _famHoles.forEach(h => players.forEach(pk => {
+      const sc = h.scores[pk] ?? null; if (sc !== null) totals[pk] += sc;
+    }));
     const totalPar = _famHoles.reduce((a, h) => a + h.par, 0);
 
     const hdrCells  = players.map(pk => `<th style="color:${FAM_PLAYERS[pk].color};">${FAM_PLAYERS[pk].emoji} ${FAM_PLAYERS[pk].name}</th>`).join('');
     const holeRows  = _famHoles.map(h => {
       const cells = players.map(pk => {
-        const diff = (h.scores[pk]||0) - h.par;
-        return `<td><span class="${famScoreClass(diff)}">${h.scores[pk]||0}</span></td>`;
+        const sc = h.scores[pk] ?? null;
+        if (sc === null) return `<td><span style="color:var(--muted);">—</span></td>`;
+        const diff = sc - h.par;
+        return `<td><span class="${famScoreClass(diff)}">${sc}</span></td>`;
       }).join('');
       const photoThumb = (h.photos?.length || h.photo)
         ? `<img src="${h.photos?.[0]||h.photo}" onclick="famViewScorecardPhoto('${h.hole}')" style="width:22px;height:22px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-left:4px;cursor:pointer;">`
@@ -12326,7 +12696,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   function famReturnToHole() {
     const footer = document.getElementById('fam-modal-footer');
     if (footer) footer.style.display = '';
-    renderFamHole();
+    _renderFamCurrentHole();
   }
   function renderFamCaddieMessages(showTyping) {
     const el = document.getElementById('fam-caddie-msgs');
@@ -12485,39 +12855,43 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     }
     btn.textContent = 'Saving...';
 
-    // Build totals map
+    // Build totals map (N/A holes excluded — null scores don't contribute)
     const totals = {};
     players.forEach(pk => {
-      totals[pk] = _famHoles.reduce((a, h) => a + (h.scores[pk] || 0), 0);
+      totals[pk] = _famHoles.reduce((a, h) => {
+        const sc = h.scores[pk] ?? null; return a + (sc !== null ? sc : 0);
+      }, 0);
     });
 
-    // Save individual round to each player's table
-    for (const pk of players) {
-      const p        = FAM_PLAYERS[pk];
-      const total    = totals[pk];
-      const holeData = _famHoles.map(h => ({
-        hole: h.hole, par: h.par, score: h.scores[pk] || 0,
-        photo_url: _hasPhoto(h.photos?.[0]) ? h.photos[0] : (_hasPhoto(h.photo) ? h.photo : null),
-      }));
-      const roundObj = {
-        date_played:  _famRound.date_played,
-        course_name:  _famRound.course_name + ' (Family)',
-        course_par:   _famRound.course_par,
-        total_score:  total,
-        score_vs_par: total - _famRound.course_par,
-        holes:        holeData,
-        is_practice:  _famRound.is_practice || false,
-        reflection:   { best:'', worked:'', worst:'', fix:'', stars:1 },
-        stars:        1,
-      };
-      if (pk === 'dad') roundObj.tee_color = 'White';
-      try {
-        await p.saveFn(roundObj);
-        saved.push(pk);
-        delete _famFailedRounds[pk];
-      } catch(e) {
-        failed.push(pk);
-        _famFailedRounds[pk] = roundObj;
+    // Save individual round to each player's table (skipped for fun rounds — not tracked for stats/handicap)
+    if (!_famRound.is_fun_round) {
+      for (const pk of players) {
+        const p        = FAM_PLAYERS[pk];
+        const total    = totals[pk];
+        const holeData = _famHoles.map(h => ({
+          hole: h.hole, par: h.par, score: h.scores[pk] ?? null,
+          photo_url: _hasPhoto(h.photos?.[0]) ? h.photos[0] : (_hasPhoto(h.photo) ? h.photo : null),
+        }));
+        const roundObj = {
+          date_played:  _famRound.date_played,
+          course_name:  _famRound.course_name + ' (Family)',
+          course_par:   _famRound.course_par,
+          total_score:  total,
+          score_vs_par: total - _famRound.course_par,
+          holes:        holeData,
+          is_practice:  _famRound.is_practice || false,
+          reflection:   { best:'', worked:'', worst:'', fix:'', stars:1 },
+          stars:        1,
+        };
+        if (pk === 'dad') roundObj.tee_color = 'White';
+        try {
+          await p.saveFn(roundObj);
+          saved.push(pk);
+          delete _famFailedRounds[pk];
+        } catch(e) {
+          failed.push(pk);
+          _famFailedRounds[pk] = roundObj;
+        }
       }
     }
 
@@ -12530,27 +12904,31 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         photo: (h.photos?.[0] && _hasPhoto(h.photos[0])) ? h.photos[0] : ((h.photo && _hasPhoto(h.photo)) ? h.photo : null),
       }));
       await saveFamilyRound({
-        date_played: _famRound.date_played,
-        course_name: _famRound.course_name,
-        course_par:  _famRound.course_par,
-        players:     players,
-        holes:       safeFamHoles,
-        totals:      totals,
-        is_practice: _famRound.is_practice || false,
+        date_played:  _famRound.date_played,
+        course_name:  _famRound.course_name,
+        course_par:   _famRound.course_par,
+        players:      players,
+        holes:        safeFamHoles,
+        totals:       _famRound.is_fun_round ? {} : totals,
+        is_practice:  _famRound.is_practice || false,
         game_mode:      _famRound.game_mode || null,
         game_mode_data: _famRound.game_mode_data || null,
       });
     } catch(e) { /* non-fatal \u2014 individual saves already done */ }
 
     statusEl.innerHTML = '';
-    if (saved.length) {
-      const savedNames = saved.map(pk => FAM_PLAYERS[pk]?.name || pk).join(', ');
-      statusEl.innerHTML += `<div style="color:var(--green);font-size:0.85rem;margin-bottom:6px;">\u2713 Saved for ${savedNames}</div>`;
-    }
-    if (failed.length) {
-      const failedNames = failed.map(pk => FAM_PLAYERS[pk]?.name || pk).join(', ');
-      statusEl.innerHTML += `<div style="color:var(--red);font-size:0.85rem;margin-bottom:8px;">\u2717 Failed for ${failedNames} \u2014 check signal</div>`;
-      statusEl.innerHTML += `<button onclick="retryFailedFamSaves(this)" style="background:var(--red);border:none;border-radius:8px;padding:9px 18px;color:#fff;font-weight:700;font-size:0.82rem;cursor:pointer;width:100%;">\u21ba Retry Failed Saves</button>`;
+    if (_famRound.is_fun_round) {
+      statusEl.innerHTML = `<div style="color:var(--green);font-size:0.85rem;margin-bottom:6px;">\u2713 Memories saved!</div>`;
+    } else {
+      if (saved.length) {
+        const savedNames = saved.map(pk => FAM_PLAYERS[pk]?.name || pk).join(', ');
+        statusEl.innerHTML += `<div style="color:var(--green);font-size:0.85rem;margin-bottom:6px;">\u2713 Saved for ${savedNames}</div>`;
+      }
+      if (failed.length) {
+        const failedNames = failed.map(pk => FAM_PLAYERS[pk]?.name || pk).join(', ');
+        statusEl.innerHTML += `<div style="color:var(--red);font-size:0.85rem;margin-bottom:8px;">\u2717 Failed for ${failedNames} \u2014 check signal</div>`;
+        statusEl.innerHTML += `<button onclick="retryFailedFamSaves(this)" style="background:var(--red);border:none;border-radius:8px;padding:9px 18px;color:#fff;font-weight:700;font-size:0.82rem;cursor:pointer;width:100%;">\u21ba Retry Failed Saves</button>`;
+      }
     }
     btn.textContent = failed.length === 0 ? 'Saved! \u2713' : 'Partial Save';
     if (failed.length === 0) btn.disabled = false;
@@ -12567,8 +12945,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       localStorage.setItem('sv-girl-family-count', String((parseInt(localStorage.getItem('sv-girl-family-count')||'0'))+1));
     }
 
-    // Fire AI range tip async (account holder only, non-blocking)
-    if (players.includes('dad')) {
+    // Fire AI range tip async (account holder only, non-blocking — skipped for fun rounds)
+    if (!_famRound.is_fun_round && players.includes('dad')) {
       const dadScore  = totals['dad'] || 0;
       const diffStr   = dadScore - _famRound.course_par;
       const diffLabel = diffStr === 0 ? 'even par' : (diffStr > 0 ? `+${diffStr}` : `${diffStr}`);
