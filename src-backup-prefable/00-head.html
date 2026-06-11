@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#13291C">
+  <meta name="theme-color" content="#ffffff">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="SpinVibes Golf">
@@ -11,7 +11,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <title>SpinVibes Golf</title>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/light/style.css">
   <script>
@@ -45,22 +45,20 @@
     html.pre-mom .nav-btn.mom-sect { display: flex !important; }
 
     :root {
-      /* ── Fable design system: forest ink chrome · white field · kelly green action ── */
       --bg:        #ffffff;
-      --surface:   #F3F7F3;
-      --surface2:  #EBF1EB;
-      --surface3:  #E0E9E0;
-      --green:     #249657;
-      --green-b:   #1E7F4A;
-      --green-dark:#13291C;
-      --ink:       #13291C;
+      --surface:   #f8f9fa;
+      --surface2:  #f0f0f0;
+      --surface3:  #e8e8e8;
+      --green:     #3DAA6B;
+      --green-b:   #2A9060;
+      --green-dark:#0D1F12;
       --gold:      #D4A843;
       --gold-l:    #b8922e;
-      --cream:     #13291C;
-      --muted:     #6B7A6E;
-      --border:    #E4EAE4;
+      --cream:     #0D1F12;
+      --muted:     #64748b;
+      --border:    rgba(0,0,0,0.08);
       --red:       #c0392b;
-      --nav-h:     54px;
+      --nav-h:     44px;
       --safe-b:    env(safe-area-inset-bottom, 0px);
     }
 
@@ -76,7 +74,7 @@
       overflow: hidden;
       background: var(--bg);
       color: var(--cream);
-      font-family: 'Archivo', sans-serif;
+      font-family: 'Outfit', sans-serif;
     }
 
     /* ── APP SHELL ── */
@@ -90,31 +88,30 @@
     /* ── TOP BAR ── */
     #topbar {
       flex-shrink: 0;
-      background: var(--ink);
+      background: #0D1F12;
       border-bottom: none;
-      padding: 10px 18px 10px;
-      padding-top: calc(12px + env(safe-area-inset-top, 0px));
+      padding: 8px 18px 8px;
+      padding-top: calc(10px + env(safe-area-inset-top, 0px));
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
     }
     .topbar-logo {
-      font-family:'Archivo',sans-serif;
-      font-weight: 700;
-      font-size: 1.15rem;
-      letter-spacing: -0.2px;
-      color: #FFFFFF;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.35rem;
+      letter-spacing: 3px;
+      color: #D4A843;
       line-height: 1;
       white-space: nowrap;
     }
-    .topbar-logo span { color: #5BBE85; }
+    .topbar-logo span { color: rgba(255,255,255,0.5); }
     .topbar-sub {
       font-size: 0.6rem;
-      color: rgba(255,255,255,0.45);
-      letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 1px;
       text-transform: uppercase;
-      margin-top: 2px;
+      margin-top: 1px;
     }
     .offline-badge {
       display: none;
@@ -161,9 +158,8 @@
       z-index: 100;
       height: var(--nav-h);
       background: #ffffff;
-      border-top: 0.5px solid var(--border);
+      border-top: 0.5px solid #e8e8e8;
       display: flex;
-      align-items: center;
       padding-bottom: env(safe-area-inset-bottom, 0px);
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -182,54 +178,27 @@
       justify-content: center;
       gap: 3px;
       border: none;
+      border-top: 2px solid transparent;
       background: none;
-      color: #9AA89D;
-      font-family: 'Archivo', sans-serif;
-      font-size: 0.58rem;
-      font-weight: 600;
-      letter-spacing: 0.1px;
-      text-transform: none;
-      cursor: pointer;
-      transition: color 0.15s;
-    }
-    .nav-btn i { font-size: 21px; line-height: 1; }
-    .nav-btn svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-    /* Active nav: ink text + icon, weight does the work */
-    .nav-btn.active {
-      color: var(--ink);
+      color: #9ca3af;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.48rem;
       font-weight: 700;
-      background: none;
-      border-radius: 0;
-    }
-    .nav-btn.active svg { stroke: var(--ink); }
-    /* ── Center PLAY button ── */
-    .nav-play {
-      flex: 0 0 auto;
-      width: 46px;
-      height: 46px;
-      margin: 0 6px;
-      border-radius: 50%;
-      border: none;
-      background: var(--green);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1px;
-      font-family: 'Archivo', sans-serif;
-      font-size: 0.44rem;
-      font-weight: 800;
       letter-spacing: 1px;
       text-transform: uppercase;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(19,41,28,0.28);
-      transition: transform 0.12s, opacity 0.15s;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
+      transition: color 0.15s, border-color 0.15s;
     }
-    .nav-play i { font-size: 18px; line-height: 1; }
-    .nav-play:active { transform: scale(0.94); opacity: 0.9; }
+    .nav-btn i { font-size: 20px; line-height: 1; }
+    .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    /* Active nav: 2px underline at top, dark green, no pill */
+    .nav-btn.active {
+      color: #0D1F12;
+      background: none;
+      border-radius: 0;
+      border-top-color: #0D1F12;
+    }
+    .nav-btn.active svg { stroke: #0D1F12; }
     /* Profile-specific active underline */
     body.son-mode     .nav-btn.active { color: #378ADD; border-top-color: #378ADD; }
     body.son-mode     .nav-btn.active svg { stroke: #378ADD; }
@@ -242,8 +211,8 @@
 
     /* ── SHARED COMPONENTS ── */
     .page-header {
-      background: var(--bg);
-      padding: 24px 20px 18px;
+      background: var(--surface2);
+      padding: 24px 20px 20px;
       border-bottom: 0.5px solid var(--border);
       position: relative;
       overflow: hidden;
@@ -258,19 +227,19 @@
       opacity: 0.08;
     }
     .page-tag {
-      font-size: 0.62rem;
-      font-weight: 700;
+      font-size: 0.65rem;
+      font-weight: 600;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: var(--green);
+      color: var(--gold);
       margin-bottom: 4px;
     }
     .page-title {
-      font-family:'Archivo',sans-serif;font-weight:800;
-      font-size: 1.75rem;
-      letter-spacing: -0.5px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 2px;
       color: var(--cream);
-      line-height: 1.05;
+      line-height: 1;
     }
     .page-sub {
       font-size: 0.78rem;
@@ -282,19 +251,19 @@
     .section:last-child { border-bottom: none; }
 
     .section-title {
-      font-family:'Archivo',sans-serif;font-weight:700;
-      font-size: 0.95rem;
-      letter-spacing: -0.1px;
-      color: var(--cream);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      color: var(--gold);
       margin-bottom: 10px;
-      text-transform: none;
+      text-transform: uppercase;
     }
 
     .card {
-      background: var(--bg);
-      border-radius: 14px;
+      background: var(--surface);
+      border-radius: 12px;
       padding: 14px 16px;
-      border: 1px solid var(--border);
+      border: 0.5px solid var(--border);
       margin-bottom: 10px;
     }
     .card:last-child { margin-bottom: 0; }
@@ -322,19 +291,19 @@
 
     /* CADDIE QUICK-TAPS */
     .caddie-chip { background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:6px 12px; font-size:0.76rem; font-weight:600; color:var(--muted); cursor:pointer; white-space:nowrap; touch-action:manipulation; font-family:inherit; transition:background 0.15s, color 0.15s; }
-    .caddie-chip:active { background:rgba(36,150,87,0.12); color:var(--green-b); border-color:rgba(36,150,87,0.4); }
-    .caddie-yardage-chip { background:rgba(36,150,87,0.08); border:1px solid rgba(36,150,87,0.28); border-radius:20px; padding:6px 14px; font-size:0.78rem; font-weight:700; color:var(--green-b); cursor:pointer; white-space:nowrap; touch-action:manipulation; font-family:inherit; }
-    .caddie-yardage-chip:active { background:rgba(36,150,87,0.2); }
+    .caddie-chip:active { background:rgba(201,168,76,0.15); color:var(--gold); border-color:rgba(201,168,76,0.4); }
+    .caddie-yardage-chip { background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); border-radius:20px; padding:6px 14px; font-size:0.78rem; font-weight:700; color:var(--gold); cursor:pointer; white-space:nowrap; touch-action:manipulation; font-family:inherit; }
+    .caddie-yardage-chip:active { background:rgba(201,168,76,0.25); }
 
     /* DAILY BRIEF */
     .daily-brief { margin: 0 0 20px; }
-    .daily-brief-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--green); margin-bottom: 8px; opacity: 0.9; }
-    .brief-card { border-left: 3px solid var(--green); background: var(--surface); border-radius: 0 12px 12px 0; padding: 14px 14px 14px 16px; margin-bottom: 10px; }
+    .daily-brief-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #3DAA6B; margin-bottom: 8px; opacity: 0.9; }
+    .brief-card { border-left: 3px solid #3DAA6B; background: var(--surface2); border-radius: 0 12px 12px 0; padding: 14px 14px 14px 16px; margin-bottom: 10px; }
     .brief-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-    .brief-card-icon { font-size: 1rem; color: var(--green); flex-shrink: 0; }
+    .brief-card-icon { font-size: 1rem; color: var(--gold); flex-shrink: 0; }
     .brief-card-title { font-weight: 700; font-size: 0.9rem; color: var(--cream); }
     .brief-card-body { font-size: 0.8rem; color: var(--muted); line-height: 1.55; }
-    .brief-card-tag { display: inline-block; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); opacity: 0.8; margin-top: 6px; }
+    .brief-card-tag { display: inline-block; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); opacity: 0.6; margin-top: 6px; }
 
     /* static label pills (range phases, club labels) */
     .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
@@ -355,13 +324,14 @@
     .pill:active { opacity: 0.7; }
 
     .cue-box {
-      background: rgba(36,150,87,0.06);
-      border-left: 3px solid var(--green);
+      background: rgba(212,168,67,0.07);
+      border-left: 3px solid var(--gold);
       border-radius: 0 8px 8px 0;
       padding: 8px 12px;
       font-size: 0.8rem;
-      color: var(--green-b);
+      color: var(--gold-l);
       margin-top: 8px;
+      font-style: italic;
     }
 
     .check-row {
@@ -392,18 +362,17 @@
       display: flex;
       justify-content: space-around;
       background: var(--surface);
-      border-radius: 14px;
+      border-radius: 12px;
       padding: 16px 12px;
       margin-bottom: 14px;
-      border: none;
+      border: 0.5px solid var(--border);
     }
     .stat { text-align: center; flex: 1; }
     .stat-num {
-      font-family:'Archivo',sans-serif;font-weight:800;
-      font-size: 1.35rem;
-      letter-spacing: -0.5px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
       color: var(--cream);
-      line-height: 1.1;
+      line-height: 1;
     }
     .stat-lbl { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
 
@@ -423,9 +392,9 @@
     body.grandma-mode .home-hero { background: #EFFAF5; border-bottom-color: #1D9E75; }
 
     .home-greeting {
-      font-family:'Archivo',sans-serif;font-weight:700;
-      font-size: 0.68rem;
-      letter-spacing: 2px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 3px;
       text-transform: uppercase;
       margin-bottom: 6px;
       color: var(--gold);
@@ -436,17 +405,13 @@
     body.grandma-mode .home-greeting { color: #1D9E75; }
 
     .home-title {
-      font-family:'Archivo',sans-serif;font-weight:800;
-      font-size: 2.1rem;
-      letter-spacing: -0.8px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.6rem;
+      letter-spacing: 2px;
       color: var(--cream);
-      line-height: 1.02;
+      line-height: 1;
     }
     .home-title span { color: var(--gold); }
-    body.son-mode     .home-title span { color: #378ADD; }
-    body.girl-mode    .home-title span { color: #D4537E; }
-    body.mom-mode     .home-title span { color: #7F77DD; }
-    body.grandma-mode .home-title span { color: #1D9E75; }
     .home-goal {
       margin-top: 12px;
       background: rgba(212,168,67,0.1);
@@ -460,10 +425,9 @@
       gap: 8px;
     }
     .home-goal-num {
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 2rem;
-      letter-spacing: -1px;
-      color: var(--green);
+      color: var(--gold);
       line-height: 1;
     }
 
@@ -534,13 +498,13 @@
       border-radius: 10px;
       padding: 12px;
       color: var(--cream);
-      font-family: 'Archivo', sans-serif;
+      font-family: 'Outfit', sans-serif;
       font-size: 0.85rem;
       line-height: 1.6;
       resize: none;
       min-height: 120px;
     }
-    .notes-area:focus { outline: none; border-color: var(--green); }
+    .notes-area:focus { outline: none; border-color: var(--gold); }
     .notes-area::placeholder { color: var(--muted); }
 
     .btn {
@@ -549,7 +513,7 @@
       gap: 6px;
       padding: 10px 18px;
       border-radius: 8px;
-      font-family: 'Archivo', sans-serif;
+      font-family: 'Outfit', sans-serif;
       font-size: 0.83rem;
       font-weight: 600;
       cursor: pointer;
@@ -571,7 +535,7 @@
       gap: 12px;
     }
     .session-date {
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 0.9rem;
       color: var(--gold);
       white-space: nowrap;
@@ -601,11 +565,11 @@
       border-radius: 8px;
       padding: 10px 12px;
       color: var(--cream);
-      font-family: 'Archivo', sans-serif;
+      font-family: 'Outfit', sans-serif;
       font-size: 16px; /* iOS auto-zooms inputs below 16px — must not be smaller. Was 0.85rem (~13.6px), beat .modal-input's 16px via specificity. */
       margin-bottom: 10px;
     }
-    input:focus, select:focus { outline: none; border-color: var(--green); }
+    input:focus, select:focus { outline: none; border-color: var(--gold); }
     input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); }
 
     label { font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
@@ -617,28 +581,26 @@
 
     /* ── DARK MODE (opt-in toggle) ── */
     body.dark-mode {
-      --bg:        #0E1B12;
-      --surface:   #16261B;
-      --surface2:  #1C3022;
-      --surface3:  #25402D;
-      --green:     #2FAE6A;
-      --green-b:   #249657;
-      --ink:       #0B1610;
+      --bg:        #0a1a0e;
+      --surface:   #111f15;
+      --surface2:  #1a2f1e;
+      --surface3:  #223828;
+      --green:     #3DAA6B;
+      --green-b:   #2A9060;
       --gold:      #D4A843;
       --gold-l:    #e8cc7a;
-      --cream:     #EDF3EC;
-      --muted:     #8FA396;
-      --border:    rgba(255,255,255,0.09);
+      --cream:     #f0ead8;
+      --muted:     #6a8a6e;
+      --border:    rgba(255,255,255,0.08);
     }
     /* Dark mode — fix hardcoded whites */
     body.dark-mode #nav {
       background: var(--surface);
       border-top-color: var(--border);
     }
-    body.dark-mode .nav-btn { color: #5F7766; }
-    body.dark-mode .nav-btn.active { color: var(--cream); }
-    body.dark-mode .nav-btn.active svg { stroke: var(--cream); }
-    body.dark-mode .nav-play { border: none; }
+    body.dark-mode .nav-btn { color: #5a7a5e; }
+    body.dark-mode .nav-btn.active { color: var(--gold); border-top-color: var(--gold); }
+    body.dark-mode .nav-btn.active svg { stroke: var(--gold); }
     body.dark-mode .home-hero { border-bottom-color: rgba(212,168,67,0.3) !important; }
     body.dark-mode body { background: var(--bg); }
     body.dark-mode .card,
@@ -674,7 +636,7 @@
       width: 30px; height: 30px;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 1rem;
       color: #fff;
       flex-shrink: 0;
@@ -729,7 +691,7 @@
       text-align: center;
     }
     .sss-rule-title {
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 0.85rem;
       letter-spacing: 2px;
       color: var(--gold);
@@ -797,7 +759,7 @@
       display:flex; align-items:center; justify-content:center; gap:6px;
       width:100%; padding:8px 0; margin-top:8px;
       background:none; border:none; border-top: 0.5px solid var(--border);
-      color:var(--muted); font-family:'Archivo',sans-serif; font-size:0.75rem; cursor:pointer;
+      color:var(--muted); font-family:'Outfit',sans-serif; font-size:0.75rem; cursor:pointer;
     }
     .exp-close:active { opacity:0.7; }
     body.dark-mode .diagram { background:rgba(255,255,255,0.04); }
@@ -816,7 +778,7 @@
       width: 32px; height: 32px;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 1.2rem;
       flex-shrink: 0;
     }
@@ -851,7 +813,7 @@
       border-radius: 50%;
       border: 2px solid rgba(255,255,255,0);
       display: flex; align-items: center; justify-content: center;
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
@@ -893,7 +855,7 @@
     .son-step-badge {
       width: 38px; height: 38px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-family:'Archivo',sans-serif;font-weight:800; font-size: 1.4rem;
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem;
       flex-shrink: 0;
     }
 
@@ -904,13 +866,13 @@
       position: fixed;
       inset: 0;
       z-index: 9999;
-      background: var(--ink);
+      background: var(--bg);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
       padding: 24px 20px;
-      padding-top: calc(10vh + env(safe-area-inset-top, 0px));
+      padding-top: calc(24px + env(safe-area-inset-top, 0px));
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
@@ -921,28 +883,28 @@
       transition: opacity 0.35s ease, transform 0.35s ease;
     }
     #landing-logo {
-      font-family:'Archivo',sans-serif;font-weight:800;
-      font-size: 2.1rem;
-      letter-spacing: -0.5px;
-      color: #FFFFFF;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.8rem;
+      letter-spacing: 4px;
+      color: var(--gold);
       line-height: 1;
       text-align: center;
     }
-    #landing-logo span { color: #5BBE85; }
+    #landing-logo span { color: var(--cream); }
     #landing-sub {
-      font-size: 0.66rem;
+      font-size: 0.68rem;
       letter-spacing: 2.5px;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.5);
-      margin-top: 6px;
-      margin-bottom: 22px;
+      color: var(--muted);
+      margin-top: 4px;
+      margin-bottom: 20px;
       text-align: center;
     }
     #landing-question {
-      font-family:'Archivo',sans-serif;font-weight:700;
-      font-size: 1.25rem;
-      letter-spacing: -0.2px;
-      color: #FFFFFF;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 3px;
+      color: var(--cream);
       margin-bottom: 14px;
       text-align: center;
     }
@@ -954,64 +916,70 @@
       max-width: 380px;
     }
     .landing-card {
-      border-radius: 14px;
-      padding: 14px 16px;
+      border-radius: 20px;
+      padding: 18px 20px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 14px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.16);
-      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+      gap: 20px;
+      border: 2px solid transparent;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
-    .landing-card:active { transform: scale(0.97); background: rgba(255,255,255,0.08); }
+    .landing-card:active { transform: scale(0.97); }
     .landing-card-dad {
-      background: rgba(255,255,255,0.05);
-      border-color: rgba(255,255,255,0.22);
+      background: #FEFAF0;
+      border-color: #D4A843;
     }
-    /* Family grid cards — uniform dark roster rows */
+    /* Family grid cards — uniform base, accent border + name only */
     .landing-card-son,
     .landing-card-girl,
     .landing-card-mom,
     .landing-card-grandma {
-      background: rgba(255,255,255,0.04);
+      background: var(--surface);
       box-shadow: none;
     }
-    .landing-card-son      .landing-card-name-sm { color: #6FB1E8; }
-    .landing-card-girl     .landing-card-name-sm { color: #E58BAB; }
-    .landing-card-girl     .landing-card-name    { color: #E58BAB; }
-    .landing-card-mom      .landing-card-name-sm { color: #A39DE8; }
-    .landing-card-grandma  .landing-card-name-sm { color: #5DC9A2; }
-    .landing-card:hover { border-color: rgba(255,255,255,0.35); }
+    .landing-card-son      { border-color: #378ADD; }
+    .landing-card-son      .landing-card-name-sm { color: #378ADD; }
+    .landing-card-girl     { border-color: #D4537E; }
+    .landing-card-girl     .landing-card-name-sm { color: #D4537E; }
+    .landing-card-girl     .landing-card-name    { color: #D4537E; }
+    .landing-card-mom      { border-color: #7F77DD; }
+    .landing-card-mom      .landing-card-name-sm { color: #7F77DD; }
+    .landing-card-grandma  { border-color: #1D9E75; }
+    .landing-card-grandma  .landing-card-name-sm { color: #1D9E75; }
+    /* Hover: subtle lift only — no glow */
+    .landing-card-son:hover,
+    .landing-card-girl:hover,
+    .landing-card-mom:hover,
+    .landing-card-grandma:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.08); }
     .landing-avatar {
       width: 44px; height: 44px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.08);
+      background: rgba(212,168,67,0.12);
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
     .landing-card-info { flex: 1; }
     .landing-card-name {
-      font-family:'Archivo',sans-serif;font-weight:800;
-      font-size: 1.45rem;
-      letter-spacing: -0.3px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 3px;
       line-height: 1;
       margin-bottom: 4px;
     }
-    .landing-card-dad .landing-card-name { color: #E5C36A; }
+    .landing-card-dad .landing-card-name { color: #D4A843; }
     .landing-card-desc {
-      font-size: 0.66rem;
-      letter-spacing: 1.2px;
+      font-size: 0.72rem;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
       font-weight: 600;
-      color: rgba(255,255,255,0.5);
+      color: var(--muted);
     }
     .landing-card-arrow {
       font-size: 1.4rem;
-      color: rgba(255,255,255,0.6);
-      opacity: 0.7;
+      opacity: 0.5;
       flex-shrink: 0;
       transition: opacity 0.18s, transform 0.18s;
     }
@@ -1023,26 +991,28 @@
       margin-top: 32px;
       font-size: 0.68rem;
       letter-spacing: 1px;
-      color: rgba(255,255,255,0.4);
+      color: var(--muted);
       text-align: center;
+      opacity: 0.6;
     }
     /* ── LANDING FAMILY HIERARCHY ── */
     #landing-family-name {
-      font-family:'Archivo',sans-serif;font-weight:700;
-      font-size: 1.05rem;
-      letter-spacing: 0.5px;
-      color: rgba(255,255,255,0.85);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 4px;
+      color: var(--gold);
       text-align: center;
       margin-bottom: 16px;
+      opacity: 0.85;
     }
     .landing-owner-badge {
       font-size: 0.58rem;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       font-weight: 700;
-      color: #E5C36A;
-      background: rgba(212,168,67,0.14);
-      border: 1px solid rgba(212,168,67,0.35);
+      color: var(--gold);
+      background: rgba(212,168,67,0.12);
+      border: 1px solid rgba(212,168,67,0.3);
       border-radius: 20px;
       padding: 3px 8px;
       white-space: nowrap;
@@ -1059,60 +1029,52 @@
     .landing-family-divider::after {
       content: '';
       flex: 1;
-      height: 1px;
-      background: rgba(255,255,255,0.14);
+      height: 0.5px;
+      background: var(--border);
     }
     .landing-family-divider span {
       font-size: 0.62rem;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.45);
+      color: var(--muted);
       font-weight: 600;
     }
-    /* Family roster — same size as Dad's card, stacked */
     .landing-family-grid {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
       width: 100%;
       max-width: 380px;
     }
     .landing-card-sm {
-      padding: 14px 16px;
-      border-radius: 14px;
-      min-width: 0;
-      gap: 14px;
+      padding: 12px 12px;
+      border-radius: 16px;
     }
-    .landing-card-sm .landing-card-info { min-width: 0; }
     .landing-avatar-sm {
-      width: 44px; height: 44px;
+      width: 34px; height: 34px;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-family:'Archivo',sans-serif;font-weight:800;
-      font-size: 1.2rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
       flex-shrink: 0;
     }
     .landing-card-name-sm {
-      font-family:'Archivo',sans-serif;font-weight:800;
-      font-size: 1.45rem;
-      letter-spacing: -0.3px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.25rem;
+      letter-spacing: 2px;
       line-height: 1;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
     .landing-card-desc-sm {
-      font-size: 0.66rem;
-      letter-spacing: 1.2px;
+      font-size: 0.6rem;
+      letter-spacing: 1px;
       text-transform: uppercase;
       font-weight: 600;
-      color: rgba(255,255,255,0.5);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      color: var(--muted);
     }
     .landing-card-arrow-sm {
       font-size: 1rem;
-      color: rgba(255,255,255,0.6);
-      opacity: 0.6;
+      opacity: 0.4;
       flex-shrink: 0;
       margin-left: auto;
       transition: opacity 0.18s, transform 0.18s;
@@ -1390,7 +1352,7 @@
       border-radius: 10px;
       padding: 12px 14px;
       color: var(--cream);
-      font-family: 'Archivo', sans-serif;
+      font-family: 'Outfit', sans-serif;
       font-size: 16px; /* 16px minimum prevents iOS auto-zoom on focus */
       margin-bottom: 10px;
       -webkit-appearance: none;
@@ -1413,9 +1375,9 @@
       display: block;
       width: 100%;
       padding: 16px 20px;
-      background: var(--green);
+      background: var(--green-b);
       color: #fff;
-      font-family: 'Archivo', sans-serif;
+      font-family: 'Outfit', sans-serif;
       font-size: 1rem;
       font-weight: 700;
       border: none;
@@ -1435,7 +1397,7 @@
       padding: 14px 20px;
       background: var(--surface2);
       color: var(--muted);
-      font-family: 'Archivo', sans-serif;
+      font-family: 'Outfit', sans-serif;
       font-size: 0.9rem;
       font-weight: 600;
       border: 1px solid rgba(255,255,255,0.1);
@@ -1450,12 +1412,12 @@
     .btn-ghost:active { opacity: 0.7; }
     .btn-ghost:disabled { opacity: 0.3; pointer-events: none; }
 
-    /* Primary CTA button (Next Hole, Finish Round) — kelly green */
+    /* Gold CTA button (Next Hole, Finish Round) */
     .btn-gold {
       padding: 16px 28px;
-      background: var(--green);
-      color: #fff;
-      font-family: 'Archivo', sans-serif;
+      background: var(--gold);
+      color: #000;
+      font-family: 'Outfit', sans-serif;
       font-size: 1rem;
       font-weight: 700;
       border: none;
@@ -1508,7 +1470,7 @@
     .stepper-btn:active  { background: rgba(212,168,67,0.25); transform: scale(0.92); }
     .stepper-btn:disabled { opacity: 0.3; pointer-events: none; }
     .score-val {
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 4.5rem;
       color: var(--cream);
       line-height: 1;
@@ -1523,7 +1485,7 @@
       margin-bottom: 16px;
     }
     .hole-number-big {
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 1.1rem;
       letter-spacing: 4px;
       color: var(--muted);
@@ -1551,7 +1513,7 @@
     .round-card-date { font-size: 0.7rem; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 2px; }
     .round-card-course { font-size: 0.88rem; color: var(--cream); font-weight: 600; }
     .round-badge {
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 1.6rem;
       padding: 4px 14px;
       border-radius: 10px;
@@ -1570,7 +1532,7 @@
       border-radius: 8px;
       color: #f87171;
       font-size: 0.78rem;
-      font-family: 'Archivo', sans-serif;
+      font-family: 'Outfit', sans-serif;
       cursor: pointer;
     }
     .round-edit-btn {
@@ -1580,7 +1542,7 @@
       border-radius: 8px;
       color: var(--gold);
       font-size: 0.78rem;
-      font-family: 'Archivo', sans-serif;
+      font-family: 'Outfit', sans-serif;
       cursor: pointer;
     }
     /* Round edit modal */
@@ -1614,7 +1576,7 @@
       border: 0.5px solid var(--border);
       border-radius: 6px;
       color: var(--cream);
-      font-family: 'Archivo', sans-serif;
+      font-family: 'Outfit', sans-serif;
       font-size: 0.75rem;
       padding: 5px 6px;
       flex: 1;
@@ -1625,7 +1587,7 @@
       border: 0.5px solid var(--border);
       border-radius: 6px;
       color: var(--cream);
-      font-family: 'Archivo', sans-serif;
+      font-family: 'Outfit', sans-serif;
       font-size: 0.75rem;
       padding: 5px 6px;
       width: 54px;
@@ -1665,7 +1627,7 @@
       margin-bottom: 16px;
     }
     .score-summary-score {
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 5rem;
       color: var(--gold);
       line-height: 1;
@@ -1698,7 +1660,7 @@
       border-radius: 14px; padding: 16px 14px 12px; margin-bottom: 14px;
     }
     .live-yards {
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 4rem; color: var(--gold); line-height: 1; text-align: center;
     }
     .yardage-pill {
@@ -1723,7 +1685,7 @@
       padding: 12px 14px; margin-bottom: 14px;
     }
     .live-club-name {
-      font-family:'Archivo',sans-serif;font-weight:800; font-size: 2.4rem; color: var(--cream);
+      font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; color: var(--cream);
       letter-spacing: 1px; line-height: 1; margin-bottom: 5px;
     }
     .live-club-note { font-size: 0.73rem; color: var(--muted); line-height: 1.4; }
@@ -1771,7 +1733,7 @@
       border: 0.5px solid var(--border);
       background: var(--surface);
       color: var(--cream);
-      font-family: 'Archivo', sans-serif;
+      font-family: 'Outfit', sans-serif;
       font-size: 1.6rem;
       font-weight: 400;
       cursor: pointer;
@@ -1859,7 +1821,7 @@
     .fam-player-vpar  { font-size: 0.72rem; }
     .fam-score-stepper { display: flex; align-items: center; gap: 10px; }
     .fam-score-val {
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 2rem; min-width: 40px; text-align: center; line-height: 1;
     }
     .fam-running-bar  { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -1964,7 +1926,7 @@
       padding: 6px 4px;
     }
     .settings-title {
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 1.3rem;
       color: var(--gold);
       letter-spacing: 2px;
@@ -2152,7 +2114,7 @@
       width: 36px; height: 36px;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 1.1rem;
       flex-shrink: 0;
     }
@@ -2189,7 +2151,7 @@
       line-height: 1;
     }
     .settings-level-badge {
-      font-family:'Archivo',sans-serif;font-weight:800;
+      font-family: 'Bebas Neue', sans-serif;
       font-size: 0.9rem;
       color: var(--gold);
       letter-spacing: 1px;

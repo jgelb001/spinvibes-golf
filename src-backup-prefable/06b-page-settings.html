@@ -1,0 +1,338 @@
+  <!-- ══════════════════════════════════════
+       SETTINGS OVERLAY (Dad Admin Panel)
+       Opened via openSettings() — full-screen overlay
+       Only accessible after Dad PIN unlock
+  ══════════════════════════════════════ -->
+  <div id="settings-overlay" style="display:none;position:fixed;inset:0;z-index:8000;background:var(--bg);overflow-y:auto;padding-bottom:calc(40px + env(safe-area-inset-bottom,0px));">
+
+    <!-- Topbar -->
+    <div class="settings-topbar">
+      <button onclick="closeSettings()" class="settings-back-btn">
+        <i class="ti ti-arrow-left"></i> Back
+      </button>
+      <div class="settings-title">Settings</div>
+      <div style="width:60px;"></div>
+    </div>
+
+    <div style="padding:0 16px;">
+
+      <!-- ── SAVE BANNER (shown after any change) ── -->
+      <div id="settings-save-banner" style="display:none;position:sticky;top:calc(56px + env(safe-area-inset-top,0px));z-index:10;margin:0 -16px;padding:10px 20px;background:var(--green);color:#fff;font-size:0.85rem;font-weight:700;display:flex;align-items:center;justify-content:space-between;">
+        <span><i class="ti ti-circle-dot"></i> Unsaved changes</span>
+        <button onclick="saveAllSettings()" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:8px;color:#fff;font-size:0.8rem;font-weight:700;padding:6px 14px;cursor:pointer;">Save All</button>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION: MY PROFILE
+      ══════════════════════════════════════ -->
+      <div class="settings-section-header">
+        <i class="ti ti-user"></i> My Profile
+      </div>
+      <div class="settings-card">
+
+        <div class="settings-row">
+          <label class="settings-label">Name</label>
+          <input id="set-name" class="settings-input" type="text" placeholder="Your name" oninput="markSettingsDirty()" />
+        </div>
+
+        <div class="settings-row">
+          <label class="settings-label">Goal Score</label>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input id="set-goal" class="settings-input" type="number" min="60" max="130" placeholder="90" style="width:72px;text-align:center;" oninput="markSettingsDirty()" />
+            <span style="font-size:0.75rem;color:var(--muted);">strokes</span>
+          </div>
+        </div>
+
+        <div class="settings-row">
+          <label class="settings-label">Handedness</label>
+          <select id="set-hand" class="settings-select" onchange="markSettingsDirty()">
+            <option value="left">Left-Handed</option>
+            <option value="right">Right-Handed</option>
+          </select>
+        </div>
+
+        <div class="settings-row">
+          <label class="settings-label">Skill Level</label>
+          <select id="set-skill" class="settings-select" onchange="markSettingsDirty()">
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+
+        <div class="settings-row" style="border:none;">
+          <label class="settings-label">Miss Tendency</label>
+          <select id="set-tendency" class="settings-select" onchange="markSettingsDirty()">
+            <option value="">None / Straight</option>
+            <option value="pull_left">Pull Left</option>
+            <option value="push_right">Push Right</option>
+            <option value="hook">Hook (hard left)</option>
+            <option value="slice">Slice (hard right)</option>
+            <option value="thin">Thin / Top it</option>
+            <option value="fat">Fat / Chunk it</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION: MY BAG
+      ══════════════════════════════════════ -->
+      <div class="settings-section-header">
+        <i class="ti ti-briefcase"></i> My Bag
+        <span style="font-size:0.7rem;font-weight:500;color:var(--muted);letter-spacing:0;text-transform:none;margin-left:6px;">tap distance to edit</span>
+      </div>
+      <div class="settings-card" style="padding:0;">
+        <div id="settings-bag-list">
+          <!-- Injected by renderSettingsBag() -->
+        </div>
+        <div style="padding:12px 16px;border-top:1px solid var(--border);">
+          <button onclick="openAddClubForm()" class="settings-add-btn">
+            <i class="ti ti-plus"></i> Add Club
+          </button>
+        </div>
+      </div>
+
+      <!-- Add Club Form (hidden by default) -->
+      <div id="add-club-form" style="display:none;" class="settings-card">
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">New Club</div>
+        <div class="settings-row">
+          <label class="settings-label">Club Name</label>
+          <input id="new-club-name" class="settings-input" type="text" placeholder="e.g. 3-Wood" />
+        </div>
+        <div class="settings-row">
+          <label class="settings-label">Carry (yds)</label>
+          <input id="new-club-dist" class="settings-input" type="number" min="10" max="400" placeholder="150" style="width:72px;text-align:center;" />
+        </div>
+        <div class="settings-row">
+          <label class="settings-label">Loft</label>
+          <input id="new-club-loft" class="settings-input" type="text" placeholder="e.g. 15°" style="width:72px;" />
+        </div>
+        <div class="settings-row" style="border:none;">
+          <label class="settings-label">Wedge?</label>
+          <label class="settings-toggle-wrap">
+            <input type="checkbox" id="new-club-wedge" class="settings-toggle-input" />
+            <span class="settings-toggle-pill"></span>
+          </label>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button onclick="addNewClub()" class="btn-primary" style="flex:1;padding:10px;font-size:0.85rem;">Add to Bag</button>
+          <button onclick="document.getElementById('add-club-form').style.display='none';" style="flex:0 0 auto;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--muted);cursor:pointer;font-size:0.85rem;">Cancel</button>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION: FAMILY
+      ══════════════════════════════════════ -->
+      <div class="settings-section-header">
+        <i class="ti ti-users"></i> Family
+      </div>
+
+      <!-- Son -->
+      <div class="settings-card settings-family-card" id="fam-card-son">
+        <div class="settings-family-header">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="settings-family-avatar" style="background:rgba(59,130,246,0.15);color:#3b82f6;">S</div>
+            <div>
+              <input id="fam-son-name" class="settings-family-name-input" type="text" placeholder="Son's name" oninput="markSettingsDirty()" />
+              <div style="font-size:0.7rem;color:var(--muted);">Junior · Right-handed</div>
+            </div>
+          </div>
+          <div class="settings-level-control">
+            <button onclick="adjustFamilyLevel('son', -1)" class="settings-level-btn">−</button>
+            <div class="settings-level-badge" id="fam-son-level-badge">Lv 1</div>
+            <button onclick="adjustFamilyLevel('son', +1)" class="settings-level-btn">+</button>
+          </div>
+        </div>
+        <div class="settings-family-dists" id="fam-son-dists">
+          <div class="settings-family-dist-row">
+            <span class="settings-label" style="font-size:0.75rem;">Driver</span>
+            <input id="fam-son-driver" type="number" class="settings-input" style="width:60px;text-align:center;padding:4px 6px;font-size:0.85rem;" placeholder="—" oninput="markSettingsDirty()" />
+            <span style="font-size:0.72rem;color:var(--muted);">yds</span>
+          </div>
+          <div class="settings-family-dist-row">
+            <span class="settings-label" style="font-size:0.75rem;">Iron / Hybrid</span>
+            <input id="fam-son-iron" type="number" class="settings-input" style="width:60px;text-align:center;padding:4px 6px;font-size:0.85rem;" placeholder="—" oninput="markSettingsDirty()" />
+            <span style="font-size:0.72rem;color:var(--muted);">yds</span>
+          </div>
+          <div class="settings-family-dist-row">
+            <span class="settings-label" style="font-size:0.75rem;">Wedge</span>
+            <input id="fam-son-wedge" type="number" class="settings-input" style="width:60px;text-align:center;padding:4px 6px;font-size:0.85rem;" placeholder="—" oninput="markSettingsDirty()" />
+            <span style="font-size:0.72rem;color:var(--muted);">yds</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daughter -->
+      <div class="settings-card settings-family-card" id="fam-card-daughter">
+        <div class="settings-family-header">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="settings-family-avatar" style="background:rgba(236,72,153,0.12);color:#ec4899;">D</div>
+            <div>
+              <input id="fam-daughter-name" class="settings-family-name-input" type="text" placeholder="Daughter's name" oninput="markSettingsDirty()" />
+              <div style="font-size:0.7rem;color:var(--muted);">Junior · Left-handed</div>
+            </div>
+          </div>
+          <div class="settings-level-control">
+            <button onclick="adjustFamilyLevel('daughter', -1)" class="settings-level-btn">−</button>
+            <div class="settings-level-badge" id="fam-daughter-level-badge">Lv 1</div>
+            <button onclick="adjustFamilyLevel('daughter', +1)" class="settings-level-btn">+</button>
+          </div>
+        </div>
+        <div class="settings-family-dists">
+          <div class="settings-family-dist-row">
+            <span class="settings-label" style="font-size:0.75rem;">Driver</span>
+            <input id="fam-daughter-driver" type="number" class="settings-input" style="width:60px;text-align:center;padding:4px 6px;font-size:0.85rem;" placeholder="—" oninput="markSettingsDirty()" />
+            <span style="font-size:0.72rem;color:var(--muted);">yds</span>
+          </div>
+          <div class="settings-family-dist-row">
+            <span class="settings-label" style="font-size:0.75rem;">Iron / Hybrid</span>
+            <input id="fam-daughter-iron" type="number" class="settings-input" style="width:60px;text-align:center;padding:4px 6px;font-size:0.85rem;" placeholder="—" oninput="markSettingsDirty()" />
+            <span style="font-size:0.72rem;color:var(--muted);">yds</span>
+          </div>
+          <div class="settings-family-dist-row">
+            <span class="settings-label" style="font-size:0.75rem;">Wedge</span>
+            <input id="fam-daughter-wedge" type="number" class="settings-input" style="width:60px;text-align:center;padding:4px 6px;font-size:0.85rem;" placeholder="—" oninput="markSettingsDirty()" />
+            <span style="font-size:0.72rem;color:var(--muted);">yds</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mom -->
+      <div class="settings-card settings-family-card" id="fam-card-mom">
+        <div class="settings-family-header">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="settings-family-avatar" style="background:rgba(20,184,166,0.12);color:#14b8a6;">M</div>
+            <div>
+              <input id="fam-mom-name" class="settings-family-name-input" type="text" placeholder="Mom's name" oninput="markSettingsDirty()" />
+              <div style="font-size:0.7rem;color:var(--muted);">Adult beginner</div>
+            </div>
+          </div>
+          <div>
+            <select id="fam-mom-skill" class="settings-select" style="font-size:0.8rem;padding:6px 10px;" onchange="markSettingsDirty()">
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grandma -->
+      <div class="settings-card settings-family-card" id="fam-card-grandma">
+        <div class="settings-family-header">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="settings-family-avatar" style="background:rgba(168,85,247,0.12);color:#a855f7;">G</div>
+            <div>
+              <input id="fam-grandma-name" class="settings-family-name-input" type="text" placeholder="Grandma's name" oninput="markSettingsDirty()" />
+              <div style="font-size:0.7rem;color:var(--muted);">Getting back out there</div>
+            </div>
+          </div>
+          <div>
+            <select id="fam-grandma-skill" class="settings-select" style="font-size:0.8rem;padding:6px 10px;" onchange="markSettingsDirty()">
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="returning">Returning</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION: SECURITY
+      ══════════════════════════════════════ -->
+      <div class="settings-section-header">
+        <i class="ti ti-shield-lock"></i> Security
+      </div>
+      <div class="settings-card">
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:14px;">Change your 4-digit PIN. All family profiles use the same PIN.</div>
+
+        <div class="settings-row">
+          <label class="settings-label">New PIN</label>
+          <input id="pin-new" class="settings-input" type="tel" maxlength="4" placeholder="4 digits" style="width:90px;text-align:center;letter-spacing:4px;" />
+        </div>
+        <div class="settings-row" style="border:none;">
+          <label class="settings-label">Confirm PIN</label>
+          <input id="pin-confirm" class="settings-input" type="tel" maxlength="4" placeholder="4 digits" style="width:90px;text-align:center;letter-spacing:4px;" />
+        </div>
+        <div id="pin-change-msg" style="font-size:0.75rem;margin:6px 0 0;display:none;"></div>
+        <button onclick="changePin()" class="settings-add-btn" style="margin-top:12px;">
+          <i class="ti ti-lock-check"></i> Update PIN
+        </button>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION: LOG A PAST ROUND
+      ══════════════════════════════════════ -->
+      <div class="settings-section-header">
+        <i class="ti ti-notebook"></i> Log a Past Round
+      </div>
+      <div class="settings-card">
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:14px;">Manually add a round you forgot to log during play.</div>
+
+        <div class="settings-row">
+          <label class="settings-label">Player</label>
+          <select id="log-round-player" class="settings-select" style="font-size:0.85rem;">
+            <option value="dad">Dad (Me)</option>
+            <option value="son">Son</option>
+            <option value="daughter">Daughter</option>
+            <option value="mom">Mom</option>
+            <option value="grandma">Grandma</option>
+          </select>
+        </div>
+
+        <div class="settings-row">
+          <label class="settings-label">Date</label>
+          <input id="log-round-date" class="settings-input" type="date" style="font-size:0.85rem;" />
+        </div>
+
+        <div class="settings-row">
+          <label class="settings-label">Course</label>
+          <input id="log-round-course" class="settings-input" type="text" placeholder="Course name" />
+        </div>
+
+        <div class="settings-row">
+          <label class="settings-label">Score</label>
+          <input id="log-round-score" class="settings-input" type="number" min="40" max="200" placeholder="92" style="width:72px;text-align:center;" />
+        </div>
+
+        <div class="settings-row">
+          <label class="settings-label">Par</label>
+          <input id="log-round-par" class="settings-input" type="number" min="27" max="73" placeholder="72" style="width:72px;text-align:center;" />
+        </div>
+
+        <div class="settings-row" style="border:none;flex-direction:column;align-items:flex-start;gap:8px;">
+          <label class="settings-label">Notes</label>
+          <textarea id="log-round-notes" class="settings-input" rows="3" placeholder="Anything worth remembering about this round..." style="width:100%;resize:none;font-family:inherit;"></textarea>
+        </div>
+
+        <div id="log-round-msg" style="font-size:0.75rem;margin:6px 0 0;display:none;"></div>
+        <button onclick="logPastRound()" class="btn-primary" style="width:100%;margin-top:12px;">
+          <i class="ti ti-plus"></i> Save Round
+        </button>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           SECTION: APP INFO
+      ══════════════════════════════════════ -->
+      <div class="settings-section-header">
+        <i class="ti ti-info-circle"></i> App
+      </div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <span class="settings-label">Device ID</span>
+          <span id="settings-device-id" style="font-size:0.7rem;color:var(--muted);font-family:monospace;word-break:break-all;"></span>
+        </div>
+        <div class="settings-row" style="border:none;">
+          <span class="settings-label">Profile stored in</span>
+          <span id="settings-profile-source" style="font-size:0.8rem;color:var(--muted);">Supabase</span>
+        </div>
+      </div>
+
+      <!-- Bottom save button -->
+      <button onclick="saveAllSettings()" class="btn-primary" style="width:100%;margin-top:8px;padding:14px;">
+        <i class="ti ti-device-floppy"></i> Save All Settings
+      </button>
+
+    </div><!-- /padding wrapper -->
+  </div><!-- /settings-overlay -->

@@ -30,16 +30,16 @@
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,4 34,20 52,20 38,31 44,48 28,38 12,48 18,31 4,20 22,20" fill="{{c}}" opacity="0.15"/><polygon points="28,4 34,20 52,20 38,31 44,48 28,38 12,48 18,31 4,20 22,20" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="28" cy="32" r="5" fill="{{c}}" opacity="0.9"/><line x1="28" y1="20" x2="28" y2="27" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/></svg>`,
       check:(rounds)=>rounds.length>=1 },
     { id:'first_birdie',name:'Birdie!',    desc:'First birdie on any hole',       color:'#1E7A3A',
-      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.1"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="28" r="18" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.4"/><text x="28" y="33" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="16" fill="{{c}}">−1</text></svg>`,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.1"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="28" r="18" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.4"/><text x="28" y="33" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="16" fill="{{c}}">−1</text></svg>`,
       check:(rounds)=>rounds.some(r=>{const hs=Array.isArray(r.holes)?r.holes:JSON.parse(r.holes||'[]');return hs.some(h=>(h.score-h.par)===-1);}) },
     { id:'par_round',   name:'Par Round',  desc:'Shot even par or better',        color:'#D4A843',
-      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="48" height="48" rx="8" fill="{{c}}" opacity="0.1"/><rect x="4" y="4" width="48" height="48" rx="8" fill="none" stroke="{{c}}" stroke-width="2.5"/><text x="28" y="24" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="11" fill="{{c}}" opacity="0.7">EVEN</text><text x="28" y="38" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="18" fill="{{c}}">PAR</text></svg>`,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="48" height="48" rx="8" fill="{{c}}" opacity="0.1"/><rect x="4" y="4" width="48" height="48" rx="8" fill="none" stroke="{{c}}" stroke-width="2.5"/><text x="28" y="24" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="11" fill="{{c}}" opacity="0.7">EVEN</text><text x="28" y="38" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="18" fill="{{c}}">PAR</text></svg>`,
       check:(rounds)=>rounds.some(r=>r.score_vs_par!==undefined?r.score_vs_par<=0:false) },
     { id:'five_rounds', name:'5 Rounds',   desc:'Played 5 rounds',                color:'#7C5CBF',
-      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.12"/><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2"/><text x="28" y="33" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="20" fill="{{c}}">5</text></svg>`,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.12"/><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2"/><text x="28" y="33" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="20" fill="{{c}}">5</text></svg>`,
       check:(rounds)=>rounds.length>=5 },
     { id:'hat_trick',   name:'Hat Trick',  desc:'3 birdies in one round',         color:'#C0392B',
-      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="28" r="17" fill="none" stroke="{{c}}" stroke-width="1.5" opacity="0.5"/><text x="28" y="34" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" fill="{{c}}">3×</text></svg>`,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="28" r="17" fill="none" stroke="{{c}}" stroke-width="1.5" opacity="0.5"/><text x="28" y="34" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="13" fill="{{c}}">3×</text></svg>`,
       check:(rounds)=>rounds.some(r=>{const hs=Array.isArray(r.holes)?r.holes:JSON.parse(r.holes||'[]');return hs.filter(h=>(h.score-h.par)<=-1).length>=3;}) },
     { id:'new_course',  name:'Explorer',   desc:'Played 2 different courses',     color:'#B86530',
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="28" cy="20" r="5" fill="{{c}}" opacity="0.9"/><line x1="28" y1="25" x2="28" y2="36" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/></svg>`,
@@ -48,7 +48,7 @@
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="48" height="48" rx="8" fill="{{c}}" opacity="0.08"/><rect x="4" y="4" width="48" height="48" rx="8" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="28" cy="25" r="9" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="25" r="4" fill="{{c}}" opacity="0.7"/><line x1="16" y1="40" x2="40" y2="40" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/><line x1="28" y1="34" x2="28" y2="40" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/></svg>`,
       check:(rounds)=>rounds.some(r=>{const hs=Array.isArray(r.holes)?r.holes:JSON.parse(r.holes||'[]');return hs.filter(h=>h.putts===1).length>=3;}) },
     { id:'ten_rounds',  name:'10 Rounds',  desc:'Played 10 rounds',               color:'#D4A843',
-      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.15"/><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2.5"/><text x="28" y="34" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="18" fill="{{c}}">10</text></svg>`,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.15"/><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2.5"/><text x="28" y="34" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="18" fill="{{c}}">10</text></svg>`,
       check:(rounds)=>rounds.length>=10 },
   ];
 
@@ -56,10 +56,10 @@
   // ── KID BADGES — kid-specific achievements using localStorage flags + rounds ──
   const KID_BADGES = [
     { id:'kid_first_par',    name:'First Par',      desc:'Made par on any hole',          color:'#22c55e',
-      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.1"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="28" r="16" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.3"/><text x="28" y="24" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="10" fill="{{c}}" opacity="0.8">FIRST</text><text x="28" y="37" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="16" fill="{{c}}">PAR</text></svg>`,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.1"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="28" r="16" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.3"/><text x="28" y="24" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="10" fill="{{c}}" opacity="0.8">FIRST</text><text x="28" y="37" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="16" fill="{{c}}">PAR</text></svg>`,
       check:(who,rounds)=>!!localStorage.getItem('sv-'+who+'-first-par') },
     { id:'kid_first_birdie', name:'First Birdie',   desc:'One under par on any hole',     color:'#1E7A3A',
-      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.1"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="28" r="18" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.4"/><text x="28" y="33" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="16" fill="{{c}}">-1</text></svg>`,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.1"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="28" r="18" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.4"/><text x="28" y="33" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="16" fill="{{c}}">-1</text></svg>`,
       check:(who,rounds)=>!!localStorage.getItem('sv-'+who+'-first-birdie') },
     { id:'kid_family_round', name:'Family Round',   desc:'Played in a family round',      color:'#3b82f6',
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="20" cy="22" r="5" fill="{{c}}" opacity="0.7"/><circle cx="36" cy="22" r="5" fill="{{c}}" opacity="0.7"/><path d="M12 36 Q20 28 28 32 Q36 28 44 36" fill="none" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/></svg>`,
@@ -71,7 +71,7 @@
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="28" cy="20" r="5" fill="{{c}}" opacity="0.9"/><line x1="28" y1="25" x2="28" y2="36" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="22" y1="39" x2="34" y2="39" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/></svg>`,
       check:(who,rounds)=>new Set(rounds.map(r=>r.course_name)).size>=3 },
     { id:'kid_loves_game',   name:'Loves the Game', desc:'10 rounds played',              color:'#ec4899',
-      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.15"/><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2.5"/><text x="28" y="34" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="13" fill="{{c}}">10+</text></svg>`,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="{{c}}" opacity="0.15"/><polygon points="28,3 35,18 52,18 39,30 44,47 28,37 12,47 17,30 4,18 21,18" fill="none" stroke="{{c}}" stroke-width="2.5"/><text x="28" y="34" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="13" fill="{{c}}">10+</text></svg>`,
       check:(who,rounds)=>rounds.length>=10 },
 
     // ── Auto badges ──────────────────────────────────────────────
@@ -79,7 +79,7 @@
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><rect x="18" y="20" width="20" height="22" rx="3" fill="none" stroke="{{c}}" stroke-width="2"/><path d="M22 20 L22 16 Q28 12 34 16 L34 20" fill="none" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="24" y1="27" x2="32" y2="27" stroke="{{c}}" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/><line x1="24" y1="31" x2="32" y2="31" stroke="{{c}}" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/><line x1="24" y1="35" x2="32" y2="35" stroke="{{c}}" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/></svg>`,
       check:(who,rounds)=>getKidRangeSessions(who).length>=10 },
     { id:'kid_hat_trick',      name:'Hat Trick',       desc:'3 rounds in one month',         color:'#0ea5e9',
-      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><text x="28" y="26" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="11" fill="{{c}}" opacity="0.8">HAT</text><text x="28" y="40" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="16" fill="{{c}}">3x</text></svg>`,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><text x="28" y="26" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="11" fill="{{c}}" opacity="0.8">HAT</text><text x="28" y="40" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="16" fill="{{c}}">3x</text></svg>`,
       check:(who,rounds)=>{
         const counts={};
         (rounds||[]).forEach(r=>{
@@ -92,7 +92,7 @@
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><path d="M14 36 Q20 20 28 24 Q36 28 42 20" fill="none" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/><circle cx="14" cy="36" r="3" fill="{{c}}" opacity="0.8"/><circle cx="28" cy="24" r="3" fill="{{c}}" opacity="0.8"/><circle cx="42" cy="20" r="3" fill="{{c}}" opacity="0.8"/></svg>`,
       check:(who,rounds)=>new Set((rounds||[]).map(r=>r.course_name)).size>=5 },
     { id:'kid_family_tradition',name:'Family Tradition',desc:'5 family rounds played',       color:'#14b8a6',
-      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="18" cy="20" r="4" fill="{{c}}" opacity="0.8"/><circle cx="38" cy="20" r="4" fill="{{c}}" opacity="0.8"/><circle cx="28" cy="22" r="4" fill="{{c}}" opacity="0.8"/><path d="M10 38 Q18 28 28 32 Q38 28 46 38" fill="none" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><text x="28" y="50" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="9" fill="{{c}}" opacity="0.8">5x</text></svg>`,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="18" cy="20" r="4" fill="{{c}}" opacity="0.8"/><circle cx="38" cy="20" r="4" fill="{{c}}" opacity="0.8"/><circle cx="28" cy="22" r="4" fill="{{c}}" opacity="0.8"/><path d="M10 38 Q18 28 28 32 Q38 28 46 38" fill="none" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><text x="28" y="50" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="9" fill="{{c}}" opacity="0.8">5x</text></svg>`,
       check:(who,rounds)=>(parseInt(localStorage.getItem('sv-'+who+'-family-count')||'0')>=5) },
 
     // ── Manual badges (account holder awards) ────────────────────
@@ -100,7 +100,7 @@
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><path d="M18 24 Q28 12 38 24" fill="{{c}}" opacity="0.25"/><path d="M18 24 Q28 12 38 24 Q40 28 28 28 Q16 28 18 24Z" fill="{{c}}" opacity="0.6"/><line x1="20" y1="33" x2="18" y2="40" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="28" y1="33" x2="26" y2="40" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="36" y1="33" x2="34" y2="40" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/></svg>`,
       check:(who)=>!!localStorage.getItem('sv-'+who+'-badge-kid_rainmaker') },
     { id:'kid_early_bird',  name:'Early Bird',   desc:'Tee time before 8am',           color:'#fbbf24', manual:true,
-      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="28" cy="26" r="9" fill="{{c}}" opacity="0.25"/><circle cx="28" cy="26" r="9" fill="none" stroke="{{c}}" stroke-width="2"/><line x1="28" y1="12" x2="28" y2="16" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="28" y1="36" x2="28" y2="40" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="14" y1="26" x2="18" y2="26" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="38" y1="26" x2="42" y2="26" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><text x="28" y="43" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="8" fill="{{c}}">RISE &amp; SHINE</text></svg>`,
+      svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="28" cy="26" r="9" fill="{{c}}" opacity="0.25"/><circle cx="28" cy="26" r="9" fill="none" stroke="{{c}}" stroke-width="2"/><line x1="28" y1="12" x2="28" y2="16" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="28" y1="36" x2="28" y2="40" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="14" y1="26" x2="18" y2="26" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="38" y1="26" x2="42" y2="26" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><text x="28" y="43" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="8" fill="{{c}}">RISE &amp; SHINE</text></svg>`,
       check:(who)=>!!localStorage.getItem('sv-'+who+'-badge-kid_early_bird') },
     { id:'kid_sunset',      name:'Sunset Round', desc:'Played a round after 5pm',      color:'#f97316', manual:true,
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.08"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2"/><path d="M14 36 Q28 20 42 36" fill="{{c}}" opacity="0.2"/><path d="M14 36 Q28 20 42 36Z" fill="none" stroke="{{c}}" stroke-width="2"/><line x1="28" y1="16" x2="28" y2="12" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="22" x2="13" y2="19" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="40" y1="22" x2="43" y2="19" stroke="{{c}}" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="36" x2="46" y2="36" stroke="{{c}}" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/></svg>`,
@@ -654,12 +654,13 @@
     document.body.classList.toggle('girl-mode',    isGirl);
     document.body.classList.toggle('grandma-mode', isGrandma);
     document.body.classList.toggle('mom-mode',     isMom);
-    document.querySelectorAll('.dad-sect')    .forEach(el => el.style.display = isDad     ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
-    document.querySelectorAll('.son-sect')    .forEach(el => el.style.display = isSon     ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
-    document.querySelectorAll('.girl-sect')   .forEach(el => el.style.display = isGirl    ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
-    document.querySelectorAll('.grandma-sect').forEach(el => el.style.display = isGrandma ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
-    document.querySelectorAll('.mom-sect')    .forEach(el => el.style.display = isMom     ? (el.classList.contains('nav-btn') ? 'flex' : 'block') : 'none');
-    const subs = { dad: 'Lefty · Sub-90 Journey', son: 'Righty · Junior', girl: 'Lefty · Age 5', grandma: 'Righty · Welcome Back', mom: 'Righty · Beginner' };
+    const _sectDisp = el => (el.classList.contains('nav-btn') || el.classList.contains('guide-card')) ? 'flex' : 'block';
+    document.querySelectorAll('.dad-sect')    .forEach(el => el.style.display = isDad     ? _sectDisp(el) : 'none');
+    document.querySelectorAll('.son-sect')    .forEach(el => el.style.display = isSon     ? _sectDisp(el) : 'none');
+    document.querySelectorAll('.girl-sect')   .forEach(el => el.style.display = isGirl    ? _sectDisp(el) : 'none');
+    document.querySelectorAll('.grandma-sect').forEach(el => el.style.display = isGrandma ? _sectDisp(el) : 'none');
+    document.querySelectorAll('.mom-sect')    .forEach(el => el.style.display = isMom     ? _sectDisp(el) : 'none');
+    const subs = { dad: 'Lefty · Sub-90 Journey', son: 'Righty · Junior', girl: 'Lefty · Age 6', grandma: 'Righty · Welcome Back', mom: 'Righty · Beginner' };
     document.getElementById('topbarSub').textContent = subs[who];
     document.getElementById('btnDad')    .classList.toggle('active', isDad);
     document.getElementById('btnSon')    .classList.toggle('active', isSon);
@@ -1325,8 +1326,8 @@
     const shieldSvg = `<svg viewBox="0 0 56 62" width="44" height="49" xmlns="http://www.w3.org/2000/svg">
       <path d="M28 3 L53 12 L53 34 Q53 50 28 59 Q3 50 3 34 L3 12 Z" fill="${sc.bg}" stroke="${sc.stroke}" stroke-width="2.5"/>
       <path d="M28 8 L48 16 L48 34 Q48 47 28 54 Q8 47 8 34 L8 16 Z" fill="${sc.fill}" stroke="none"/>
-      <text x="28" y="27" text-anchor="middle" font-family="Bebas Neue,Impact,sans-serif" font-size="8" fill="${sc.text}" opacity="0.7">LEVEL</text>
-      <text x="28" y="44" text-anchor="middle" font-family="Bebas Neue,Impact,sans-serif" font-size="20" fill="${sc.text}">${level}</text>
+      <text x="28" y="27" text-anchor="middle" font-family="Archivo,Impact,sans-serif" font-weight="800" font-size="8" fill="${sc.text}" opacity="0.7">LEVEL</text>
+      <text x="28" y="44" text-anchor="middle" font-family="Archivo,Impact,sans-serif" font-weight="800" font-size="20" fill="${sc.text}">${level}</text>
     </svg>`;
     const shieldHtml = `
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 14px;background:${def.color}18;border-radius:12px;border:1px solid ${def.color}35;">
@@ -1877,7 +1878,7 @@
 
     el.innerHTML = `
       ${suggested ? `<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--gold);line-height:1;">✦ ${suggested.name}</div>
+        <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.5rem;color:var(--gold);line-height:1;">✦ ${suggested.name}</div>
         <div class="live-club-note">${note}</div>
       </div>` : ''}
       <div style="display:flex;flex-wrap:wrap;gap:5px;">
@@ -1951,7 +1952,7 @@
         <div style="font-size:0.75rem;color:var(--muted);">${parLabel}</div>
         <div style="display:flex;align-items:center;gap:6px;">
           <button class="stepper-btn" onclick="dadHolePar(-1)">−</button>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);">PAR <span id="dh-par">${h.par}</span></div>
+          <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.1rem;color:var(--gold);">PAR <span id="dh-par">${h.par}</span></div>
           <button class="stepper-btn" onclick="dadHolePar(1)">+</button>
         </div>
       </div>
@@ -2040,7 +2041,7 @@
           <div id="dad-live-caddie-msgs" style="max-height:200px;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;font-size:0.83rem;line-height:1.5;"></div>
           <div style="display:flex;gap:8px;align-items:flex-end;">
             <textarea id="dad-live-caddie-input" rows="2"
-              style="flex:1;background:var(--surface2);border:1px solid rgba(212,168,67,0.25);border-radius:8px;padding:8px 10px;color:var(--cream);font-family:'Outfit',sans-serif;font-size:0.85rem;resize:none;"
+              style="flex:1;background:var(--surface2);border:1px solid rgba(212,168,67,0.25);border-radius:8px;padding:8px 10px;color:var(--cream);font-family:'Archivo',sans-serif;font-size:0.85rem;resize:none;"
               placeholder="How far to the pin? What's your lie?"
               onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDadLiveCaddieMsg();}"></textarea>
             <button onclick="sendDadLiveCaddieMsg()" id="dad-live-caddie-send"
@@ -2066,7 +2067,7 @@
             style="flex:0 0 auto;width:44px;height:50px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:1.6rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;">−</button>
           <div style="flex:0 0 auto;text-align:center;min-width:48px;">
             <div style="font-size:0.42rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1px;">STROKES</div>
-            <div class="score-val" id="dh-score" style="font-family:'Bebas Neue',sans-serif;font-size:2rem;line-height:1;">${h.score}</div>
+            <div class="score-val" id="dh-score" style="font-family:'Archivo',sans-serif;font-weight:800;font-size:2rem;line-height:1;">${h.score}</div>
           </div>
           <button onclick="dadHoleScore(1)"
             style="flex:0 0 auto;width:44px;height:50px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:1.6rem;font-weight:300;color:var(--cream);cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;">+</button>
@@ -2272,7 +2273,7 @@
       <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:4px 0 14px;">
         <div>
           <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:2px;">TOTAL</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:3.2rem;color:var(--cream);line-height:1;">${total}</div>
+          <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:3.2rem;color:var(--cream);line-height:1;">${total}</div>
           <div style="font-size:0.82rem;font-weight:700;color:${diffColor};margin-top:2px;">${diffStr} thru ${thru}</div>
         </div>
         <div style="text-align:right;">
@@ -2281,7 +2282,7 @@
             const parSoFar = _dadHoles.slice(0, thru).reduce((a,h)=>a+h.par, 0);
             const projDiff = parSoFar > 0 ? Math.round((diff / parSoFar) * totalPar) : null;
             const proj = projDiff !== null ? totalPar + projDiff : null;
-            return proj ? `<div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--muted);line-height:1;">${proj}</div><div style="font-size:0.6rem;color:var(--muted);">projected</div>` : '<div style="font-size:0.75rem;color:var(--border);">—</div>';
+            return proj ? `<div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.6rem;color:var(--muted);line-height:1;">${proj}</div><div style="font-size:0.6rem;color:var(--muted);">projected</div>` : '<div style="font-size:0.75rem;color:var(--border);">—</div>';
           })()}
         </div>
       </div>
@@ -2806,14 +2807,14 @@
             <div>
               <div style="font-size:0.58rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:4px;">LAST ROUND</div>
               <div style="display:flex;align-items:baseline;gap:8px;">
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--cream);line-height:1;">${last.total_score}</div>
+                <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:3rem;color:var(--cream);line-height:1;">${last.total_score}</div>
                 ${scoreDelta !== null ? `<div style="font-size:0.75rem;font-weight:700;color:${deltaColor};">${deltaStr}</div>` : ''}
               </div>
               <div style="font-size:0.68rem;color:var(--muted);margin-top:3px;">${last.course_name || '—'}</div>
             </div>
             <div style="text-align:right;">
               <div style="font-size:0.58rem;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px;">BEST</div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--gold);line-height:1;">${best.total_score}</div>
+              <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.8rem;color:var(--gold);line-height:1;">${best.total_score}</div>
               <div style="font-size:0.6rem;color:var(--muted);">${statsPool.length} reg rounds · avg ${avg}</div>
             </div>
           </div>
@@ -2830,17 +2831,17 @@
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
           ${firPct !== null ? `
             <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;">
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--cream);line-height:1;">${firPct}%</div>
+              <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.6rem;color:var(--cream);line-height:1;">${firPct}%</div>
               <div style="font-size:0.58rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-top:2px;">FIR</div>
             </div>` : ''}
           ${girPct !== null ? `
             <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;">
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--cream);line-height:1;">${girPct}%</div>
+              <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.6rem;color:var(--cream);line-height:1;">${girPct}%</div>
               <div style="font-size:0.58rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-top:2px;">GIR</div>
             </div>` : ''}
           ${avgPutts !== null ? `
             <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;">
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--cream);line-height:1;">${avgPutts}</div>
+              <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.6rem;color:var(--cream);line-height:1;">${avgPutts}</div>
               <div style="font-size:0.58rem;font-weight:700;letter-spacing:1px;color:var(--muted);margin-top:2px;">PUTTS</div>
             </div>` : ''}
         </div>
@@ -3010,13 +3011,13 @@
           <div>
             <div style="font-size:0.58rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:4px;">HANDICAP INDEX</div>
             <div style="display:flex;align-items:baseline;gap:6px;">
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:${indexColor};line-height:1;">${hc.index}</div>
+              <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:3rem;color:${indexColor};line-height:1;">${hc.index}</div>
               <div style="font-size:0.72rem;color:var(--muted);">est. WHS</div>
             </div>
           </div>
           <div style="text-align:right;">
             <div style="font-size:0.58rem;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px;">ROUNDS USED</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--cream);line-height:1;">${hc.usedCount} <span style="font-size:0.9rem;">of</span> ${hc.eligibleCount}</div>
+            <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.6rem;color:var(--cream);line-height:1;">${hc.usedCount} <span style="font-size:0.9rem;">of</span> ${hc.eligibleCount}</div>
             <div style="font-size:0.6rem;color:var(--muted);">best differentials</div>
           </div>
         </div>
@@ -3332,12 +3333,12 @@
     }
     modal.innerHTML = `
       <div class="rem-inner">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--gold);margin-bottom:2px;">Edit Round</div>
+        <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.5rem;color:var(--gold);margin-bottom:2px;">Edit Round</div>
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:18px;">${dateStr} · ${r.course_name}</div>
         <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;">APPROACH DATA</div>
         ${holes.map((h, i) => `
           <div class="rem-hole-row">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--cream);width:28px;flex-shrink:0;">H${h.hole}</div>
+            <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1rem;color:var(--cream);width:28px;flex-shrink:0;">H${h.hole}</div>
             <div style="font-size:0.7rem;color:var(--muted);width:22px;flex-shrink:0;text-align:right;">p${h.par}</div>
             <select id="rem-club-${i}" style="flex:1;min-width:0;">
               <option value="">— none —</option>
@@ -3350,11 +3351,11 @@
           </div>`).join('')}
         <div style="display:flex;gap:10px;margin-top:20px;">
           <button onclick="saveRoundEdit(${holes.length})"
-            style="flex:1;padding:13px;background:var(--green);border:none;border-radius:10px;color:var(--cream);font-family:'Outfit',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;">
+            style="flex:1;padding:13px;background:var(--green);border:none;border-radius:10px;color:var(--cream);font-family:'Archivo',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;">
             Save Changes
           </button>
           <button onclick="closeRoundEditModal()"
-            style="padding:13px 18px;background:none;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Outfit',sans-serif;font-size:0.9rem;cursor:pointer;">
+            style="padding:13px 18px;background:none;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-family:'Archivo',sans-serif;font-size:0.9rem;cursor:pointer;">
             Cancel
           </button>
         </div>
@@ -3547,6 +3548,13 @@
       showToast('Error opening round: ' + (e?.message || String(e)), 'error');
     }
   }
+  // ── Center PLAY button (bottom nav) ──
+  // Dad → solo round setup. Everyone else → family round (dad-PIN gated, an adult runs it).
+  function svPlay() {
+    if (currentProfile === 'dad') { openDadModal(); }
+    else { openFamilyModal(); }
+  }
+
   function _openDadModalInner() {
     _lockBodyScroll();
     // Check for an unfinished in-progress round saved to localStorage
@@ -4197,7 +4205,7 @@
       <div id="levelup-confetti" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;"></div>
       <div style="font-size:5rem;margin-bottom:14px;animation:lvlBounce 0.55s ease infinite alternate;color:${def.color};"><i class="${def.icon}"></i></div>
       <div style="font-size:0.75rem;font-weight:700;letter-spacing:3px;color:var(--muted);margin-bottom:4px;">LEVEL UP!</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:${color};letter-spacing:2px;line-height:1;margin-bottom:6px;">Level ${newLevel}</div>
+      <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:3rem;color:${color};letter-spacing:2px;line-height:1;margin-bottom:6px;">Level ${newLevel}</div>
       <div style="font-size:1.25rem;font-weight:700;color:var(--cream);margin-bottom:10px;">${def.name}</div>
       <div style="font-size:0.88rem;color:var(--muted);max-width:280px;line-height:1.6;margin-bottom:24px;">${def.desc}</div>
       <div style="background:${color}18;border:1px solid ${color}50;border-radius:14px;padding:14px 20px;max-width:300px;margin-bottom:28px;">
@@ -5341,7 +5349,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         <input type="text" id="fm-search-input" class="modal-input" style="margin-bottom:0;flex:1;"
           placeholder="Search course name..."
           onkeydown="if(event.key==='Enter'){event.preventDefault();famSearchCourse();}">
-        <button onclick="famSearchCourse()" style="flex-shrink:0;background:var(--gold);border:none;border-radius:10px;padding:0 16px;color:#1a1300;font-weight:700;font-size:0.85rem;cursor:pointer;touch-action:manipulation;">Search</button>
+        <button onclick="famSearchCourse()" style="flex-shrink:0;background:var(--green);border:none;border-radius:10px;padding:0 16px;color:#fff;font-weight:700;font-size:0.85rem;cursor:pointer;touch-action:manipulation;">Search</button>
       </div>
       <div id="fm-search-status" style="font-size:0.75rem;color:var(--muted);margin-bottom:6px;"></div>
       <div id="fm-search-results" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
@@ -5359,18 +5367,18 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       <label class="modal-label">Who's playing?</label>
       <div id="fm-players-wrap">
         ${[
-          {key:'dad',    emoji:'\uD83C\uDFCC',  name:'Dad'},
-          {key:'son',    emoji:'\u26F3',  name:'Son'},
-          {key:'girl',   emoji:'\uD83C\uDF38', name:'Daughter'},
-          {key:'mom',    emoji:'\uD83C\uDF3A', name:'Mom'},
-          {key:'grandma',emoji:'\u2B50', name:'Grandma'},
+          {key:'dad',    color:'#D4A843', name:'Dad'},
+          {key:'son',    color:'#378ADD', name:'Son'},
+          {key:'girl',   color:'#D4537E', name:'Daughter'},
+          {key:'mom',    color:'#7F77DD', name:'Mom'},
+          {key:'grandma',color:'#1D9E75', name:'Grandma'},
         ].map(p => `
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
             <div class="fam-checkbox-card${p.key==='dad'||p.key==='son'?' selected':''}" data-player="${p.key}"
               onclick="famTogglePlayer(this,'${p.key}')"
-              style="flex-shrink:0;width:56px;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:12px;border:1.5px solid ${p.key==='dad'||p.key==='son'?'rgba(212,168,67,0.5)':'rgba(255,255,255,0.1)'};background:${p.key==='dad'||p.key==='son'?'rgba(212,168,67,0.15)':'var(--surface2)'};cursor:pointer;touch-action:manipulation;">
-              <span style="font-size:1.4rem;">${p.emoji}</span>
-              <span style="font-size:0.58rem;font-weight:700;color:var(--muted);letter-spacing:0.5px;">${p.name.toUpperCase()}</span>
+              style="flex-shrink:0;width:56px;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:12px;border:1.5px solid ${p.key==='dad'||p.key==='son'?'var(--green)':'var(--border)'};background:${p.key==='dad'||p.key==='son'?'rgba(36,150,87,0.08)':'var(--bg)'};cursor:pointer;touch-action:manipulation;">
+              <span style="width:26px;height:26px;flex:0 0 26px;border-radius:50%;background:${p.color};color:#fff;font-weight:800;font-size:0.78rem;display:flex;align-items:center;justify-content:center;">${p.name[0]}</span>
+              <span style="font-size:0.55rem;font-weight:700;color:var(--muted);letter-spacing:0.4px;">${p.name.toUpperCase()}</span>
             </div>
             <div id="fam-tee-selector-${p.key}" style="flex:1;display:${p.key==='dad'||p.key==='son'?'block':'none'};">
               <div style="font-size:0.7rem;color:var(--muted);font-weight:600;letter-spacing:0.5px;margin-bottom:4px;">TEE BOX</div>
@@ -5386,7 +5394,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         ${Object.values(GAME_MODES).map(gm => `
           <div class="fm-gamemode-card${gm.key==='none'?' selected':''}${gm.status==='soon'?' soon':''}" data-mode="${gm.key}"
             onclick="${gm.status==='soon' ? '' : `famSelectGameMode('${gm.key}')`}"
-            style="display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:12px;border:1.5px solid ${gm.key==='none'?'rgba(212,168,67,0.5)':'rgba(255,255,255,0.08)'};background:${gm.key==='none'?'rgba(212,168,67,0.12)':'var(--surface2)'};cursor:${gm.status==='soon'?'default':'pointer'};opacity:${gm.status==='soon'?'0.55':'1'};touch-action:manipulation;">
+            style="display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:12px;border:1.5px solid ${gm.key==='none'?'var(--green)':'var(--border)'};background:${gm.key==='none'?'rgba(36,150,87,0.08)':'var(--bg)'};cursor:${gm.status==='soon'?'default':'pointer'};opacity:${gm.status==='soon'?'0.55':'1'};touch-action:manipulation;">
             <div style="width:36px;height:36px;border-radius:50%;background:${gm.color}22;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
               <i class="${gm.icon}" style="font-size:1.05rem;color:${gm.color};"></i>
             </div>
@@ -5397,14 +5405,14 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
               </div>
               <div style="font-size:0.72rem;color:var(--muted);line-height:1.35;margin-top:2px;">${gm.blurb}</div>
             </div>
-            ${gm.status!=='soon' ? `<i class="ph-light ph-check-circle" style="font-size:1.2rem;color:${gm.key===_famGameMode?'var(--gold)':'rgba(255,255,255,0.15)'};flex-shrink:0;"></i>` : ''}
+            ${gm.status!=='soon' ? `<i class="ph-light ph-check-circle" style="font-size:1.2rem;color:${gm.key===_famGameMode?'var(--green)':'var(--surface3)'};flex-shrink:0;"></i>` : ''}
           </div>`).join('')}
       </div>
-      <div id="fm-gamemode-howto" onclick="famToggleGmExplainer()" style="display:${_famGameMode==='none'?'none':'flex'};align-items:center;gap:7px;padding:9px 12px;cursor:pointer;color:var(--gold);font-size:0.78rem;font-weight:600;touch-action:manipulation;">
+      <div id="fm-gamemode-howto" onclick="famToggleGmExplainer()" style="display:${_famGameMode==='none'?'none':'flex'};align-items:center;gap:7px;padding:9px 12px;cursor:pointer;color:var(--green-b);font-size:0.78rem;font-weight:600;touch-action:manipulation;">
         <i class="ph-light ph-info"></i> <span>How does ${GAME_MODES[_famGameMode]?.name || ''} work?</span>
         <i class="ph-light ph-caret-${_famGmExplainerOpen?'up':'down'}" style="margin-left:auto;color:var(--muted);"></i>
       </div>
-      <div id="fm-gamemode-howto-body" style="display:${_famGmExplainerOpen && _famGameMode!=='none'?'block':'none'};background:rgba(255,255,255,0.04);border-radius:10px;padding:12px 14px;margin:-2px 0 10px;font-size:0.78rem;line-height:1.5;color:var(--cream);">
+      <div id="fm-gamemode-howto-body" style="display:${_famGmExplainerOpen && _famGameMode!=='none'?'block':'none'};background:var(--surface);border-radius:10px;padding:12px 14px;margin:-2px 0 10px;font-size:0.78rem;line-height:1.5;color:var(--cream);">
         ${GAME_MODES[_famGameMode]?.howTo || ''}
       </div>
       <div id="fm-teams-wrap"></div>
@@ -5541,8 +5549,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   function famTogglePlayer(el, pk) {
     el.classList.toggle('selected');
     const isSelected = el.classList.contains('selected');
-    el.style.background   = isSelected ? 'rgba(212,168,67,0.15)' : 'var(--surface2)';
-    el.style.borderColor  = isSelected ? 'rgba(212,168,67,0.5)'  : 'rgba(255,255,255,0.1)';
+    el.style.background   = isSelected ? 'rgba(36,150,87,0.08)' : 'var(--bg)';
+    el.style.borderColor  = isSelected ? 'var(--green)'  : 'var(--border)';
     const selectorEl = document.getElementById('fam-tee-selector-' + pk);
     if (selectorEl) {
       selectorEl.style.display = isSelected ? 'block' : 'none';
@@ -5566,10 +5574,10 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const ck = card.dataset.mode;
       const isSel = ck === key;
       card.classList.toggle('selected', isSel);
-      card.style.borderColor = isSel ? 'rgba(212,168,67,0.5)' : 'rgba(255,255,255,0.08)';
-      card.style.background  = isSel ? 'rgba(212,168,67,0.12)' : 'var(--surface2)';
+      card.style.borderColor = isSel ? 'var(--green)' : 'var(--border)';
+      card.style.background  = isSel ? 'rgba(36,150,87,0.08)' : 'var(--bg)';
       const check = card.querySelector('.ph-check-circle');
-      if (check) check.style.color = isSel ? 'var(--gold)' : 'rgba(255,255,255,0.15)';
+      if (check) check.style.color = isSel ? 'var(--green)' : 'var(--surface3)';
     });
     const howtoTrigger = document.getElementById('fm-gamemode-howto');
     const howtoBody    = document.getElementById('fm-gamemode-howto-body');
@@ -5615,12 +5623,12 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const members = selectedPlayers.filter(pk => _famTeamAssign[pk] === teamKey);
       return `<div style="background:${color}12;border:1px solid ${color}45;border-radius:12px;padding:11px 13px;margin-bottom:8px;">
         <input type="text" value="${_famTeamNames[teamKey]}" maxlength="18" oninput="famSetTeamName('${teamKey}', this.value)"
-          style="width:100%;background:transparent;border:none;border-bottom:1.5px solid ${color}55;color:${color};font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.5px;padding:2px 0 5px;margin-bottom:8px;">
+          style="width:100%;background:transparent;border:none;border-bottom:1.5px solid ${color}55;color:${color};font-family:'Archivo',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:0.5px;padding:2px 0 5px;margin-bottom:8px;">
         <div style="display:flex;flex-wrap:wrap;gap:6px;">
           ${members.length ? members.map(pk => {
             const p = FAM_PLAYERS[pk];
             return `<div onclick="famAssignTeam('${pk}','${teamKey==='a'?'b':'a'}')" style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-radius:20px;cursor:pointer;touch-action:manipulation;">
-              <div style="width:22px;height:22px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:0.7rem;flex-shrink:0;">${p.emoji}</div>
+              <div style="width:22px;height:22px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;font-weight:800;font-size:0.7rem;flex-shrink:0;">${p.emoji}</div>
               <span style="font-size:0.76rem;font-weight:600;color:var(--cream);">${p.name}</span>
               <i class="ph-light ph-arrows-left-right" style="font-size:0.85rem;color:var(--muted);"></i>
             </div>`;
@@ -6049,7 +6057,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       return `<div style="flex:1;background:${color}14;border:1px solid ${color}45;border-radius:11px;padding:9px 12px;">
         <div style="font-size:0.66rem;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:${color};margin-bottom:2px;">${gm.teamNames[teamKey]}</div>
         <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px;">${names}</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--text);">${best !== null ? best : '—'}</div>
+        <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.5rem;color:var(--text);">${best !== null ? best : '—'}</div>
       </div>`;
     };
     return `<div style="margin-bottom:10px;">
@@ -6072,7 +6080,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       `<div style="flex:1;background:${color}14;border:1px solid ${color}45;border-radius:11px;padding:9px 12px;">
         <div style="font-size:0.66rem;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:${color};margin-bottom:2px;">${label}</div>
         <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px;">${sub}</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--text);">${score != null ? score : '—'}</div>
+        <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.5rem;color:var(--text);">${score != null ? score : '—'}</div>
       </div>`;
     return `<div style="margin-bottom:10px;">
       <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Parents vs. Kids — adjusted best ball</div>
@@ -6253,7 +6261,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
       return `<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
         <div style="display:flex;align-items:center;gap:12px;">
-          <div style="width:38px;height:38px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;flex-shrink:0;">${p.emoji}</div>
+          <div style="width:38px;height:38px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;font-weight:800;font-size:1.05rem;flex-shrink:0;">${p.emoji}</div>
           <div style="flex:1;min-width:0;">
             <div style="font-weight:700;font-size:0.88rem;color:${p.color};">${p.name}</div>
             <div style="display:flex;gap:6px;align-items:center;margin-top:2px;">
@@ -6263,7 +6271,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
           </div>
           <div style="display:flex;align-items:center;">
             <button onclick="famHoleScore('${pk}',-1)" style="width:46px;height:46px;border-radius:12px 0 0 12px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-right:none;color:var(--cream);font-size:1.5rem;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;">-</button>
-            <div id="fsc-${pk}" style="width:54px;height:46px;background:var(--surface);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.9rem;line-height:1;color:${scCol};">${isNA ? '—' : sc}</div>
+            <div id="fsc-${pk}" style="width:54px;height:46px;background:var(--surface);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;font-weight:800;font-size:1.9rem;line-height:1;color:${scCol};">${isNA ? '—' : sc}</div>
             <button onclick="famHoleScore('${pk}',1)" style="width:46px;height:46px;border-radius:0 12px 12px 0;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-left:none;color:var(--cream);font-size:1.4rem;font-weight:200;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation;">+</button>
           </div>
         </div>
@@ -6298,13 +6306,13 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
       <div style="display:flex;align-items:baseline;justify-content:space-between;padding:2px 0 8px;">
         <div style="display:flex;align-items:baseline;gap:10px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:2.6rem;color:var(--cream);line-height:1;">HOLE ${h.hole}</div>
+          <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:2.6rem;color:var(--cream);line-height:1;">HOLE ${h.hole}</div>
           ${h.yds ? `<span style="font-size:0.78rem;color:var(--gold);font-weight:700;">${h.yds} yds</span>` : ''}
         </div>
         <div style="display:flex;align-items:center;gap:6px;">
           <span style="font-size:0.75rem;color:var(--muted);">Par</span>
           <button onclick="famHolePar(-1)" style="width:26px;height:26px;border-radius:6px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);color:var(--cream);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">-</button>
-          <span id="fh-par" style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--cream);min-width:20px;text-align:center;">${h.par}</span>
+          <span id="fh-par" style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.4rem;color:var(--cream);min-width:20px;text-align:center;">${h.par}</span>
           <button onclick="famHolePar(1)" style="width:26px;height:26px;border-radius:6px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);color:var(--cream);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
         </div>
       </div>
@@ -6327,7 +6335,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
           <div id="fam-caddie-msgs" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;font-size:0.83rem;line-height:1.5;"></div>
           <div style="display:flex;gap:8px;align-items:flex-end;">
             <textarea id="fam-caddie-input" rows="2"
-              style="flex:1;background:var(--surface2);border:1px solid rgba(212,168,67,0.25);border-radius:8px;padding:8px 10px;color:var(--cream);font-family:'Outfit',sans-serif;font-size:0.85rem;resize:none;"
+              style="flex:1;background:var(--surface2);border:1px solid rgba(212,168,67,0.25);border-radius:8px;padding:8px 10px;color:var(--cream);font-family:'Archivo',sans-serif;font-size:0.85rem;resize:none;"
               placeholder="Yardage? Lie? Wind?"
               onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendFamCaddieMsg();}"></textarea>
             <button onclick="sendFamCaddieMsg()" id="fam-caddie-send"
@@ -6525,7 +6533,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     sheet.style.cssText = 'width:100%;background:var(--surface);border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));';
     sheet.innerHTML = `
       <div style="width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 14px;"></div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:var(--cream);text-align:center;margin-bottom:16px;">Share Round</div>
+      <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:2px;color:var(--cream);text-align:center;margin-bottom:16px;">Share Round</div>
       ${photoStrip}
       <div style="display:flex;gap:8px;margin-bottom:18px;background:var(--surface2);border-radius:10px;padding:4px;">
         <button id="sp-portrait" onclick="setShareOrientation('portrait',this)" style="flex:1;border:none;border-radius:8px;padding:8px;font-size:0.82rem;font-weight:700;cursor:pointer;background:var(--gold);color:var(--bg);">◻ Portrait</button>
@@ -6618,7 +6626,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     }).join('');
     sheet.innerHTML = `
       <div style="width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 14px;"></div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--cream);margin-bottom:14px;">Pick a Hole</div>
+      <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:2px;color:var(--cream);margin-bottom:14px;">Pick a Hole</div>
       ${photoItems}
     `;
     overlay.appendChild(sheet);
@@ -6652,11 +6660,11 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       <img src="${objUrl}" style="max-width:100%;max-height:70dvh;border-radius:10px;object-fit:contain;">
       <div style="display:flex;gap:10px;width:100%;max-width:360px;">
         <button onclick="this.closest('div[style]').remove();URL.revokeObjectURL('${objUrl}')"
-          style="flex:1;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:14px;color:#fff;font-family:Outfit,sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;touch-action:manipulation;">
+          style="flex:1;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:12px;padding:14px;color:#fff;font-family:Archivo,sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;touch-action:manipulation;">
           Cancel
         </button>
         <button id="sv-share-confirm-btn"
-          style="flex:2;background:#2d6a3f;border:none;border-radius:12px;padding:14px;color:#e8f5ec;font-family:Outfit,sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;touch-action:manipulation;">
+          style="flex:2;background:#2d6a3f;border:none;border-radius:12px;padding:14px;color:#e8f5ec;font-family:Archivo,sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;touch-action:manipulation;">
           Share →
         </button>
       </div>`;
@@ -6718,7 +6726,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     _rr(ctx, boxX, boxY, boxW, boxH, 8); ctx.fill();
     ctx.textAlign = 'center';
     ctx.fillStyle = _C.gold;
-    ctx.font = `bold ${spinF}px "Bebas Neue",Impact,Arial,sans-serif`;
+    ctx.font = `bold ${spinF}px "Archivo ExtraBold","Archivo",Impact,Arial,sans-serif`;
     ctx.fillText('SPINVIBES', boxX + boxW/2, boxY + padY + spinF);
     ctx.fillStyle = _C.cream;
     ctx.font = `italic ${famF}px Georgia,"Times New Roman",serif`;
@@ -6732,7 +6740,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const gap   = Math.round(8*sf);
     ctx.textAlign = 'center';
     ctx.fillStyle = _C.gold;
-    ctx.font = `bold ${spinF}px "Bebas Neue",Impact,Arial,sans-serif`;
+    ctx.font = `bold ${spinF}px "Archivo ExtraBold","Archivo",Impact,Arial,sans-serif`;
     ctx.fillText('SPINVIBES', cx, y + spinF);
     ctx.fillStyle = _C.cream;
     ctx.font = `italic ${famF}px Georgia,"Times New Roman",serif`;
@@ -6881,18 +6889,18 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     // Name
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.font = `500 ${Math.round(15 * sf)}px Outfit,Arial,sans-serif`;
+    ctx.font = `500 ${Math.round(15 * sf)}px Archivo,Arial,sans-serif`;
     ctx.fillText(p.name || pk, midX, cy + chipH * 0.28);
 
     // Score
     ctx.fillStyle = scoreColor;
-    ctx.font = `500 ${Math.round(52 * sf)}px "Bebas Neue",Impact,Arial,sans-serif`;
+    ctx.font = `500 ${Math.round(52 * sf)}px "Archivo ExtraBold","Archivo",Impact,Arial,sans-serif`;
     ctx.fillText(String(score), midX, cy + chipH * 0.70);
 
     // Achievement or vs-par
     const label = achv || dStr;
     ctx.fillStyle = achv ? '#fbbf24' : 'rgba(255,255,255,0.4)';
-    ctx.font = `400 ${Math.round(13 * sf)}px Outfit,Arial,sans-serif`;
+    ctx.font = `400 ${Math.round(13 * sf)}px Archivo,Arial,sans-serif`;
     ctx.fillText(label, midX, cy + chipH * 0.90);
   }
 
@@ -6902,11 +6910,11 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     ctx.textAlign = 'center';
     if (winLine) {
       ctx.fillStyle = _C.gold;
-      ctx.font = `500 ${Math.round(16 * sf)}px Outfit,Arial,sans-serif`;
+      ctx.font = `500 ${Math.round(16 * sf)}px Archivo,Arial,sans-serif`;
       ctx.fillText(winLine, W / 2, H - pad - Math.round(36 * sf));
     }
     ctx.fillStyle = 'rgba(255,255,255,0.38)';
-    ctx.font = `400 ${Math.round(13 * sf)}px Outfit,Arial,sans-serif`;
+    ctx.font = `400 ${Math.round(13 * sf)}px Archivo,Arial,sans-serif`;
     ctx.fillText(`${(courseName || '').toUpperCase()}  ·  ${date || ''}`, W / 2, H - pad);
   }
 
@@ -6948,11 +6956,11 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     let y = photoH - 10;
     ctx.textAlign = 'center';
     ctx.fillStyle = '#f5f0e8';
-    ctx.font = `500 ${Math.round(42*sf)}px "Bebas Neue",Impact,Arial`;
+    ctx.font = `800 ${Math.round(42*sf)}px "Archivo",Impact,Arial`;
     ctx.fillText((_famRound.course_name||'').toUpperCase(), W/2, y);
     y += Math.round(28*sf);
     ctx.fillStyle = 'rgba(255,255,255,0.38)';
-    ctx.font = `400 ${Math.round(17*sf)}px Outfit,Arial`;
+    ctx.font = `400 ${Math.round(17*sf)}px Archivo,Arial`;
     ctx.fillText(`${_famRound.date_played||''}  ·  Par ${totalPar}`, W/2, y);
     y += Math.round(22*sf);
 
@@ -6961,7 +6969,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     function _scoreCell(cx, cy, cw, ch, score, par, color) {
       const diff = score - par;
       ctx.fillStyle = color;
-      ctx.font = `500 ${Math.round(13.5*sf)}px Outfit,Arial`;
+      ctx.font = `500 ${Math.round(13.5*sf)}px Archivo,Arial`;
       ctx.textAlign = 'center';
       const tx = cx + cw/2, ty = cy + ch*0.66;
 
@@ -6994,7 +7002,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       ctx.fillStyle = 'rgba(255,255,255,0.06)';
       ctx.fillRect(pad, startY, W-pad*2, rowH);
       ctx.fillStyle = 'rgba(255,255,255,0.35)';
-      ctx.font = `400 ${Math.round(11*sf)}px Outfit,Arial`;
+      ctx.font = `400 ${Math.round(11*sf)}px Archivo,Arial`;
       ctx.textAlign = 'center';
       holes.forEach((h,i) => ctx.fillText(String(h.hole), pad+nameW+i*holeW+holeW/2, startY+rowH*0.70));
       ctx.fillText(holes.length===9?'OUT':'', pad+nameW+holes.length*holeW+subW/2, startY+rowH*0.70);
@@ -7004,7 +7012,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       ctx.fillStyle = 'rgba(255,255,255,0.04)';
       ctx.fillRect(pad, parY, W-pad*2, rowH);
       ctx.fillStyle = 'rgba(255,255,255,0.3)';
-      ctx.font = `400 ${Math.round(11*sf)}px Outfit,Arial`;
+      ctx.font = `400 ${Math.round(11*sf)}px Archivo,Arial`;
       ctx.textAlign = 'left';
       ctx.fillText('PAR', pad+6, parY+rowH*0.70);
       holes.forEach((h,i) => {
@@ -7021,7 +7029,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
         // Name
         ctx.fillStyle = _C[pk]||_C.gold;
-        ctx.font = `500 ${Math.round(11.5*sf)}px Outfit,Arial`;
+        ctx.font = `500 ${Math.round(11.5*sf)}px Archivo,Arial`;
         ctx.textAlign = 'left';
         ctx.fillText(p.name, pad+5, rowY+rowH*0.70);
 
@@ -7038,7 +7046,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         const subDiff = sub - sectionPar;
         const subColor = subDiff<0?'#60a5fa':subDiff===0?'rgba(255,255,255,0.6)':'#f87171';
         ctx.fillStyle = subColor;
-        ctx.font = `500 ${Math.round(12.5*sf)}px Outfit,Arial`;
+        ctx.font = `500 ${Math.round(12.5*sf)}px Archivo,Arial`;
         ctx.textAlign = 'center';
         ctx.fillText(String(sub), pad+nameW+holes.length*holeW+subW/2, rowY+rowH*0.70);
       });
@@ -7077,7 +7085,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const winLine = winners.length===players.length?'All tied!':
       winners.map(pk=>FAM_PLAYERS[pk]?.name||pk).join(' & ')+(winners.length===1?' wins!':' tie!');
     ctx.fillStyle = _C.gold;
-    ctx.font = `500 ${Math.round(15*sf)}px Outfit,Arial`;
+    ctx.font = `500 ${Math.round(15*sf)}px Archivo,Arial`;
     ctx.textAlign = 'center';
     ctx.fillText(winLine, W/2, y + Math.round(14*sf));
 
@@ -7127,14 +7135,14 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     let y = photoH - 6;
     ctx.textAlign = 'center';
     ctx.fillStyle = 'rgba(29,158,117,0.9)';
-    ctx.font = `500 ${Math.round(15*sf)}px Outfit,Arial`;
+    ctx.font = `500 ${Math.round(15*sf)}px Archivo,Arial`;
     ctx.fillText('TEAM SCRAMBLE · BEST BALL', W/2, y - Math.round(34*sf));
     ctx.fillStyle = '#f5f0e8';
-    ctx.font = `500 ${Math.round(42*sf)}px "Bebas Neue",Impact,Arial`;
+    ctx.font = `800 ${Math.round(42*sf)}px "Archivo",Impact,Arial`;
     ctx.fillText((_famRound.course_name||'').toUpperCase(), W/2, y);
     y += Math.round(28*sf);
     ctx.fillStyle = 'rgba(255,255,255,0.38)';
-    ctx.font = `400 ${Math.round(17*sf)}px Outfit,Arial`;
+    ctx.font = `400 ${Math.round(17*sf)}px Archivo,Arial`;
     ctx.fillText(`${_famRound.date_played||''}  ·  Par ${totalPar}`, W/2, y);
     y += Math.round(50*sf);
 
@@ -7159,20 +7167,20 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       ctx.textAlign = 'center';
       const midX = cx + cardW/2;
       ctx.fillStyle = color;
-      ctx.font = `500 ${Math.round(20*sf)}px "Bebas Neue",Impact,Arial`;
+      ctx.font = `800 ${Math.round(20*sf)}px "Archivo",Impact,Arial`;
       ctx.fillText((gm.teamNames[teamKey]||'').toUpperCase(), midX, y + cardH*0.26);
       ctx.fillStyle = 'rgba(255,255,255,0.55)';
-      ctx.font = `400 ${Math.round(12.5*sf)}px Outfit,Arial`;
+      ctx.font = `400 ${Math.round(12.5*sf)}px Archivo,Arial`;
       ctx.fillText(members, midX, y + cardH*0.40);
       ctx.fillStyle = '#f5f0e8';
-      ctx.font = `500 ${Math.round(54*sf)}px "Bebas Neue",Impact,Arial`;
+      ctx.font = `800 ${Math.round(54*sf)}px "Archivo",Impact,Arial`;
       ctx.fillText(String(total), midX, y + cardH*0.74);
       ctx.fillStyle = 'rgba(255,255,255,0.4)';
-      ctx.font = `400 ${Math.round(13*sf)}px Outfit,Arial`;
+      ctx.font = `400 ${Math.round(13*sf)}px Archivo,Arial`;
       ctx.fillText(dStr, midX, y + cardH*0.90);
       if (isWinner) {
         ctx.fillStyle = _C.gold;
-        ctx.font = `500 ${Math.round(11*sf)}px Outfit,Arial`;
+        ctx.font = `500 ${Math.round(11*sf)}px Archivo,Arial`;
         ctx.fillText('🏆 WINNER', midX, y - Math.round(8*sf));
       }
     });
@@ -7183,7 +7191,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       ? `${gm.teamNames[winnerKey]} wins by ${Math.abs(totalA-totalB)}!`
       : `${gm.teamNames.a} & ${gm.teamNames.b} tied!`;
     ctx.fillStyle = _C.gold;
-    ctx.font = `500 ${Math.round(17*sf)}px Outfit,Arial`;
+    ctx.font = `500 ${Math.round(17*sf)}px Archivo,Arial`;
     ctx.textAlign = 'center';
     ctx.fillText(resultLine, W/2, y);
 
@@ -7281,7 +7289,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     let y = collageTop + collageH + 30;
 
     // "FAMILY OUTING" eyebrow
-    ctx.font = '700 22px "Outfit", sans-serif';
+    ctx.font = '700 22px "Archivo", sans-serif';
     ctx.fillStyle = 'rgba(212,168,67,0.75)';
     ctx.textAlign = 'center';
     ctx.letterSpacing = '3px';
@@ -7294,16 +7302,16 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     ctx.textAlign = 'center';
     // Responsive font size
     let courseFontSize = 72;
-    ctx.font = `900 ${courseFontSize}px "Bebas Neue", sans-serif`;
+    ctx.font = `900 ${courseFontSize}px "Archivo", sans-serif`;
     while (ctx.measureText(courseName).width > W - 60 && courseFontSize > 36) {
       courseFontSize -= 4;
-      ctx.font = `900 ${courseFontSize}px "Bebas Neue", sans-serif`;
+      ctx.font = `900 ${courseFontSize}px "Archivo", sans-serif`;
     }
     ctx.fillText(courseName, W / 2, y);
     y += courseFontSize * 0.3 + 18;
 
     // Date
-    ctx.font = '400 28px "Outfit", sans-serif';
+    ctx.font = '400 28px "Archivo", sans-serif';
     ctx.fillStyle = 'rgba(237,227,200,0.5)';
     ctx.fillText(_famRound.date_played || '', W / 2, y);
     y += 52;
@@ -7325,7 +7333,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       return p ? `${p.emoji} ${p.name}` : pk;
     });
     // Measure total width and wrap if needed
-    ctx.font = '700 22px "Outfit", sans-serif';
+    ctx.font = '700 22px "Archivo", sans-serif';
     const chipWidths = chipLabels.map(lbl => ctx.measureText(lbl).width + 36);
     const totalW = chipWidths.reduce((a, b) => a + b, 0) + chipGap * (chipLabels.length - 1);
     const startX = totalW <= W - 40 ? (W - totalW) / 2 : 20;
@@ -7343,7 +7351,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       ctx.roundRect?.(cx, y, cw, chipH, chipR) ||
         _roundRect(ctx, cx, y, cw, chipH, chipR);
       ctx.fill();
-      ctx.font = '700 22px "Outfit", sans-serif';
+      ctx.font = '700 22px "Archivo", sans-serif';
       ctx.fillStyle = col;
       ctx.textAlign = 'left';
       ctx.fillText(lbl, cx + 18, y + chipH * 0.67);
@@ -7353,10 +7361,10 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     // SpinVibes branding
     ctx.textAlign = 'center';
-    ctx.font = '700 28px "Bebas Neue", sans-serif';
+    ctx.font = '700 28px "Archivo", sans-serif';
     ctx.fillStyle = 'rgba(212,168,67,0.6)';
     ctx.fillText('SPINVIBES', W / 2, H - 56);
-    ctx.font = '400 18px "Outfit", sans-serif';
+    ctx.font = '400 18px "Archivo", sans-serif';
     ctx.fillStyle = 'rgba(212,168,67,0.35)';
     ctx.fillText('spinvibes.com', W / 2, H - 30);
 
@@ -7387,7 +7395,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     ctx.fillStyle = 'rgba(10,14,8,0.58)';
     _rr(ctx, SAFE, SAFE, Math.round(180 * sf), bH, 8); ctx.fill();
     ctx.fillStyle = _C.gold;
-    ctx.font      = `500 ${Math.round(15 * sf)}px Outfit,Arial,sans-serif`;
+    ctx.font      = `500 ${Math.round(15 * sf)}px Archivo,Arial,sans-serif`;
     ctx.textAlign = 'left';
     ctx.fillText(`Hole ${h.hole}  ·  Par ${h.par}`, SAFE + 12, SAFE + bH * 0.70);
 
@@ -7439,7 +7447,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     }).join('');
     sheet.innerHTML = `
       <div style="width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 14px;"></div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--cream);margin-bottom:14px;">Whose Best Moment?</div>
+      <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:2px;color:var(--cream);margin-bottom:14px;">Whose Best Moment?</div>
       ${items}`;
     overlay.appendChild(sheet);
     document.body.appendChild(overlay);
@@ -7486,7 +7494,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     sheet.style.cssText = 'width:100%;background:var(--surface);border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));';
     sheet.innerHTML = `
       <div style="width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 14px;"></div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--cream);margin-bottom:6px;">${p.name} — Hole ${bestH.hole}</div>
+      <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:2px;color:var(--cream);margin-bottom:6px;">${p.name} — Hole ${bestH.hole}</div>
       <div style="font-size:0.78rem;color:var(--muted);margin-bottom:14px;">Pick which photo to use on the card</div>
       <div style="display:flex;gap:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px;scrollbar-width:none;">
         ${photos.map((src, i) => `
@@ -7529,7 +7537,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     ctx.closePath(); ctx.fill();
     ctx.strokeStyle = sc; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.fillStyle = sc;
-    ctx.font = `bold ${Math.round(size * 0.55)}px Outfit,Arial`;
+    ctx.font = `bold ${Math.round(size * 0.55)}px Archivo,Arial`;
     ctx.textAlign = 'center';
     ctx.fillText(String(level), cx, cy + size * 0.2);
   }
@@ -7577,24 +7585,24 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     ctx.strokeStyle = _C[pk] || _C.gold; ctx.lineWidth = Math.round(2 * sf);
     ctx.beginPath(); ctx.arc(midX, midY - Math.round(60 * sf), r, 0, Math.PI * 2); ctx.stroke();
     ctx.fillStyle = _C[pk] || _C.gold;
-    ctx.font      = `500 ${Math.round(18 * sf)}px Outfit,Arial`;
+    ctx.font      = `500 ${Math.round(18 * sf)}px Archivo,Arial`;
     ctx.textAlign = 'center';
     ctx.fillText(p.name, midX, midY - Math.round(60 * sf) + Math.round(6 * sf));
 
     // Hole info
     ctx.fillStyle = 'rgba(255,255,255,0.42)';
-    ctx.font      = `400 ${Math.round(13 * sf)}px Outfit,Arial`;
+    ctx.font      = `400 ${Math.round(13 * sf)}px Archivo,Arial`;
     ctx.fillText(`Hole ${bestH.hole}  ·  Par ${bestH.par}`, midX, midY);
 
     // Big score
     ctx.fillStyle = scoreColor;
-    ctx.font      = `500 ${Math.round(110 * sf)}px "Bebas Neue",Impact,Arial`;
+    ctx.font      = `800 ${Math.round(110 * sf)}px "Archivo",Impact,Arial`;
     ctx.fillText(String(score), midX, midY + Math.round(80 * sf));
 
     // Achievement label
     if (achv) {
       ctx.fillStyle = '#fbbf24';
-      ctx.font      = `500 ${Math.round(22 * sf)}px Outfit,Arial`;
+      ctx.font      = `500 ${Math.round(22 * sf)}px Archivo,Arial`;
       ctx.fillText(achv, midX, midY + Math.round(108 * sf));
     }
 
@@ -7625,7 +7633,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const used = gm.bombDrivesUsed[pk] || [];
       const holesUsed = used.map(u => `Hole ${u.hole}`).join(', ');
       return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-        <div style="width:34px;height:34px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:0.95rem;flex-shrink:0;">${p.emoji}</div>
+        <div style="width:34px;height:34px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;font-weight:800;font-size:0.95rem;flex-shrink:0;">${p.emoji}</div>
         <div style="flex:1;">
           <div style="font-size:0.82rem;font-weight:700;color:${p.color};">${p.name}</div>
           <div style="font-size:0.72rem;color:var(--muted);margin-top:1px;">${used.length ? `Bomb drive used on ${holesUsed} — saved the team!` : 'Saved both bomb drives — held them in reserve.'}</div>
@@ -7674,7 +7682,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
           <div style="font-size:0.72rem;color:var(--muted);margin-top:1px;">${names}</div>
         </div>
         <div style="text-align:right;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--text);">${total}</div>
+          <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.4rem;color:var(--text);">${total}</div>
           <div style="font-size:0.68rem;color:var(--muted);">${diffStr}</div>
         </div>
       </div>`;
@@ -7726,11 +7734,11 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       <div style="font-size:0.8rem;color:var(--gold);font-weight:700;margin-bottom:6px;">${hero}</div>
       <div style="display:flex;gap:10px;margin-top:6px;">
         <div style="flex:1;text-align:center;background:rgba(29,158,117,0.1);border-radius:10px;padding:10px 6px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--text);">${adultsWins}</div>
+          <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.6rem;color:var(--text);">${adultsWins}</div>
           <div style="font-size:0.7rem;color:var(--muted);">${adultNames}</div>
         </div>
         <div style="flex:1;text-align:center;background:rgba(127,119,221,0.1);border-radius:10px;padding:10px 6px;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--text);">${kidsWins}</div>
+          <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.6rem;color:var(--text);">${kidsWins}</div>
           <div style="font-size:0.7rem;color:var(--muted);">${kidNames}</div>
         </div>
       </div>
@@ -7758,10 +7766,10 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         return `H${h}${def ? ` (${def.label.split(' ').slice(0,2).join(' ')})` : ''}`;
       }).join(', ');
       return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-        <div style="width:30px;height:30px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:0.85rem;flex-shrink:0;">${p.emoji}</div>
+        <div style="width:30px;height:30px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;font-weight:800;font-size:0.85rem;flex-shrink:0;">${p.emoji}</div>
         <div style="flex:1;"><div style="font-size:0.82rem;font-weight:700;color:${p.color};">${p.name}</div>
           <div style="font-size:0.7rem;color:var(--muted);">${holesWon}</div></div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--text);">${count}</div>
+        <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.3rem;color:var(--text);">${count}</div>
       </div>`;
     }).join('');
     return `<div class="card" style="border-color:rgba(212,83,126,0.35);background:rgba(212,83,126,0.08);padding:14px 16px;margin-bottom:14px;">
@@ -7786,7 +7794,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const p = FAM_PLAYERS[pk];
       const myWins = winEntries.filter(([,wpk]) => wpk === pk).map(([h]) => `H${h}`);
       return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-        <div style="width:34px;height:34px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:0.95rem;flex-shrink:0;">${p.emoji}</div>
+        <div style="width:34px;height:34px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;font-weight:800;font-size:0.95rem;flex-shrink:0;">${p.emoji}</div>
         <div style="flex:1;"><div style="font-size:0.82rem;font-weight:700;color:${p.color};">${p.name}</div>
           <div style="font-size:0.72rem;color:var(--muted);margin-top:1px;">${myWins.length ? `Bomb on ${myWins.join(', ')}` : 'No bombs this round'} · target = par +${gm.kidTargetOffset[pk] || 2}</div></div>
         <i class="ph-light ph-confetti" style="font-size:1.15rem;color:${myWins.length ? p.color : 'rgba(255,255,255,0.15)'};flex-shrink:0;"></i>
@@ -7812,7 +7820,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const myPicks = Object.entries(picks).filter(([,v]) => v.captain === pk);
       const pickLines = myPicks.map(([hNum, v]) => `H${hNum}: ${FAM_PLAYERS[v.chosenAdult]?.name || v.chosenAdult}`).join(', ');
       return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-        <div style="width:34px;height:34px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:0.95rem;flex-shrink:0;">${p.emoji}</div>
+        <div style="width:34px;height:34px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;font-weight:800;font-size:0.95rem;flex-shrink:0;">${p.emoji}</div>
         <div style="flex:1;"><div style="font-size:0.82rem;font-weight:700;color:${p.color};">${p.name}</div>
           <div style="font-size:0.7rem;color:var(--muted);margin-top:1px;">${pickLines || 'No picks this round'}</div></div>
         <i class="ph-light ph-flag-checkered" style="font-size:1.15rem;color:${myPicks.length ? p.color : 'rgba(255,255,255,0.15)'};flex-shrink:0;"></i>
@@ -7883,14 +7891,14 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       <input type="file" id="ffpc" accept="image/*" capture="environment" style="display:none;" onchange="famLoadHolePhoto(this)">
       <input type="file" id="ffpr" accept="image/*" style="display:none;" onchange="famLoadHolePhoto(this)">
 
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:2.6rem;color:var(--cream);line-height:1;padding:4px 0 10px;">HOLE ${h.hole}</div>
+      <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:2.6rem;color:var(--cream);line-height:1;padding:4px 0 10px;">HOLE ${h.hole}</div>
 
       <div style="font-size:0.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Highlights this hole</div>
       ${highlightList}
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">${pillsHtml}</div>
       <div style="display:flex;gap:8px;margin-bottom:14px;">
         <input id="fam-fun-note" type="text" placeholder="Add your own moment…"
-          style="flex:1;background:var(--surface2);border:1px solid rgba(212,168,67,0.2);border-radius:10px;padding:10px 12px;color:var(--cream);font-family:'Outfit',sans-serif;font-size:0.88rem;outline:none;"
+          style="flex:1;background:var(--surface2);border:1px solid rgba(212,168,67,0.2);border-radius:10px;padding:10px 12px;color:var(--cream);font-family:'Archivo',sans-serif;font-size:0.88rem;outline:none;"
           onkeydown="if(event.key==='Enter'){famFunAddNote();event.preventDefault();}">
         <button onclick="famFunAddNote()" style="background:var(--gold);border:none;border-radius:10px;padding:10px 14px;color:var(--bg);font-weight:700;font-size:0.88rem;cursor:pointer;flex-shrink:0;touch-action:manipulation;">Add</button>
       </div>
@@ -7959,7 +7967,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     document.getElementById('fam-modal-body').innerHTML = `
       <div style="text-align:center;margin-bottom:16px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--cream);">${_famRound.course_name}</div>
+        <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:2rem;color:var(--cream);">${_famRound.course_name}</div>
         <div style="font-size:0.8rem;color:var(--muted);">${_famRound.date_played} · ${_famRound.players.length} player${_famRound.players.length>1?'s':''}</div>
         <div style="display:flex;justify-content:center;gap:8px;margin-top:8px;">
           ${players.map(pk => `<span style="background:${FAM_PLAYERS[pk].bg};color:${FAM_PLAYERS[pk].color};border-radius:20px;padding:3px 10px;font-size:0.78rem;font-weight:700;">${FAM_PLAYERS[pk].emoji} ${FAM_PLAYERS[pk].name}</span>`).join('')}
@@ -8015,7 +8023,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     document.getElementById('fam-modal-body').innerHTML = `
       <div style="text-align:center;margin-bottom:16px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--cream);">${_famRound.course_name}</div>
+        <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:2rem;color:var(--cream);">${_famRound.course_name}</div>
         <div style="font-size:0.8rem;color:var(--muted);">${_famRound.date_played} &middot; Par ${totalPar}</div>
         <div style="font-size:1.15rem;margin-top:10px;">${winMsg}</div>
       </div>
@@ -8381,7 +8389,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     overlay.style.display = 'block';
     overlay.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--gold);">Add New Course</div>
+        <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.8rem;color:var(--gold);">Add New Course</div>
         <button onclick="closeAddCourseOverlay()" style="background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;">✕</button>
       </div>
 
