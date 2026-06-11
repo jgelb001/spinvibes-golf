@@ -5216,24 +5216,24 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       howTo: 'Adults play their own ball as normal. Each kid gets ONE "bomb drive" per 9 holes — on that hole, the team plays from the kid\'s tee shot instead, no matter where it lands. Use it to save a tough hole or just for fun. The team score for that hole becomes the best ball from there. Track who saves the day!'
     },
     parents_vs_kids: {
-      key: 'parents_vs_kids', name: 'Parents vs. Kids', icon: 'ph-light ph-users-three', color: '#7F77DD', status: 'soon',
-      blurb: 'Adults vs. kids, with scores auto-adjusted by age so it stays a fair fight.',
-      howTo: 'Coming soon — teams split by generation, with a built-in handicap so a 6-year-old and a grown-up are evenly matched on every hole.'
+      key: 'parents_vs_kids', name: 'Parents vs. Kids', icon: 'ph-light ph-users-three', color: '#7F77DD', status: 'ready',
+      blurb: 'Adults vs. kids — scores auto-adjusted by level so it stays a fair fight all round.',
+      howTo: 'Adults play it straight. Kids get a per-hole stroke handicap based on their SpinVibes level (L0–L1 = 3 strokes off, L2–L3 = 2 strokes, L4+ = 1 stroke). Each side\'s hole score is the lowest adjusted score in the group. Lowest total wins. Great for a 6-year-old going head-to-head with a grown-up for real.'
     },
     hole_challenge: {
-      key: 'hole_challenge', name: 'Hole Challenge', icon: 'ph-light ph-medal', color: '#D4537E', status: 'soon',
-      blurb: 'A different mini-challenge each hole — closest to the pin, fewest putts, longest drive.',
-      howTo: 'Coming soon — every hole gets its own side bet (closest to the pin, fewest putts, hit the fairway) that anyone can win, no matter their score for the hole.'
+      key: 'hole_challenge', name: 'Hole Challenge', icon: 'ph-light ph-medal', color: '#D4537E', status: 'ready',
+      blurb: 'A different mini-challenge every hole — closest to the pin, fewest putts, longest drive.',
+      howTo: 'Each hole gets a challenge automatically: par 3s get Closest to the Pin, par 4/5s rotate through Fewest Putts, Longest Drive, and Hit the Fairway. After scoring, tap who won the challenge. Track wins across the round and see who comes out on top!'
     },
     kid_birdie_bomb: {
-      key: 'kid_birdie_bomb', name: 'Kid Birdie Bomb', icon: 'ph-light ph-confetti', color: '#D4A843', status: 'soon',
-      blurb: 'When a kid scores par or better, their team wins the hole outright — bonus excitement.',
-      howTo: 'Coming soon — if a kid posts par or better on a hole (with a friendly adjusted target), their team wins that hole outright, regardless of anyone else\'s score.'
+      key: 'kid_birdie_bomb', name: 'Kid Birdie Bomb', icon: 'ph-light ph-confetti', color: '#D4A843', status: 'ready',
+      blurb: 'When a kid hits their adjusted target — or better — they win the hole outright.',
+      howTo: 'Kids get a friendly per-hole target based on their SpinVibes level: L0–L1 = par + 3, L2–L3 = par + 2, L4+ = par + 1. Hit that target and the kid wins the hole regardless of adult scores. On a par 4, an L2 kid just needs a 6. Every win triggers a Birdie Bomb moment!'
     },
     team_captain: {
-      key: 'team_captain', name: 'Team Captain', icon: 'ph-light ph-flag-checkered', color: '#1D9E75', status: 'soon',
-      blurb: 'The kid is captain — they pick which adult\'s shot the team plays from each hole.',
-      howTo: 'Coming soon — the kid is team captain for the round. After everyone tees off, the captain picks whose ball the team plays from. Captain duties rotate hole to hole.'
+      key: 'team_captain', name: 'Team Captain', icon: 'ph-light ph-flag-checkered', color: '#1D9E75', status: 'ready',
+      blurb: 'A kid is captain each hole — they pick which adult\'s score the team uses.',
+      howTo: 'The captain role rotates through the kids each hole. After everyone plays, the captain picks which adult\'s score counts for the team that hole. The captain\'s own score still tracks for their personal total. Captaincy rotates every hole so every kid calls the shots. Who picks best under pressure?'
     },
   };
   let _famGameMode      = 'none';   // selected key from GAME_MODES
@@ -5877,6 +5877,40 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         teams: { a: teamA, b: teamB },
       };
     }
+    if (gmKey === 'parents_vs_kids') {
+      const kidKeys   = players.filter(pk => pk === 'son' || pk === 'girl');
+      const adultKeys = players.filter(pk => pk !== 'son' && pk !== 'girl');
+      if (!kidKeys.length || !adultKeys.length) { showToast('Needs at least one kid and one adult', 'error'); return; }
+      const kidHcap = pk => { const lvl = getKidLevel(pk); return lvl <= 1 ? 3 : lvl <= 3 ? 2 : 1; };
+      gameModeData = {
+        kids: kidKeys, adults: adultKeys,
+        kidHandicaps: Object.fromEntries(kidKeys.map(pk => [pk, kidHcap(pk)])),
+        holeWins: {},
+      };
+    }
+    if (gmKey === 'hole_challenge') {
+      const POOL = ['fewest_putts', 'longest_drive', 'hit_fairway'];
+      let pi = 0;
+      const challenges = {};
+      holePars.forEach((par, i) => { challenges[i + 1] = par === 3 ? 'closest_pin' : POOL[pi++ % POOL.length]; });
+      gameModeData = { challenges, wins: {} };
+    }
+    if (gmKey === 'kid_birdie_bomb') {
+      const kidKeys = players.filter(pk => pk === 'son' || pk === 'girl');
+      if (!kidKeys.length) { showToast('Needs at least one kid', 'error'); return; }
+      const kidOffset = pk => { const lvl = getKidLevel(pk); return lvl <= 1 ? 3 : lvl <= 3 ? 2 : 1; };
+      gameModeData = {
+        kids: kidKeys,
+        kidTargetOffset: Object.fromEntries(kidKeys.map(pk => [pk, kidOffset(pk)])),
+        kidWins: {},
+      };
+    }
+    if (gmKey === 'team_captain') {
+      const kidKeys   = players.filter(pk => pk === 'son' || pk === 'girl');
+      const adultKeys = players.filter(pk => pk !== 'son' && pk !== 'girl');
+      if (!kidKeys.length) { showToast('Needs at least one kid to be captain', 'error'); return; }
+      gameModeData = { kids: kidKeys, adults: adultKeys, captainOrder: kidKeys, captainPicks: {} };
+    }
 
     _famRound = {
       date_played: dateVal,
@@ -6024,6 +6058,148 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     </div>`;
   }
 
+  function famPvkBanner(h) {
+    if (_famRound.game_mode !== 'parents_vs_kids' || !_famRound.game_mode_data) return '';
+    const gm = _famRound.game_mode_data;
+    const kidsAdj   = gm.kids.map(pk => { const sc = h.scores[pk]; return (sc != null) ? Math.max(1, sc - (gm.kidHandicaps[pk] || 2)) : null; }).filter(s => s != null);
+    const adultRaw  = gm.adults.map(pk => h.scores[pk]).filter(s => typeof s === 'number' && s > 0);
+    const kidsBest  = kidsAdj.length  ? Math.min(...kidsAdj)  : null;
+    const adultBest = adultRaw.length ? Math.min(...adultRaw) : null;
+    const kidNames   = gm.kids.map(pk => FAM_PLAYERS[pk]?.name).join(' & ');
+    const adultNames = gm.adults.map(pk => FAM_PLAYERS[pk]?.name).join(' & ');
+    const kidSub = gm.kids.map(pk => `${FAM_PLAYERS[pk]?.name} –${gm.kidHandicaps[pk]}`).join(', ');
+    const box = (label, color, score, sub) =>
+      `<div style="flex:1;background:${color}14;border:1px solid ${color}45;border-radius:11px;padding:9px 12px;">
+        <div style="font-size:0.66rem;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;color:${color};margin-bottom:2px;">${label}</div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px;">${sub}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--text);">${score != null ? score : '—'}</div>
+      </div>`;
+    return `<div style="margin-bottom:10px;">
+      <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Parents vs. Kids — adjusted best ball</div>
+      <div style="display:flex;gap:8px;">${box(adultNames,'#1D9E75',adultBest,'raw score')}${box(kidNames,'#7F77DD',kidsBest,kidSub)}</div>
+    </div>`;
+  }
+
+  const _HOLE_CHALLENGE_DEF = {
+    closest_pin:   { icon: 'ph-flag-pennant', label: 'Closest to the Pin', hint: 'Par 3 — who lands closest?' },
+    fewest_putts:  { icon: 'ph-golf',         label: 'Fewest Putts',       hint: 'Who holes out with the fewest putts?' },
+    longest_drive: { icon: 'ph-arrow-right',  label: 'Longest Drive',      hint: 'Who gets furthest off the tee?' },
+    hit_fairway:   { icon: 'ph-check-square', label: 'Hit the Fairway',    hint: 'Who splits the fairway with their drive?' },
+  };
+
+  function famHoleChallengePanel(h) {
+    if (_famRound.game_mode !== 'hole_challenge' || !_famRound.game_mode_data) return '';
+    const gm  = _famRound.game_mode_data;
+    const key = gm.challenges[h.hole];
+    if (!key) return '';
+    const def    = _HOLE_CHALLENGE_DEF[key] || { icon: 'ph-medal', label: key, hint: '' };
+    const winner = gm.wins[h.hole];
+    if (winner) {
+      const p = FAM_PLAYERS[winner];
+      return `<div style="display:flex;align-items:center;gap:10px;background:rgba(212,83,126,0.08);border:1px solid rgba(212,83,126,0.35);border-radius:12px;padding:11px 14px;margin-bottom:10px;">
+        <i class="ph-light ph-medal" style="font-size:1.3rem;color:#D4537E;"></i>
+        <div style="flex:1;"><div style="font-size:0.84rem;font-weight:700;color:#D4537E;">${def.label} — ${p.name} wins!</div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:1px;">${def.hint}</div></div>
+        <button onclick="famChallengePickWinner(null)" style="background:none;border:none;color:var(--muted);font-size:0.68rem;text-decoration:underline;cursor:pointer;flex-shrink:0;touch-action:manipulation;">Undo</button>
+      </div>`;
+    }
+    const buttons = _famRound.players.map(pk => {
+      const p = FAM_PLAYERS[pk];
+      return `<button onclick="famChallengePickWinner('${pk}')" style="display:flex;align-items:center;gap:6px;font-size:0.74rem;font-weight:700;color:${p.color};padding:8px 14px;background:${p.color}18;border:1.5px solid ${p.color}55;border-radius:20px;cursor:pointer;touch-action:manipulation;"><span>${p.emoji}</span>${p.name}</button>`;
+    }).join('');
+    return `<div style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+        <i class="ph-light ph-${def.icon}" style="font-size:0.95rem;color:#D4537E;"></i>
+        <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;">Challenge: ${def.label}</div>
+      </div>
+      <div style="font-size:0.72rem;color:var(--muted);margin-bottom:8px;">${def.hint} — tap to pick the winner:</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">${buttons}
+        <button onclick="famChallengePickWinner(null)" style="font-size:0.72rem;color:var(--muted);padding:8px 12px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-radius:20px;cursor:pointer;touch-action:manipulation;">Skip</button>
+      </div>
+    </div>`;
+  }
+
+  function famChallengePickWinner(pk) {
+    const gm = _famRound.game_mode_data;
+    if (!gm) return;
+    const h = _famHoles[_famHoleIdx];
+    if (pk) { gm.wins[h.hole] = pk; showToast(`${FAM_PLAYERS[pk]?.name} wins the Hole Challenge!`); }
+    else { delete gm.wins[h.hole]; }
+    _saveFamDraft();
+    renderFamHole();
+  }
+
+  function famKidBirdieBombBanner(h) {
+    if (_famRound.game_mode !== 'kid_birdie_bomb' || !_famRound.game_mode_data) return '';
+    const gm = _famRound.game_mode_data;
+    const bombWinner = (gm.kids || []).find(pk => {
+      const sc = h.scores[pk]; if (sc == null) return false;
+      return sc <= h.par + (gm.kidTargetOffset[pk] || 2);
+    });
+    if (bombWinner) {
+      if (!gm.kidWins[h.hole]) gm.kidWins[h.hole] = bombWinner;
+      const p = FAM_PLAYERS[bombWinner];
+      const sc = h.scores[bombWinner];
+      const target = h.par + (gm.kidTargetOffset[bombWinner] || 2);
+      return `<div style="display:flex;align-items:center;gap:10px;background:${p.color}1c;border:1px solid ${p.color}55;border-radius:12px;padding:11px 14px;margin-bottom:10px;">
+        <i class="ph-light ph-confetti" style="font-size:1.3rem;color:${p.color};"></i>
+        <div style="flex:1;"><div style="font-size:0.84rem;font-weight:700;color:${p.color};">KID BIRDIE BOMB! ${p.name} wins the hole!</div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:1px;">Scored ${sc} — target was ${target}. Hole goes to ${p.name}!</div></div>
+      </div>`;
+    }
+    if (gm.kidWins[h.hole]) delete gm.kidWins[h.hole];
+    const kidRows = (gm.kids || []).map(pk => {
+      const p = FAM_PLAYERS[pk]; const target = h.par + (gm.kidTargetOffset[pk] || 2);
+      return `<span style="font-size:0.72rem;padding:5px 10px;background:${p.color}18;border:1px solid ${p.color}40;border-radius:20px;color:${p.color};">${p.name}: ${target} or better</span>`;
+    }).join('');
+    return `<div style="margin-bottom:10px;">
+      <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Kid Birdie Bomb — targets this hole</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">${kidRows}</div>
+    </div>`;
+  }
+
+  function famTeamCaptainBanner(h) {
+    if (_famRound.game_mode !== 'team_captain' || !_famRound.game_mode_data) return '';
+    const gm = _famRound.game_mode_data;
+    const captainPk = gm.captainOrder[(h.hole - 1) % gm.captainOrder.length];
+    const captain   = FAM_PLAYERS[captainPk];
+    const pick      = gm.captainPicks[h.hole];
+    if (pick) {
+      const chosen = FAM_PLAYERS[pick.chosenAdult];
+      return `<div style="display:flex;align-items:center;gap:10px;background:${captain.color}1c;border:1px solid ${captain.color}55;border-radius:12px;padding:11px 14px;margin-bottom:10px;">
+        <i class="ph-light ph-flag-checkered" style="font-size:1.3rem;color:${captain.color};"></i>
+        <div style="flex:1;"><div style="font-size:0.84rem;font-weight:700;color:${captain.color};">${captain.name} picks ${chosen.name}'s shot!</div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:1px;">Team plays from ${chosen.name}'s ball this hole.</div></div>
+        <button onclick="famCaptainUnpick(${h.hole})" style="background:none;border:none;color:var(--muted);font-size:0.68rem;text-decoration:underline;cursor:pointer;flex-shrink:0;touch-action:manipulation;">Change</button>
+      </div>`;
+    }
+    const adultBtns = gm.adults.map(pk => {
+      const p = FAM_PLAYERS[pk];
+      return `<button onclick="famCaptainPick(${h.hole},'${captainPk}','${pk}')" style="display:flex;align-items:center;gap:6px;font-size:0.74rem;font-weight:700;color:${p.color};padding:8px 14px;background:${p.color}18;border:1.5px solid ${p.color}55;border-radius:20px;cursor:pointer;touch-action:manipulation;"><span>${p.emoji}</span>${p.name}</button>`;
+    }).join('');
+    return `<div style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+        <i class="ph-light ph-flag-checkered" style="font-size:0.95rem;color:${captain.color};"></i>
+        <div style="font-size:0.66rem;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:${captain.color};">Captain ${captain.name}'s pick</div>
+      </div>
+      <div style="font-size:0.72rem;color:var(--muted);margin-bottom:8px;">Which adult's shot does the team play from?</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">${adultBtns}</div>
+    </div>`;
+  }
+
+  function famCaptainPick(holeNum, captainPk, chosenAdult) {
+    const gm = _famRound.game_mode_data; if (!gm) return;
+    gm.captainPicks[holeNum] = { captain: captainPk, chosenAdult };
+    _saveFamDraft(); renderFamHole();
+    showToast(`${FAM_PLAYERS[captainPk]?.name} picks ${FAM_PLAYERS[chosenAdult]?.name}!`);
+  }
+
+  function famCaptainUnpick(holeNum) {
+    const gm = _famRound.game_mode_data; if (!gm) return;
+    delete gm.captainPicks[holeNum];
+    _saveFamDraft(); renderFamHole();
+  }
+
   function renderFamHole() {
     const h      = _famHoles[_famHoleIdx];
     const isLast = _famHoleIdx === _famHoles.length - 1;
@@ -6112,6 +6288,10 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     document.getElementById('fam-modal-body').innerHTML = `
       ${famJuniorScrambleBanner(h)}
       ${famTeamScrambleBanner(h)}
+      ${famPvkBanner(h)}
+      ${famHoleChallengePanel(h)}
+      ${famKidBirdieBombBanner(h)}
+      ${famTeamCaptainBanner(h)}
       ${photoBanner}
       <input type="file" id="fhpc" accept="image/*" capture="environment" style="display:none;" onchange="famLoadHolePhoto(this)">
       <input type="file" id="fhpr" accept="image/*" style="display:none;" onchange="famLoadHolePhoto(this)">
@@ -7519,6 +7699,137 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     </div>`;
   }
 
+  function famPvkSummaryCard() {
+    if (_famRound.game_mode !== 'parents_vs_kids' || !_famRound.game_mode_data) return '';
+    const gm = _famRound.game_mode_data;
+    let kidsWins = 0, adultsWins = 0, ties = 0;
+    _famHoles.forEach(h => {
+      const kidAdj   = gm.kids.map(pk => { const sc = h.scores[pk]; return sc != null ? Math.max(1, sc - (gm.kidHandicaps[pk] || 2)) : Infinity; });
+      const adultRaw = gm.adults.map(pk => { const sc = h.scores[pk]; return (sc != null && sc > 0) ? sc : Infinity; });
+      const kB = Math.min(...kidAdj), aB = Math.min(...adultRaw);
+      if (kB === Infinity && aB === Infinity) return;
+      if (kB < aB) kidsWins++; else if (aB < kB) adultsWins++; else ties++;
+    });
+    const kidNames   = gm.kids.map(pk => FAM_PLAYERS[pk]?.name).join(' & ');
+    const adultNames = gm.adults.map(pk => FAM_PLAYERS[pk]?.name).join(' & ');
+    const tieNote    = ties ? ` (${ties} tied)` : '';
+    let hero;
+    if (kidsWins > adultsWins) hero = `Kids win! ${kidsWins}–${adultsWins}${tieNote}.`;
+    else if (adultsWins > kidsWins) hero = `Adults win! ${adultsWins}–${kidsWins}${tieNote}.`;
+    else hero = `All square — ${kidsWins} holes each${tieNote}!`;
+    const hcapNote = gm.kids.map(pk => `${FAM_PLAYERS[pk]?.name}: –${gm.kidHandicaps[pk]} per hole`).join(' · ');
+    return `<div class="card" style="border-color:rgba(127,119,221,0.35);background:rgba(127,119,221,0.08);padding:14px 16px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <i class="ph-light ph-users-three" style="font-size:1.1rem;color:#7F77DD;"></i>
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7F77DD;">Parents vs. Kids</div>
+      </div>
+      <div style="font-size:0.8rem;color:var(--gold);font-weight:700;margin-bottom:6px;">${hero}</div>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <div style="flex:1;text-align:center;background:rgba(29,158,117,0.1);border-radius:10px;padding:10px 6px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--text);">${adultsWins}</div>
+          <div style="font-size:0.7rem;color:var(--muted);">${adultNames}</div>
+        </div>
+        <div style="flex:1;text-align:center;background:rgba(127,119,221,0.1);border-radius:10px;padding:10px 6px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--text);">${kidsWins}</div>
+          <div style="font-size:0.7rem;color:var(--muted);">${kidNames}</div>
+        </div>
+      </div>
+      <div style="font-size:0.65rem;color:var(--muted);margin-top:8px;">${hcapNote}</div>
+    </div>`;
+  }
+
+  function famHoleChallengeSummaryCard() {
+    if (_famRound.game_mode !== 'hole_challenge' || !_famRound.game_mode_data) return '';
+    const gm = _famRound.game_mode_data;
+    const wins = gm.wins || {};
+    const tally = {};
+    _famRound.players.forEach(pk => { tally[pk] = 0; });
+    Object.values(wins).forEach(pk => { if (pk) tally[pk] = (tally[pk] || 0) + 1; });
+    const sorted = Object.entries(tally).sort((a, b) => b[1] - a[1]);
+    const topCount = sorted[0]?.[1] || 0;
+    let hero;
+    if (!Object.values(wins).some(Boolean)) hero = 'No challenges called this round.';
+    else if (sorted.filter(([,c]) => c === topCount).length > 1) hero = `Tied at ${topCount} challenge${topCount > 1 ? 's' : ''} each!`;
+    else { const w = FAM_PLAYERS[sorted[0][0]]; hero = `${w.name} wins the most challenges — ${topCount} hole${topCount>1?'s':''}!`; }
+    const rows = sorted.filter(([,c]) => c > 0).map(([pk, count]) => {
+      const p = FAM_PLAYERS[pk];
+      const holesWon = Object.entries(wins).filter(([,wpk]) => wpk === pk).map(([h]) => {
+        const def = _HOLE_CHALLENGE_DEF[gm.challenges[h]];
+        return `H${h}${def ? ` (${def.label.split(' ').slice(0,2).join(' ')})` : ''}`;
+      }).join(', ');
+      return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <div style="width:30px;height:30px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:0.85rem;flex-shrink:0;">${p.emoji}</div>
+        <div style="flex:1;"><div style="font-size:0.82rem;font-weight:700;color:${p.color};">${p.name}</div>
+          <div style="font-size:0.7rem;color:var(--muted);">${holesWon}</div></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--text);">${count}</div>
+      </div>`;
+    }).join('');
+    return `<div class="card" style="border-color:rgba(212,83,126,0.35);background:rgba(212,83,126,0.08);padding:14px 16px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <i class="ph-light ph-medal" style="font-size:1.1rem;color:#D4537E;"></i>
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#D4537E;">Hole Challenge Recap</div>
+      </div>
+      <div style="font-size:0.8rem;color:var(--gold);font-weight:700;margin-bottom:4px;">${hero}</div>
+      ${rows}
+    </div>`;
+  }
+
+  function famKidBirdieBombSummaryCard() {
+    if (_famRound.game_mode !== 'kid_birdie_bomb' || !_famRound.game_mode_data) return '';
+    const gm = _famRound.game_mode_data;
+    const kidWins = gm.kidWins || {};
+    const winEntries = Object.entries(kidWins);
+    const hero = winEntries.length
+      ? `Kids won ${winEntries.length} hole${winEntries.length > 1 ? 's' : ''} outright this round!`
+      : `No Kid Birdie Bombs this round — go get 'em next time!`;
+    const kidLines = (gm.kids || []).map(pk => {
+      const p = FAM_PLAYERS[pk];
+      const myWins = winEntries.filter(([,wpk]) => wpk === pk).map(([h]) => `H${h}`);
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <div style="width:34px;height:34px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:0.95rem;flex-shrink:0;">${p.emoji}</div>
+        <div style="flex:1;"><div style="font-size:0.82rem;font-weight:700;color:${p.color};">${p.name}</div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:1px;">${myWins.length ? `Bomb on ${myWins.join(', ')}` : 'No bombs this round'} · target = par +${gm.kidTargetOffset[pk] || 2}</div></div>
+        <i class="ph-light ph-confetti" style="font-size:1.15rem;color:${myWins.length ? p.color : 'rgba(255,255,255,0.15)'};flex-shrink:0;"></i>
+      </div>`;
+    }).join('');
+    return `<div class="card" style="border-color:rgba(212,168,67,0.35);background:rgba(212,168,67,0.08);padding:14px 16px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <i class="ph-light ph-confetti" style="font-size:1.1rem;color:#D4A843;"></i>
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#D4A843;">Kid Birdie Bomb Recap</div>
+      </div>
+      <div style="font-size:0.8rem;color:var(--gold);font-weight:700;margin-bottom:4px;">${hero}</div>
+      ${kidLines}
+    </div>`;
+  }
+
+  function famTeamCaptainSummaryCard() {
+    if (_famRound.game_mode !== 'team_captain' || !_famRound.game_mode_data) return '';
+    const gm = _famRound.game_mode_data;
+    const picks = gm.captainPicks || {};
+    const hasPicks = Object.keys(picks).length > 0;
+    const captainRows = gm.captainOrder.map(pk => {
+      const p = FAM_PLAYERS[pk];
+      const myPicks = Object.entries(picks).filter(([,v]) => v.captain === pk);
+      const pickLines = myPicks.map(([hNum, v]) => `H${hNum}: ${FAM_PLAYERS[v.chosenAdult]?.name || v.chosenAdult}`).join(', ');
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+        <div style="width:34px;height:34px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:0.95rem;flex-shrink:0;">${p.emoji}</div>
+        <div style="flex:1;"><div style="font-size:0.82rem;font-weight:700;color:${p.color};">${p.name}</div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:1px;">${pickLines || 'No picks this round'}</div></div>
+        <i class="ph-light ph-flag-checkered" style="font-size:1.15rem;color:${myPicks.length ? p.color : 'rgba(255,255,255,0.15)'};flex-shrink:0;"></i>
+      </div>`;
+    }).join('');
+    const heroNames = gm.captainOrder.map(pk => FAM_PLAYERS[pk]?.name).join(' & ');
+    const hero = hasPicks ? `${heroNames} called the shots this round!` : 'No captain picks made this round.';
+    return `<div class="card" style="border-color:rgba(29,158,117,0.35);background:rgba(29,158,117,0.08);padding:14px 16px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <i class="ph-light ph-flag-checkered" style="font-size:1.1rem;color:#1D9E75;"></i>
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#1D9E75;">Team Captain Recap</div>
+      </div>
+      <div style="font-size:0.8rem;color:var(--gold);font-weight:700;margin-bottom:4px;">${hero}</div>
+      ${captainRows}
+    </div>`;
+  }
+
   // ── Just for Fun: hole screen ────────────────────────────────────────────────
   const FUN_HIGHLIGHT_PILLS = [
     'Great drive', 'Hit the green', 'Made a par', 'Hit the fairway',
@@ -7710,6 +8021,10 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       </div>
       ${famJuniorScrambleSummaryCard()}
       ${famTeamScrambleSummaryCard()}
+      ${famPvkSummaryCard()}
+      ${famHoleChallengeSummaryCard()}
+      ${famKidBirdieBombSummaryCard()}
+      ${famTeamCaptainSummaryCard()}
       <div class="fam-scroll-wrap">
         <table class="fam-sc-table">
           <thead><tr><th>Hole</th>${hdrCells}</tr></thead>
