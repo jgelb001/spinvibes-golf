@@ -695,6 +695,25 @@
     }
   }
 
+  function handleBetaSubmit(e) {
+    e.preventDefault();
+    const form = document.getElementById('betaForm');
+    const msg  = document.getElementById('betaMsg');
+    fetch(form.action, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: new FormData(form)
+    }).then(r => {
+      if (r.ok) {
+        form.querySelector('input[type=email]').style.display = 'none';
+        form.querySelector('button[type=submit]').style.display = 'none';
+        msg.style.display = 'block';
+      }
+    }).catch(() => {
+      // silent fail — Formspree will still capture if fetch blocked
+    });
+  }
+
   function enterProfile(who) {
     // Called from landing page cards — fade landing out, show app
     sessionStorage.setItem('sv-session', '1'); // mark session active
