@@ -1,7 +1,7 @@
 # SpinVibes Golf — Current Status
 > **Update this at the end of every Cowork session.** This is the first thing to read when starting a new session. It answers: where are we, what's broken, what's next.
 
-*Last updated: 2026-05-29 (session 27 — kid badges, shot dispersion, share card for dad rounds, club distances fixed)*
+*Last updated: 2026-06-11 (session 28 — bag cleanup: 4-iron fully removed, 5i→165 / 6i→160, all distances marked range-confirmed in code + Supabase sv_clubs)*
 
 ---
 
@@ -11,7 +11,7 @@
 |------|--------|
 | spinvibes.com (PWA) | ✅ Live — GitHub Pages |
 | golf.spinvibes.com (guide builder) | ✅ Live — GitHub Pages |
-| Service worker | **v103 / cache v149** |
+| Service worker | **v105 / cache v151** |
 | Stable checkpoint | **`v1.0-stable`** tag on GitHub — safe rollback before file split |
 | Last commit | Session 27: kid badges, shot dispersion, dad share card, club distance fixes |
 | CF Worker | Updated with `/course-search`, `/course-detail`, `/parse-scorecard` routes. `GOLF_COURSE_API_KEY` set. |
