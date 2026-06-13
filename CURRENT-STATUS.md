@@ -1,7 +1,39 @@
 # SpinVibes Golf — Current Status
 > **Update this at the end of every Cowork session.** This is the first thing to read when starting a new session. It answers: where are we, what's broken, what's next.
 
-*Last updated: 2026-06-12 (session 39 — app↔PWA parity (Coach's Plan markdown, handicap index, scorecard OCR), Caddie/Short-Game nav fixes, PWA notch nav-overlap fix, beta-docs email)*
+*Last updated: 2026-06-12 (session 40 — training metaphor voice + daily-thoughts feed + Best Moment share (app); PWA kids' polish + age fix; FOUND beta-guide gap → DECIDED to build per-kid custom plans in the app next)*
+
+---
+
+## 🔜 NEXT SPRINT — App Family/Kid Custom Plans (Jeremy's call, 2026-06-12)
+
+**Goal:** In app.spinvibes.com, a beta user can add their kids, and **each kid gets a CUSTOM plan exactly like the main user** — dynamic, keyed to the kid's age/hand/skill, in the metaphor/game voice. Just like the PWA, but **not hardcoded** (PWA is fixed to Jeremy's Son/Daughter via `FAM_PLAYERS` + 32 `son-sect`/`girl-sect` blocks).
+
+**Why:** The public app is currently **solo-only** — no family/kid/add-player/leveling/game-modes code at all. But `beta-user-guide.md` already promises testers family rounds, up to 5 profiles, kid leveling, and game modes. Mismatch a tester hits immediately.
+
+**KEY:** the **wizard already collects family** — `create-my-guide.html` adds up to 3 members `{name, age, hand, goal}`, encodes them as the `fm` URL param (`name~age~handInitial~goal`, pipe-separated), and `guide_users` has a `members` JSON column that `guide.html` reads back (`u.members`). **The app simply never loads them.** So this is an APP-side build, not new data capture.
+
+**Scope:**
+1. **App loads family** — pull `members` from the `?u=UUID` guide_users fetch; also parse a `?fm=` param fallback (same format as guide.html `parseFM`). Belt-and-suspenders: have guide.html append `&fm=` to the app link so family always reaches the app.
+2. **Profile switcher** — topbar pills (main user + each member), like the PWA. Tapping switches the active profile and re-renders Home/Range/Short Game/Strategy/Caddie/daily-thoughts.
+3. **Per-member custom plan** — each member becomes a profile `{name, hand, goal, age, skill(derived from age/goal), isKid}` run through the SAME render engine as the main user. Kids get beginner content in the metaphor voice; age tier drives kid game-voice (6–8 superhero pose/squish the bug; 9+ simple analogies; PGA doc §9).
+4. **In-app add/edit family (post-wizard)** — Settings → "Family": add / edit / remove members in the app itself after the guide is made (same fields as the wizard: name, age, hand, goal). Persist to `guide_users.members` (PATCH) + localStorage. So a user who skipped family in the wizard, or whose family changes, can manage it without redoing the guide.
+5. **Honest "Coming at launch" list (in-app beta-status bar/list)** — a visible, always-honest list in the app of features promised but **not yet in beta**, clearly framed as "available at launch" (e.g. family rounds, game modes, kid leveling/badges, scorecard-photo round import, etc.). Goal: **shrink this list every day as features ship** while never implying something works that doesn't. Likely a card on Home or a Settings entry "What's coming." This also reconciles the `beta-user-guide.md` over-promise — guide should say these are "coming," app shows the live status.
+6. **Follow-ups (later):** per-member round history + handicap, kid leveling, family round + game modes (to fully match the guide) — fold into the "Coming at launch" list until shipped.
+
+**Honesty principle (Jeremy):** be obvious about what's promised vs. live; close the gap daily but never over-state. The in-app "Coming at launch" list is the mechanism. Until it ships, `beta-user-guide.md` Step 2 over-promises (family rounds, leveling, game modes) — trim it or ship the list.
+
+**Discovered this session — exact data shapes (start here next session):**
+- **Wizard member fields** (`create-my-guide.html` getAnswers): `{ name, age (int), hand ('right'|'left'), goal }`. Encoded into `fm` param as `encodeURIComponent(name)~age~hand[0]~goal`, pipe-separated (`generateGuide`, line ~1479).
+- **⚠ Member `goal` values differ from the main user's!** Member goal `<select>` options are `fun | learn | compete | return` (create-my-guide.html ~line 1016) — NOT the main user's `break100/90/80/70`. App `GOAL` map has `fun`/`return` but NOT `learn`/`compete`. **Must map:** `learn`→`beginner`, `compete`→`break90` (or `consistency`), keep `fun`/`return`. Add labels for any unmapped keys.
+- **App maps** (app index.html ~306–309): `GOAL{break120,break100,break90,break80,break70,consistency,beginner,fun,return}`, `SKILL{beginner,some,mid,low,advanced}`, `HAND{l,r,left,right}` (handles both initial + word).
+- **App boot** (~335–405): `profile = rows[0]` from `GET guide_users?id=eq.UUID&select=*`. So `profile.members` IS available *if* the column is populated. Active profile pattern to add: `mainProfile`, `family[]`, `activeKey`, with `profile` pointing at the active one. Render fns (`renderHome/Range/ShortGame/Strategy/Caddie/dailyThoughtsHtml`) all key off `profile.skill/goal/hand` — switching profile + re-rendering = custom plan per member, no engine changes.
+- **Per-member rounds:** make `RK()` include `activeKey` (`'sv-app-rounds-'+userId+(activeKey==='main'?'':'-'+activeKey)`) so each member gets their own round history/handicap; reload rounds on switch.
+- **⚠ OPEN QUESTION:** could NOT find where the wizard persists the `guide_users` row / `members` column (no POST in create-my-guide.html, guide.html, or netlify/functions; UUID only set from `?u=`). guide.html *reads* `u.members` (line ~1835) so the column is expected. **Verify members is actually saved.** If not reliable, the robust path is: app reads `?fm=` param fallback AND have `guide.html` append `&fm=` to its app link (`getAppLink` ~line 499, currently `?u=UUID` only).
+- **Kid voice depth:** app training is already metaphor-rich (beginner tier). Full age-gated kid game-voice (6–8 "superhero pose/squish the bug", 9+ analogies; PGA §9) is a follow-up; MVP = each member gets their skill/goal/hand-keyed plan + switcher.
+- **Build tasks queued:** #16 load family, #17 switcher + per-member plan, #18 guide link + deploy/verify.
+
+---
 
 ---
 
@@ -72,6 +104,21 @@
 | Next goal | Break 90 — 3 strokes away |
 | Bag | Faktor Golf combo set. Callaway driver + 7-wood · Faktor 4H + irons · Callaway Opus 50°/56°/60° wedges · Odyssey Ai-ONE #7 putter |
 | Pin | 4417 |
+
+---
+
+## What Was Just Finished (Session 40 — June 12, training voice + daily thoughts + Best Moment + kids polish)
+
+| Item | Result |
+|------|--------|
+| Training metaphor voice (app) | Range / Short Game / Strategy rewritten with visualization/metaphor across all levels (PGA doc §9 + §11), incl. "next shot is the only one that matters" reframe. Voice approved via samples. Live. |
+| Daily thoughts feed (app) | New "Today" Home section, 2 date-seeded cards from an 18-tip universal pool + lefty bonus (`dailyThoughtsHtml`). Live + verified. |
+| Best Moment share (app) | 3rd template `buildBestMomentCard()` — auto-picks standout hole. Full PWA share parity. Live + verified (picked birdie-with-photo). |
+| Layout pass | Reviewed mobile screens; clean, no blind changes. |
+| PWA kids' polish | Son chip → kid metaphor; girl "shaft lean" → "hands leading"; **Daughter Age 5→6** fixed. Already-great game cards left alone. Live + verified. |
+| **Family-into-app (decided, building next)** | Wizard already collects family; app never loaded it. Jeremy: each added member gets a CUSTOM plan like the main user. See NEXT SPRINT block at top. |
+
+SW: app v5, PWA v153.
 
 ---
 
