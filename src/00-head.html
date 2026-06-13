@@ -159,7 +159,10 @@
       left: 0;
       right: 0;
       z-index: 100;
-      height: var(--nav-h);
+      /* Include the safe-area inset IN the height (border-box) so the 54px nav
+         buttons aren't squeezed/overflowing upward over page content on
+         notched phones. Matches app.spinvibes.com's nav pattern. */
+      height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
       background: #ffffff;
       border-top: 0.5px solid var(--border);
       display: flex;
