@@ -1,7 +1,7 @@
 # SpinVibes Golf — Current Status
 > **Update this at the end of every Cowork session.** This is the first thing to read when starting a new session. It answers: where are we, what's broken, what's next.
 
-*Last updated: 2026-06-12 (session 38 — beta tester fixes: wizard dead-end, Supabase auth URLs, scanner-proof magic links, Resend SMTP sender, light mode, SW network-first)*
+*Last updated: 2026-06-12 (session 39 — app↔PWA parity (Coach's Plan markdown, handicap index, scorecard OCR), Caddie/Short-Game nav fixes, PWA notch nav-overlap fix, beta-docs email)*
 
 ---
 
@@ -72,6 +72,29 @@
 | Next goal | Break 90 — 3 strokes away |
 | Bag | Faktor Golf combo set. Callaway driver + 7-wood · Faktor 4H + irons · Callaway Opus 50°/56°/60° wedges · Odyssey Ai-ONE #7 putter |
 | Pin | 4417 |
+
+---
+
+## What Was Just Finished (Session 39 — June 12, app↔PWA parity + nav/overlap fixes)
+
+> Closed the three "still open" items from the Fable session, fixed the real bottom-nav overlap, and added Short Game back buttons. All deployed + verified live (app at `?u=preview`, PWA as Dad).
+
+| Item | Result |
+|------|--------|
+| Coach's Plan raw markdown | **Fixed (app)** — `mdToHtml()` renders headings/bold/italics/lists/paragraphs; `.md` styles. Only shows when a `coaching_plan` exists. |
+| Handicap index tracker | **Ported to app My Game** — WHS estimate (best-N diffs × 0.96) + 8-bar sparkline. Rounds now capture tee **rating/slope** at start; only regulation-18 w/ rating+slope count. Hidden until ≥1 eligible round. |
+| Scorecard OCR | **Ported to app round setup** — "OR SCAN A SCORECARD": tee pills → photo → `/parse-scorecard` → pre-fills course (pars/yardages/par/rating/slope) → Start Round. Verified live. |
+| OCR editable review | **Added** — after scan, editable course name + per-hole par/yards table (live total) to fix misreads before Start Round (full PWA parity). Verified live. |
+| Handicap backfill | **Added** — "+ Handicap data" chip on regulation-18 rounds missing rating/slope → sheet to enter them so they count toward the index. Verified live (3→4 eligible). |
+| Caddie nav overlap | **Fixed (app)** — input row was hidden under the nav (fixed `100dvh` height inside a padded `.page`). Rebuilt as flex; input pinned above nav. Verified live. |
+| Short Game dead-end | **Fixed (both)** — "‹ Range" back button atop Short Game (app `.back-chip`; PWA header button). Verified live. |
+| PWA notch nav overlap | **Fixed** — `#nav` height now includes `env(safe-area-inset-bottom)` so 54px buttons stop overflowing up over content on notched phones (border-box). |
+| Share sheets | Added ✕ (app); audit confirmed all other modals already have close/back. |
+| Beta docs email | `jeremy.gelbaum@gmail.com` → **`spinvibespb@gmail.com`** in `beta-user-guide.md` + invite PDF/PNG (design preserved). |
+| SW bumps | app v2→v3; PWA cache v151→v152 (sw v105→v106). |
+| Meta backup | Was blocked by GitHub secret-scanning — live PAT in `spinvibes-meta/SESSION-START.md` redacted; backup pushes again. |
+
+**Deferred — Security (Jeremy: "we're not big enough to worry just yet… but it'll be a big task"):** rotate the GitHub PAT (it's in plaintext in every repo's remote URL + `push-*.command`), purge it from meta git history, and do a broader secrets/auth pass. Tracked as a future sprint.
 
 ---
 
