@@ -15,7 +15,7 @@ The "NEXT SPRINT" below is **done and far exceeded**. Over session 41 the app we
 - **Kid leveling** — play-based points → 9 levels (Fresh Caddie→Tour Bound), badge grid, **per-level PGA challenges** (auto-verified), **daily check-ins**, **manual grown-up level controls**.
 - **Round polish (PWA-parity)** — adult achievement badges, memories photo gallery, **log a past round**, **log practice sessions**, **edit a saved round**, **caddie voice input**, **wake lock** (screen stays on), centered PLAY in PWA + app nav.
 - **Honesty system** — in-app "Coming at launch" card (data-driven), now down to one item.
-- **Family stats sync** — app code built (members → `family_rounds` table by guide link); **PENDING: run `spinvibes-app/family-rounds-table.sql` in Supabase**, then it's live. Until then members are local-only. Last item on the Coming-at-launch list.
+- **Family stats sync** — ✅ LIVE. `family_rounds` table created in Supabase; members' rounds sync to the cloud by guide link. Round-trip verified (insert/read/delete via anon key). **In-app "Coming at launch" list is now EMPTY — gap to the family PWA is closed.**
 - **Beta docs** — rebuilt `BETAUSERDOCS/beta-invite.html` (+ regenerated PDF/PNG) with honest live-features list; `beta-user-guide.md` aligned; new `BETAUSERDOCS/update-emails/` (template + first session email + README — **send once per session at wrap-it**, not per push); `BETAUSERDOCS/FEATURES.md` tracker.
 - **Guide link** — `&fm=` appended in both wizards (belt-and-suspenders); confirmed members DO persist (live wizard `golf-guide-builder/index.html` POSTs them).
 
