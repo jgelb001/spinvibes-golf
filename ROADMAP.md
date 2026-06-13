@@ -296,6 +296,16 @@ alter table courses enable row level security;
 
 **Keep this updated.** Every meaningful web-app change gets a one-line entry here with date + commit hash (if pushed).
 
+### 2026-06-13 (session 41 — app↔PWA family parity, app SW v5→v13)
+- Family into app: load `members`/`?fm=`, per-member dynamic profiles + plans, topbar profile switcher, in-app family editor (Settings → Family), per-member round keys.
+- Family round (one-card scoring) + combined recap + canvas family recap share card.
+- All 7 game modes: Just for fun, Junior/Team Scramble, Parents vs. Kids, Hole Challenge, Kid Birdie Bomb, Team Captain.
+- Kid leveling (play-based, 9 levels) + badges + per-level PGA challenges (auto-verified) + daily check-ins + manual grown-up level controls.
+- Round polish to PWA parity: adult achievement badges, memories photo gallery, log-a-past-round, log-practice-sessions, edit-a-saved-round, caddie voice input, wake lock, centered PLAY (PWA `10-nav.html` + app).
+- Honesty: data-driven in-app "Coming at launch" card; down to one item (family stats sync).
+- Family stats sync: app code wired to `family_rounds` (by guide link). PENDING DB: run `spinvibes-app/family-rounds-table.sql`.
+- Guide: `&fm=` appended to app link in both wizards. Beta docs rebuilt (invite HTML+PDF/PNG, guide, update-email structure, FEATURES.md tracker).
+
 ### 2026-04-17
 - Created this roadmap document.
 - `655b1b3` — Mobile nav fit (`flex: 1 1 0`) + Welk Oaks par fix (54/18) + My Game lock button + clubs/lofts expander on home page.

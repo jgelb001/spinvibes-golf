@@ -1,11 +1,31 @@
 # SpinVibes Golf — Current Status
 > **Update this at the end of every Cowork session.** This is the first thing to read when starting a new session. It answers: where are we, what's broken, what's next.
 
-*Last updated: 2026-06-12 (session 40 — training metaphor voice + daily-thoughts feed + Best Moment share (app); PWA kids' polish + age fix; FOUND beta-guide gap → DECIDED to build per-kid custom plans in the app next)*
+*Last updated: 2026-06-13 (session 41 — SHIPPED full family stack into app.spinvibes.com + closed the PWA↔app gap. See below.)*
 
 ---
 
-## 🔜 NEXT SPRINT — App Family/Kid Custom Plans (Jeremy's call, 2026-06-12)
+## ✅ SHIPPED — App brought to family-PWA parity (session 41, 2026-06-13)
+
+The "NEXT SPRINT" below is **done and far exceeded**. Over session 41 the app went from solo-only to full family parity, deployed in batches (app SW v5 → **v13**):
+
+- **Per-member custom plans + profile switcher** — members flow in from `members`/`?fm=`, each gets a dynamic plan (age/hand/goal), age-gated kid voice. In-app add/edit/remove family (Settings → Family).
+- **Family round** — one-card hole-by-hole multi-player scoring + combined recap + **canvas recap share card**. Per-member round history (`RK()` includes `activeKey`).
+- **All 7 game modes** — Just for fun, Junior Scramble (bomb drives), Parents vs. Kids (age handicaps), Team Scramble, Hole Challenge, Kid Birdie Bomb, Team Captain.
+- **Kid leveling** — play-based points → 9 levels (Fresh Caddie→Tour Bound), badge grid, **per-level PGA challenges** (auto-verified), **daily check-ins**, **manual grown-up level controls**.
+- **Round polish (PWA-parity)** — adult achievement badges, memories photo gallery, **log a past round**, **log practice sessions**, **edit a saved round**, **caddie voice input**, **wake lock** (screen stays on), centered PLAY in PWA + app nav.
+- **Honesty system** — in-app "Coming at launch" card (data-driven), now down to one item.
+- **Family stats sync** — app code built (members → `family_rounds` table by guide link); **PENDING: run `spinvibes-app/family-rounds-table.sql` in Supabase**, then it's live. Until then members are local-only. Last item on the Coming-at-launch list.
+- **Beta docs** — rebuilt `BETAUSERDOCS/beta-invite.html` (+ regenerated PDF/PNG) with honest live-features list; `beta-user-guide.md` aligned; new `BETAUSERDOCS/update-emails/` (template + first session email + README — **send once per session at wrap-it**, not per push); `BETAUSERDOCS/FEATURES.md` tracker.
+- **Guide link** — `&fm=` appended in both wizards (belt-and-suspenders); confirmed members DO persist (live wizard `golf-guide-builder/index.html` POSTs them).
+
+**Verification:** all JS syntax-clean; logic verified via headless-DOM (jsdom) tests for every feature; switcher / family round / game modes / kid level card screenshotted live in Chrome at mobile width.
+
+**Open follow-ups:** (1) run the `family_rounds` SQL → verify sync → remove last Coming-at-launch item. (2) Port these app features back to iOS for parity. (3) Send the session update email (`BETAUSERDOCS/update-emails/2026-06-13-update.html`) to `guide_users` — Jeremy's manual step.
+
+---
+
+## 🔜 (DONE — see above) NEXT SPRINT — App Family/Kid Custom Plans (Jeremy's call, 2026-06-12)
 
 **Goal:** In app.spinvibes.com, a beta user can add their kids, and **each kid gets a CUSTOM plan exactly like the main user** — dynamic, keyed to the kid's age/hand/skill, in the metaphor/game voice. Just like the PWA, but **not hardcoded** (PWA is fixed to Jeremy's Son/Daughter via `FAM_PLAYERS` + 32 `son-sect`/`girl-sect` blocks).
 
