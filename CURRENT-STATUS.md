@@ -21,7 +21,9 @@ The "NEXT SPRINT" below is **done and far exceeded**. Over session 41 the app we
 
 **Verification:** all JS syntax-clean; logic verified via headless-DOM (jsdom) tests for every feature; switcher / family round / game modes / kid level card screenshotted live in Chrome at mobile width.
 
-**Open follow-ups:** (1) run the `family_rounds` SQL → verify sync → remove last Coming-at-launch item. (2) Port these app features back to iOS for parity. (3) Send the session update email (`BETAUSERDOCS/update-emails/2026-06-13-update.html`) to `guide_users` — Jeremy's manual step.
+**Open follow-ups:** (1) ✅ DONE — `family_rounds` table created, sync verified, last Coming-at-launch item removed (list now empty). (2) Port these app features back to iOS for parity (iOS still on Sprint 9.5). (3) Session update email DEFERRED — Jeremy is holding the broadcast until there are >2 signups; Mike + Ryan were texted directly. Draft kept at `BETAUSERDOCS/update-emails/2026-06-13-update.html`; recipients in `recipients-2026-06-13.csv`; see send-log in that folder's README.
+
+**Beta invite** now exists in three formats with the full live-feature list: `BETAUSERDOCS/beta-invite.html` (editable source), `SpinVibes-Beta-Invite.pdf`, `SpinVibes-Beta-Invite.png`, plus `beta-invite.md`. Tracker: `BETAUSERDOCS/FEATURES.md`.
 
 ---
 
