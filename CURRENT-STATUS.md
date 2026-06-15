@@ -1,7 +1,32 @@
 # SpinVibes Golf — Current Status
 > **Update this at the end of every Cowork session.** This is the first thing to read when starting a new session. It answers: where are we, what's broken, what's next.
 
-*Last updated: 2026-06-13 (session 41 — SHIPPED full family stack into app.spinvibes.com + closed the PWA↔app gap. See below.)*
+*Last updated: 2026-06-14 (session 42 — closing the iOS↔web gap while beta feedback comes in. See iOS block directly below.)*
+
+---
+
+## 🍎 IN PROGRESS — iOS parity with the web app (session 42, 2026-06-14)
+
+**Context:** With the web app at full family parity (session 41), this session ports the gaps into the native iOS app (`spinvibes-ios`, folder-synced Xcode project, iOS 26.5 target, Swift 5). **Constraint: this sandbox cannot compile Swift — Jeremy builds in Xcode between changes; we iterate on compiler output.**
+
+**Landed + build-confirmed green:**
+- **Wake lock** during solo + family rounds (`isIdleTimerDisabled`).
+- **Log a past round** — manual-entry sheet in MyGameView → `user_rounds`.
+- **Voice caddie** — new `SpeechDictation.swift` (SFSpeechRecognizer + AVAudioEngine), mic button in CaddieView; mic/speech usage strings added to `project.pbxproj`. (Bug found+fixed: needed `import Combine` for `@Published`.)
+- **Dynamic kid-level keys** — `KidLevelSheet.swift`: kids keyed by name slug (no 2-slot `son`/`girl` cap); hardcoded fallback keeps `son`/`girl`. HomeView + MyGameView refactored to `.sheet(item:)`.
+- **Per-member profile switcher (Stage A)** — `ActiveProfile.swift`: `ActiveProfileStore` (activeKey + synthetic member `GuideUser` via `memberToGuideUser`), `ProfileSwitcherBar`. Range / Short Game / Caddie render off the active profile.
+
+**Landed, PENDING Jeremy's build confirm (latest batch):**
+- **Member home pages** — Home follows the active profile; the top family pills now *switch profile* (not open the popup). A member shows a "Coaching [Name]" page with shortcuts into their Range/Short Game/Caddie. Kid "quick look" (level/badges/check-in) intentionally kept in the **My Game** tab.
+- **Debug user given real `members`** (Son 8 / Daughter 6 / Mom 40) so the simulator exercises the real switcher; seed keys aligned to slugs (`sv-son-*`, `sv-daughter-*`).
+- **Kid-voiced, age-tiered content** — Range warm-up + drills and Short Game chipping/putting branch to 6–8 / 9–12 kid voice (steering-hand cue flips for lefties); adults stay skill-tiered.
+- **Bug fixes:** caddie input bar overlap (now a bottom `safeAreaInset`); Settings sheet missing a **Done** button.
+
+**⚠ BACKEND CONFLICT FOUND (needs a decision):** the web app's `family_rounds` table (per-member rows: `member_key`, `round` jsonb — created + verified this session) **collides** with iOS's pre-existing `family_rounds` usage (event rows: `course_name`, `players`, `totals`, `game_mode`, `is_practice`). My web SQL did `drop table … cascade`, so iOS's event save/load now mismatches columns. Web sync is live and correct; iOS family-round history is the side that breaks. **Fix options:** (a) point iOS's event log at its own table `family_round_events` (new table + SQL) — recommended since web sync is already live; or (b) unify both clients on the per-member schema. Tracked as a task.
+
+**Still open on iOS:** dynamic daily-rotating quick drills tied to Today's Focus; adult-member profile behavior (Mom/Grandma/other — deliberately deferred, TODO in `HomeView.coachingSection`); My Game per-member rounds (needs the schema decision above); **remove the `#if DEBUG` simulator bypass before any TestFlight**; the full UI/UX nav pass (back buttons vs swipe-to-dismiss — Jeremy flagged, deferred).
+
+**Nothing iOS pushed yet** — build-confirm the latest batch first, then `push-all` (it pushes `spinvibes-ios`).
 
 ---
 

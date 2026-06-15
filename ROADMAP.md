@@ -296,6 +296,14 @@ alter table courses enable row level security;
 
 **Keep this updated.** Every meaningful web-app change gets a one-line entry here with date + commit hash (if pushed).
 
+### 2026-06-14 (session 42 — iOS parity, in progress; sandbox can't compile Swift, Jeremy builds in Xcode)
+- iOS gaps ported: wake lock; log-a-past-round; voice caddie (`SpeechDictation.swift` + Info.plist usage keys); dynamic kid-level keys (`KidLevelSheet.swift`, slug-keyed, no son/girl cap).
+- Per-member profile switcher: `ActiveProfile.swift` (`ActiveProfileStore` + `memberToGuideUser` + `ProfileSwitcherBar`); Range/Short Game/Caddie + Home now render off the active profile; family pills switch profile; kid quick-look stays in My Game.
+- Kid-voiced, age-tiered (6–8 / 9–12) Range warm-up/drills + Short Game chipping/putting; debug user given real members so the simulator exercises the switcher.
+- Fixes: caddie input safe-area overlap; Settings Done button; `import Combine` for SpeechDictation.
+- ⚠ Found: `family_rounds` schema collision — web per-member rows vs iOS event rows (web SQL dropped/recreated the table). Needs reconciliation (lean: iOS → `family_round_events`).
+- Not pushed yet (build-confirm latest batch first). Deferred: dynamic daily drills, adult-member profiles, My Game per-member rounds, remove #if DEBUG bypass, full UI/UX nav pass.
+
 ### 2026-06-13 (session 41 — app↔PWA family parity, app SW v5→v13)
 - Family into app: load `members`/`?fm=`, per-member dynamic profiles + plans, topbar profile switcher, in-app family editor (Settings → Family), per-member round keys.
 - Family round (one-card scoring) + combined recap + canvas family recap share card.
