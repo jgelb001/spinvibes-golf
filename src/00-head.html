@@ -608,7 +608,10 @@
       font-size: 16px; /* iOS auto-zooms inputs below 16px — must not be smaller. Was 0.85rem (~13.6px), beat .modal-input's 16px via specificity. */
       margin-bottom: 10px;
     }
-    input:focus, select:focus { outline: none; border-color: var(--green); }
+    /* iOS auto-zooms on focus when a field is below 16px. Keep textareas (caddie
+       box, round notes) at 16px too so focusing them never zooms the page. */
+    textarea { font-size: 16px; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--green); }
     input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); }
 
     label { font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
