@@ -1,12 +1,12 @@
 <script>
 
-  // ── iOS Safari :active fix — Safari only applies :active styles on tap when
+  // ── iOS Safari :active fix, Safari only applies :active styles on tap when
   // a touch listener exists somewhere in the document. This no-op listener
   // makes .pill:active, .btn:active, etc. fire immediately on tap (fixes
   // "pills not highlighting on tap" bug). Must be registered before any UI renders.
   document.addEventListener('touchstart', function(){}, { passive: true });
 
-  // ── SPRINT 3: Profile state — declared FIRST (before any code that could throw) ──
+  // ── SPRINT 3: Profile state, declared FIRST (before any code that could throw) ──
   let _activePin     = '4417';   // overridden at boot from Supabase
   let _activeClubs   = null;     // null = fall back to hardcoded CLUBS const
   let _activeProfile = null;     // loaded Supabase sv_profiles row
@@ -14,7 +14,7 @@
   let _settingsClubs = [];       // working copy used by bag editor
   let _settingsDirty = false;
 
-  // ── PIN ACCUMULATOR VARS — declared at top to avoid TDZ if SDK crashes below ──
+  // ── PIN ACCUMULATOR VARS, declared at top to avoid TDZ if SDK crashes below ──
   let _dadPin = '';
   let _sonPin = '';
   let _girlPin = '';
@@ -24,7 +24,7 @@
   let _dadLoadedRounds = [];   // cache for round editing
   let _editingRoundId   = null;
 
-  // ── BADGES — declared at top so renderBadges() never hits TDZ ──────────────
+  // ── BADGES, declared at top so renderBadges() never hits TDZ ──────────────
   const BADGES = [
     { id:'first_tee',   name:'First Tee',  desc:'Played your first round',       color:'#3B7CB8',
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><polygon points="28,4 34,20 52,20 38,31 44,48 28,38 12,48 18,31 4,20 22,20" fill="{{c}}" opacity="0.15"/><polygon points="28,4 34,20 52,20 38,31 44,48 28,38 12,48 18,31 4,20 22,20" fill="none" stroke="{{c}}" stroke-width="2"/><circle cx="28" cy="32" r="5" fill="{{c}}" opacity="0.9"/><line x1="28" y1="20" x2="28" y2="27" stroke="{{c}}" stroke-width="2.5" stroke-linecap="round"/></svg>`,
@@ -53,7 +53,7 @@
   ];
 
 
-  // ── KID BADGES — kid-specific achievements using localStorage flags + rounds ──
+  // ── KID BADGES, kid-specific achievements using localStorage flags + rounds ──
   const KID_BADGES = [
     { id:'kid_first_par',    name:'First Par',      desc:'Made par on any hole',          color:'#22c55e',
       svg:`<svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="24" fill="{{c}}" opacity="0.1"/><circle cx="28" cy="28" r="24" fill="none" stroke="{{c}}" stroke-width="2.5"/><circle cx="28" cy="28" r="16" fill="none" stroke="{{c}}" stroke-width="1" opacity="0.3"/><text x="28" y="24" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="10" fill="{{c}}" opacity="0.8">FIRST</text><text x="28" y="37" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="16" fill="{{c}}">PAR</text></svg>`,
@@ -113,7 +113,7 @@
       check:(who)=>!!localStorage.getItem('sv-'+who+'-badge-kid_dynamic_duo') },
   ];
 
-  // ── CLUBS — declared at top so bag/caddie never hit TDZ from init errors ──
+  // ── CLUBS, declared at top so bag/caddie never hit TDZ from init errors ──
   const CLUBS = [
     { name: 'Driver',    dist: 195, loft: '10.5°', display: 'Driver',        confirmed: true,  note: 'Vice Boost · 10.5° · Graphite · Midsize grip · 190–200 yds ✅ Confirmed' },
     { name: '7-Wood',    dist: 180, loft: '21°',   display: '7-Wood',        confirmed: true,  note: 'Callaway Paradym Ai Smoke MAX · 21° · Aldila Ascent 40g · Senior flex · 180 yds ✅ Jeremy confirmed May 2026' },
@@ -129,7 +129,7 @@
     { name: 'LW (60°)',  dist: 68,  loft: '60°',   display: 'LW · Lob',      confirmed: true, wedge: true, note: 'Callaway Opus · 60–75 yds · specialty/flops ✅ Confirmed June 2026' },
   ];
 
-  // ── KID LEVELS — declared at top to prevent TDZ when updateRangeLevelBadge() runs at init ──
+  // ── KID LEVELS, declared at top to prevent TDZ when updateRangeLevelBadge() runs at init ──
   const KID_LEVELS = {
     0: { name: 'Fresh Caddie',    icon: 'ph-light ph-backpack',         color: '#888780', desc: 'Welcome to the game. Everything starts here.', nextLabel: 'Grip & Ripper', nextTrigger: '4 activity points', roundsNeeded: 0 },
     1: { name: 'Grip & Ripper',   icon: 'ph-light ph-golf',             color: '#639922', desc: 'Just hit it. No form, no distance, no rules. Pure fun.', nextLabel: 'Ball Finder', nextTrigger: '12 pts + first round + check-in', roundsNeeded: 1 },
@@ -143,7 +143,7 @@
   };
 
 
-  // ── KID LEVEL REQUIREMENTS — points-based composite gates ──────────────────
+  // ── KID LEVEL REQUIREMENTS, points-based composite gates ──────────────────
   // Activity points: round = 3 pts, range/practice session = 1 pt
   const KID_LEVEL_REQS = {
     0: { points: 4,   checkin: true, challenge: null },                           // Fresh Caddie → Grip & Ripper
@@ -157,13 +157,13 @@
     8: null,
   };
 
-  // ── KID CHALLENGES — PGA-guided, one per level gate, auto-verified ────────────
+  // ── KID CHALLENGES, PGA-guided, one per level gate, auto-verified ────────────
   const KID_CHALLENGES = {
     1: { // L2→L3 (Ball Finder → Straight Shooter)
       title: 'Contact Challenge',
       badge: 'PGA Start Golf',
-      desc:  'Log a range session with a feel rating of 3 or better — solid contact, ball going up and forward.',
-      short: 'Range session — feel 3+',
+      desc:  'Log a range session with a feel rating of 3 or better, solid contact, ball going up and forward.',
+      short: 'Range session, feel 3+',
       check: (who, rounds) => getKidRangeSessions(who).some(s => s.feel >= 3),
     },
     2: { // L3→L4 (Straight Shooter → Par Machine)
@@ -176,7 +176,7 @@
     3: { // L4→L5 (Par Machine → Course Reader)
       title: 'Two-Par Challenge',
       badge: 'PGA Prep Golf',
-      desc:  'Make par on at least 2 holes — same round or across rounds. Prove it was not a fluke.',
+      desc:  'Make par on at least 2 holes, same round or across rounds. Prove it was not a fluke.',
       short: '2 pars recorded',
       check: (who, rounds) => {
         let total = 0;
@@ -196,8 +196,8 @@
     },
   };
 
-  // ── KID CHECK-IN QUESTIONS — account holder observes and answers ─────────────
-  // ── KID CHECK-IN QUESTIONS — account holder observes and answers ─────────────
+  // ── KID CHECK-IN QUESTIONS, account holder observes and answers ─────────────
+  // ── KID CHECK-IN QUESTIONS, account holder observes and answers ─────────────
   // passing = min yes answers required to pass the check-in
   const KID_CHECKIN_QS = {
     0: {
@@ -250,7 +250,7 @@
     },
     5: {
       title:    'Level 6 Readiness Check',
-      subtitle: 'A real skill milestone — answer honestly.',
+      subtitle: 'A real skill milestone, answer honestly.',
       passing:  3,
       questions: [
         'Do they think about the hole layout before they tee off?',
@@ -261,19 +261,19 @@
     },
     6: {
       title:    'Level 7 Readiness Check',
-      subtitle: 'Junior golf territory — answer carefully.',
+      subtitle: 'Junior golf territory, answer carefully.',
       passing:  4,
       questions: [
-        'Do they understand course management — playing away from trouble?',
+        'Do they understand course management, playing away from trouble?',
         'Can they maintain focus for a full 9 or 18-hole round?',
-        'Are they competitive — do they care about their score improving?',
+        'Are they competitive, do they care about their score improving?',
         'Would you feel comfortable entering them in a junior clinic or event?',
         'Are they dedicated enough to practice on their own?',
       ],
     },
     7: {
       title:    'Level 8 Readiness Check',
-      subtitle: 'Tour Bound is the real deal — be sure.',
+      subtitle: 'Tour Bound is the real deal, be sure.',
       passing:  4,
       questions: [
         'Do they track all stats (fairways, greens in regulation, putts per round)?',
@@ -285,54 +285,54 @@
     },
   };
 
-  // ── DAILY BRIEF — home tab dynamic content, date-seeded ─────────────────
+  // ── DAILY BRIEF, home tab dynamic content, date-seeded ─────────────────
   const DAILY_TIPS = {
     dad: [
       // Drills
-      { icon:'ti-target', tag:'drill', title:'Gate Drill — Putting', body:'Two tees just wider than your putter, 6 inches in front of the ball. Make 10 in a row from 6 feet without clipping them. Best stroke trainer you can do anywhere.' },
+      { icon:'ti-target', tag:'drill', title:'Gate Drill, Putting', body:'Two tees just wider than your putter, 6 inches in front of the ball. Make 10 in a row from 6 feet without clipping them. Best stroke trainer you can do anywhere.' },
       { icon:'ti-rotate', tag:'drill', title:'Towel Under Arms', body:'Tuck a towel under both armpits and hit half-shots with a 7-iron. If it falls, your arms disconnected from your body. This fixes 90% of over-the-top pulls.' },
-      { icon:'ti-clock', tag:'drill', title:'Clock Drill — Wedges', body:'From 20 yards, hit to 3, 6, 9, and 12 o\'clock around the hole. Forces distance control in all directions. 7 o\'clock backswing ≈ 35y. 9 o\'clock ≈ 65y. 11 o\'clock ≈ 90y.' },
-      { icon:'ti-flame', tag:'drill', title:'50% Driver Day', body:'On the range today: hit every driver at 50% effort. Focus on solid contact and finishing tall. You\'ll probably hit it just as far — and you\'ll find out how much of your miss comes from over-swinging.' },
+      { icon:'ti-clock', tag:'drill', title:'Clock Drill, Wedges', body:'From 20 yards, hit to 3, 6, 9, and 12 o\'clock around the hole. Forces distance control in all directions. 7 o\'clock backswing ≈ 35y. 9 o\'clock ≈ 65y. 11 o\'clock ≈ 90y.' },
+      { icon:'ti-flame', tag:'drill', title:'50% Driver Day', body:'On the range today: hit every driver at 50% effort. Focus on solid contact and finishing tall. You\'ll probably hit it just as far, and you\'ll find out how much of your miss comes from over-swinging.' },
       { icon:'ti-activity', tag:'drill', title:'Tempo Count', body:'On your next range session, count 1-2-3 through every swing. 1 = takeaway, 2 = top of backswing, 3 = impact. Most amateurs rush from 2 to 3. That pause at the top is where the swing lives.' },
-      { icon:'ti-golf', tag:'drill', title:'One-Club Bucket', body:'Take just your 7-iron to the range today. Hit a full bucket — chips, full swings, punches, high shots. Forces creativity and builds real feel for the club. Best short-session drill there is.' },
+      { icon:'ti-golf', tag:'drill', title:'One-Club Bucket', body:'Take just your 7-iron to the range today. Hit a full bucket, chips, full swings, punches, high shots. Forces creativity and builds real feel for the club. Best short-session drill there is.' },
       { icon:'ti-target', tag:'drill', title:'9-Ball Short Game Circuit', body:'3 balls from 10 yards, 3 from 25, 3 from 40. Chip each to a single hole. Count total putts to finish. Par is 12. Beat it, and your short game is sharp enough to score with.' },
-      { icon:'ti-crosshair', tag:'drill', title:'Lag Putting Circuit', body:'5 balls from 20 feet, 5 from 30, 5 from 40. Goal: every ball inside 18 inches. No 3-putts. This is the cheapest stroke saver in the bag — most rounds are lost here, not on tee shots.' },
+      { icon:'ti-crosshair', tag:'drill', title:'Lag Putting Circuit', body:'5 balls from 20 feet, 5 from 30, 5 from 40. Goal: every ball inside 18 inches. No 3-putts. This is the cheapest stroke saver in the bag, most rounds are lost here, not on tee shots.' },
       // Course strategy
       { icon:'ti-brain', tag:'strategy', title:'Play to the Fat Side', body:'Every approach today: aim for the widest part of the green, not the pin. A 30-footer for birdie beats a chip from short-side rough every time. Course management beats hero shots.' },
-      { icon:'ti-map', tag:'strategy', title:'Par 5 Rule', body:'On every par 5: lay up to your best wedge distance — the one where you know exactly what\'s going to happen. For you, that\'s the 50° GW around 90-95 yards. Set it up perfectly.' },
+      { icon:'ti-map', tag:'strategy', title:'Par 5 Rule', body:'On every par 5: lay up to your best wedge distance, the one where you know exactly what\'s going to happen. For you, that\'s the 50° GW around 90-95 yards. Set it up perfectly.' },
       { icon:'ti-refresh', tag:'strategy', title:'The Bounce-Back Rule', body:'After a bad hole: par the next one. That\'s it. A bad hole followed by a par is a good two-hole sequence. Reset, pick a conservative target, execute one shot.' },
-      { icon:'ti-wind', tag:'strategy', title:'Wind Adjustment', body:'Into the wind: take one more club, swing at 80%, keep it low. Downwind: same club, same swing — the wind will carry it. Crosswind: aim into it, let it come back. Never fight the wind.' },
+      { icon:'ti-wind', tag:'strategy', title:'Wind Adjustment', body:'Into the wind: take one more club, swing at 80%, keep it low. Downwind: same club, same swing, the wind will carry it. Crosswind: aim into it, let it come back. Never fight the wind.' },
       { icon:'ti-pin', tag:'strategy', title:'Tee Height for Driver', body:'Ball should be teed so the top half is above the clubface at address. Higher tee = more upward strike = more carry, less spin. You\'re swinging up on it. Let the tee do the work.' },
       // Mental
-      { icon:'ti-bulb', tag:'mental', title:'One Swing Thought Max', body:'Pick it before you leave the car. Stick with it all session — even if it\'s not working. Changing swing thoughts mid-round is the fastest way to make a bad day worse.' },
+      { icon:'ti-bulb', tag:'mental', title:'One Swing Thought Max', body:'Pick it before you leave the car. Stick with it all session, even if it\'s not working. Changing swing thoughts mid-round is the fastest way to make a bad day worse.' },
       { icon:'ti-heart', tag:'mental', title:'Pre-Shot Routine', body:'Same 3 steps before every shot. Stand behind the ball, pick your target. Step in and align. One breath, then go. Takes 10 seconds. This is what separates consistent ball-strikers from streaky ones.' },
-      { icon:'ti-mood-smile', tag:'mental', title:'Miss Tendency Reset', body:'Every golfer has a pattern. Yours is a pull-draw when you over-rotate too fast. When you feel it starting: slower transition, feel the right elbow drop. Don\'t fix it — just feel the opposite.' },
+      { icon:'ti-mood-smile', tag:'mental', title:'Miss Tendency Reset', body:'Every golfer has a pattern. Yours is a pull-draw when you over-rotate too fast. When you feel it starting: slower transition, feel the right elbow drop. Don\'t fix it, just feel the opposite.' },
       // Family games
       { icon:'ti-users', tag:'family game', title:'Putting Contest', body:'End of this round: everyone putts from 6 feet, same hole, 5 balls each. Count makes. Winner picks the next course, or picks someone\'s bag for the cart ride home. First game Son takes seriously.' },
-      { icon:'ti-trophy', tag:'family game', title:'Closest to the Pin — Par 3s', body:'Every par 3 this round: mark where everyone\'s ball lands. Closest to the pin gets a point. Track across 18 — pay out at the end. Keeps everyone dialed in on par 3s all round.' },
+      { icon:'ti-trophy', tag:'family game', title:'Closest to the Pin, Par 3s', body:'Every par 3 this round: mark where everyone\'s ball lands. Closest to the pin gets a point. Track across 18, pay out at the end. Keeps everyone dialed in on par 3s all round.' },
       { icon:'ti-cards', tag:'family game', title:'Scramble Format', body:'Try a full scramble with Son: everyone hits, play the best shot. Takes the pressure off and makes the whole round feel collaborative. Great format when Son needs a confidence boost.' },
       // Products
       { icon:'ti-package', tag:'gear', title:'Vice Golf Pro Plus Ball', body:'Matches your swing speed well. Soft feel for short game, enough distance off the tee. Better than what most mid-handicaps play, without Tour ball pricing. Worth keeping a sleeve in the bag.' },
-      { icon:'ti-package', tag:'gear', title:'Alignment Sticks', body:'The cheapest best training aid in golf. Use them on the range for ball position, foot line, target line — all at once. Two sticks, under $15. No substitute for what they teach your eye.' },
+      { icon:'ti-package', tag:'gear', title:'Alignment Sticks', body:'The cheapest best training aid in golf. Use them on the range for ball position, foot line, target line, all at once. Two sticks, under $15. No substitute for what they teach your eye.' },
       { icon:'ti-calendar', tag:'reminder', title:'Book a Lesson This Month', body:'Every 4–6 weeks is the right cadence for where you are right now. Too often and the changes stack up. Not enough and you\'re guessing. One thing per lesson, one month to own it.' },
       // Lefty specific
-      { icon:'ti-rotate-clockwise', tag:'lefty tip', title:'Lead Wrist at Impact', body:'As a lefty, your lead (right) wrist should be flat or slightly bowed at impact — not cupped. A cupped lead wrist causes fat shots and flips. Feel like you\'re holding the angle through the ball.' },
+      { icon:'ti-rotate-clockwise', tag:'lefty tip', title:'Lead Wrist at Impact', body:'As a lefty, your lead (right) wrist should be flat or slightly bowed at impact, not cupped. A cupped lead wrist causes fat shots and flips. Feel like you\'re holding the angle through the ball.' },
       { icon:'ti-shopping-bag', tag:'gear', title:'Left-Handed Gear Sources', body:'leftiesonlygolf.com for specialty equipment. 2ndswing.com for quality used lefty clubs at real prices. GlobalGolf.com is worth checking too. Most big-box stores stock minimal lefty options.' },
-      { icon:'ti-chart-line', tag:'reminder', title:'Log Your Misses Today', body:'Every time you miss a green today, note which side — left, right, short, long. After 9 holes you\'ll have a pattern. That pattern tells you exactly what to work on at the range next session.' },
+      { icon:'ti-chart-line', tag:'reminder', title:'Log Your Misses Today', body:'Every time you miss a green today, note which side, left, right, short, long. After 9 holes you\'ll have a pattern. That pattern tells you exactly what to work on at the range next session.' },
     ],
 
     son: [
-      { icon:'ti-trophy', tag:'challenge', title:'Closest to the Pin — 5 Balls', body:'Drop 5 balls at 10 yards from the practice green and chip. Count how many finish inside 3 feet. Beat your record next time. Write the number down somewhere.' },
-      { icon:'ti-flame', tag:'challenge', title:'Beat Dad on One Hole', body:'Pick one hole this round and go all-in: best tee shot you\'ve got, full focus all the way to the cup. Just one hole. You don\'t have to beat him all day — just once.' },
+      { icon:'ti-trophy', tag:'challenge', title:'Closest to the Pin, 5 Balls', body:'Drop 5 balls at 10 yards from the practice green and chip. Count how many finish inside 3 feet. Beat your record next time. Write the number down somewhere.' },
+      { icon:'ti-flame', tag:'challenge', title:'Beat Dad on One Hole', body:'Pick one hole this round and go all-in: best tee shot you\'ve got, full focus all the way to the cup. Just one hole. You don\'t have to beat him all day, just once.' },
       { icon:'ti-target', tag:'drill', title:'Count Your Makes', body:'On the putting green, count how many 3-footers you make in a row before you miss. Your record is the one to beat. 10 in a row means your stroke is dialed. Go get it.' },
       { icon:'ti-golf', tag:'drill', title:'Fringe Chip Drill', body:'From the fringe, pick a spot 3 feet onto the green and try to land the ball exactly there. Every time you land it on the spot, it\'s a point. 7 out of 10 = consistent chipper.' },
-      { icon:'ti-run', tag:'challenge', title:'Drive Count — Straight Ones', body:'On the range today, hit 10 drivers and count how many go straight or draw slightly. That\'s your number. Try to beat it next session. Most juniors improve fast when they start tracking.' },
-      { icon:'ti-cards', tag:'family game', title:'Points Game This Round', body:'Birdie = 3 points, Par = 2, Bogey = 1, Double = 0. Play this scoring system this round. It rewards consistency over heroics — and you can beat Dad at it even when he shoots lower.' },
+      { icon:'ti-run', tag:'challenge', title:'Drive Count, Straight Ones', body:'On the range today, hit 10 drivers and count how many go straight or draw slightly. That\'s your number. Try to beat it next session. Most juniors improve fast when they start tracking.' },
+      { icon:'ti-cards', tag:'family game', title:'Points Game This Round', body:'Birdie = 3 points, Par = 2, Bogey = 1, Double = 0. Play this scoring system this round. It rewards consistency over heroics, and you can beat Dad at it even when he shoots lower.' },
       { icon:'ti-award', tag:'challenge', title:'3 Clubs Only', body:'For 3 holes today, use only your 7-iron, sand wedge, and putter. No driver, no fairway wood. Forces creativity and teaches you what each club can actually do. Best golf brain drill there is.' },
       { icon:'ti-users', tag:'family game', title:'Caddie for a Hole', body:'On one hole this round, be Dad\'s caddie. Read the distance, suggest a club, read the putt. He has to take your advice. Whoever is right more often wins a Gatorade at the turn.' },
       { icon:'ti-star', tag:'challenge', title:'Shoot Your Age', body:'On 9 holes today, try to shoot your age or under (8 or less). That means averaging under a bogey per hole. It\'s harder than it sounds. Write down your score and try to beat it next time.' },
-      { icon:'ti-bulb', tag:'tip', title:'Pre-Shot Routine — Start Now', body:'Before every shot on the range: stand behind the ball, pick a target, then step in. One look, one thought, swing. This habit at 8 years old is worth 5 years of lessons later.' },
-      { icon:'ti-clipboard-list', tag:'tip', title:'Learn One Rule This Week', body:'Ask Dad one rule of golf you\'ve wondered about. Drop zones, penalty strokes, out of bounds, casual water — knowing the rules makes you a real golfer and helps you score better.' },
+      { icon:'ti-bulb', tag:'tip', title:'Pre-Shot Routine, Start Now', body:'Before every shot on the range: stand behind the ball, pick a target, then step in. One look, one thought, swing. This habit at 8 years old is worth 5 years of lessons later.' },
+      { icon:'ti-clipboard-list', tag:'tip', title:'Learn One Rule This Week', body:'Ask Dad one rule of golf you\'ve wondered about. Drop zones, penalty strokes, out of bounds, casual water, knowing the rules makes you a real golfer and helps you score better.' },
       { icon:'ti-trophy', tag:'family game', title:'Speed Putting Race', body:'Who makes 3 putts in a row first from 4 feet? Go head-to-head on the practice green before the round. Winner starts the round with bragging rights. Loser carries the bag to the first tee.' },
       { icon:'ti-pin', tag:'challenge', title:'Hit the 50-Yard Marker', body:'On the range, try to land a ball as close to the 50-yard marker as possible using your sand wedge. 5 attempts. Closest one counts. Then try the 75-yard marker. Distance control is real scoring.' },
       { icon:'ti-chart-bar', tag:'tip', title:'Map Your Clubs', body:'Today on the range: hit 5 balls with each iron and note the average distance. Write it in your phone. Knowing exactly how far each club goes is the #1 thing that improves scoring.' },
@@ -347,45 +347,45 @@
     girl: [
       { icon:'ti-star', tag:'today\'s game', title:'Make 3 in a Row', body:'From 3 feet on the putting green, try to make 3 putts in a row. When you do, move back to 4 feet. Celebrate every single one. You\'ve got this.' },
       { icon:'ti-heart', tag:'today\'s game', title:'Pick Your Favorite Shot', body:'Hit 5 balls and decide which one is your favorite. That\'s YOUR best swing. Show Dad. That\'s the swing to repeat next time.' },
-      { icon:'ti-award', tag:'challenge', title:'Give Dad a Putting Lesson', body:'Teach Dad how you putt. Show him exactly what you do. You might know something he doesn\'t — and teaching is how you get even better yourself.' },
+      { icon:'ti-award', tag:'challenge', title:'Give Dad a Putting Lesson', body:'Teach Dad how you putt. Show him exactly what you do. You might know something he doesn\'t, and teaching is how you get even better yourself.' },
       { icon:'ti-leaf', tag:'today\'s game', title:'Watch It Roll', body:'From just off the green, try chipping the ball and watching it roll all the way to the hole. See how far you can get it to roll! The 9-iron makes it roll the furthest.' },
-      { icon:'ti-eye', tag:'today\'s game', title:'Spot the Ball Game', body:'Whoever sees the ball land first after someone hits gets a point. Play this the whole round. You\'re really good at spotting — this one is yours to win.' },
+      { icon:'ti-eye', tag:'today\'s game', title:'Spot the Ball Game', body:'Whoever sees the ball land first after someone hits gets a point. Play this the whole round. You\'re really good at spotting, this one is yours to win.' },
       { icon:'ti-target', tag:'challenge', title:'10 Chip Challenge', body:'Drop 10 balls at the same spot and chip them all to a hole. Count how many end up inside 5 feet. Write your number down and try to beat it next time.' },
-      { icon:'ti-flame', tag:'today\'s game', title:'See How Far Without Trying', body:'Hit a ball as far as you can WITHOUT swinging hard. Just smooth and easy. It might go further than you think — and it feels so much better when you swing easy.' },
+      { icon:'ti-flame', tag:'today\'s game', title:'See How Far Without Trying', body:'Hit a ball as far as you can WITHOUT swinging hard. Just smooth and easy. It might go further than you think, and it feels so much better when you swing easy.' },
       { icon:'ti-map', tag:'today\'s game', title:'Design Your Own Hole', body:'You pick the tee, you pick the target. Everyone plays YOUR hole your way. You\'re the course designer and the rules are whatever you decide.' },
-      { icon:'ti-users', tag:'family game', title:'Best Ball with Dad', body:'On each hole today, both of you hit, and you play whichever ball is in a better spot. It\'s a team — and sometimes your shot will be the one everyone plays. That feels amazing.' },
+      { icon:'ti-users', tag:'family game', title:'Best Ball with Dad', body:'On each hole today, both of you hit, and you play whichever ball is in a better spot. It\'s a team, and sometimes your shot will be the one everyone plays. That feels amazing.' },
       { icon:'ti-photo', tag:'today\'s game', title:'Find the Prettiest Spot', body:'Look for the most beautiful spot on the course today. Maybe it\'s a tree, a pond, a hill. When you find it, remember it. Golf is also about being somewhere beautiful.' },
-      { icon:'ti-run', tag:'today\'s game', title:'Quiet Hands Putting', body:'On the putting green, try keeping your wrists completely still — like your whole arm is one straight stick. Firm, quiet, smooth. See how many you can make with super quiet hands.' },
+      { icon:'ti-run', tag:'today\'s game', title:'Quiet Hands Putting', body:'On the putting green, try keeping your wrists completely still, like your whole arm is one straight stick. Firm, quiet, smooth. See how many you can make with super quiet hands.' },
       { icon:'ti-trophy', tag:'family game', title:'Fastest Putter', body:'Who can make 3 putts in a row first? Go head-to-head with Dad or Son. Set the clock, see who wins. If you win, you pick where the family gets lunch.' },
-      { icon:'ti-golf', tag:'challenge', title:'Try a New Club', body:'Today pick a club you don\'t usually use and hit 5 balls with it. Just explore. What happens? Does it go far? Does it go high? There\'s no wrong answer — just curious.' },
+      { icon:'ti-golf', tag:'challenge', title:'Try a New Club', body:'Today pick a club you don\'t usually use and hit 5 balls with it. Just explore. What happens? Does it go far? Does it go high? There\'s no wrong answer, just curious.' },
       { icon:'ti-heart', tag:'today\'s game', title:'Celebrate Every Contact', body:'Every single shot that gets airborne today: celebrate it. Arms up, big smile. Because getting a golf ball in the air is actually really hard, and you do it every time.' },
       { icon:'ti-bulb', tag:'tip', title:'Pick Up the Tee', body:'After a driver shot, walk up and pick up your tee from the ground. That\'s a real golfer move. Pros do it every time. You\'ll remember it forever once you start.' },
       { icon:'ti-target', tag:'challenge', title:'Chip to a Towel', body:'Dad puts a towel on the ground at 15 yards. Try to land the ball on it. 3 balls, best of 3. Closer than the towel counts too. It\'s harder than it looks, and way more fun than just chipping.' },
       { icon:'ti-award', tag:'today\'s game', title:'Longest Drive Contest', body:'Everyone tees up on the practice range. One swing each. Whoever\'s ball goes furthest wins. You might surprise everyone. Swing as smooth as you can.' },
       { icon:'ti-refresh', tag:'tip', title:'9-Iron vs Pitching Wedge', body:'Try chipping from the same spot with your 9-iron and then your pitching wedge. Notice how one rolls more and one pops up higher. That\'s the difference. Both are useful. You\'re learning when to use each.' },
-      { icon:'ti-heart', tag:'reminder', title:'Dad\'s Rule — Leave Wanting More', body:'Whenever YOU are done, you are done. There\'s no pressure to stay longer. The best sessions are the ones that end while you still want to hit more. That\'s the secret.' },
+      { icon:'ti-heart', tag:'reminder', title:'Dad\'s Rule, Leave Wanting More', body:'Whenever YOU are done, you are done. There\'s no pressure to stay longer. The best sessions are the ones that end while you still want to hit more. That\'s the secret.' },
       { icon:'ti-users', tag:'family game', title:'Teach It Back', body:'Ask Dad for one tip today. Then at the end of the session, teach it back to him exactly. If you can teach it, you own it. You\'re going to be a great coach someday.' },
     ],
 
     mom: [
-      { icon:'ti-bulb', tag:'tip', title:'Look at the Hole — Short Putts', body:'For any putt inside 5 feet, try looking at the hole instead of the ball. Your instincts take over and the stroke smooths out. It works for most people the first time they try it.' },
-      { icon:'ti-heart', tag:'today\'s focus', title:'One Thing Only', body:'Pick one thing to focus on this session — just one. Ball position, keeping your eye on the ball, finishing tall. Everything else is background noise. One thing at a time is how this gets learned.' },
+      { icon:'ti-bulb', tag:'tip', title:'Look at the Hole, Short Putts', body:'For any putt inside 5 feet, try looking at the hole instead of the ball. Your instincts take over and the stroke smooths out. It works for most people the first time they try it.' },
+      { icon:'ti-heart', tag:'today\'s focus', title:'One Thing Only', body:'Pick one thing to focus on this session, just one. Ball position, keeping your eye on the ball, finishing tall. Everything else is background noise. One thing at a time is how this gets learned.' },
       { icon:'ti-target', tag:'drill', title:'Bump and Run', body:'From just off the green, grab your 9-iron, put the ball back in your stance, weight forward, hands ahead, firm wrists. Push it like a long putt. It rolls to the hole. This is your most reliable short game shot.' },
-      { icon:'ti-mood-smile', tag:'tip', title:'Tee Up on Par 3s — Always', body:'No shame, more contact, better round. Even tour pros tee it up every time. The tee exists to help you — use it on every par 3 until you\'re consistently making solid contact without it.' },
-      { icon:'ti-users', tag:'family game', title:'Count Putts This Round', body:'Just track putts today — nothing else. Try for 36 or under (2 per hole). You might surprise yourself, and it completely changes what you focus on vs the full score.' },
+      { icon:'ti-mood-smile', tag:'tip', title:'Tee Up on Par 3s, Always', body:'No shame, more contact, better round. Even tour pros tee it up every time. The tee exists to help you, use it on every par 3 until you\'re consistently making solid contact without it.' },
+      { icon:'ti-users', tag:'family game', title:'Count Putts This Round', body:'Just track putts today, nothing else. Try for 36 or under (2 per hole). You might surprise yourself, and it completely changes what you focus on vs the full score.' },
       { icon:'ti-golf', tag:'tip', title:'Three-Ball Warm-Up', body:'Every session, in this order: chip 3 balls to a practice hole, pitch 3 balls from 20 yards, putt 3 balls from 6 feet. That\'s enough. Short game first, every time. Sets your tempo for everything else.' },
-      { icon:'ti-flame', tag:'tip', title:'Happy Feet Drill', body:'After every shot, hold your finish until the ball lands — or until you could count to 3. If you\'re falling off balance, you\'re swinging too hard. Balance is the most honest feedback in golf.' },
+      { icon:'ti-flame', tag:'tip', title:'Happy Feet Drill', body:'After every shot, hold your finish until the ball lands, or until you could count to 3. If you\'re falling off balance, you\'re swinging too hard. Balance is the most honest feedback in golf.' },
       { icon:'ti-map', tag:'strategy', title:'Walk the Hole First', body:'Before you hit, walk a few steps toward the target and look at the hole. Where\'s the trouble? Where\'s the safe side? Make a plan, then forget the trouble and aim for the safe side.' },
       { icon:'ti-cards', tag:'family game', title:'No-Penalty Game', body:'For one round, pretend out-of-bounds doesn\'t exist. Play every ball where it lies, count strokes only. Takes the stress out and shows you exactly what your actual contact looks like without the penalty math.' },
-      { icon:'ti-pin', tag:'strategy', title:'Fairway Wood Off a Tee', body:'On the range today, tee up every fairway wood. Hit 10 balls and focus on solid contact only — not distance. The distance will come. Getting comfortable with the club is the whole game right now.' },
+      { icon:'ti-pin', tag:'strategy', title:'Fairway Wood Off a Tee', body:'On the range today, tee up every fairway wood. Hit 10 balls and focus on solid contact only, not distance. The distance will come. Getting comfortable with the club is the whole game right now.' },
       { icon:'ti-heart', tag:'tip', title:'Find Your Confidence Club', body:'Every golfer has one club that just feels right. Which one is yours? Hit 20 balls with it. Know what it does. That\'s your go-to under pressure, and it\'s worth knowing before you need it.' },
-      { icon:'ti-rotate', tag:'drill', title:'Ball First Drill', body:'Put a coin 2 inches behind the ball on the ground. Try to hit the ball without touching the coin. Ball first, ground second — that\'s the whole game. Do this 10 times on the range and feel the difference.' },
-      { icon:'ti-users', tag:'family game', title:'Closest to the Pin — Par 3s', body:'Every par 3 this round: mark where balls land, closest to the pin gets a point. Even if you don\'t win the hole, you can win the par 3 game. Track it separately.' },
-      { icon:'ti-chart-bar', tag:'tip', title:'Track One Stat', body:'Just fairways hit today — yes or no on every tee shot. No other stats. After the round you\'ll know exactly what percentage of the time you\'re starting holes with a clear fairway. That\'s information.' },
+      { icon:'ti-rotate', tag:'drill', title:'Ball First Drill', body:'Put a coin 2 inches behind the ball on the ground. Try to hit the ball without touching the coin. Ball first, ground second, that\'s the whole game. Do this 10 times on the range and feel the difference.' },
+      { icon:'ti-users', tag:'family game', title:'Closest to the Pin, Par 3s', body:'Every par 3 this round: mark where balls land, closest to the pin gets a point. Even if you don\'t win the hole, you can win the par 3 game. Track it separately.' },
+      { icon:'ti-chart-bar', tag:'tip', title:'Track One Stat', body:'Just fairways hit today, yes or no on every tee shot. No other stats. After the round you\'ll know exactly what percentage of the time you\'re starting holes with a clear fairway. That\'s information.' },
       { icon:'ti-leaf', tag:'tip', title:'Preferred Lies', body:'For any bad lie in the fairway, move the ball to a better spot within one club length, no closer to the hole. It\'s called preferred lies and it\'s perfectly fine for recreational rounds. Don\'t punish yourself for course conditions.' },
-      { icon:'ti-bulb', tag:'tip', title:'Three-Putt Recovery', body:'If you three-putt, it\'s not a miss — it\'s a distance control lesson. The next time from that distance: look at the hole, feel the distance, stroke it. The lesson is free.' },
+      { icon:'ti-bulb', tag:'tip', title:'Three-Putt Recovery', body:'If you three-putt, it\'s not a miss, it\'s a distance control lesson. The next time from that distance: look at the hole, feel the distance, stroke it. The lesson is free.' },
       { icon:'ti-award', tag:'family game', title:'Scramble with the Kids', body:'Everyone hits, play the best ball. This format makes you feel like a great golfer even on a tough day, and the kids love being part of choosing the shot. Real team golf.' },
-      { icon:'ti-calendar', tag:'reminder', title:'Just the Front 9', body:'If you\'re tired or short on time, play just the front 9 at full pace — no rushing, no shortcuts. Nine unhurried holes is better than 18 hurried ones every time.' },
+      { icon:'ti-calendar', tag:'reminder', title:'Just the Front 9', body:'If you\'re tired or short on time, play just the front 9 at full pace, no rushing, no shortcuts. Nine unhurried holes is better than 18 hurried ones every time.' },
       { icon:'ti-heart', tag:'reminder', title:'One Thing at a Time', body:'You don\'t have to fix everything at once. Nobody does. Pick one thing to improve this month. Own it. Then pick the next thing. That\'s exactly how every good golfer got good.' },
       { icon:'ti-map', tag:'strategy', title:'Aim for Center of Green', body:'Every approach shot today: aim for the center of the green, no exceptions. Forget the pin. A 25-footer for birdie beats a chip from a nasty lie every time. The center is always the right answer.' },
     ],
@@ -399,12 +399,12 @@
       { icon:'ti-leaf', tag:'tip', title:'First Tee Routine', body:'One practice swing, one slow breath, one clear target. That is enough preparation for every tee shot on every hole. Overthinking the first tee is what produces the first-tee shot. Keep it simple.' },
       { icon:'ti-hand-stop', tag:'tip', title:'Soft Hands', body:'Throughout the entire swing, your grip should feel as though you are holding something fragile. Tight hands create tension in the arms and shoulders. Soft hands allow the club to do its job.' },
       { icon:'ti-golf', tag:'drill', title:'9-Iron from the Fringe', body:'For most chip shots from just off the green: 9-iron, hands forward, firm wrists, and let the ball run. No need for a wedge unless there is something to carry. This is the most reliable chip in the bag.' },
-      { icon:'ti-pin', tag:'tip', title:'Ball Position Check', body:'Irons: ball in the center of your stance. Fairway wood: one ball forward of center. Driver: just inside the lead heel. These positions are worth confirming periodically — they quietly drift over time.' },
+      { icon:'ti-pin', tag:'tip', title:'Ball Position Check', body:'Irons: ball in the center of your stance. Fairway wood: one ball forward of center. Driver: just inside the lead heel. These positions are worth confirming periodically, they quietly drift over time.' },
       { icon:'ti-clock', tag:'strategy', title:'Pace Yourself After the Turn', body:'Most rounds are won or lost on the back nine, not the front. Take your time at the halfway point. A few minutes to sit, drink water, and reset your mind is worth at least two strokes on the back nine.' },
       { icon:'ti-arrow-right', tag:'strategy', title:'The Best Recovery Shot', body:'When in trouble: one more club than you think, swing easier than you want to, aim for the center of the green. The goal of a recovery shot is to be on the green, not to make up for the missed shot.' },
       { icon:'ti-circle-check', tag:'reminder', title:'Permission to Pick Up', body:'Give yourself full permission to pick up if a hole is going sideways. It protects your enjoyment of the rest of the round. No score is worth carrying the weight of a bad hole to the next tee.' },
-      { icon:'ti-repeat', tag:'drill', title:'6-Foot Putt Drill', body:'Make three putts in a row from the same spot at 6 feet. Then move to a new spot and repeat. The goal is to build confidence deliberately — not to practice missing from different locations.' },
-      { icon:'ti-bulb', tag:'tip', title:'Notice What Feels Easy', body:'Today, notice which shots feel genuinely easy — natural, unhurried, well-struck. That ease is exactly what you are trying to repeat. Your best golf happens when you are not trying to fix anything.' },
+      { icon:'ti-repeat', tag:'drill', title:'6-Foot Putt Drill', body:'Make three putts in a row from the same spot at 6 feet. Then move to a new spot and repeat. The goal is to build confidence deliberately, not to practice missing from different locations.' },
+      { icon:'ti-bulb', tag:'tip', title:'Notice What Feels Easy', body:'Today, notice which shots feel genuinely easy, natural, unhurried, well-struck. That ease is exactly what you are trying to repeat. Your best golf happens when you are not trying to fix anything.' },
       { icon:'ti-list', tag:'tip', title:'Warm Up in Order', body:'A reliable pre-round routine: ten chips to a practice hole, ten putts from 6 feet, two easy driver swings. In that order, always. Starting with the short game sets the right tempo for everything that follows.' },
     ],
   };
@@ -436,13 +436,13 @@
       </div>`;
   }
 
-  // ── CADDIE — swap this URL after deploying the Cloudflare Worker ──────────
+  // ── CADDIE, swap this URL after deploying the Cloudflare Worker ──────────
   // Deploy: cd caddie-worker && wrangler secret put ANTHROPIC_API_KEY && wrangler deploy
   // Then replace the URL below with your workers.dev URL (or caddie.spinvibes.com)
-  const CADDIE_URL    = 'https://spinvibes-caddie.spinvibes.workers.dev'; // Cloudflare Worker — key stored as CF secret
+  const CADDIE_URL    = 'https://spinvibes-caddie.spinvibes.workers.dev'; // Cloudflare Worker, key stored as CF secret
   const WORKER_SECRET = 'sv-golf-2026-xK9mPqR4nBzT'; // Must match WORKER_SECRET set via: wrangler secret put WORKER_SECRET
 
-  // ── SUPABASE — wrapped safely so CDN failure can't crash the whole script ──
+  // ── SUPABASE, wrapped safely so CDN failure can't crash the whole script ──
   const SUPABASE_URL  = 'https://zairvjyiwhajsulefyoi.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphaXJ2anlpd2hhanN1bGVmeW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMDkxODAsImV4cCI6MjA5MTY4NTE4MH0.AAdJfqSGHMergPgL4tEoBMn0Wr5d8D1NuxhPMonp_60';
   let _sb = null;
@@ -450,7 +450,7 @@
     if (typeof supabase !== 'undefined') {
       _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     } else {
-      console.warn('[SpinVibes] Supabase SDK not loaded — offline / CDN miss');
+      console.warn('[SpinVibes] Supabase SDK not loaded, offline / CDN miss');
     }
   } catch(e) {
     console.warn('[SpinVibes] Supabase init error:', e.message);
@@ -668,11 +668,11 @@
     document.getElementById('btnGrandma').classList.toggle('active', isGrandma);
     document.getElementById('btnMom')    .classList.toggle('active', isMom);
     localStorage.setItem('sv-profile', who);
-    // Short Game shows for all profiles — content adapts per profile
+    // Short Game shows for all profiles, content adapts per profile
     // (no hiding needed)
-    // Strip pre-render classes — JS owns display state from here
+    // Strip pre-render classes, JS owns display state from here
     document.documentElement.classList.remove('pre-son', 'pre-girl', 'pre-grandma', 'pre-mom');
-    // Progress page removed — no session/notes rendering needed
+    // Progress page removed, no session/notes rendering needed
   }
 
   function showApp() {
@@ -696,7 +696,7 @@
   }
 
   function enterProfile(who) {
-    // Called from landing page cards — fade landing out, show app
+    // Called from landing page cards, fade landing out, show app
     sessionStorage.setItem('sv-session', '1'); // mark session active
     applyProfile(who);
     document.getElementById('app').style.display = 'flex';
@@ -708,7 +708,7 @@
   }
 
   function switchProfile(who) {
-    // Called from topbar pills — stay in app, no landing
+    // Called from topbar pills, stay in app, no landing
     applyProfile(who);
     document.querySelectorAll('.exp-trigger.open').forEach(t => t.classList.remove('open'));
     document.querySelectorAll('.exp-body.open').forEach(b => b.classList.remove('open'));
@@ -717,7 +717,7 @@
   }
 
   function goToLanding() {
-    // Strip !important pre-render classes FIRST — otherwise they block
+    // Strip !important pre-render classes FIRST, otherwise they block
     // landing.style.display = 'flex' (CSS !important beats inline styles)
     document.documentElement.classList.remove('has-profile', 'pre-son', 'pre-girl', 'pre-grandma', 'pre-mom');
     document.body.classList.remove('son-mode', 'girl-mode', 'grandma-mode', 'mom-mode');
@@ -734,12 +734,12 @@
     const saved = localStorage.getItem('sv-profile');
     const inSession = sessionStorage.getItem('sv-session');
     if (saved && inSession) {
-      // Same session + known profile — skip landing (e.g. page reload mid-session)
+      // Same session + known profile, skip landing (e.g. page reload mid-session)
       showApp();
       applyProfile(saved);
       showPage('home');
     }
-    // else: fresh tab or first visit — landing stays visible
+    // else: fresh tab or first visit, landing stays visible
   }
 
 
@@ -875,7 +875,7 @@
     const el = document.getElementById('grandma-sessionHistory');
     if (!el) return;
     if (!sessions.length) {
-      el.innerHTML = '<div style="font-size:0.82rem;color:var(--muted);text-align:center;padding:20px 0;">No sessions yet.<br>Get out there — you\'ve got this! 💜</div>';
+      el.innerHTML = '<div style="font-size:0.82rem;color:var(--muted);text-align:center;padding:20px 0;">No sessions yet.<br>Get out there, you\'ve got this! 💜</div>';
       return;
     }
     el.innerHTML = sessions.map(s => {
@@ -914,15 +914,15 @@
   // ── RANGE SESSION FOCUS ──────────────────────────────────────
   const _FOCUS_KEY = 'sv-range-focus';
   const _FOCUS_SUGGESTIONS = [
-    'Hip fire before arms — initiate with hips',
-    'Ball-first contact — divot after the ball',
-    '70% tempo, full finish — don\'t muscle it',
+    'Hip fire before arms, initiate with hips',
+    'Ball-first contact, divot after the ball',
+    '70% tempo, full finish, don\'t muscle it',
     'Keep head still through impact',
     'Driver: sweep up off the tee',
     'Grip pressure: light, no squeezing',
-    'Bump-and-run chipping — land and let it run',
-    'Lag putt speed control — 3-foot tap-in zone',
-    'One swing thought only — commit fully',
+    'Bump-and-run chipping, land and let it run',
+    'Lag putt speed control, 3-foot tap-in zone',
+    'One swing thought only, commit fully',
     '4-Hybrid: 70% swing, let it release',
   ];
 
@@ -934,7 +934,7 @@
     const display = document.getElementById('range-focus-display');
     if (!display) return;
     if (!data.items || !data.items.length) {
-      display.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;font-style:italic;">No focus set — tap Edit to pick what to work on today.</div>`;
+      display.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;font-style:italic;">No focus set, tap Edit to pick what to work on today.</div>`;
       return;
     }
     display.innerHTML = data.items.map((item, i) => `
@@ -1226,14 +1226,14 @@
   }
 
   // ── BUILD VERSION / CACHE BUSTER ─────────────────────────────
-  // Bump BUILD_ID with every deploy. App checks on load — if version
+  // Bump BUILD_ID with every deploy. App checks on load, if version
   // changed, SW caches are cleared and page reloads. localStorage
   // (logs, notes, profile) is never touched.
   const BUILD_ID = '2026-05-26-v39';
   (function checkBuild() {
     const prev = localStorage.getItem('sv-build');
     if (prev && prev !== BUILD_ID) {
-      // New version detected — nuke SW caches silently then reload
+      // New version detected, nuke SW caches silently then reload
       localStorage.setItem('sv-build', BUILD_ID);
       if ('caches' in window) {
         caches.keys()
@@ -1248,7 +1248,7 @@
       } else {
         location.reload(true);
       }
-      return; // stop — reload is coming
+      return; // stop, reload is coming
     }
     localStorage.setItem('sv-build', BUILD_ID);
   })();
@@ -1275,7 +1275,7 @@
   renderKidLevelCard('girl', null);  // show level card immediately
 
   // Sprint 3: load user profile from Supabase (overrides PIN, clubs, etc.)
-  // Non-blocking — app works fine if this fails (no signal, tables not yet created)
+  // Non-blocking, app works fine if this fails (no signal, tables not yet created)
   loadUserProfile()
     .then(() => {
       // Re-render bag table if it's open so Supabase-loaded distances show immediately
@@ -1284,16 +1284,16 @@
     })
     .catch(e => console.warn('[SpinVibes] Profile load error:', e));
 
-  // Load best round for home hero — non-blocking, silent on failure
+  // Load best round for home hero, non-blocking, silent on failure
   loadDadBestRoundFromSupabase();
 
   // Render daily brief on initial load
   renderDailyBrief(currentProfile);
 
 
-  // ── CLUB SYSTEM — defined at top of file (see line ~20) ──────
+  // ── CLUB SYSTEM, defined at top of file (see line ~20) ──────
 
-  // ── ACHIEVEMENT BADGE SYSTEM — defined at top of file (see line ~20) ──────
+  // ── ACHIEVEMENT BADGE SYSTEM, defined at top of file (see line ~20) ──────
 
   function renderBadges(rounds, accentColor) {
     const color = accentColor || '#3B7CB8';
@@ -1375,7 +1375,7 @@
     return `${shieldHtml}
       <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:${color};margin-bottom:8px;">ACHIEVEMENTS</div>
       <div class="badge-shelf" style="margin-bottom:4px;">${autoBadgeHtml}</div>
-      <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-top:14px;margin-bottom:8px;">SPECIAL MOMENTS ${isAdmin ? '<span style="font-size:0.55rem;opacity:0.6;font-weight:400;letter-spacing:0;text-transform:none;">— tap to award</span>' : ''}</div>
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-top:14px;margin-bottom:8px;">SPECIAL MOMENTS ${isAdmin ? '<span style="font-size:0.55rem;opacity:0.6;font-weight:400;letter-spacing:0;text-transform:none;">tap to award</span>' : ''}</div>
       <div class="badge-shelf" style="margin-bottom:4px;">${manualBadgeHtml}</div>
       <div style="font-size:0.6rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-top:14px;margin-bottom:8px;">SHARED BADGES</div>
       ${renderBadges(rounds, color)}`;
@@ -1581,7 +1581,7 @@
     const name = who === 'son' ? 'Son' : 'Daughter';
     showToast(name + '\'s range session logged!', 'gold');
     // Auto-check if challenge now met
-    const rounds = who === 'son' ? _dadLoadedRounds : []; // best effort — challenge check uses localStorage
+    const rounds = who === 'son' ? _dadLoadedRounds : []; // best effort, challenge check uses localStorage
     autoCheckChallenge(who, rounds);
     // Re-render level card
     if (who === 'son') loadSonRoundsAndRender();
@@ -1627,12 +1627,12 @@
         <div style="width:100%;background:var(--surface);border-radius:20px 20px 0 0;padding:24px 20px 32px;max-height:90vh;overflow-y:auto;">
           <div style="width:36px;height:4px;background:var(--muted);border-radius:2px;margin:0 auto 20px;opacity:0.4;"></div>
           <div style="font-size:0.65rem;font-weight:700;letter-spacing:2px;color:${def.color};margin-bottom:4px;">${qs.title.toUpperCase()}</div>
-          <div style="font-size:1rem;font-weight:700;color:var(--cream);margin-bottom:6px;">${name} — Level ${level}→${level+1}</div>
+          <div style="font-size:1rem;font-weight:700;color:var(--cream);margin-bottom:6px;">${name}, Level ${level}→${level+1}</div>
           <div style="font-size:0.8rem;color:var(--muted);margin-bottom:20px;">${qs.subtitle}</div>
           ${qHtml}
           ${allAnswered ? `
             <div style="margin:16px 0;padding:12px 16px;background:${score>=(qs.passing||3)?'#22c55e18':'#ef444418'};border-radius:10px;border:1px solid ${score>=(qs.passing||3)?'#22c55e40':'#ef444440'};">
-              <div style="font-size:0.78rem;font-weight:700;color:${score>=(qs.passing||3)?'#22c55e':'#ef4444'};">${score}/${qs.questions.length} — ${score>=(qs.passing||3)?'Ready to level up!':'Not quite yet — keep going'}</div>
+              <div style="font-size:0.78rem;font-weight:700;color:${score>=(qs.passing||3)?'#22c55e':'#ef4444'};">${score}/${qs.questions.length}, ${score>=(qs.passing||3)?'Ready to level up!':'Not quite yet, keep going'}</div>
               ${score<(qs.passing||3)?'<div style="font-size:0.75rem;color:var(--muted);margin-top:4px;">Check back after a few more sessions.</div>':''}
             </div>
             <button onclick="saveKidCheckin('${who}', ${score})"
@@ -1668,7 +1668,7 @@
     document.getElementById('kid-checkin-overlay')?.remove();
     const name = who === 'son' ? 'Son' : 'Daughter';
     if (score >= 3) showToast(name + '\'s Level ' + (level+1) + ' check-in passed!', 'gold');
-    else showToast('Check-in saved — keep working toward it!');
+    else showToast('Check-in saved, keep working toward it!');
     if (who === 'son') loadSonRoundsAndRender();
     if (who === 'girl') loadGirlRoundsAndRender();
   }
@@ -1709,7 +1709,7 @@
 
   function suggestClub(yards) {
     if (!yards || yards < 1) return null;
-    // Driver excluded from approach suggestions — 7-Wood IS available for long layups (170+ yds)
+    // Driver excluded from approach suggestions, 7-Wood IS available for long layups (170+ yds)
     const approachClubs = getActiveClubs().filter(c => c.name !== 'Driver');
     const ranked = approachClubs.map(c => ({ ...c, avg: getClubDist(c.name) }))
                                 .sort((a, b) => a.avg - b.avg);
@@ -1717,10 +1717,10 @@
     // Sorted ascending so goodFit[0] is always the shortest sufficient club
     const goodFit = ranked.filter(c => c.avg >= yards && c.avg <= yards + 40);
     if (goodFit.length) return goodFit[0];
-    // Can reach (might be significant overkill) — still pick shortest available
+    // Can reach (might be significant overkill), still pick shortest available
     const canReach = ranked.filter(c => c.avg >= yards);
     if (canReach.length) return canReach[0];
-    // Nothing can reach — return the longest club available
+    // Nothing can reach, return the longest club available
     return ranked[ranked.length - 1];
   }
 
@@ -1732,24 +1732,24 @@
 
     // Swing tips by club type
     const tips = {
-      'Driver':   'tee low, ball forward off lead instep, sweep up — 60–70% tempo',
-      '7-Wood':   'ball just inside lead instep, sweep through, 80% tempo — let it release',
-      '4-Hybrid': 'ball lead-of-center, sweep with hip fire — 70% swing, let it run',
+      'Driver':   'tee low, ball forward off lead instep, sweep up, 60–70% tempo',
+      '7-Wood':   'ball just inside lead instep, sweep through, 80% tempo, let it release',
+      '4-Hybrid': 'ball lead-of-center, sweep with hip fire, 70% swing, let it run',
       '5-iron':   'ball lead-of-center, weight forward, compress',
       '6-iron':   'ball center-to-lead, divot after the ball, full finish',
-      '7-iron':   'ball center, weight shifts to lead side — divot right of ball',
+      '7-iron':   'ball center, weight shifts to lead side, divot right of ball',
       '8-iron':   'ball center, hands forward, ball-first contact',
-      '9-iron':   'ball center, trust the loft — hit down, let it fly',
-      'PW':       'ball center, hands ahead, 80% swing — distance control over power',
-      'GW':       '70–90 yds zone — find your reliable carry, don\'t max it',
+      '9-iron':   'ball center, trust the loft, hit down, let it fly',
+      'PW':       'ball center, hands ahead, 80% swing, distance control over power',
+      'GW':       '70–90 yds zone, find your reliable carry, don\'t max it',
       'SW':       'ball center-to-forward, light grip, accelerate through',
-      'LW':       'ball forward, open face slightly, hinge and hold — soft landing',
+      'LW':       'ball forward, open face slightly, hinge and hold, soft landing',
     };
     const swingTip = tips[club.name] || '';
 
-    if (avg < yards) return `max club — ${yards - avg} yds short · aim at front, let it run`;
+    if (avg < yards) return `max club, ${yards - avg} yds short · aim at front, let it run`;
     if (n === 0)   return `default estimate · ${swingTip}`;
-    if (diff <= 5) return `tight fit — one more club? · ${swingTip}`;
+    if (diff <= 5) return `tight fit, one more club? · ${swingTip}`;
     return `avg ${avg} yds · ${diff > 0 ? diff + ' yds buffer' : 'right on'} · ${swingTip}`;
   }
 
@@ -1778,7 +1778,7 @@
     try {
       _wakeLock = await navigator.wakeLock.request('screen');
       _wakeLock.addEventListener('release', () => { _wakeLock = null; });
-    } catch(e) { /* silently ignore — not critical */ }
+    } catch(e) { /* silently ignore, not critical */ }
   }
   function _releaseWakeLock() {
     if (_wakeLock) { _wakeLock.release(); _wakeLock = null; }
@@ -1793,7 +1793,7 @@
 
   function markBall() {
     if (!_currentPos) {
-      // No GPS — apply manually typed yardage if present
+      // No GPS, apply manually typed yardage if present
       const inp = document.getElementById('live-yardage-input');
       if (inp && inp.value) {
         setManualYards(inp.value);
@@ -1801,7 +1801,7 @@
         if (btn) btn.classList.add('marked');
         showToast('Yardage set ✓');
       } else {
-        showToast('No GPS — type yardage in the field above', 'error');
+        showToast('No GPS, type yardage in the field above', 'error');
       }
       return;
     }
@@ -1871,7 +1871,7 @@
     if (!el) return;
     const suggested = suggestClub(yards);
     const note = suggested ? clubNote(suggested, yards) : '';
-    // All clubs except Driver — reversed so SHORT clubs are LEFT, LONG clubs RIGHT
+    // All clubs except Driver, reversed so SHORT clubs are LEFT, LONG clubs RIGHT
     // This matches the slider direction (30 yds = left, 250 yds = right)
     const approachClubs = [...getActiveClubs().filter(c => c.name !== 'Driver')].reverse();
 
@@ -1964,7 +1964,7 @@
           <div class="live-yards" id="live-yards" style="font-size:3rem;line-height:1;">—</div>
           <div style="font-size:0.85rem;color:var(--muted);padding-bottom:4px;">yds</div>
         </div>
-        <!-- Slider — 30 to 250, step 5, one-handed thumb drag -->
+        <!-- Slider, 30 to 250, step 5, one-handed thumb drag -->
         <input type="range" id="live-yardage-slider" min="30" max="250" step="5"
           value="${_manualYards || 150}"
           style="width:100%;accent-color:var(--gold);height:6px;cursor:pointer;touch-action:none;margin-bottom:10px;"
@@ -2013,7 +2013,7 @@
         </div>
       </div>
 
-      <!-- HOLE PHOTO — always visible, not buried in details -->
+      <!-- HOLE PHOTO, always visible, not buried in details -->
       <input type="file" id="dh-photo-input" accept="image/*" style="display:none;" onchange="dadHolePhotoSelected(this)">
       <div id="dh-photo-wrap" style="margin-bottom:12px;">
         ${h.photo
@@ -2033,7 +2033,7 @@
       <div style="margin-bottom:16px;">
         <button onclick="toggleDadLiveCaddie()" id="dad-live-caddie-toggle"
           style="width:100%;background:var(--surface2);border:1px solid rgba(212,168,67,0.25);border-radius:10px;padding:12px 16px;color:var(--gold-l);font-size:0.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;">
-          <span><i class="ti ti-message-circle" style="font-size:0.9rem;vertical-align:-1px;margin-right:6px;"></i>Ask Caddie — Hole ${h.hole}, Par ${h.par}</span>
+          <span><i class="ti ti-message-circle" style="font-size:0.9rem;vertical-align:-1px;margin-right:6px;"></i>Ask Caddie, Hole ${h.hole}, Par ${h.par}</span>
           <span id="dad-live-caddie-caret">${_dadLiveCaddieOpen ? '▲' : '▼'}</span>
         </button>
         <div id="dad-live-caddie-panel" style="display:${_dadLiveCaddieOpen ? 'block' : 'none'};background:var(--surface);border:1px solid rgba(212,168,67,0.15);border-top:none;border-radius:0 0 10px 10px;padding:12px 14px;">
@@ -2051,7 +2051,7 @@
 
     `;
 
-    // Populate the fixed footer — single row: CARD | − | score | + | NEXT HOLE
+    // Populate the fixed footer, single row: CARD | − | score | + | NEXT HOLE
     const footer = document.getElementById('dad-modal-footer');
     if (footer) {
       footer.style.display = '';
@@ -2075,7 +2075,7 @@
         </div>
         <button onclick="confirmExitRound()"
           style="width:100%;background:none;border:1px solid rgba(192,57,43,0.35);border-radius:10px;padding:9px;color:rgba(192,57,43,0.8);font-size:0.78rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;">
-          EXIT ROUND — Progress saved, tap to confirm
+          EXIT ROUND, Progress saved, tap to confirm
         </button>
       `;
     }
@@ -2318,42 +2318,42 @@
   const COURSES = [
     // ── Temecula Creek Inn ─────────────────────────────────────
     // Source: physical scorecard. Creek = front 9, Stonehouse = back 9.
-    { name: 'TCI — Creek + Stonehouse', par: 71, holes: 18, teeColor: 'Sage',
+    { name: 'TCI, Creek + Stonehouse', par: 71, holes: 18, teeColor: 'Sage',
       rating: 67.4, slope: 124,
       holePars:  [4,3,4,5,4,4,3,5,4, 4,4,4,4,3,4,4,3,5],
       yardages:  [333,150,323,492,349,367,163,453,334, 350,311,335,299,143,321,305,132,480],
     },
-    { name: 'TCI — Creek (9 holes)', par: 36, holes: 9, teeColor: 'Sage',
+    { name: 'TCI, Creek (9 holes)', par: 36, holes: 9, teeColor: 'Sage',
       holePars:  [4,3,4,5,4,4,3,5,4],
       yardages:  [333,150,323,492,349,367,163,453,334],
     },
-    { name: 'TCI — Stonehouse (9 holes)', par: 35, holes: 9, teeColor: 'Sage',
+    { name: 'TCI, Stonehouse (9 holes)', par: 35, holes: 9, teeColor: 'Sage',
       holePars:  [4,4,4,4,3,4,4,3,5],
       yardages:  [350,311,335,299,143,321,305,132,480],
     },
     // Source: physical scorecard. Creek = front 9 (C10-C18), Oaks = back 9 (O1-O9). Sage tees.
-    { name: 'TCI — Creek + Oaks', par: 72, holes: 18, teeColor: 'Sage',
+    { name: 'TCI, Creek + Oaks', par: 72, holes: 18, teeColor: 'Sage',
       rating: 67.4, slope: 124,
       holePars:  [4,3,4,5,4,4,3,5,4, 4,5,3,4,4,3,5,4,4],
       yardages:  [315,150,323,492,349,367,163,453,334, 300,475,140,385,365,110,438,363,333],
     },
     // Oaks front 9, then Creek back 9 (this weekend's rotation)
-    { name: 'TCI — Oaks + Creek', par: 72, holes: 18, teeColor: 'Sage',
+    { name: 'TCI, Oaks + Creek', par: 72, holes: 18, teeColor: 'Sage',
       rating: 67.4, slope: 124,
       holePars:  [4,5,3,4,4,3,5,4,4, 4,3,4,5,4,4,3,5,4],
       yardages:  [300,475,140,385,365,110,438,363,333, 315,150,323,492,349,367,163,453,334],
     },
-    { name: 'TCI — Oaks (9 holes)', par: 36, holes: 9, teeColor: 'Sage',
+    { name: 'TCI, Oaks (9 holes)', par: 36, holes: 9, teeColor: 'Sage',
       holePars:  [4,5,3,4,4,3,5,4,4],
       yardages:  [300,475,140,385,365,110,438,363,333],
     },
     // ── Other local courses ────────────────────────────────────
     { name: 'Pechanga Golf Course', par: 72, holes: 18 },
-    { name: 'Welk Resort — Fountains Course', par: 62, holes: 18, teeColor: 'Resort',
+    { name: 'Welk Resort, Fountains Course', par: 62, holes: 18, teeColor: 'Resort',
       holePars: [3,4,3,3,4,3,4,3,4, 4,3,4,3,3,3,4,3,4],
       yardages: [132,250,102,145,290,152,288,133,303, 219,119,282,169,137,172,192,110,268],
     },
-    { name: 'Welk Resort — Oaks Course (Par 3)', par: 54, holes: 18, teeColor: 'Blue',
+    { name: 'Welk Resort, Oaks Course (Par 3)', par: 54, holes: 18, teeColor: 'Blue',
       holePars:  [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],
       yardages:  [90,101,107,86,92,110,88,83,127,121,80,110,91,105,91,73,83,126],
     },
@@ -2448,7 +2448,7 @@
     const activeClubs = getActiveClubs();
     body.innerHTML = activeClubs.map((c, i) => {
       const hits   = saved[c.name + '_n'] || 0;
-      // Always use confirmed distance from Settings/Supabase (c.dist) — never let old logged data override
+      // Always use confirmed distance from Settings/Supabase (c.dist), never let old logged data override
       const carry  = c.dist;
       const isLast = i === activeClubs.length - 1;
       const nameCell = c.wedge ? `<strong>${c.display}</strong>` : c.display;
@@ -2595,7 +2595,7 @@
     updatePinDots('grandma', _grandmaPin.length);
   }
 
-  // Mom round storage (localStorage — simple, no Supabase table yet)
+  // Mom round storage (localStorage, simple, no Supabase table yet)
   function openMomRoundModal() {
     document.getElementById('mom-round-date').value = new Date().toISOString().split('T')[0];
     document.getElementById('mom-round-course').value = '';
@@ -2622,7 +2622,7 @@
     const el = document.getElementById('mom-rounds-list');
     if (!el) return;
     if (rounds.length === 0) {
-      el.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0;">No rounds yet — tap Log a Round to start.</div>';
+      el.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0;">No rounds yet, tap Log a Round to start.</div>';
       return;
     }
     el.innerHTML = rounds.map(r => `
@@ -2674,7 +2674,7 @@
     const el = document.getElementById('grandma-rounds-list');
     if (!el) return;
     if (rounds.length === 0) {
-      el.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0;">No rounds yet — tap Log a Round to start.</div>';
+      el.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;text-align:center;padding:20px 0;">No rounds yet, tap Log a Round to start.</div>';
       return;
     }
     el.innerHTML = rounds.map(r => `
@@ -2704,7 +2704,7 @@
     const listEl = document.getElementById('dad-history-list');
     listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;"><i class="ti ti-loader-2" style="font-size:1.1rem;vertical-align:-2px;"></i> Loading your rounds…</div>';
     if (!_sb) {
-      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:0.85rem;">Supabase SDK not loaded — reload the page</div>';
+      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:0.85rem;">Supabase SDK not loaded, reload the page</div>';
       return;
     }
     try {
@@ -2721,7 +2721,7 @@
   // Helper: is this a regulation 18-hole round?
   // Checks explicit round_type first (new rounds), falls back to course_par inference (legacy)
   function isRegulationRound(r) {
-    if ((r.course_par || 0) < 65) return false; // safety net — par-3/exec always excluded
+    if ((r.course_par || 0) < 65) return false; // safety net, par-3/exec always excluded
     if (r.round_type) return r.round_type === 'regulation_18';
     return true; // legacy rounds with course_par >= 65 assumed regulation
   }
@@ -2744,7 +2744,7 @@
     const statsBar = document.getElementById('dad-stats-bar');
     if (!rounds || rounds.length === 0) { rounds = []; }
     statsBar.style.display = 'none';
-    // Stats — scored rounds only (all non-practice for history display)
+    // Stats, scored rounds only (all non-practice for history display)
     const scoredRounds = rounds.filter(r => !r.is_practice);
     // Best/avg only count regulation 18-hole rounds (par 60+)
     const regulationRounds = scoredRounds.filter(r => isRegulationRound(r));
@@ -2765,7 +2765,7 @@
       if (homeBestEl) {
         const bd = new Date(best.date_played + 'T12:00:00');
         const bLabel = bd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        homeBestEl.textContent = `Best: ${best.total_score} — ${bLabel}`;
+        homeBestEl.textContent = `Best: ${best.total_score}, ${bLabel}`;
       }
 
       // Per-round hole stats
@@ -2858,7 +2858,7 @@
         ${renderBadges(scoredRounds, '#D4A843')}
       </div>` : '';
 
-    // Legacy hardcoded cards removed — all rounds now loaded from Supabase
+    // Legacy hardcoded cards removed, all rounds now loaded from Supabase
     const legacyCards = '';
 
     listEl.innerHTML = dadBadgesHtml + rounds.map((r, idx) => {
@@ -2985,7 +2985,7 @@
       el.innerHTML = `
         <div style="background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px;">
           <div style="font-size:0.58rem;font-weight:700;letter-spacing:2px;color:var(--muted);margin-bottom:6px;">HANDICAP INDEX</div>
-          <div style="font-size:0.82rem;color:var(--muted);line-height:1.5;">No eligible rounds yet — play a regulation 18 at TCI to start tracking your index.</div>
+          <div style="font-size:0.82rem;color:var(--muted);line-height:1.5;">No eligible rounds yet, play a regulation 18 at TCI to start tracking your index.</div>
         </div>`;
       return;
     }
@@ -3108,7 +3108,7 @@
       const avg = bc.totalVsPar / bc.count;
       const avgStr = avg >= 0 ? '+' + avg.toFixed(1) : avg.toFixed(1);
       return `<div style="margin-bottom:12px;padding:8px 12px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:8px;font-size:0.8rem;line-height:1.4;">
-        <i class="ti ti-trophy" style="color:var(--green);font-size:0.9rem;vertical-align:-1px;"></i> <strong style="color:var(--green);">Best club:</strong> ${bestClub} — avg <strong style="color:var(--green);">${avgStr}</strong> vs par over ${bc.count} approach${bc.count !== 1 ? 'es' : ''}
+        <i class="ti ti-trophy" style="color:var(--green);font-size:0.9rem;vertical-align:-1px;"></i> <strong style="color:var(--green);">Best club:</strong> ${bestClub}, avg <strong style="color:var(--green);">${avgStr}</strong> vs par over ${bc.count} approach${bc.count !== 1 ? 'es' : ''}
       </div>`;
     })() : '';
 
@@ -3212,7 +3212,7 @@
     const tipMap = {
       left:   'You miss left. Aim slightly right of target, avoid pins tucked left.',
       right:  'You miss right. Aim slightly left of target, avoid pins tucked right.',
-      center: 'Solid direction — keep tracking to confirm the pattern.',
+      center: 'Solid direction, keep tracking to confirm the pattern.',
     };
     const tip = tipMap[dominantDir];
 
@@ -3279,7 +3279,7 @@
   // ── BEST ROUND (dynamic) ──────────────────────────────────────
   function refreshDadBestRound(rounds) {
     // rounds = already-loaded array (avoids second network call)
-    // Only regulation rounds count — exclude par-3/exec and practice
+    // Only regulation rounds count, exclude par-3/exec and practice
     const regulation = rounds.filter(r => !r.is_practice && r.total_score > 0 && isRegulationRound(r));
     if (!regulation.length) return;
     const best = regulation.reduce((a, b) => a.total_score <= b.total_score ? a : b);
@@ -3287,7 +3287,7 @@
     if (!el) return;
     const d = new Date(best.date_played + 'T12:00:00');
     const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    el.textContent = `Best: ${best.total_score} — ${dateStr}`;
+    el.textContent = `Best: ${best.total_score}, ${dateStr}`;
   }
 
   async function loadDadBestRoundFromSupabase() {
@@ -3300,7 +3300,7 @@
         .eq('is_practice', false)
         .order('total_score', { ascending: true });
       if (data && data.length) refreshDadBestRound(data);
-    } catch(e) { /* silent — home hero keeps loading fallback */ }
+    } catch(e) { /* silent, home hero keeps loading fallback */ }
   }
 
   async function confirmDeleteDadRound(id) {
@@ -3310,7 +3310,7 @@
       showToast('Round deleted');
       loadDadRoundsAndRender();
     } catch(e) {
-      showToast('Delete failed — check your signal', 'error');
+      showToast('Delete failed, check your signal', 'error');
     }
   }
 
@@ -3340,7 +3340,7 @@
             <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1rem;color:var(--cream);width:28px;flex-shrink:0;">H${h.hole}</div>
             <div style="font-size:0.7rem;color:var(--muted);width:22px;flex-shrink:0;text-align:right;">p${h.par}</div>
             <select id="rem-club-${i}" style="flex:1;min-width:0;">
-              <option value="">— none —</option>
+              <option value="">none —</option>
               ${clubOptions.filter(c => c).map(c =>
                 `<option value="${c}"${h.approach_club === c ? ' selected' : ''}>${c}</option>`
               ).join('')}
@@ -3386,7 +3386,7 @@
       closeRoundEditModal();
       loadDadRoundsAndRender();
     } catch(e) {
-      showToast('Save failed — ' + (e?.message || 'check signal'), 'error');
+      showToast('Save failed, ' + (e?.message || 'check signal'), 'error');
     }
   }
 
@@ -3402,7 +3402,7 @@
       renderSonHistory(rounds);
     } catch(e) {
       renderKidLevelCard('son', []);
-      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:0.85rem;">Could not connect — check your signal</div>';
+      listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:0.85rem;">Could not connect, check your signal</div>';
     }
   }
 
@@ -3450,7 +3450,7 @@
       showToast('Round deleted');
       loadSonRoundsAndRender();
     } catch(e) {
-      showToast('Delete failed — check your signal', 'error');
+      showToast('Delete failed, check your signal', 'error');
     }
   }
 
@@ -3465,7 +3465,7 @@
       renderKidLevelCard('girl', rounds);
       checkAutoLevelUp('girl', rounds);
       if (!rounds || rounds.length === 0) {
-        el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet — join a Family Round to get started.</div>';
+        el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:0.85rem;">No rounds yet, join a Family Round to get started.</div>';
         return;
       }
       const girlBadgesHtml = `<div style="margin-bottom:16px;">${renderKidBadges('girl', rounds, '#B85490')}</div>`;
@@ -3493,7 +3493,7 @@
           </div>`;
       }).join('');
     } catch(e) {
-      el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:0.85rem;">Could not connect — check your signal</div>';
+      el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red);font-size:0.85rem;">Could not connect, check your signal</div>';
     }
   }
 
@@ -3504,7 +3504,7 @@
       showToast('Round deleted');
       loadGirlRoundsAndRender();
     } catch(e) {
-      showToast('Delete failed — check your signal', 'error');
+      showToast('Delete failed, check your signal', 'error');
     }
   }
 
@@ -3524,7 +3524,7 @@
     document.body.style.top = `-${scrollY}px`;
     document.body.style.width = '100%';
     // .page has a `transform` (for page-switch animation) which creates a new
-    // containing block for position:fixed descendants — #dad-modal lives inside
+    // containing block for position:fixed descendants, #dad-modal lives inside
     // .page.dad-progress, so without this the modal positions relative to .page
     // and the Round History list bleeds through behind the CARD view. Neutralize
     // the transform for the duration of the modal.
@@ -3590,7 +3590,7 @@
     if (f) f.style.display = 'none';
     _unlockBodyScroll();
     _releaseWakeLock();
-    // Draft is intentionally kept — user may want to resume later.
+    // Draft is intentionally kept, user may want to resume later.
     // It is cleared automatically on successful save or when they start a fresh round.
     _refreshDadResumeBanner();
   }
@@ -3599,7 +3599,7 @@
     // Only show confirm dialog if a round is actually in progress (hole > 0)
     const inRound = typeof _dadCurrentHole !== 'undefined' && _dadCurrentHole > 0;
     if (!inRound) { closeDadModal(); return; }
-    if (confirm('Exit this round? Your progress is saved — you can resume from My Game.')) {
+    if (confirm('Exit this round? Your progress is saved, you can resume from My Game.')) {
       closeDadModal();
     }
   }
@@ -3671,7 +3671,7 @@
       if(!resp.ok||data.error){if(st)st.textContent=data.error||'Search failed';return;}
       const courses=data.courses||[];
       if(!courses.length){if(st)st.textContent='No courses found';return;}
-      if(st)st.textContent=courses.length+' found — tap to select';
+      if(st)st.textContent=courses.length+' found, tap to select';
       re.innerHTML=courses.map(c=>{
         const loc=[c.city,c.state].filter(Boolean).join(', ');
         const courseLine = c.course ? '<div style="font-size:0.82rem;color:var(--gold);font-weight:600;margin-top:1px;">'+c.course+'</div>' : '';
@@ -3685,7 +3685,7 @@
   }
 
   // Temecula Creek fix: GolfCourseAPI has no "Sage" tee for this course (only
-  // Blue/White/Red, none matching Jeremy's physical scorecard — confirmed by
+  // Blue/White/Red, none matching Jeremy's physical scorecard, confirmed by
   // probing /course-detail directly). Inject the verified Sage tee from the
   // local COURSES list (scorecard-sourced) so it's selectable alongside
   // whatever the API returns, keyed off the API's course/sub-layout name.
@@ -3697,12 +3697,12 @@
     const hasCreek = cn.includes('creek'), hasStone = cn.includes('stone'), hasOaks = cn.includes('oaks');
     const nineOnly = !cn.includes('/');
     let match = null;
-    if (nineOnly && hasCreek)      match = COURSES.find(c => c.name === 'TCI — Creek (9 holes)');
-    else if (nineOnly && hasStone) match = COURSES.find(c => c.name === 'TCI — Stonehouse (9 holes)');
-    else if (nineOnly && hasOaks)  match = COURSES.find(c => c.name === 'TCI — Oaks (9 holes)');
-    else if (hasCreek && hasStone) match = COURSES.find(c => c.name === 'TCI — Creek + Stonehouse');
-    else if (hasOaks && hasCreek && cn.indexOf('oaks') < cn.indexOf('creek')) match = COURSES.find(c => c.name === 'TCI — Oaks + Creek');
-    else if (hasCreek && hasOaks)  match = COURSES.find(c => c.name === 'TCI — Creek + Oaks');
+    if (nineOnly && hasCreek)      match = COURSES.find(c => c.name === 'TCI, Creek (9 holes)');
+    else if (nineOnly && hasStone) match = COURSES.find(c => c.name === 'TCI, Stonehouse (9 holes)');
+    else if (nineOnly && hasOaks)  match = COURSES.find(c => c.name === 'TCI, Oaks (9 holes)');
+    else if (hasCreek && hasStone) match = COURSES.find(c => c.name === 'TCI, Creek + Stonehouse');
+    else if (hasOaks && hasCreek && cn.indexOf('oaks') < cn.indexOf('creek')) match = COURSES.find(c => c.name === 'TCI, Oaks + Creek');
+    else if (hasCreek && hasOaks)  match = COURSES.find(c => c.name === 'TCI, Creek + Oaks');
     if (!match) return courseData;
     const sageTee = {
       name: 'Sage', rating: match.rating||null, slope: match.slope||null,
@@ -3724,7 +3724,7 @@
       if(st)st.textContent='';
       const sd=document.getElementById('dm-course-selected');
       if(sd)sd.style.display='';
-      const ne=document.getElementById('dm-course-name'); if(ne)ne.textContent=clubName+(courseName?' — '+courseName:'');
+      const ne=document.getElementById('dm-course-name'); if(ne)ne.textContent=clubName+(courseName?', '+courseName:'');
       const se=document.getElementById('dm-course-sub'); if(se)se.textContent=(location||'')+(data.course.allTees?.length?' · Tees: '+data.course.allTees.map(t=>t.name).join(', '):'');
       // Tee pills
       const tees=data.course.allTees||[];
@@ -3762,7 +3762,7 @@
     const roundType  = document.querySelector('#dm-format-pills .pill.active')?.dataset.val || 'regulation_18';
     const isPractice = document.querySelector('#dm-type-pills .pill.active')?.dataset.val === 'practice';
 
-    // Practice rounds don't require a course — use placeholder if none selected
+    // Practice rounds don't require a course, use placeholder if none selected
     if (!_dadCourseData && !isPractice) { showToast('Search and select a course first', 'error'); return; }
 
     const tee      = _dadSelectedTee || (_dadCourseData?.allTees?.[_dadCourseData.allTees.length-1]?.name) || 'White';
@@ -3776,7 +3776,7 @@
 
     const coursePar  = holePars.slice(0, numHoles).reduce((a,b)=>a+b, 0) || _dadCourseData?.par || (numHoles === 9 ? 36 : 72);
     const courseName = _dadCourseData
-      ? _dadCourseData.name + (_dadCourseData.course ? ' — ' + _dadCourseData.course : '')
+      ? _dadCourseData.name + (_dadCourseData.course ? ', ' + _dadCourseData.course : '')
       : 'Practice Session';
 
     _dadRound = {
@@ -3918,7 +3918,7 @@
     document.getElementById('dad-modal-body').innerHTML = `
       <div class="score-summary-card">
         <div class="score-summary-score">${total}</div>
-        <div class="score-summary-line">You shot ${total} — ${diffStr} on ${_dadRound.course_name}</div>
+        <div class="score-summary-line">You shot ${total}, ${diffStr} on ${_dadRound.course_name}</div>
         <div class="score-motivational">${motivational}</div>
       </div>
       <label class="modal-label">Star Rating</label>
@@ -3982,9 +3982,9 @@
     const doSave = document.getElementById('dr-do-save')?.checked !== false;
     const total = _dadHoles.reduce((a, h) => a + h.score, 0);
 
-    // Skip Save mode — just close, no DB write
+    // Skip Save mode, just close, no DB write
     if (!doSave) {
-      showToast('Test round — not saved');
+      showToast('Test round, not saved');
       _clearDraftRound();
       closeDadModal();
       return;
@@ -4033,7 +4033,7 @@
         saveBtn.textContent = '↺ Retry Save';
         saveBtn.style.background = 'var(--red)';
       }
-      showToast('Save failed — tap Retry Save when you have signal', 'error');
+      showToast('Save failed, tap Retry Save when you have signal', 'error');
     }
   }
 
@@ -4041,7 +4041,7 @@
   //  KIDS LEVELING SYSTEM
   // ══════════════════════════════════════════════════════════
 
-  // KID_LEVELS moved to top of file — see line ~20
+  // KID_LEVELS moved to top of file, see line ~20
 
   function getKidLevel(who) {
     const defaults = { son: 0, girl: 0 };
@@ -4084,7 +4084,7 @@
           </div>
           ${r.minRounds ? gate(r.roundsDone, 'First round on a real course', '') : ''}
           ${gate(r.checkinDone,   'Account holder check-in', currentProfile==='dad'?'showKidCheckin(\'' + who + '\')':'')}
-          ${ch ? gate(r.challengeDone, ch.title + ' — ' + ch.short, '') : ''}
+          ${ch ? gate(r.challengeDone, ch.title + ', ' + ch.short, '') : ''}
           ${r.withinPar ? gate(r.withinParDone, 'Shoot within +' + r.withinPar + ' of par in a round', '') : ''}
         </div>`;
     }
@@ -4108,7 +4108,7 @@
       </div>`;
   }
 
-  // Account holder promotes a kid — requires confirmation
+  // Account holder promotes a kid, requires confirmation
   function adminLevelUp(who) {
     const current = getKidLevel(who);
     if (current >= 8) { showToast('Already at max level! Tour Bound!', 'gold'); return; }
@@ -4123,9 +4123,9 @@
       if (!r.rangeDone)     missing.push(`${r.rangeCount}/${r.rangeNeeded} range sessions`);
       if (!r.checkinDone)   missing.push('check-in not completed');
       if (!r.challengeDone) missing.push(`${r.challengeTitle} not completed`);
-      msg += `\n\n⚠️ Still pending:\n• ${missing.join('\n• ')}\n\nYou can still promote — you know best.`;
+      msg += `\n\n⚠️ Still pending:\n• ${missing.join('\n• ')}\n\nYou can still promote, you know best.`;
     } else {
-      msg += '\n\nAll readiness gates are met — great milestone!';
+      msg += '\n\nAll readiness gates are met, great milestone!';
     }
 
     if (!confirm(msg)) return;
@@ -4134,7 +4134,7 @@
     triggerLevelUpCeremony(who, current + 1);
   }
 
-  // Check if auto-flag should fire (does NOT auto-promote — just notifies account holder)
+  // Check if auto-flag should fire (does NOT auto-promote, just notifies account holder)
   function checkAutoLevelUp(who, rounds) {
     const current = getKidLevel(who);
     if (current >= 8) return;
@@ -4149,7 +4149,7 @@
   }
 
   // Check for first-ever par / birdie milestones on a kid round
-  // Fires a celebratory toast the very first time it happens — does not auto-promote
+  // Fires a celebratory toast the very first time it happens, does not auto-promote
   function checkKidMilestones(who, holes) {
     if (!holes || !holes.length) return;
     const name = who === 'son' ? 'Son' : 'Daughter';
@@ -4209,7 +4209,7 @@
       <div style="font-size:0.88rem;color:var(--muted);max-width:280px;line-height:1.6;margin-bottom:24px;">${def.desc}</div>
       <div style="background:${color}18;border:1px solid ${color}50;border-radius:14px;padding:14px 20px;max-width:300px;margin-bottom:28px;">
         <div style="font-size:0.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:${color};margin-bottom:5px;">${name} unlocked</div>
-        <div style="font-size:0.85rem;color:var(--cream);">${KID_LEVELS[newLevel+1] ? 'Next milestone: ' + (KID_LEVELS[newLevel].nextTrigger || 'Stay consistent!') : 'You\'ve reached the top — welcome to the big leagues!'}</div>
+        <div style="font-size:0.85rem;color:var(--cream);">${KID_LEVELS[newLevel+1] ? 'Next milestone: ' + (KID_LEVELS[newLevel].nextTrigger || 'Stay consistent!') : 'You\'ve reached the top, welcome to the big leagues!'}</div>
       </div>
       <button onclick="document.getElementById('levelup-overlay').remove();if(typeof loadSonRoundsAndRender==='function'&&'${who}'==='son')loadSonRoundsAndRender();if(typeof loadGirlRoundsAndRender==='function'&&'${who}'==='girl')loadGirlRoundsAndRender();"
         style="background:${color};color:#fff;border:none;border-radius:14px;padding:14px 44px;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;-webkit-tap-highlight-color:transparent;">
@@ -4263,7 +4263,7 @@
   }
 
   // ══════════════════════════════════════════════════════════
-  //  KIDS RANGE — LEVEL-GATED CONTENT
+  //  KIDS RANGE, LEVEL-GATED CONTENT
   // ══════════════════════════════════════════════════════════
 
   function expCard(badgeHtml, title, pills, body, cueText, cueStyle, detailHtml) {
@@ -4300,15 +4300,15 @@
     let cards = '';
 
     if (lv === 1) {
-      // L1 — JUST FOR FUN: contact only, max encouragement, no technique
+      // L1, JUST FOR FUN: contact only, max encouragement, no technique
       cards = `
       <div class="section">
         ${expCard(
           '<span class="fun-badge">Warm Up</span>',
-          '5 Magic Swings — No Ball 🌀',
+          '5 Magic Swings, No Ball 🌀',
           ['7-Iron','Super slow','Feel it first'],
-          'Pick up the 7-iron. Take <strong>5 super slow practice swings</strong> — so slow it feels silly. Feel the club go back, then whoosh through. No ball yet.',
-          '"Turn your back to the target — then FIRE!"',
+          'Pick up the 7-iron. Take <strong>5 super slow practice swings</strong>: so slow it feels silly. Feel the club go back, then whoosh through. No ball yet.',
+          '"Turn your back to the target, then FIRE!"',
           '',
           `<div class="exp-detail">Swings 1–2: go so slow it's funny. Swings 3–4: normal speed. Swing 5: <strong>hold your finish for 3 seconds</strong>. If you wobble, you swung too hard.</div>
           <div class="exp-detail"><strong>Pro Tip:</strong> Close your eyes for one swing and feel the club head. That heavy feeling at the bottom? That's exactly right.</div>`
@@ -4317,11 +4317,11 @@
           '<span class="fun-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);">Phase 1</span>',
           'Make It Fly! ✈️',
           ['9-Iron or 7-Iron','~12 balls','Count every airborne shot'],
-          '<strong>The Game:</strong> Hit 8 out of 12 in the air. Count every shot that flies — out loud! It doesn\'t matter where it goes, only that it goes UP.',
-          '"Hit DOWN on it — the club does the lifting!"',
+          '<strong>The Game:</strong> Hit 8 out of 12 in the air. Count every shot that flies, out loud! It doesn\'t matter where it goes, only that it goes UP.',
+          '"Hit DOWN on it, the club does the lifting!"',
           '',
-          `<div class="exp-detail"><strong>Setup:</strong> Ball in the middle of your stance. Feet shoulder-width. Weight 50/50. Swing through — don't scoop the ball up. The 9-iron does that for you.</div>
-          <div class="exp-detail"><strong>If you hit 8+ in the air — you WIN Phase 1!</strong> Move on. Under 8? No stress — take 4 more. Every shot is practice.</div>
+          `<div class="exp-detail"><strong>Setup:</strong> Ball in the middle of your stance. Feet shoulder-width. Weight 50/50. Swing through, don't scoop the ball up. The 9-iron does that for you.</div>
+          <div class="exp-detail"><strong>If you hit 8+ in the air, you WIN Phase 1!</strong> Move on. Under 8? No stress, take 4 more. Every shot is practice.</div>
           <div class="exp-mistake"><div class="em-lbl">⚠ Watch For</div><p>Trying to help the ball up. Hit <strong>through</strong> the ball. The divot appears <em>in front</em> of where the ball was.</p></div>`
         )}
         ${expCard(
@@ -4331,12 +4331,12 @@
           '<strong>The Game:</strong> Which club goes farthest? Hit 5 with the 7-iron, 5 with the fairway wood. Remember your personal record!',
           '"Longer club = wider, smoother swing. Same sequence!"',
           '',
-          `<div class="exp-detail"><strong>Ball position moves forward</strong> with longer clubs — for the fairway wood, play it just inside your left heel (lead heel). Same swing, just a wider arc.</div>
-          <div class="exp-detail"><strong>Track your record:</strong> What's your longest 7-iron today? Write it down or remember it — that's your number to beat next time.</div>`
+          `<div class="exp-detail"><strong>Ball position moves forward</strong> with longer clubs, for the fairway wood, play it just inside your left heel (lead heel). Same swing, just a wider arc.</div>
+          <div class="exp-detail"><strong>Track your record:</strong> What's your longest 7-iron today? Write it down or remember it, that's your number to beat next time.</div>`
         )}
         ${expCard(
           '<span class="fun-badge" style="background:linear-gradient(135deg,#ef4444,#f97316);">Bonus</span>',
-          'Rocket Launch 🚀 — Driver!',
+          'Rocket Launch 🚀, Driver!',
           ['Driver','~3 balls','Max fun'],
           'Tee it up and <strong>just rip it</strong>. No swing thoughts. If it goes sideways, laugh and try again. Pure fun.',
           '"Sweep it up off the tee. Smooth is fast!"',
@@ -4345,34 +4345,34 @@
         )}
       </div>
       <div class="section">
-        <div class="section-title">🏁 Finish — Putting Game</div>
+        <div class="section-title">🏁 Finish, Putting Game</div>
         ${expCard(
           '<span class="fun-badge" style="background:linear-gradient(135deg,#10b981,#059669);">Putting</span>',
           'Closest to the Hole vs Dad 🏆',
           ['Putter','5 balls each','Any distance'],
           'Both players putt 5 balls. <strong>Closest to the hole wins.</strong> Let him pick where you putt from. He has full control.',
-          '"Eyes on the ball — roll it smooth!"',
+          '"Eyes on the ball, roll it smooth!"',
           '',
           `<div class="exp-detail"><strong>If he sinks one:</strong> full celebration. Jump around. Make it a moment he wants to recreate every session.</div>
-          <div class="exp-detail">For short putts: pick a specific spot on the back of the cup, not just the middle — it sharpens focus immediately.</div>`
+          <div class="exp-detail">For short putts: pick a specific spot on the back of the cup, not just the middle, it sharpens focus immediately.</div>`
         )}
         <div class="section-title" style="margin-top:4px;">Level 1 Golden Rules 🌟</div>
-        <div class="check-row"><span>Count your GOOD shots — forget the bad ones instantly.</span></div>
-        <div class="check-row"><span>⏱ Stop at <strong>25–30 minutes</strong> — leave him wanting more.</span></div>
+        <div class="check-row"><span>Count your GOOD shots, forget the bad ones instantly.</span></div>
+        <div class="check-row"><span>⏱ Stop at <strong>25–30 minutes</strong>: leave him wanting more.</span></div>
         <div class="check-row"><span>Water break whenever. No performance without hydration.</span></div>
         <div class="check-row"><span>One swing thought only: <strong>"Turn and FIRE!"</strong></span></div>
-        <div class="check-row"><span>Bad shot? Laugh and reload. No dwelling — ever.</span></div>
+        <div class="check-row"><span>Bad shot? Laugh and reload. No dwelling, ever.</span></div>
       </div>`;
 
     } else if (lv === 2) {
-      // L2 — GETTING THE HANG OF IT: mechanics intro, grip check, half-swing contact, clock drill intro
+      // L2, GETTING THE HANG OF IT: mechanics intro, grip check, half-swing contact, clock drill intro
       cards = `
       <div class="section">
         ${expCard(
           '<span class="fun-badge">Warm Up</span>',
           'Grip Check + 5 Practice Swings 🤝',
-          ['7-Iron','2 min','Grip first — every session'],
-          'Before hitting a single ball: check the grip. Club runs diagonally across the fingers — not in the palm. Then take 5 slow practice swings and hold the finish.',
+          ['7-Iron','2 min','Grip first, every session'],
+          'Before hitting a single ball: check the grip. Club runs diagonally across the fingers, not in the palm. Then take 5 slow practice swings and hold the finish.',
           '"Grip in the fingers. Turn your back to the target. Hold the finish."',
           '',
           `<div class="exp-detail"><strong>Grip check:</strong> Hold the club at waist height. The "V" formed by your thumb and forefinger should point toward your right shoulder (trail shoulder). If it points toward the sky, the grip is too weak.</div>
@@ -4380,23 +4380,23 @@
         )}
         ${expCard(
           '<span class="fun-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);">Phase 1</span>',
-          'Contact Challenge — 9-to-3',
+          'Contact Challenge, 9-to-3',
           ['9-Iron','~10 balls','Half swing only'],
-          '<strong>The Drill:</strong> Club goes to 9 o\'clock back, 3 o\'clock through. Small and controlled. Goal: 8/10 solid contacts. No full swings yet — half swing builds the habit.',
-          '"Ball first, then ground — in that order."',
+          '<strong>The Drill:</strong> Club goes to 9 o\'clock back, 3 o\'clock through. Small and controlled. Goal: 8/10 solid contacts. No full swings yet, half swing builds the habit.',
+          '"Ball first, then ground, in that order."',
           '',
           `<div class="exp-detail"><strong>9-to-3 explained:</strong> Imagine a clock face. Backswing stops when the lead arm points at 9 o'clock (about hip height). Follow-through stops at 3 o'clock. Same length both sides.</div>
           <div class="exp-detail"><strong>Good contact signal:</strong> You'll hear a clean click and see a small divot <em>in front of where the ball was</em>. That divot is proof you hit ball-first.</div>
-          <div class="exp-mistake"><div class="em-lbl">⚠ Common Miss</div><p>Scooping — trying to lift the ball up with your hands. Trust the 9-iron's loft. Hit down and through. The ball goes up on its own.</p></div>`
+          <div class="exp-mistake"><div class="em-lbl">⚠ Common Miss</div><p>Scooping, trying to lift the ball up with your hands. Trust the 9-iron's loft. Hit down and through. The ball goes up on its own.</p></div>`
         )}
         ${expCard(
           '<span class="fun-badge" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">Phase 2</span>',
           'Distance Explorer + Clock Drill Intro 📏',
           ['PW or 9-iron','7-Iron','~15 balls'],
-          '<strong>Task 1:</strong> Hit 5 PW at half swing (9 o\'clock). Note how far. Hit 5 at full swing. See the difference? That\'s the clock drill. <strong>Task 2:</strong> 5 with 7-iron — track your record distance.',
+          '<strong>Task 1:</strong> Hit 5 PW at half swing (9 o\'clock). Note how far. Hit 5 at full swing. See the difference? That\'s the clock drill. <strong>Task 2:</strong> 5 with 7-iron, track your record distance.',
           '"Know your numbers. What does your half-swing PW carry?"',
           '',
-          `<div class="exp-detail"><strong>Clock Drill basics:</strong> Same club, 3 different backswing lengths = 3 different distances. 7 o'clock (hip high) = short. 9 o'clock (shoulder) = medium. 11 o'clock (full) = max. Learn these numbers — they're your secret weapon.</div>
+          `<div class="exp-detail"><strong>Clock Drill basics:</strong> Same club, 3 different backswing lengths = 3 different distances. 7 o'clock (hip high) = short. 9 o'clock (shoulder) = medium. 11 o'clock (full) = max. Learn these numbers, they're your secret weapon.</div>
           <div class="exp-detail"><strong>Your 7-iron PR:</strong> How far did it carry today? Write it down or remember it. Beating your personal record is the real game.</div>`
         )}
         ${expCard(
@@ -4407,38 +4407,38 @@
           '"Smooth is fast. Harder doesn\'t mean farther."',
           '',
           `<div class="exp-detail"><strong>Driver tee setup:</strong> Half the ball above the clubface. Ball off your left (lead) heel. Wide stance. The driver is the ONE club you hit slightly on the upswing.</div>
-          <div class="exp-detail">For fairway wood: ball just inside left heel. Same easy swing as the driver — just don't swing as hard. Smooth tempo produces the distance.</div>`
+          <div class="exp-detail">For fairway wood: ball just inside left heel. Same easy swing as the driver, just don't swing as hard. Smooth tempo produces the distance.</div>`
         )}
       </div>
       <div class="section">
-        <div class="section-title">🏁 Finish — Ring of Fire Putting</div>
+        <div class="section-title">🏁 Finish, Ring of Fire Putting</div>
         ${expCard(
           '<span class="fun-badge" style="background:linear-gradient(135deg,#10b981,#059669);">Putting</span>',
           'Ring of Fire 🔥',
           ['Putter','5 balls','3 feet away from hole'],
-          'Place 5 balls in a circle around the hole — all exactly <strong>3 feet away</strong>. Make ALL 5 in a row. Miss one? Start over. Same drill tour pros use every day.',
-          '"Pick a spot on the back of the cup. Aim for THAT spot — not the middle."',
+          'Place 5 balls in a circle around the hole, all exactly <strong>3 feet away</strong>. Make ALL 5 in a row. Miss one? Start over. Same drill tour pros use every day.',
+          '"Pick a spot on the back of the cup. Aim for THAT spot, not the middle."',
           '',
-          `<div class="card" style="background:rgba(0,0,0,0.15);margin-bottom:8px;"><div class="card-title" style="font-size:0.85rem;">🎯 Eyes Over the Ball</div><div class="card-body">Drop a ball from your nose — it should land on your ball. If not, adjust your position. Eyes directly over ball = consistent path.</div></div>
+          `<div class="card" style="background:rgba(0,0,0,0.15);margin-bottom:8px;"><div class="card-title" style="font-size:0.85rem;">🎯 Eyes Over the Ball</div><div class="card-body">Drop a ball from your nose, it should land on your ball. If not, adjust your position. Eyes directly over ball = consistent path.</div></div>
           <div class="card" style="background:rgba(0,0,0,0.15);margin-bottom:0;"><div class="card-title" style="font-size:0.85rem;">🎯 Pendulum Only</div><div class="card-body">Shoulders rock, wrists stay locked. Backswing and follow-through are the same length. No flipping at impact.</div></div>`
         )}
         <div class="section-title" style="margin-top:4px;">Level 2 Golden Rules ⚡</div>
-        <div class="check-row"><span>Check your grip <strong>before every session</strong> — it's the habit that sticks for life.</span></div>
-        <div class="check-row"><span>One swing thought per session — commit to it fully, don't switch mid-session.</span></div>
+        <div class="check-row"><span>Check your grip <strong>before every session</strong>: it's the habit that sticks for life.</span></div>
+        <div class="check-row"><span>One swing thought per session, commit to it fully, don't switch mid-session.</span></div>
         <div class="check-row"><span>Track your 7-iron distance. It's your benchmark club.</span></div>
         <div class="check-row"><span>⏱ Sessions stay at <strong>30–40 minutes</strong>. Quality over quantity.</span></div>
-        <div class="check-row"><span>Count your par-3 scores — that's real scoring starting now.</span></div>
+        <div class="check-row"><span>Count your par-3 scores, that's real scoring starting now.</span></div>
       </div>`;
 
     } else if (lv === 3) {
-      // L3 — LEARNING THE GAME: structured plan, clock drill, course management intro, lag putting
+      // L3, LEARNING THE GAME: structured plan, clock drill, course management intro, lag putting
       cards = `
       <div class="section">
         ${expCard(
           '<span class="fun-badge">Warm Up</span>',
           'Pump Drill + Alignment Check 🔄',
           ['PW or 9-iron','3 reps','Then 5 half-swings'],
-          '<strong>Pump Drill:</strong> Take the club to the top of your backswing, then PAUSE — feel your hips fire toward the target before your arms come down. Do this 3 times with no ball, then hit 5 half-swing shots.',
+          '<strong>Pump Drill:</strong> Take the club to the top of your backswing, then PAUSE, feel your hips fire toward the target before your arms come down. Do this 3 times with no ball, then hit 5 half-swing shots.',
           '"Hips fire FIRST. Club arrives LAST. That\'s where the speed comes from."',
           '',
           `<div class="exp-detail"><strong>Why the Pump Drill:</strong> Most golfers lose distance and consistency because they throw the club from the top with their arms. The Pump Drill trains the correct sequence: hips → torso → arms → club. Every extra yard comes from this.</div>
@@ -4448,7 +4448,7 @@
           '<span class="fun-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);">Phase 1</span>',
           'Short Iron Contact Quality',
           ['9-iron','PW','~12 balls'],
-          'Focus: ball-first contact, forward shaft lean, divot AFTER the ball. <strong>Not a distance session</strong> — a contact quality session.',
+          'Focus: ball-first contact, forward shaft lean, divot AFTER the ball. <strong>Not a distance session</strong>: a contact quality session.',
           '"Ball first, then ground. In that exact order, every time."',
           '',
           `<div class="exp-detail"><strong>Tee in the Ground drill:</strong> Push a tee into the ground 2 inches in front of where your ball sits. Goal: hit the ball AND clip the tee. If you clip the tee, shaft lean is correct.</div>
@@ -4456,9 +4456,9 @@
         )}
         ${expCard(
           '<span class="fun-badge" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">Phase 2</span>',
-          'Clock Drill — Wedge Distance Control ⏱',
+          'Clock Drill, Wedge Distance Control ⏱',
           ['PW or GW','~15 balls','7 / 9 / 11 o\'clock'],
-          '<strong>The Drill:</strong> 5 balls at each backswing position. Record where they land. Same tempo at all three positions — only the length changes.',
+          '<strong>The Drill:</strong> 5 balls at each backswing position. Record where they land. Same tempo at all three positions, only the length changes.',
           '"What\'s your 9 o\'clock PW? Know that number before every short shot."',
           '',
           `<div class="exp-detail"><strong>How to use it on the course:</strong> You have 55 yards. Your 9 o'clock PW goes 60 yards. That's your shot. Step in, commit, swing. No guessing.</div>
@@ -4468,72 +4468,72 @@
           '<span class="fun-badge" style="background:linear-gradient(135deg,#22c55e,#059669);">Phase 3</span>',
           'Course Management Challenge 🧠',
           ['Any club','~10 balls','Pick a target, commit'],
-          'Pick a target on the range — a flag, a sign, a yardage marker. Choose your club based on the distance. Aim at the safe side of the target. Commit and swing.',
-          '"Where\'s the trouble? Aim AWAY from it — always."',
+          'Pick a target on the range, a flag, a sign, a yardage marker. Choose your club based on the distance. Aim at the safe side of the target. Commit and swing.',
+          '"Where\'s the trouble? Aim AWAY from it, always."',
           '',
-          `<div class="exp-detail"><strong>Pre-shot routine (start building this now):</strong><br>1. Stand behind the ball — see the shot, pick the target.<br>2. Walk in, align the clubface first, then your feet.<br>3. One waggle. One thought.<br>4. Commit and swing. No more thinking after step 3.</div>
-          <div class="exp-detail"><strong>Course management rule #1:</strong> When in trouble — chip out. The goal is never "can I make par?" It's "how do I avoid a big number?" A bogey from trouble is a victory.</div>`
+          `<div class="exp-detail"><strong>Pre-shot routine (start building this now):</strong><br>1. Stand behind the ball, see the shot, pick the target.<br>2. Walk in, align the clubface first, then your feet.<br>3. One waggle. One thought.<br>4. Commit and swing. No more thinking after step 3.</div>
+          <div class="exp-detail"><strong>Course management rule #1:</strong> When in trouble, chip out. The goal is never "can I make par?" It's "how do I avoid a big number?" A bogey from trouble is a victory.</div>`
         )}
       </div>
       <div class="section">
-        <div class="section-title">🏁 Finish — Lag Putting + Ring of Fire</div>
+        <div class="section-title">🏁 Finish, Lag Putting + Ring of Fire</div>
         ${expCard(
           '<span class="fun-badge" style="background:linear-gradient(135deg,#10b981,#059669);">Putting</span>',
           'Lag From 20 Feet + Ring of Fire 🔥',
           ['Putter','10 balls','Distance control first'],
-          '<strong>Part 1:</strong> 5 putts from 20 feet — goal is to leave every one inside 3 feet. Don\'t try to make them. Just get them close. <strong>Part 2:</strong> Ring of Fire — 3 feet, make all 5.',
+          '<strong>Part 1:</strong> 5 putts from 20 feet, goal is to leave every one inside 3 feet. Don\'t try to make them. Just get them close. <strong>Part 2:</strong> Ring of Fire, 3 feet, make all 5.',
           '"Distance control first. Direction is secondary on long putts."',
           '',
-          `<div class="exp-detail"><strong>Eyes Closed drill:</strong> On 2 of your 5 lag putts, close your eyes after you start the stroke. Feel the distance in your arms — don't try to see where it goes. This builds distance instinct faster than anything.</div>
-          <div class="exp-detail"><strong>3-putt math:</strong> Every 3-putt is a stroke you gave away. Lag putting well from 20 feet eliminates most 3-putts. That's 2–4 strokes per round — without changing your swing.</div>`
+          `<div class="exp-detail"><strong>Eyes Closed drill:</strong> On 2 of your 5 lag putts, close your eyes after you start the stroke. Feel the distance in your arms, don't try to see where it goes. This builds distance instinct faster than anything.</div>
+          <div class="exp-detail"><strong>3-putt math:</strong> Every 3-putt is a stroke you gave away. Lag putting well from 20 feet eliminates most 3-putts. That's 2–4 strokes per round, without changing your swing.</div>`
         )}
         <div class="section-title" style="margin-top:4px;">Level 3 Session Rules 🎯</div>
-        <div class="check-row"><span>Pump Drill warmup — <strong>every session without exception</strong>.</span></div>
+        <div class="check-row"><span>Pump Drill warmup, <strong>every session without exception</strong>.</span></div>
         <div class="check-row"><span>Know your 3 clock-drill distances for your scoring wedge.</span></div>
-        <div class="check-row"><span>Pick a target before every swing on the range — no hitting to nowhere.</span></div>
-        <div class="check-row"><span>Track doubles on the course — eliminating them is your fastest scoring path.</span></div>
+        <div class="check-row"><span>Pick a target before every swing on the range, no hitting to nowhere.</span></div>
+        <div class="check-row"><span>Track doubles on the course, eliminating them is your fastest scoring path.</span></div>
         <div class="check-row"><span>Short game gets <strong>half your session time</strong>. It's where scores are made.</span></div>
       </div>`;
 
     } else {
-      // L4 — GETTING SERIOUS: full complexity, all drills, course management deep, stats tracking
+      // L4, GETTING SERIOUS: full complexity, all drills, course management deep, stats tracking
       cards = `
       <div class="section">
         ${expCard(
           '<span class="fun-badge" style="background:linear-gradient(135deg,#c8922a,#92400e);">Warm Up</span>',
           'Pump Drill + Feet Together Reset 🔄',
           ['PW','3 Pump reps','5 Feet Together shots'],
-          '<strong>Pump Drill:</strong> 3 reps with no ball — feel hips fire before arms drop. Then 5 Feet Together half-swings. This sequence is your warmup for every session from here forward.',
+          '<strong>Pump Drill:</strong> 3 reps with no ball, feel hips fire before arms drop. Then 5 Feet Together half-swings. This sequence is your warmup for every session from here forward.',
           '"Hips lead. Club arrives last. Hold the finish."',
           '',
-          `<div class="exp-detail"><strong>Feet Together drill:</strong> Stand with feet touching. Hit half-swing shots. Balance breaks if your tempo is wrong — this self-corrects immediately. 5 solid Feet Together shots = your swing is in rhythm.</div>
+          `<div class="exp-detail"><strong>Feet Together drill:</strong> Stand with feet touching. Hit half-swing shots. Balance breaks if your tempo is wrong, this self-corrects immediately. 5 solid Feet Together shots = your swing is in rhythm.</div>
           <div class="exp-detail"><strong>Alignment station:</strong> Every session starts with a club on the ground pointing at your target. Check that feet, hips, and shoulders are all parallel. Non-negotiable at this level.</div>`
         )}
         ${expCard(
           '<span class="fun-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);">Phase 1</span>',
-          'Short Iron — Contact + Shaft Lean',
+          'Short Iron, Contact + Shaft Lean',
           ['9-iron','PW','~12 balls'],
           'Tee in the Ground drill: push a tee 2 inches ahead of your ball. Goal: clip the ball AND the tee. Forward shaft lean achieved. Ball-first contact confirmed.',
-          '"Club loft does the lifting. Hit DOWN — it goes UP."',
+          '"Club loft does the lifting. Hit DOWN, it goes UP."',
           '',
           `<div class="exp-detail">If you're catching the tee first, ball position is too far forward. Move it back one ball-width toward your trail foot.</div>
-          <div class="exp-detail"><strong>Diagnose your miss:</strong> After every poor contact — ask why. Fat = you bottomed out before the ball. Thin = you stood up at impact. Scoop = trail hand took over. Name the fault, apply the fix.</div>`
+          <div class="exp-detail"><strong>Diagnose your miss:</strong> After every poor contact, ask why. Fat = you bottomed out before the ball. Thin = you stood up at impact. Scoop = trail hand took over. Name the fault, apply the fix.</div>`
         )}
         ${expCard(
           '<span class="fun-badge" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">Phase 2</span>',
-          'Full Clock Drill — Scoring Wedge',
+          'Full Clock Drill, Scoring Wedge',
           ['PW or GW','~12 balls','7 / 9 / 11 o\'clock'],
-          'Full clock drill with your scoring wedge. 4 balls at each position. Record distances. <strong>These 3 numbers are your scoring system</strong> — know them cold.',
+          'Full clock drill with your scoring wedge. 4 balls at each position. Record distances. <strong>These 3 numbers are your scoring system</strong>: know them cold.',
           '"Same tempo at all 3 positions. Swing length controls distance, not effort."',
           '',
-          `<div class="exp-detail"><strong>Trajectory control:</strong> For a lower, penetrating shot — ball slightly toward trail foot, hands more forward, shorter follow-through. For higher, softer landing — ball slightly forward, open face slightly, full finish.</div>
+          `<div class="exp-detail"><strong>Trajectory control:</strong> For a lower, penetrating shot, ball slightly toward trail foot, hands more forward, shorter follow-through. For higher, softer landing, ball slightly forward, open face slightly, full finish.</div>
           <div class="exp-detail">On the course: you never guess distances inside 100 yards. You know your number and you commit to it. That's what separates Level 4 from everyone else.</div>`
         )}
         ${expCard(
           '<span class="fun-badge" style="background:linear-gradient(135deg,#22c55e,#059669);">Phase 3</span>',
-          'Mid Irons — Hip Sequence',
+          'Mid Irons, Hip Sequence',
           ['7-iron','6-iron','~10 balls'],
-          'Full swing — but with a focus on hip sequence. Hips start turning toward the target before the arms come down. Count fairways hit on your imaginary range target.',
+          'Full swing, but with a focus on hip sequence. Hips start turning toward the target before the arms come down. Count fairways hit on your imaginary range target.',
           '"Belt buckle fires FIRST. The rest follows."',
           '',
           `<div class="exp-detail"><strong>Hip sequence check:</strong> At the top of the backswing, pause for a half-second and feel your hips start turning before your arms move. That pause is the Pump Drill in real time.</div>
@@ -4541,31 +4541,31 @@
         )}
         ${expCard(
           '<span class="fun-badge" style="background:linear-gradient(135deg,#c8922a,#92400e);">Phase 4</span>',
-          'Driver — Control Over Distance',
+          'Driver, Control Over Distance',
           ['Driver','~10 balls','Target: fairways, not yards'],
           '<strong>Two tasks:</strong> 5 at 80% effort (smooth, controlled). 5 at full effort. Count which group hits the imaginary fairway more often. That\'s the lesson.',
           '"Fairway first. Distance is a bonus."',
           '',
           `<div class="exp-detail">80% effort almost always wins the fairway test. The harder you swing, the wider the miss. Distance comes from sequence, not effort.</div>
-          <div class="exp-detail"><strong>Pre-shot routine is mandatory at Level 4:</strong> Every driver shot gets a full routine — stand behind, see the shot, pick intermediate target, walk in, waggle, commit. No exceptions.</div>`
+          <div class="exp-detail"><strong>Pre-shot routine is mandatory at Level 4:</strong> Every driver shot gets a full routine, stand behind, see the shot, pick intermediate target, walk in, waggle, commit. No exceptions.</div>`
         )}
       </div>
       <div class="section">
-        <div class="section-title">🏁 Short Game — Full Routine</div>
+        <div class="section-title">🏁 Short Game, Full Routine</div>
         ${expCard(
           '<span class="fun-badge" style="background:linear-gradient(135deg,#10b981,#059669);">Short Game</span>',
           'Bump-and-Run + Lag + Ring of Fire 🔥',
           ['9-iron chip','Putter','15 min'],
-          '<strong>Station 1:</strong> 5 bump-and-run chips with 9-iron from 10 yards — land it 3 feet on the green and let it release. <strong>Station 2:</strong> Lag from 25 feet — inside 3 feet goal. <strong>Station 3:</strong> Ring of Fire.',
+          '<strong>Station 1:</strong> 5 bump-and-run chips with 9-iron from 10 yards, land it 3 feet on the green and let it release. <strong>Station 2:</strong> Lag from 25 feet, inside 3 feet goal. <strong>Station 3:</strong> Ring of Fire.',
           '"Short game is where scores live. Own this and the rounds follow."',
           '',
-          `<div class="exp-detail"><strong>Bump-and-run setup:</strong> Ball just back of center. Weight 70% lead foot (stays there). Narrow stance. Pendulum motion — no wrist flip. 9-iron: 20% air time, 80% roll.</div>
+          `<div class="exp-detail"><strong>Bump-and-run setup:</strong> Ball just back of center. Weight 70% lead foot (stays there). Narrow stance. Pendulum motion, no wrist flip. 9-iron: 20% air time, 80% roll.</div>
           <div class="exp-detail"><strong>Level 4 stats to track on the course:</strong> Fairways hit · Greens in regulation · Putts per hole · Up-and-down % from inside 30 yards. These four numbers tell you exactly where strokes are going.</div>`
         )}
         <div class="section-title" style="margin-top:4px;">Level 4 Standards 🏆</div>
-        <div class="check-row"><span>Pump Drill + alignment stick — every single session.</span></div>
+        <div class="check-row"><span>Pump Drill + alignment stick, every single session.</span></div>
         <div class="check-row"><span>Know your 3 clock-drill distances by heart. No guessing inside 100 yards.</span></div>
-        <div class="check-row"><span>Pre-shot routine on every swing — on the range and on the course.</span></div>
+        <div class="check-row"><span>Pre-shot routine on every swing, on the range and on the course.</span></div>
         <div class="check-row"><span>Track fairways hit, putts per round, and up-and-down percentage.</span></div>
         <div class="check-row"><span>Short game gets <strong>at least 20 min</strong> of every session. Always.</span></div>
       </div>`;
@@ -4599,12 +4599,12 @@
       <div class="section">
         ${expCard(
           '<span class="girl-badge">Warm Up</span>',
-          '3 Magic Swings — No Ball 🪄',
+          '3 Magic Swings, No Ball 🪄',
           ['7-Iron','Super slow','2 min'],
-          'Pick up the 7-iron and take <strong>3 super slow practice swings</strong> — like moving through honey. Feel the club go back, then swoop through. No ball yet — just feel it!',
+          'Pick up the 7-iron and take <strong>3 super slow practice swings</strong>: like moving through honey. Feel the club go back, then swoop through. No ball yet, just feel it!',
           '"Reach back and SWOOOOOP!"',
           pink,
-          `<div class="exp-detail">Make it silly — go SO slow it's funny. Let her laugh. On the 3rd swing, ask her to hold the finish and balance on one foot. Any giggles = winning.</div>
+          `<div class="exp-detail">Make it silly, go SO slow it's funny. Let her laugh. On the 3rd swing, ask her to hold the finish and balance on one foot. Any giggles = winning.</div>
           <div class="exp-detail"><strong>What you're teaching:</strong> Muscle memory for the swing shape before adding the challenge of a ball. At this age this is everything.</div>`
         )}
         ${expCard(
@@ -4614,9 +4614,9 @@
           '<strong>The only goal:</strong> hit the ball and make it go forward. ANY forward movement counts! Count every one that moves and cheer out loud.',
           '"Just hit it and watch where it goes!"',
           pink,
-          `<div class="exp-detail"><strong>For a lefty:</strong> Ball in the middle of her stance. Right hand on top of the grip (lead hand for lefty). Let her swing naturally — no corrections at this age.</div>
+          `<div class="exp-detail"><strong>For a lefty:</strong> Ball in the middle of her stance. Right hand on top of the grip (lead hand for lefty). Let her swing naturally, no corrections at this age.</div>
           <div class="exp-detail"><strong>If the ball isn't moving:</strong> Tee it up! There's no shame in teeing up at the range. It builds confidence fast.</div>
-          <div class="exp-detail"><strong>Account holder focus:</strong> Watch for her head staying down through impact — that's the one thing worth gently mentioning. Everything else can wait.</div>`
+          <div class="exp-detail"><strong>Account holder focus:</strong> Watch for her head staying down through impact, that's the one thing worth gently mentioning. Everything else can wait.</div>`
         )}
         ${expCard(
           '<span class="girl-badge" style="background:linear-gradient(135deg,#14b8a6,#6366f1);">Phase 2</span>',
@@ -4626,7 +4626,7 @@
           '"Which one do you want to try?"',
           teal,
           `<div class="exp-detail">Autonomy is everything at this age. Letting her choose gives her ownership. She'll remember the fun, not whether she used the "right" club.</div>
-          <div class="exp-detail"><strong>End here</strong> — while she's still happy and energized. A 15-minute session ending on a high beats a 40-minute session ending in frustration every time.</div>`
+          <div class="exp-detail"><strong>End here</strong>: while she's still happy and energized. A 15-minute session ending on a high beats a 40-minute session ending in frustration every time.</div>`
         )}
       </div>
       <div class="section">
@@ -4636,18 +4636,18 @@
           'Closest to the Hole Wins! 🏆',
           ['Putter','5 balls each','Any distance'],
           'Both players putt 5 balls. <strong>Whoever gets closest to the hole wins.</strong> Let her pick where you putt from. She has full control.',
-          '"Eyes on the ball, roll it smooth — like sending it on a little trip to the hole!"',
+          '"Eyes on the ball, roll it smooth, like sending it on a little trip to the hole!"',
           pink,
-          `<div class="exp-detail"><strong>Let her win sometimes.</strong> Not always — she'll know if it's fake — but occasionally miss just enough that she beats you genuinely. Beating a grown-up is massive motivation.</div>
+          `<div class="exp-detail"><strong>Let her win sometimes.</strong> Not always, she'll know if it's fake, but occasionally miss just enough that she beats you genuinely. Beating a grown-up is massive motivation.</div>
           <div class="exp-detail"><strong>If she sinks one:</strong> Stop everything. Full celebration. Make it a moment she wants to recreate every time.</div>
-          <div class="exp-detail"><strong>Lefty putting at this age:</strong> Just get her rolling the ball forward. Don't correct grip or stance yet — contact and direction are enough.</div>`
+          <div class="exp-detail"><strong>Lefty putting at this age:</strong> Just get her rolling the ball forward. Don't correct grip or stance yet, contact and direction are enough.</div>`
         )}
         <div class="section-title" style="margin-top:4px;">Level 1 Golden Rules 🌟</div>
-        <div class="check-row"><span>🎉 Cheer for <strong>every</strong> swing — contact or not, she tried!</span></div>
-        <div class="check-row"><span>⏱ Stop at 15 minutes — <strong>always leave her wanting more</strong></span></div>
-        <div class="check-row"><span>🍦 Promise a treat after — she earned it by showing up</span></div>
-        <div class="check-row"><span>📵 Phone away — she notices, and it matters to her</span></div>
-        <div class="check-row"><span>🌈 Not feeling it today? That's totally fine — <strong>come back next time</strong></span></div>
+        <div class="check-row"><span>🎉 Cheer for <strong>every</strong> swing, contact or not, she tried!</span></div>
+        <div class="check-row"><span>⏱ Stop at 15 minutes, <strong>always leave her wanting more</strong></span></div>
+        <div class="check-row"><span>🍦 Promise a treat after, she earned it by showing up</span></div>
+        <div class="check-row"><span>📵 Phone away, she notices, and it matters to her</span></div>
+        <div class="check-row"><span>🌈 Not feeling it today? That's totally fine, <strong>come back next time</strong></span></div>
       </div>`;
 
     } else if (lv === 2) {
@@ -4657,20 +4657,20 @@
           '<span class="girl-badge">Warm Up</span>',
           'Grip Check + 3 Magic Swings 🤝',
           ['7-Iron','Grip first','2 min'],
-          'Before hitting: quick grip check — club runs across the fingers, not the palm. Then 3 slow practice swings. Hold the finish on the last one.',
+          'Before hitting: quick grip check, club runs across the fingers, not the palm. Then 3 slow practice swings. Hold the finish on the last one.',
           '"Grip in the fingers. Reach back. Hold the finish!"',
           pink,
-          `<div class="exp-detail"><strong>Simple grip check for a lefty:</strong> Right hand on top (lead hand), left hand below. Club sits at the base of the fingers — not deep in the palm. Ask her to show you her grip before every session.</div>`
+          `<div class="exp-detail"><strong>Simple grip check for a lefty:</strong> Right hand on top (lead hand), left hand below. Club sits at the base of the fingers, not deep in the palm. Ask her to show you her grip before every session.</div>`
         )}
         ${expCard(
           '<span class="girl-badge" style="background:linear-gradient(135deg,#ec4899,#f97316);">Phase 1</span>',
           'Make It Fly! ✈️',
           ['9-Iron','~10 balls','Count shots in the air'],
-          '<strong>The Game:</strong> Hit 6 out of 10 in the air. Count every airborne shot out loud! Doesn\'t matter where it goes — only that it goes UP.',
-          '"Hit DOWN on it — the club does the lifting!"',
+          '<strong>The Game:</strong> Hit 6 out of 10 in the air. Count every airborne shot out loud! Doesn\'t matter where it goes, only that it goes UP.',
+          '"Hit DOWN on it, the club does the lifting!"',
           pink,
-          `<div class="exp-detail"><strong>Good contact check:</strong> A small divot (or brushed grass) should appear <em>in front of where the ball was</em>. That means ball-first contact — perfect.</div>
-          <div class="exp-detail"><strong>If she hits 6+ in the air — WIN!</strong> Move on. Under 6? No stress — 4 more tries. Every swing is getting better.</div>`
+          `<div class="exp-detail"><strong>Good contact check:</strong> A small divot (or brushed grass) should appear <em>in front of where the ball was</em>. That means ball-first contact, perfect.</div>
+          <div class="exp-detail"><strong>If she hits 6+ in the air, WIN!</strong> Move on. Under 6? No stress, 4 more tries. Every swing is getting better.</div>`
         )}
         ${expCard(
           '<span class="girl-badge" style="background:linear-gradient(135deg,#14b8a6,#6366f1);">Phase 2</span>',
@@ -4684,20 +4684,20 @@
         )}
       </div>
       <div class="section">
-        <div class="section-title">🏁 Finish — Closest to the Hole 2.0</div>
+        <div class="section-title">🏁 Finish, Closest to the Hole 2.0</div>
         ${expCard(
           '<span class="girl-badge">Putting</span>',
-          'Ring of Fire — Starter Version 🔥',
+          'Ring of Fire, Starter Version 🔥',
           ['Putter','5 balls','2 feet from hole'],
-          'Place 5 balls around the hole — <strong>2 feet away</strong> (closer than normal for now). Make all 5 in a row. Miss? Start over. These are the putts that change scores.',
-          '"Pick a spot on the back of the cup. Aim there — not just \"at the hole\"."',
+          'Place 5 balls around the hole, <strong>2 feet away</strong> (closer than normal for now). Make all 5 in a row. Miss? Start over. These are the putts that change scores.',
+          '"Pick a spot on the back of the cup. Aim there, not just \"at the hole\"."',
           pink,
           `<div class="exp-detail">2 feet builds confidence fast. When she's making all 5 consistently, move out to 3 feet. That's the progression.</div>
           <div class="exp-detail"><strong>One key:</strong> Shoulders rock like a pendulum. Wrists stay quiet. Same backswing and follow-through length.</div>`
         )}
         <div class="section-title" style="margin-top:4px;">Level 2 Rules ⚡</div>
         <div class="check-row"><span>Check her grip before <strong>every session</strong>.</span></div>
-        <div class="check-row"><span>Count every shot in the air — it's the real score at this level.</span></div>
+        <div class="check-row"><span>Count every shot in the air, it's the real score at this level.</span></div>
         <div class="check-row"><span>Track her 7-iron personal record. Beat it next time.</span></div>
         <div class="check-row"><span>⏱ Sessions stay at <strong>20–25 minutes</strong>.</span></div>
       </div>`;
@@ -4709,14 +4709,14 @@
           '<span class="girl-badge">Warm Up</span>',
           'Grip Check + Half-Swing Contact 🤝',
           ['9-iron','5 half-swings','No rush'],
-          'Grip check first, then 5 half-swing shots with the 9-iron. 9-to-3 only — club to hip height back, hip height through. Clean contact before full swings.',
-          '"Ball first, then ground — in that order."',
+          'Grip check first, then 5 half-swing shots with the 9-iron. 9-to-3 only, club to hip height back, hip height through. Clean contact before full swings.',
+          '"Ball first, then ground, in that order."',
           pink,
-          `<div class="exp-detail"><strong>9-to-3 explained:</strong> Backswing stops when your lead arm points at 9 o'clock (hip height). Follow-through stops at 3 o'clock. Same length both sides — pendulum motion.</div>`
+          `<div class="exp-detail"><strong>9-to-3 explained:</strong> Backswing stops when your lead arm points at 9 o'clock (hip height). Follow-through stops at 3 o'clock. Same length both sides, pendulum motion.</div>`
         )}
         ${expCard(
           '<span class="girl-badge" style="background:linear-gradient(135deg,#ec4899,#f97316);">Phase 1</span>',
-          'Clock Drill — Pitching Wedge 📏',
+          'Clock Drill, Pitching Wedge 📏',
           ['PW or 9-iron','~12 balls','3 distances'],
           '<strong>The Drill:</strong> 4 balls at 7 o\'clock (hip height), 4 at 9 o\'clock (shoulder), 4 at 11 o\'clock (full). Note how far each goes. These are her scoring distances.',
           '"Same tempo at all 3 positions. Length controls distance, not effort."',
@@ -4728,7 +4728,7 @@
           '<span class="girl-badge" style="background:linear-gradient(135deg,#14b8a6,#6366f1);">Phase 2</span>',
           'Distance Explorer + Target Practice 🎯',
           ['7-Iron','FW Wood','~12 balls'],
-          'Hit 6 with the 7-iron at a specific target on the range — not just "out there." Pick a flag or a yardage sign. Then 6 with the fairway wood.',
+          'Hit 6 with the 7-iron at a specific target on the range, not just "out there." Pick a flag or a yardage sign. Then 6 with the fairway wood.',
           '"Pick the target BEFORE you swing. Aim at something specific."',
           teal,
           `<div class="exp-detail"><strong>Pre-shot routine:</strong> Stand behind the ball → see the shot → pick a target → walk in → swing. At Level 3, every swing has a target. No hitting to nowhere.</div>`
@@ -4743,14 +4743,14 @@
           '<strong>Chipping:</strong> 5 bump-and-run chips from 8 yards with 9-iron. Goal: land it 2–3 feet onto the green and let it roll. <strong>Putting:</strong> Ring of Fire at 3 feet.',
           '"Land it soft. Let it roll. Don\'t try to put it in the hole on the fly."',
           pink,
-          `<div class="exp-detail"><strong>Chip setup:</strong> Ball just back of center. Weight 70% on lead foot (stays there). Narrow stance. Pendulum motion — no wrist flip. The 9-iron rolls the ball like a long putt once it lands.</div>
+          `<div class="exp-detail"><strong>Chip setup:</strong> Ball just back of center. Weight 70% on lead foot (stays there). Narrow stance. Pendulum motion, no wrist flip. The 9-iron rolls the ball like a long putt once it lands.</div>
           <div class="exp-detail">Ring of Fire: 5 balls, 3 feet away. Make all 5 in a row. Miss? Start over. This is the same drill the best players in the world use every day.</div>`
         )}
         <div class="section-title" style="margin-top:4px;">Level 3 Rules 🎯</div>
         <div class="check-row"><span>Every swing at the range needs a <strong>specific target</strong>.</span></div>
         <div class="check-row"><span>Know her 3 clock-drill distances by heart.</span></div>
         <div class="check-row"><span>Short game gets half the session. Always.</span></div>
-        <div class="check-row"><span>Start counting <strong>pars</strong> on the course — not just total score.</span></div>
+        <div class="check-row"><span>Start counting <strong>pars</strong> on the course, not just total score.</span></div>
       </div>`;
 
     } else {
@@ -4761,36 +4761,36 @@
           '<span class="girl-badge" style="background:linear-gradient(135deg,#c8922a,#92400e);">Warm Up</span>',
           'Pump Drill + Alignment Check 🔄',
           ['9-iron or PW','3 Pump reps','5 half-swings'],
-          '<strong>Pump Drill:</strong> Take the club to the top, pause — feel the hips fire before the arms come down. 3 reps, no ball. Then 5 half-swing contact shots with alignment stick on the ground.',
+          '<strong>Pump Drill:</strong> Take the club to the top, pause, feel the hips fire before the arms come down. 3 reps, no ball. Then 5 half-swing contact shots with alignment stick on the ground.',
           '"Hips lead. Club arrives last. That\'s where the speed lives."',
           pink,
-          `<div class="exp-detail"><strong>Pump Drill for lefties:</strong> At the top, your left hip (trail hip) is loaded. The RIGHT hip (lead hip) starts the downswing by firing toward the target — before your arms come down. That's the sequence.</div>
-          <div class="exp-detail"><strong>Alignment stick:</strong> Every session. Feet, hips, shoulders — all parallel to target line. This habit alone is worth strokes.</div>`
+          `<div class="exp-detail"><strong>Pump Drill for lefties:</strong> At the top, your left hip (trail hip) is loaded. The RIGHT hip (lead hip) starts the downswing by firing toward the target, before your arms come down. That's the sequence.</div>
+          <div class="exp-detail"><strong>Alignment stick:</strong> Every session. Feet, hips, shoulders, all parallel to target line. This habit alone is worth strokes.</div>`
         )}
         ${expCard(
           '<span class="girl-badge" style="background:linear-gradient(135deg,#ec4899,#f97316);">Phase 1</span>',
-          'Short Iron — Ball-First Contact Quality',
+          'Short Iron, Ball-First Contact Quality',
           ['9-iron','PW','~10 balls'],
-          'Tee in the Ground drill: push a tee into the ground 2 inches in front of the ball. Try to clip the ball AND the tee, in that order — that means your hands led the club through. Ball first, then the tee.',
+          'Tee in the Ground drill: push a tee into the ground 2 inches in front of the ball. Try to clip the ball AND the tee, in that order, that means your hands led the club through. Ball first, then the tee.',
           '"Ball first, then ground. In that exact order."',
           pink,
-          `<div class="exp-detail">If you clip the tee: your hands were leading the club — perfect. If you miss the tee: you caught the ball only or the ground first. Move the ball back one step and try again.</div>`
+          `<div class="exp-detail">If you clip the tee: your hands were leading the club, perfect. If you miss the tee: you caught the ball only or the ground first. Move the ball back one step and try again.</div>`
         )}
         ${expCard(
           '<span class="girl-badge" style="background:linear-gradient(135deg,#14b8a6,#6366f1);">Phase 2</span>',
-          'Clock Drill — Full System',
+          'Clock Drill, Full System',
           ['PW','SW if available','~12 balls'],
-          'Full clock drill. 4 balls at 7 / 9 / 11 o\'clock. Record distances. These are her 3 scoring distances — know them cold.',
+          'Full clock drill. 4 balls at 7 / 9 / 11 o\'clock. Record distances. These are her 3 scoring distances, know them cold.',
           '"Same tempo. Same rhythm. Swing length is the only variable."',
           teal,
           `<div class="exp-detail">On the course: no guessing inside 100 yards. She picks the clock position that matches the distance, commits, and swings. That's a system.</div>`
         )}
         ${expCard(
           '<span class="girl-badge" style="background:linear-gradient(135deg,#22c55e,#059669);">Phase 3</span>',
-          'Target Practice — Course Management',
+          'Target Practice, Course Management',
           ['7-iron','FW Wood','~10 balls'],
           'Every swing at a named target. Before each shot: where\'s the trouble? Aim away from it. <strong>Hit 10 shots using the full pre-shot routine.</strong>',
-          '"Where\'s the trouble? Aim AWAY from it — every time."',
+          '"Where\'s the trouble? Aim AWAY from it, every time."',
           teal,
           `<div class="exp-detail"><strong>Pre-shot routine (non-negotiable at Level 4):</strong> Stand behind ball → see the shot → pick target → walk in → align clubface first, then feet → one waggle → commit → swing. Every single shot.</div>`
         )}
@@ -4801,14 +4801,14 @@
           '<span class="girl-badge" style="background:linear-gradient(135deg,#10b981,#059669);">Short Game</span>',
           'Chips + Lag Putts + Ring of Fire 🔥',
           ['9-iron','Putter','15 min'],
-          '<strong>Station 1:</strong> 5 bump-and-run chips, land 3 feet onto green. <strong>Station 2:</strong> 5 lag putts from 20 feet — goal inside 3 feet. <strong>Station 3:</strong> Ring of Fire.',
+          '<strong>Station 1:</strong> 5 bump-and-run chips, land 3 feet onto green. <strong>Station 2:</strong> 5 lag putts from 20 feet, goal inside 3 feet. <strong>Station 3:</strong> Ring of Fire.',
           '"Short game is where rounds are won. Own it."',
           pink,
-          `<div class="exp-detail"><strong>Chip setup (lefty):</strong> Ball slightly back of center. Weight 70% on right (lead) foot. Narrow stance. Wrists stay quiet — shoulders do the rocking.</div>
+          `<div class="exp-detail"><strong>Chip setup (lefty):</strong> Ball slightly back of center. Weight 70% on right (lead) foot. Narrow stance. Wrists stay quiet, shoulders do the rocking.</div>
           <div class="exp-detail"><strong>Eyes Closed lag drill:</strong> On 2 of your 5 lag putts, close your eyes after you start the stroke. Feel the distance. This builds instinct you can't get any other way.</div>`
         )}
         <div class="section-title" style="margin-top:4px;">Level 4 Standards 🏆</div>
-        <div class="check-row"><span>Pump Drill warmup — <strong>every session, no exceptions</strong>.</span></div>
+        <div class="check-row"><span>Pump Drill warmup, <strong>every session, no exceptions</strong>.</span></div>
         <div class="check-row"><span>Know clock-drill distances for scoring wedge by heart.</span></div>
         <div class="check-row"><span>Full pre-shot routine on every swing, range and course.</span></div>
         <div class="check-row"><span>Short game = minimum 15 min of every session.</span></div>
@@ -4955,7 +4955,7 @@
     document.getElementById('son-modal-body').innerHTML = `
       <div class="score-summary-card">
         <div class="score-summary-score">${total}</div>
-        <div class="score-summary-line">You shot ${total} — ${diffStr} over par</div>
+        <div class="score-summary-line">You shot ${total}, ${diffStr} over par</div>
       </div>
       <label class="modal-label">🏆 Best hole this round</label>
       <textarea id="sr-best" class="modal-input" rows="2" placeholder="Your best hole..."></textarea>
@@ -4968,12 +4968,12 @@
   // ── AI CADDIE ─────────────────────────────────────────────────
   let _caddieHistory = [];
 
-  // Caddie system prompt — strategic, conversational, course-management focused
-  const _CADDIE_SYSTEM = `You are a smart, concise on-course caddie for Jeremy — left-handed golfer, goal: break 90.
+  // Caddie system prompt, strategic, conversational, course-management focused
+  const _CADDIE_SYSTEM = `You are a smart, concise on-course caddie for Jeremy, left-handed golfer, goal: break 90.
 
 CARRY DISTANCES (use ONLY these, never generic golf knowledge):
 Driver 190-200 | 7W 180 | 4H 175 | 5i 165 | 6i 160 | 7i 137 | 8i 125 | 9i 115 | PW 100 | GW 85-105 | SW 80-90 | LW 60-75
-(Irons are Faktor Golf combo set — all distances range-confirmed June 2026)
+(Irons are Faktor Golf combo set, all distances range-confirmed June 2026)
 
 COURSE MANAGEMENT RULES:
 - Think in plays, not just clubs. Recommend the shot strategy first, then the club.
@@ -4997,24 +4997,24 @@ COURSE MANAGEMENT RULES:
     return _CADDIE_SYSTEM + (tendencyLine ? '\n\nMISS TENDENCY: ' + tendencyLine : '');
   }
 
-  // Family-round caddie — player-aware yardage cards
+  // Family-round caddie, player-aware yardage cards
   const _FAM_YARDAGES = {
-    dad:     `Dad (Jeremy, left-handed): Driver 190-200 | 7W 180 | 4H 175 | 5i 165 | 6i 160 | 7i 137 | 8i 125 | 9i 115 | PW 100 | GW 85-105 | SW 80-90 | LW 60-75 (Faktor Golf combo set — all distances range-confirmed)`,
+    dad:     `Dad (Jeremy, left-handed): Driver 190-200 | 7W 180 | 4H 175 | 5i 165 | 6i 160 | 7i 137 | 8i 125 | 9i 115 | PW 100 | GW 85-105 | SW 80-90 | LW 60-75 (Faktor Golf combo set, all distances range-confirmed)`,
     son:     `Son (right-handed, junior set, age 8): Driver ~60-80 | FW Wood ~50-65 | 5i ~40-55 | 7i ~30-45 | 9i ~25-35 | SW ~15-25`,
-    girl:    `Daughter (lefty, age 6, junior set): distances vary — ask how far she hits before recommending`,
-    mom:     `Mom (right-handed, beginner): distances unknown — ask how far she hits before recommending`,
-    grandma: `Grandma (right-handed): distances unknown — ask how far she hits before recommending`,
+    girl:    `Daughter (lefty, age 6, junior set): distances vary, ask how far she hits before recommending`,
+    mom:     `Mom (right-handed, beginner): distances unknown, ask how far she hits before recommending`,
+    grandma: `Grandma (right-handed): distances unknown, ask how far she hits before recommending`,
   };
 
   function _famCaddieSystem() {
     const activePlayers = (_famRound.players || [])
       .map(pk => _FAM_YARDAGES[pk] || pk)
       .join('\n');
-    return `FAMILY ROUND CADDIE — multiple players on the course.
+    return `FAMILY ROUND CADDIE, multiple players on the course.
 PLAYER YARDAGE CARDS:
 ${activePlayers}
 
-RULES: Always state which player you are advising. Use ONLY that player's yardage card — never mix up players' distances. Show distance math inline (e.g. "7-iron. 130-140 fits the 135 yd gap."). Name the club. One sentence strategy. 3 sentences max. If the user doesn't say who they're asking for, ask. If a player's distances are unknown, ask before recommending.`;
+RULES: Always state which player you are advising. Use ONLY that player's yardage card, never mix up players' distances. Show distance math inline (e.g. "7-iron. 130-140 fits the 135 yd gap."). Name the club. One sentence strategy. 3 sentences max. If the user doesn't say who they're asking for, ask. If a player's distances are unknown, ask before recommending.`;
   }
 
   function renderCaddieYardageChips() {
@@ -5028,7 +5028,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const step = Math.max(1, Math.floor(clubs.length / 7));
     const picks = clubs.filter((_, i) => i % step === 0).slice(0, 8);
     el.innerHTML = picks.map(c =>
-      `<button class="caddie-yardage-chip" onclick="caddieQuickTap('I\\'m ${c.dist} yards out — what\\'s the play?')">${c.dist}y</button>`
+      `<button class="caddie-yardage-chip" onclick="caddieQuickTap('I\\'m ${c.dist} yards out, what\\'s the play?')">${c.dist}y</button>`
     ).join('');
   }
 
@@ -5078,7 +5078,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       _caddieHistory.push({ role: 'assistant', content: reply });
       renderCaddieMessages(false);
     } catch(e) {
-      showToast('No signal — check your connection', 'error');
+      showToast('No signal, check your connection', 'error');
       _caddieHistory.pop();
       renderCaddieMessages(false);
     } finally {
@@ -5090,7 +5090,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   function renderCaddieMessages(showTyping) {
     const el = document.getElementById('caddie-messages');
     if (!el) return;
-    const welcome = `<div style="background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.2);border-radius:12px;padding:14px 16px;font-size:0.85rem;color:var(--cream);line-height:1.6;"><i class="ti ti-microphone" style="color:var(--gold);vertical-align:-1px;"></i> <strong>On the bag.</strong> Just say your distance and situation — I'll pick the club. Try: <em>"About 140 out, slight headwind"</em> or <em>"Tee shot, tight fairway."</em></div>`;
+    const welcome = `<div style="background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.2);border-radius:12px;padding:14px 16px;font-size:0.85rem;color:var(--cream);line-height:1.6;"><i class="ti ti-microphone" style="color:var(--gold);vertical-align:-1px;"></i> <strong>On the bag.</strong> Just say your distance and situation, I'll pick the club. Try: <em>"About 140 out, slight headwind"</em> or <em>"Tee shot, tight fairway."</em></div>`;
     const msgs = _caddieHistory.map(m => {
       const isUser = m.role === 'user';
       return `<div style="
@@ -5186,7 +5186,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       closeSonModal();
       loadSonRoundsAndRender();
     } catch(e) {
-      showToast('Save failed — check your signal', 'error');
+      showToast('Save failed, check your signal', 'error');
       if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Round'; }
     }
   }
@@ -5203,49 +5203,49 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     grandma: { key:'grandma', name:'Grandma',  emoji:'G', color:'#1D9E75', bg:'rgba(29,158,117,0.12)',  saveFn: r => saveGrandmaRound(r) },
   };
 
-  // Family game modes — light, kid-inclusive formats for whole-family rounds.
+  // Family game modes, light, kid-inclusive formats for whole-family rounds.
   // Adult-only formats (Scramble, Wolf, Match Play, etc.) intentionally excluded —
   // those are for serious tracking, not for keeping the family loose on the course.
   const GAME_MODES = {
     none: {
       key: 'none', name: 'Just Track Scores', icon: 'ph-light ph-flag', color: '#888780', status: 'ready',
-      blurb: 'Standard family round — everyone plays their own ball, scores tracked as usual.',
+      blurb: 'Standard family round, everyone plays their own ball, scores tracked as usual.',
       howTo: 'No special rules. Play your own ball on every hole and post your score like normal.'
     },
     team_scramble: {
       key: 'team_scramble', name: 'Team Scramble', icon: 'ph-light ph-handshake', color: '#1D9E75', status: 'ready',
-      blurb: 'Split into two teams of two — pick teammates, name your squads, and play best ball.',
-      howTo: 'Split the group into two teams (pairs work best — e.g. Dad + one kid vs. Mom + the other). Name your teams for fun. On every hole, each team\'s score is its BEST BALL — whichever teammate scores lower, that\'s the team\'s score for the hole. Everyone still posts their own score; the team score is just the better of the two. Lowest total wins for the team!'
+      blurb: 'Split into two teams of two, pick teammates, name your squads, and play best ball.',
+      howTo: 'Split the group into two teams (pairs work best, e.g. Dad + one kid vs. Mom + the other). Name your teams for fun. On every hole, each team\'s score is its BEST BALL, whichever teammate scores lower, that\'s the team\'s score for the hole. Everyone still posts their own score; the team score is just the better of the two. Lowest total wins for the team!'
     },
     junior_scramble: {
       key: 'junior_scramble', name: 'Junior Scramble', icon: 'ph-light ph-rocket-launch', color: '#378ADD', status: 'ready',
-      blurb: 'Adults play it straight — but each kid gets one "bomb drive" per 9 holes to rescue the team.',
-      howTo: 'Adults play their own ball as normal. Each kid gets ONE "bomb drive" per 9 holes — on that hole, the team plays from the kid\'s tee shot instead, no matter where it lands. Use it to save a tough hole or just for fun. The team score for that hole becomes the best ball from there. Track who saves the day!'
+      blurb: 'Adults play it straight, but each kid gets one "bomb drive" per 9 holes to rescue the team.',
+      howTo: 'Adults play their own ball as normal. Each kid gets ONE "bomb drive" per 9 holes, on that hole, the team plays from the kid\'s tee shot instead, no matter where it lands. Use it to save a tough hole or just for fun. The team score for that hole becomes the best ball from there. Track who saves the day!'
     },
     parents_vs_kids: {
       key: 'parents_vs_kids', name: 'Parents vs. Kids', icon: 'ph-light ph-users-three', color: '#7F77DD', status: 'ready',
-      blurb: 'Adults vs. kids — scores auto-adjusted by level so it stays a fair fight all round.',
+      blurb: 'Adults vs. kids, scores auto-adjusted by level so it stays a fair fight all round.',
       howTo: 'Adults play it straight. Kids get a per-hole stroke handicap based on their SpinVibes level (L0–L1 = 3 strokes off, L2–L3 = 2 strokes, L4+ = 1 stroke). Each side\'s hole score is the lowest adjusted score in the group. Lowest total wins. Great for a 6-year-old going head-to-head with a grown-up for real.'
     },
     hole_challenge: {
       key: 'hole_challenge', name: 'Hole Challenge', icon: 'ph-light ph-medal', color: '#D4537E', status: 'ready',
-      blurb: 'A different mini-challenge every hole — closest to the pin, fewest putts, longest drive.',
+      blurb: 'A different mini-challenge every hole, closest to the pin, fewest putts, longest drive.',
       howTo: 'Each hole gets a challenge automatically: par 3s get Closest to the Pin, par 4/5s rotate through Fewest Putts, Longest Drive, and Hit the Fairway. After scoring, tap who won the challenge. Track wins across the round and see who comes out on top!'
     },
     kid_birdie_bomb: {
       key: 'kid_birdie_bomb', name: 'Kid Birdie Bomb', icon: 'ph-light ph-confetti', color: '#D4A843', status: 'ready',
-      blurb: 'When a kid hits their adjusted target — or better — they win the hole outright.',
+      blurb: 'When a kid hits their adjusted target, or better, they win the hole outright.',
       howTo: 'Kids get a friendly per-hole target based on their SpinVibes level: L0–L1 = par + 3, L2–L3 = par + 2, L4+ = par + 1. Hit that target and the kid wins the hole regardless of adult scores. On a par 4, an L2 kid just needs a 6. Every win triggers a Birdie Bomb moment!'
     },
     team_captain: {
       key: 'team_captain', name: 'Team Captain', icon: 'ph-light ph-flag-checkered', color: '#1D9E75', status: 'ready',
-      blurb: 'A kid is captain each hole — they pick which adult\'s score the team uses.',
+      blurb: 'A kid is captain each hole, they pick which adult\'s score the team uses.',
       howTo: 'The captain role rotates through the kids each hole. After everyone plays, the captain picks which adult\'s score counts for the team that hole. The captain\'s own score still tracks for their personal total. Captaincy rotates every hole so every kid calls the shots. Who picks best under pressure?'
     },
   };
   let _famGameMode      = 'none';   // selected key from GAME_MODES
   let _famGmExplainerOpen = false;
-  // Team Scramble setup state — { pk: 'a'|'b' } assignments + custom team names
+  // Team Scramble setup state, { pk: 'a'|'b' } assignments + custom team names
   let _famTeamAssign    = {};
   let _famTeamNames     = { a: 'Team A', b: 'Team B' };
 
@@ -5264,7 +5264,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   let _dadLiveCaddieOpen    = false;
 
   function openFamilyModal() {
-    // Require dad's PIN — same session lock used by My Game
+    // Require dad's PIN, same session lock used by My Game
     if (sessionStorage.getItem('sv-dad-unlocked') !== '1') {
       // Show PIN overlay; on success it will call _openFamilyModalUnlocked()
       _pendingAfterPin = '_openFamilyModalUnlocked';
@@ -5388,7 +5388,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
           </div>`).join('')}
       </div>
 
-      <label class="modal-label" style="margin-top:14px;">Game mode <span style="font-weight:400;color:var(--muted);">— keep it light</span></label>
+      <label class="modal-label" style="margin-top:14px;">Game mode <span style="font-weight:400;color:var(--muted);">keep it light</span></label>
       <div id="fm-gamemode-wrap" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px;">
         ${Object.values(GAME_MODES).map(gm => `
           <div class="fm-gamemode-card${gm.key==='none'?' selected':''}${gm.status==='soon'?' soon':''}" data-mode="${gm.key}"
@@ -5451,8 +5451,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const data = await resp.json();
       if (!resp.ok || data.error) { if (statusEl) statusEl.textContent = data.error || 'Search failed'; return; }
       const courses = data.courses || [];
-      if (!courses.length) { if (statusEl) statusEl.textContent = 'No courses found — try a shorter name'; return; }
-      if (statusEl) statusEl.textContent = courses.length + ' found — tap to select';
+      if (!courses.length) { if (statusEl) statusEl.textContent = 'No courses found, try a shorter name'; return; }
+      if (statusEl) statusEl.textContent = courses.length + ' found, tap to select';
       resultsEl.innerHTML = courses.map(c => {
         const loc = [c.city, c.state].filter(Boolean).join(', ');
         const sub = loc ? '<div style="font-size:0.7rem;color:var(--muted);">' + loc + '</div>' : '';
@@ -5465,7 +5465,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
           + '<div style="font-size:0.88rem;font-weight:600;color:var(--cream);">' + c.name + '</div>' + sub + '</div>';
       }).join('');
     } catch(e) {
-      if (statusEl) statusEl.textContent = 'Network error — check signal';
+      if (statusEl) statusEl.textContent = 'Network error, check signal';
     }
   }
 
@@ -5491,13 +5491,13 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const nameEl = document.getElementById('fm-course-name');
       const subEl  = document.getElementById('fm-course-sub');
       if (selectedDiv) selectedDiv.style.display = '';
-      if (nameEl) nameEl.textContent = clubName + (courseName ? ' — ' + courseName : '');
+      if (nameEl) nameEl.textContent = clubName + (courseName ? ', ' + courseName : '');
       const teeNames = (data.course.allTees || []).map(t => t.name).join(', ');
       if (subEl) subEl.textContent = (location || '') + (teeNames ? ' · Tees: ' + teeNames : '');
 
       famRefreshTeePills();
     } catch(e) {
-      if (statusEl) statusEl.textContent = 'Network error — check signal';
+      if (statusEl) statusEl.textContent = 'Network error, check signal';
     }
   }
 
@@ -5558,7 +5558,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     famRenderTeamPicker();
   }
 
-  // Called whenever the round-type pill changes — hides game mode for fun/practice rounds.
+  // Called whenever the round-type pill changes, hides game mode for fun/practice rounds.
   function famOnTypeChange() {
     const val = document.querySelector('#fm-type-pills .pill.active')?.dataset.val;
     const gmWrap = document.getElementById('fm-gamemode-wrap');
@@ -5631,16 +5631,16 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
               <span style="font-size:0.76rem;font-weight:600;color:var(--cream);">${p.name}</span>
               <i class="ph-light ph-arrows-left-right" style="font-size:0.85rem;color:var(--muted);"></i>
             </div>`;
-          }).join('') : `<div style="font-size:0.7rem;color:var(--muted);padding:4px 0;">No one yet — tap a player on the other team to move them here.</div>`}
+          }).join('') : `<div style="font-size:0.7rem;color:var(--muted);padding:4px 0;">No one yet, tap a player on the other team to move them here.</div>`}
         </div>
       </div>`;
     };
 
     wrap.innerHTML = `
-      <label class="modal-label" style="margin-top:12px;">Set your teams <span style="font-weight:400;color:var(--muted);">— tap a player to swap sides</span></label>
+      <label class="modal-label" style="margin-top:12px;">Set your teams <span style="font-weight:400;color:var(--muted);">tap a player to swap sides</span></label>
       ${teamRow('a', '#378ADD')}
       ${teamRow('b', '#D4537E')}
-      <div style="font-size:0.68rem;color:var(--muted);text-align:center;margin:-2px 0 10px;">📸 Tip: name your teams something fun — it'll show up when you share photos from the round.</div>
+      <div style="font-size:0.68rem;color:var(--muted);text-align:center;margin:-2px 0 10px;">📸 Tip: name your teams something fun, it'll show up when you share photos from the round.</div>
     `;
   }
 
@@ -5650,7 +5650,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   }
 
   function famSetTeamName(teamKey, val) {
-    // Store the live value as typed — don't re-render (would steal input focus).
+    // Store the live value as typed, don't re-render (would steal input focus).
     // Empty/default fallback is applied at round-start time in startFamRound().
     _famTeamNames[teamKey] = val;
   }
@@ -5671,7 +5671,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       showToast('Round deleted');
       loadFamHistory();
     } catch(e) {
-      showToast('Delete failed — check your signal', 'error');
+      showToast('Delete failed, check your signal', 'error');
     }
   }
 
@@ -5697,7 +5697,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     try {
       let rounds = await loadFamilyRounds();
       if (!rounds || rounds.length === 0) {
-        listEl.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:24px 0;">No family rounds yet — start one.</div>';
+        listEl.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:24px 0;">No family rounds yet, start one.</div>';
         return;
       }
       if (_memFilter !== 'all') {
@@ -5738,7 +5738,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         </div>`;
       }).join('');
     } catch(e) {
-      listEl.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px 0;">Could not load — check signal</div>';
+      listEl.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px 0;">Could not load, check signal</div>';
     }
   }
 
@@ -5748,7 +5748,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     try {
       const rounds = await loadFamilyRounds();
       if (!rounds || rounds.length === 0) {
-        listEl.textContent = 'No family rounds yet — start one above!';
+        listEl.textContent = 'No family rounds yet, start one above!';
         return;
       }
       listEl.innerHTML = rounds.map(r => {
@@ -5783,7 +5783,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         </div>`;
       }).join('');
     } catch(e) {
-      listEl.textContent = 'Could not load history — check signal';
+      listEl.textContent = 'Could not load history, check signal';
     }
   }
 
@@ -5811,7 +5811,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const label = document.getElementById('fam-modal-label');
     if (label) label.textContent = r.course_name || 'Round';
     renderFamSummary();
-    // Override buttons — read-only share view
+    // Override buttons, read-only share view
     setTimeout(() => {
       const saveBtn = document.querySelector('#fam-modal-body .btn-primary');
       if (saveBtn) saveBtn.style.display = 'none';
@@ -5834,9 +5834,9 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     let courseName, coursePar, numHoles, holePars, playerYardages;
 
     if (_famCourseData) {
-      // API-sourced course — use tee data per player
+      // API-sourced course, use tee data per player
       const dadTee = _famCourseData.allTees?.find(t => t.name === _famPlayerTees['dad']) || _famCourseData.allTees?.[_famCourseData.allTees.length - 1] || {};
-      courseName = _famCourseData.name + (_famCourseData.course ? ' — ' + _famCourseData.course : '');
+      courseName = _famCourseData.name + (_famCourseData.course ? ', ' + _famCourseData.course : '');
       numHoles   = (dadTee.holePars || _famCourseData.holePars || []).length || 18;
       holePars   = dadTee.holePars || _famCourseData.holePars || Array(numHoles).fill(4);
       coursePar  = holePars.reduce((a,b) => a+b, 0);
@@ -5846,7 +5846,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         playerYardages[pk] = tee?.yardages || null;
       });
     } else if (famIsFun) {
-      // Fun round — course selection optional; use typed name if available
+      // Fun round, course selection optional; use typed name if available
       const typed = (document.getElementById('fm-search-input')?.value || '').trim();
       courseName = typed || 'Golf Course';
       numHoles   = 18;
@@ -5858,8 +5858,8 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       return;
     }
 
-    // Fun rounds use game_mode:'fun' (no schema change needed — reuses existing column)
-    // Game mode setup — additive, backward-compatible. 'none' stores game_mode:null
+    // Fun rounds use game_mode:'fun' (no schema change needed, reuses existing column)
+    // Game mode setup, additive, backward-compatible. 'none' stores game_mode:null
     const gmKey = famIsFun ? 'fun' : (_famGameMode || 'none');
     const gameMode = gmKey === 'none' ? null : gmKey;
     let gameModeData = null;
@@ -5992,7 +5992,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       return `<div style="display:flex;align-items:center;gap:10px;background:${p.color}1c;border:1px solid ${p.color}55;border-radius:12px;padding:11px 14px;margin-bottom:10px;">
         <i class="ph-light ph-rocket-launch" style="font-size:1.3rem;color:${p.color};"></i>
         <div style="flex:1;">
-          <div style="font-size:0.84rem;font-weight:700;color:${p.color};">Bomb drive used — ${p.name}'s carrying the team!</div>
+          <div style="font-size:0.84rem;font-weight:700;color:${p.color};">Bomb drive used, ${p.name}'s carrying the team!</div>
           <div style="font-size:0.7rem;color:var(--muted);margin-top:1px;">Team plays from ${p.name}'s tee shot on this hole.</div>
         </div>
         <button onclick="famUndoBombDrive(${holeNum})" style="background:none;border:none;color:var(--muted);font-size:0.68rem;text-decoration:underline;cursor:pointer;flex-shrink:0;touch-action:manipulation;">Undo</button>
@@ -6015,7 +6015,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     if (!kidButtons) return '';
     return `<div style="margin-bottom:10px;">
-      <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Junior Scramble — ${isFront9?'Front':'Back'} 9 rescue available</div>
+      <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Junior Scramble, ${isFront9?'Front':'Back'} 9 rescue available</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">${kidButtons}</div>
     </div>`;
   }
@@ -6060,7 +6060,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       </div>`;
     };
     return `<div style="margin-bottom:10px;">
-      <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Team Scramble — best ball this hole</div>
+      <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Team Scramble, best ball this hole</div>
       <div style="display:flex;gap:8px;">${teamRow('a', '#378ADD')}${teamRow('b', '#D4537E')}</div>
     </div>`;
   }
@@ -6082,13 +6082,13 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.5rem;color:var(--text);">${score != null ? score : '—'}</div>
       </div>`;
     return `<div style="margin-bottom:10px;">
-      <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Parents vs. Kids — adjusted best ball</div>
+      <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Parents vs. Kids, adjusted best ball</div>
       <div style="display:flex;gap:8px;">${box(adultNames,'#1D9E75',adultBest,'raw score')}${box(kidNames,'#7F77DD',kidsBest,kidSub)}</div>
     </div>`;
   }
 
   const _HOLE_CHALLENGE_DEF = {
-    closest_pin:   { icon: 'ph-flag-pennant', label: 'Closest to the Pin', hint: 'Par 3 — who lands closest?' },
+    closest_pin:   { icon: 'ph-flag-pennant', label: 'Closest to the Pin', hint: 'Par 3, who lands closest?' },
     fewest_putts:  { icon: 'ph-golf',         label: 'Fewest Putts',       hint: 'Who holes out with the fewest putts?' },
     longest_drive: { icon: 'ph-arrow-right',  label: 'Longest Drive',      hint: 'Who gets furthest off the tee?' },
     hit_fairway:   { icon: 'ph-check-square', label: 'Hit the Fairway',    hint: 'Who splits the fairway with their drive?' },
@@ -6105,7 +6105,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const p = FAM_PLAYERS[winner];
       return `<div style="display:flex;align-items:center;gap:10px;background:rgba(212,83,126,0.08);border:1px solid rgba(212,83,126,0.35);border-radius:12px;padding:11px 14px;margin-bottom:10px;">
         <i class="ph-light ph-medal" style="font-size:1.3rem;color:#D4537E;"></i>
-        <div style="flex:1;"><div style="font-size:0.84rem;font-weight:700;color:#D4537E;">${def.label} — ${p.name} wins!</div>
+        <div style="flex:1;"><div style="font-size:0.84rem;font-weight:700;color:#D4537E;">${def.label}, ${p.name} wins!</div>
           <div style="font-size:0.7rem;color:var(--muted);margin-top:1px;">${def.hint}</div></div>
         <button onclick="famChallengePickWinner(null)" style="background:none;border:none;color:var(--muted);font-size:0.68rem;text-decoration:underline;cursor:pointer;flex-shrink:0;touch-action:manipulation;">Undo</button>
       </div>`;
@@ -6119,7 +6119,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         <i class="ph-light ph-${def.icon}" style="font-size:0.95rem;color:#D4537E;"></i>
         <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;">Challenge: ${def.label}</div>
       </div>
-      <div style="font-size:0.72rem;color:var(--muted);margin-bottom:8px;">${def.hint} — tap to pick the winner:</div>
+      <div style="font-size:0.72rem;color:var(--muted);margin-bottom:8px;">${def.hint}, tap to pick the winner:</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">${buttons}
         <button onclick="famChallengePickWinner(null)" style="font-size:0.72rem;color:var(--muted);padding:8px 12px;background:var(--surface2);border:1px solid rgba(255,255,255,0.08);border-radius:20px;cursor:pointer;touch-action:manipulation;">Skip</button>
       </div>
@@ -6151,7 +6151,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       return `<div style="display:flex;align-items:center;gap:10px;background:${p.color}1c;border:1px solid ${p.color}55;border-radius:12px;padding:11px 14px;margin-bottom:10px;">
         <i class="ph-light ph-confetti" style="font-size:1.3rem;color:${p.color};"></i>
         <div style="flex:1;"><div style="font-size:0.84rem;font-weight:700;color:${p.color};">KID BIRDIE BOMB! ${p.name} wins the hole!</div>
-          <div style="font-size:0.7rem;color:var(--muted);margin-top:1px;">Scored ${sc} — target was ${target}. Hole goes to ${p.name}!</div></div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:1px;">Scored ${sc}, target was ${target}. Hole goes to ${p.name}!</div></div>
       </div>`;
     }
     if (gm.kidWins[h.hole]) delete gm.kidWins[h.hole];
@@ -6160,7 +6160,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       return `<span style="font-size:0.72rem;padding:5px 10px;background:${p.color}18;border:1px solid ${p.color}40;border-radius:20px;color:${p.color};">${p.name}: ${target} or better</span>`;
     }).join('');
     return `<div style="margin-bottom:10px;">
-      <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Kid Birdie Bomb — targets this hole</div>
+      <div style="font-size:0.66rem;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px;">Kid Birdie Bomb, targets this hole</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;">${kidRows}</div>
     </div>`;
   }
@@ -6214,14 +6214,14 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     document.getElementById('fam-modal-label').textContent = `HOLE ${h.hole}`;
     const famSub = document.getElementById('fam-modal-hole-sub');
     if (famSub) { famSub.textContent = `of ${_famHoles.length} · par ${h.par}`; famSub.style.display = ''; }
-    // Hide X during live tracking — Exit Round is in the footer
+    // Hide X during live tracking, Exit Round is in the footer
     const famClose = document.getElementById('fam-modal-close-btn');
     if (famClose) famClose.style.display = 'none';
     // Show footer with Exit Round button
     const famFooter = document.getElementById('fam-modal-footer');
     if (famFooter) {
       famFooter.style.display = '';
-      famFooter.innerHTML = `<button onclick="confirmExitFamRound()" style="width:100%;background:none;border:1px solid rgba(192,57,43,0.35);border-radius:10px;padding:9px;color:rgba(192,57,43,0.8);font-size:0.78rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;touch-action:manipulation;">EXIT ROUND — Tap to confirm</button>`;
+      famFooter.innerHTML = `<button onclick="confirmExitFamRound()" style="width:100%;background:none;border:1px solid rgba(192,57,43,0.35);border-radius:10px;padding:9px;color:rgba(192,57,43,0.8);font-size:0.78rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;touch-action:manipulation;">EXIT ROUND, Tap to confirm</button>`;
     }
     updateFamRunningBar();
 
@@ -6327,7 +6327,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       <div style="margin-top:10px;">
         <button onclick="toggleFamCaddie()" id="fam-caddie-toggle"
           style="width:100%;background:var(--surface2);border:1px solid rgba(212,168,67,0.25);border-radius:10px;padding:10px 16px;color:var(--gold-l);font-size:0.84rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-tap-highlight-color:transparent;">
-          <span>🎙️ Caddie — H${h.hole} P${h.par}</span>
+          <span>🎙️ Caddie, H${h.hole} P${h.par}</span>
           <span id="fam-caddie-caret">${_famCaddieOpen ? '▲' : '▼'}</span>
         </button>
         <div id="fam-caddie-panel" style="display:${_famCaddieOpen ? 'block' : 'none'};background:var(--surface);border:1px solid rgba(212,168,67,0.15);border-top:none;border-radius:0 0 10px 10px;padding:12px 14px;">
@@ -6457,7 +6457,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   }
 
   function confirmExitFamRound() {
-    if (confirm('Exit round? Progress is saved — tap Family Round to resume.')) {
+    if (confirm('Exit round? Progress is saved, tap Family Round to resume.')) {
       _saveFamDraft();
       closeFamilyModal();
     }
@@ -6559,7 +6559,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         </button>
         <button onclick="buildAndShare('best')" style="background:var(--surface2);border:1px solid rgba(212,175,110,0.2);border-radius:14px;padding:16px;text-align:left;cursor:pointer;color:var(--cream);">
           <div style="font-weight:700;font-size:0.95rem;margin-bottom:3px;">Best Moment</div>
-          <div style="font-size:0.78rem;color:var(--muted);">Auto-picks your best hole — with photo or prompts to add one</div>
+          <div style="font-size:0.78rem;color:var(--muted);">Auto-picks your best hole, with photo or prompts to add one</div>
         </button>`}
       </div>
     `;
@@ -6675,7 +6675,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       try {
         const file = new File([blob], filename, { type: 'image/png' });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: 'SpinVibes Golf — ' + (_famRound.course_name||'') });
+          await navigator.share({ files: [file], title: 'SpinVibes Golf, ' + (_famRound.course_name||'') });
           URL.revokeObjectURL(objUrl); return;
         }
       } catch(e) { /* share cancelled or not supported */ }
@@ -6709,7 +6709,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     );
   }
 
-  // Draw logo badge (SPINVIBES / Family Golf) — box sized from text, no EST.
+  // Draw logo badge (SPINVIBES / Family Golf), box sized from text, no EST.
   function _drawLogoBadge(ctx, rightEdge, topEdge, sf) {
     const spinF = Math.round(26*sf);
     const famF  = Math.round(18*sf);
@@ -6732,7 +6732,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     ctx.fillText('Family Golf', boxX + boxW/2, boxY + padY + spinF + gap + famF);
   }
 
-  // Draw centered logo (scorecard header) — SPINVIBES + Family Golf, no EST.
+  // Draw centered logo (scorecard header), SPINVIBES + Family Golf, no EST.
   function _drawLogoCenter(ctx, cx, y, sf) {
     const spinF = Math.round(36*sf);
     const famF  = Math.round(22*sf);
@@ -6786,7 +6786,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     return totals;
   }
 
-  // Auto-grid collage — works for 1 to 18+ photos
+  // Auto-grid collage, works for 1 to 18+ photos
   async function _drawCollageBackground(ctx, W, H, allPhotos) {
     // Cap at 9, pick evenly spread if more
     const MAX = 9;
@@ -6839,7 +6839,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     topG.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = topG; ctx.fillRect(0, 0, W, H);
 
-    // Logo — top right
+    // Logo, top right
     const logo = await _loadSvLogo();
     if (logo) {
       const logoW = Math.round(200 * sf);
@@ -6864,7 +6864,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     return g;
   }
 
-  // Draw a player chip — name / big score / vs-par label
+  // Draw a player chip, name / big score / vs-par label
   function _drawPlayerChip(ctx, pk, score, par, cx, cy, chipW, chipH, sf, isWinner) {
     const p    = FAM_PLAYERS[pk] || {};
     const diff = score - par;
@@ -7071,7 +7071,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W-pad, y); ctx.stroke();
     y += Math.round(14*sf);
 
-    // ── TOTAL ROW — player chips ──
+    // ── TOTAL ROW, player chips ──
     const chipW = Math.round(Math.min(155*sf, (W-pad*2-(players.length-1)*8)/players.length));
     const chipH = Math.round(82*sf);
     const chipX0 = (W-(players.length*chipW+(players.length-1)*8))/2;
@@ -7092,7 +7092,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     return _canvasToBlob(canvas);
   }
 
-  // ── TEMPLATE 1b: TEAM SCRAMBLE RECAP — team names front and center, best-ball totals ──
+  // ── TEMPLATE 1b: TEAM SCRAMBLE RECAP, team names front and center, best-ball totals ──
   async function _buildTeamScrambleCard() {
     if (_famRound.game_mode !== 'team_scramble' || !_famRound.game_mode_data) return null;
     const W = 720, H = 1280;
@@ -7145,7 +7145,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     ctx.fillText(`${_famRound.date_played||''}  ·  Par ${totalPar}`, W/2, y);
     y += Math.round(50*sf);
 
-    // ── TEAM CARDS — name, members, big total ──
+    // ── TEAM CARDS, name, members, big total ──
     const cardW = Math.round((W - pad*2 - 18) / 2);
     const cardH = Math.round(220*sf);
     ['a','b'].forEach((teamKey, i) => {
@@ -7439,7 +7439,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         <div style="width:36px;height:36px;border-radius:50%;background:${_C[pk+'Bg']||'rgba(255,255,255,0.08)'};border:2px solid ${_C[pk]||_C.gold};display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.82rem;color:${_C[pk]||_C.gold};flex-shrink:0;">${p.name.slice(0,2)}</div>
         <div style="flex:1;text-align:left;">
           <div style="font-weight:700;font-size:0.92rem;">${p.name}</div>
-          <div style="font-size:0.75rem;color:var(--muted);margin-top:2px;">${bestH ? 'Best: Hole ' + bestH.hole + ' — ' + ach : 'No data'}</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:2px;">${bestH ? 'Best: Hole ' + bestH.hole + ', ' + ach : 'No data'}</div>
         </div>
         <div style="color:var(--gold);">›</div>
       </button>`;
@@ -7473,7 +7473,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       return;
     }
 
-    // Single or no photo — build directly
+    // Single or no photo, build directly
     const btn = document.getElementById('fam-share-btn');
     if (btn) { btn.disabled = true; btn.textContent = 'Building...'; }
     try {
@@ -7493,7 +7493,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     sheet.style.cssText = 'width:100%;background:var(--surface);border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));';
     sheet.innerHTML = `
       <div style="width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:0 auto 14px;"></div>
-      <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:2px;color:var(--cream);margin-bottom:6px;">${p.name} — Hole ${bestH.hole}</div>
+      <div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:2px;color:var(--cream);margin-bottom:6px;">${p.name}, Hole ${bestH.hole}</div>
       <div style="font-size:0.78rem;color:var(--muted);margin-bottom:14px;">Pick which photo to use on the card</div>
       <div style="display:flex;gap:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px;scrollbar-width:none;">
         ${photos.map((src, i) => `
@@ -7635,7 +7635,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         <div style="width:34px;height:34px;border-radius:50%;background:${p.color};color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;font-weight:800;font-size:0.95rem;flex-shrink:0;">${p.emoji}</div>
         <div style="flex:1;">
           <div style="font-size:0.82rem;font-weight:700;color:${p.color};">${p.name}</div>
-          <div style="font-size:0.72rem;color:var(--muted);margin-top:1px;">${used.length ? `Bomb drive used on ${holesUsed} — saved the team!` : 'Saved both bomb drives — held them in reserve.'}</div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:1px;">${used.length ? `Bomb drive used on ${holesUsed}, saved the team!` : 'Saved both bomb drives, held them in reserve.'}</div>
         </div>
         <i class="ph-light ph-rocket-launch" style="font-size:1.15rem;color:${used.length ? p.color : 'rgba(255,255,255,0.15)'};flex-shrink:0;"></i>
       </div>`;
@@ -7643,7 +7643,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
     const heroLine = rescuedEntries.length
       ? `<div style="font-size:0.8rem;color:var(--gold);font-weight:700;margin-bottom:4px;">🚀 ${rescuedEntries.length} hole${rescuedEntries.length>1?'s':''} rescued by bomb drives this round!</div>`
-      : `<div style="font-size:0.8rem;color:var(--muted);margin-bottom:4px;">No bomb drives used — the team played it straight all the way.</div>`;
+      : `<div style="font-size:0.8rem;color:var(--muted);margin-bottom:4px;">No bomb drives used, the team played it straight all the way.</div>`;
 
     return `<div class="card" style="border-color:rgba(55,138,221,0.35);background:rgba(55,138,221,0.08);padding:14px 16px;margin-bottom:14px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
@@ -7698,7 +7698,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     return `<div class="card" style="border-color:rgba(29,158,117,0.35);background:rgba(29,158,117,0.08);padding:14px 16px;margin-bottom:14px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
         <i class="ph-light ph-handshake" style="font-size:1.1rem;color:#1D9E75;"></i>
-        <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#1D9E75;">Team Scramble Recap — Best Ball</div>
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#1D9E75;">Team Scramble Recap, Best Ball</div>
       </div>
       ${heroLine}
       ${teamLine('a', '#378ADD', totalA)}
@@ -7723,7 +7723,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     let hero;
     if (kidsWins > adultsWins) hero = `Kids win! ${kidsWins}–${adultsWins}${tieNote}.`;
     else if (adultsWins > kidsWins) hero = `Adults win! ${adultsWins}–${kidsWins}${tieNote}.`;
-    else hero = `All square — ${kidsWins} holes each${tieNote}!`;
+    else hero = `All square, ${kidsWins} holes each${tieNote}!`;
     const hcapNote = gm.kids.map(pk => `${FAM_PLAYERS[pk]?.name}: –${gm.kidHandicaps[pk]} per hole`).join(' · ');
     return `<div class="card" style="border-color:rgba(127,119,221,0.35);background:rgba(127,119,221,0.08);padding:14px 16px;margin-bottom:14px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
@@ -7757,7 +7757,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     let hero;
     if (!Object.values(wins).some(Boolean)) hero = 'No challenges called this round.';
     else if (sorted.filter(([,c]) => c === topCount).length > 1) hero = `Tied at ${topCount} challenge${topCount > 1 ? 's' : ''} each!`;
-    else { const w = FAM_PLAYERS[sorted[0][0]]; hero = `${w.name} wins the most challenges — ${topCount} hole${topCount>1?'s':''}!`; }
+    else { const w = FAM_PLAYERS[sorted[0][0]]; hero = `${w.name} wins the most challenges, ${topCount} hole${topCount>1?'s':''}!`; }
     const rows = sorted.filter(([,c]) => c > 0).map(([pk, count]) => {
       const p = FAM_PLAYERS[pk];
       const holesWon = Object.entries(wins).filter(([,wpk]) => wpk === pk).map(([h]) => {
@@ -7788,7 +7788,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const winEntries = Object.entries(kidWins);
     const hero = winEntries.length
       ? `Kids won ${winEntries.length} hole${winEntries.length > 1 ? 's' : ''} outright this round!`
-      : `No Kid Birdie Bombs this round — go get 'em next time!`;
+      : `No Kid Birdie Bombs this round, go get 'em next time!`;
     const kidLines = (gm.kids || []).map(pk => {
       const p = FAM_PLAYERS[pk];
       const myWins = winEntries.filter(([,wpk]) => wpk === pk).map(([h]) => `H${h}`);
@@ -7855,7 +7855,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const famFooter = document.getElementById('fam-modal-footer');
     if (famFooter) {
       famFooter.style.display = '';
-      famFooter.innerHTML = `<button onclick="confirmExitFamRound()" style="width:100%;background:none;border:1px solid rgba(192,57,43,0.35);border-radius:10px;padding:9px;color:rgba(192,57,43,0.8);font-size:0.78rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;touch-action:manipulation;">EXIT ROUND — Tap to confirm</button>`;
+      famFooter.innerHTML = `<button onclick="confirmExitFamRound()" style="width:100%;background:none;border:1px solid rgba(192,57,43,0.35);border-radius:10px;padding:9px;color:rgba(192,57,43,0.8);font-size:0.78rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;touch-action:manipulation;">EXIT ROUND, Tap to confirm</button>`;
     }
 
     const hPhotos    = h.photos?.length ? h.photos : (h.photo ? [h.photo] : []);
@@ -8052,7 +8052,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
 
   function famMidRoundScorecard() {
-    // Hide the Exit Round footer — Share is in the body
+    // Hide the Exit Round footer, Share is in the body
     const footer = document.getElementById('fam-modal-footer');
     if (footer) footer.style.display = 'none';
     renderFamSummary();
@@ -8081,7 +8081,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     if (!el) return;
     const h = _famHoles[_famHoleIdx];
     const holeCtx = h ? `Hole ${h.hole}, Par ${h.par}` : '';
-    const welcome = `<div style="background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.2);border-radius:10px;padding:12px 14px;font-size:0.82rem;color:var(--cream);line-height:1.55;"><i class="ti ti-microphone" style="color:var(--gold);vertical-align:-1px;"></i> <strong>Caddie ready.</strong> ${holeCtx ? 'You\'re on ' + holeCtx + '.' : ''} Ask anything — club, layup vs. go, wind adjustments.</div>`;
+    const welcome = `<div style="background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.2);border-radius:10px;padding:12px 14px;font-size:0.82rem;color:var(--cream);line-height:1.55;"><i class="ti ti-microphone" style="color:var(--gold);vertical-align:-1px;"></i> <strong>Caddie ready.</strong> ${holeCtx ? 'You\'re on ' + holeCtx + '.' : ''} Ask anything, club, layup vs. go, wind adjustments.</div>`;
     const msgs = _famCaddieHistory.map(m => {
       const isUser = m.role === 'user';
       return `<div style="
@@ -8204,7 +8204,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       _famCaddieHistory.push({ role: 'assistant', content: reply });
       renderFamCaddieMessages(false);
     } catch(e) {
-      showToast('No signal — check your connection', 'error');
+      showToast('No signal, check your connection', 'error');
       _famCaddieHistory.pop();
       renderFamCaddieMessages(false);
     } finally {
@@ -8217,7 +8217,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
 
   async function saveFamRound(btn) {
     btn.disabled = true; btn.textContent = 'Saving...';
-    _clearFamDraft(); // round saved — clear in-progress draft
+    _clearFamDraft(); // round saved, clear in-progress draft
     const players  = _famRound.players;
     const statusEl = document.getElementById('fam-save-status');
     const saved = [], failed = [];
@@ -8233,7 +8233,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     }
     btn.textContent = 'Saving...';
 
-    // Build totals map (N/A holes excluded — null scores don't contribute)
+    // Build totals map (N/A holes excluded, null scores don't contribute)
     const totals = {};
     players.forEach(pk => {
       totals[pk] = _famHoles.reduce((a, h) => {
@@ -8241,7 +8241,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       }, 0);
     });
 
-    // Save individual round to each player's table (skipped for fun rounds — not tracked for stats/handicap)
+    // Save individual round to each player's table (skipped for fun rounds, not tracked for stats/handicap)
     if (!_famRound.is_fun_round) {
       for (const pk of players) {
         const p        = FAM_PLAYERS[pk];
@@ -8323,7 +8323,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       localStorage.setItem('sv-girl-family-count', String((parseInt(localStorage.getItem('sv-girl-family-count')||'0'))+1));
     }
 
-    // Fire AI range tip async (account holder only, non-blocking — skipped for fun rounds)
+    // Fire AI range tip async (account holder only, non-blocking, skipped for fun rounds)
     if (!_famRound.is_fun_round && players.includes('dad')) {
       const dadScore  = totals['dad'] || 0;
       const diffStr   = dadScore - _famRound.course_par;
@@ -8460,17 +8460,17 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       const data = await resp.json();
 
       if (!resp.ok || data.error) {
-        if (statusEl) statusEl.textContent = data.error || 'Search failed — check your signal';
+        if (statusEl) statusEl.textContent = data.error || 'Search failed, check your signal';
         return;
       }
 
       const courses = data.courses || [];
       if (!courses.length) {
-        if (statusEl) statusEl.textContent = 'No courses found — try a different name or scan the scorecard below';
+        if (statusEl) statusEl.textContent = 'No courses found, try a different name or scan the scorecard below';
         return;
       }
 
-      if (statusEl) statusEl.textContent = `${courses.length} course${courses.length !== 1 ? 's' : ''} found — tap to select`;
+      if (statusEl) statusEl.textContent = `${courses.length} course${courses.length !== 1 ? 's' : ''} found, tap to select`;
       if (resultsEl) {
         resultsEl.innerHTML = courses.map(c => {
           const loc = [c.city, c.state].filter(Boolean).join(', ');
@@ -8485,7 +8485,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         }).join('');
       }
     } catch (e) {
-      if (statusEl) statusEl.textContent = 'Network error — check your signal';
+      if (statusEl) statusEl.textContent = 'Network error, check your signal';
       console.error(e);
     }
   }
@@ -8517,7 +8517,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       // Scroll to review form
       setTimeout(() => document.getElementById('ac-review-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
     } catch (e) {
-      if (statusEl) statusEl.textContent = 'Network error — check your signal';
+      if (statusEl) statusEl.textContent = 'Network error, check your signal';
       console.error(e);
     }
   }
@@ -8560,7 +8560,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       });
       const data = await resp.json();
       if (!resp.ok || data.error) {
-        statusEl.textContent = data.error || 'Parse failed — try a clearer photo';
+        statusEl.textContent = data.error || 'Parse failed, try a clearer photo';
         parseBtn.disabled = false;
         parseBtn.textContent = 'Parse Scorecard →';
         return;
@@ -8568,7 +8568,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       _parsedCourse = data.course;
       renderAcReviewForm(_parsedCourse);
     } catch(e) {
-      statusEl.textContent = 'Network error — check your signal';
+      statusEl.textContent = 'Network error, check your signal';
       console.error(e);
     } finally {
       parseBtn.disabled = false;
@@ -8649,7 +8649,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         </div>` : ''}
       </div>
       <div style="background:var(--surface);border-radius:12px;padding:14px 16px;margin-bottom:14px;">
-        <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Hole Details — review &amp; fix any misreads</div>
+        <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Hole Details, review &amp; fix any misreads</div>
         <div style="overflow-x:auto;">
           <table style="width:100%;border-collapse:collapse;">
             <thead><tr>
@@ -8734,13 +8734,13 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       else if (_addCourseContext === 'fam') renderFamSetup();
     } catch(e) {
       console.error(e);
-      if (statusEl) statusEl.textContent = 'Save failed — check your signal';
+      if (statusEl) statusEl.textContent = 'Save failed, check your signal';
       if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Course ✓'; }
     }
   }
 
   // ══════════════════════════════════════════════════════════════
-  // SPRINT 3 — SETTINGS & PROFILE SYSTEM
+  // SPRINT 3, SETTINGS & PROFILE SYSTEM
   // ══════════════════════════════════════════════════════════════
 
   // ── Helpers ───────────────────────────────────────────────────
@@ -8764,7 +8764,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
   async function loadUserProfile() {
     const deviceId = getOrCreateDeviceId();
     try {
-      // 1. Profile row — try this device first, fall back to pin_code for cross-device sync
+      // 1. Profile row, try this device first, fall back to pin_code for cross-device sync
       let { data: profile } = await _sb
         .from('sv_profiles').select('*')
         .eq('device_id', deviceId).maybeSingle();
@@ -8903,7 +8903,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     const tendEl = document.getElementById('set-tendency');
     if (tendEl)  tendEl.value  = localStorage.getItem('sv-dad-tendency') || '';
 
-    // Bag — deep copy so edits don't mutate active clubs until Save
+    // Bag, deep copy so edits don't mutate active clubs until Save
     _settingsClubs = getActiveClubs().map(c => ({ ...c }));
     renderSettingsBag();
 
@@ -9058,7 +9058,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
     }
 
     if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) { pinMsg('New PIN must be exactly 4 digits.', false); return; }
-    if (newPin !== confirm) { pinMsg('PINs don\'t match — re-enter and try again.', false); return; }
+    if (newPin !== confirm) { pinMsg('PINs don\'t match, re-enter and try again.', false); return; }
 
     // Update in memory immediately
     _activePin = newPin;
@@ -9075,7 +9075,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
         }, { onConflict: 'device_id' });
       pinMsg('PIN updated successfully.', true);
     } catch(e) {
-      pinMsg('Saved locally — will sync when online.', true);
+      pinMsg('Saved locally, will sync when online.', true);
     }
 
     // Clear fields
@@ -9109,7 +9109,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       });
       _activeProfile = saved;
 
-      // 3. Save clubs — Supabase + localStorage cache (cache survives refresh without Supabase)
+      // 3. Save clubs, Supabase + localStorage cache (cache survives refresh without Supabase)
       await saveClubsToSupabase(saved.id, _settingsClubs);
       _activeClubs = _settingsClubs.map(c => ({ ...c }));
       localStorage.setItem('sv-active-clubs', JSON.stringify(_activeClubs));
@@ -9146,7 +9146,7 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       if (srcEl) srcEl.textContent = 'Supabase ✓';
     } catch(e) {
       console.error('Settings save error:', e);
-      showToast('Save failed — check signal', 'error');
+      showToast('Save failed, check signal', 'error');
     } finally {
       if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save All Settings'; }
     }
@@ -9228,14 +9228,14 @@ RULES: Always state which player you are advising. Use ONLY that player's yardag
       if (logPar) logPar.value = '';
     } catch(e) {
       console.error(e);
-      logMsg('Save failed — check your signal.', false);
+      logMsg('Save failed, check your signal.', false);
     } finally {
       if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Round'; }
     }
   }
 
   // ══════════════════════════════════════════════════════════════
-  // END SPRINT 3 — SETTINGS
+  // END SPRINT 3, SETTINGS
   // ══════════════════════════════════════════════════════════════
 
   async function retryFailedFamSaves(btn) {

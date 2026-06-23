@@ -1,10 +1,10 @@
-# SpinVibes Golf — Deployment Guide
+# SpinVibes Golf, Deployment Guide
 ## How to publish to SpinVibes.com (Free Hosting via GitHub Pages)
 
 ---
 
 ## What You're Publishing
-A Progressive Web App (PWA) — a website that installs on your iPhone like a real app.
+A Progressive Web App (PWA), a website that installs on your iPhone like a real app.
 Works fully offline once installed. No App Store needed.
 
 ---
@@ -25,14 +25,14 @@ spinvibes-golf/
 
 ## STEP-BY-STEP: First-Time Setup
 
-### STEP 1 — Create a Free GitHub Account
+### STEP 1, Create a Free GitHub Account
 1. Go to https://github.com
-2. Click **Sign up** — use any email
+2. Click **Sign up**: use any email
 3. Choose the **Free** plan
 
 ---
 
-### STEP 2 — Create a New Repository
+### STEP 2, Create a New Repository
 1. Once logged in, click the **+** button (top right) → **New repository**
 2. Repository name: `spinvibes-golf` (exactly this)
 3. Set to **Public**
@@ -40,7 +40,7 @@ spinvibes-golf/
 
 ---
 
-### STEP 3 — Upload Your Files
+### STEP 3, Upload Your Files
 1. In your new repository, click **uploading an existing file** (blue link)
 2. Drag and drop ALL files from this folder:
    - `index.html`
@@ -51,19 +51,19 @@ spinvibes-golf/
 
 ---
 
-### STEP 4 — Enable GitHub Pages
+### STEP 4, Enable GitHub Pages
 1. In your repository, click **Settings** (top menu)
 2. Scroll down to **Pages** (left sidebar)
 3. Under **Source**, select **Deploy from a branch**
 4. Branch: **main** | Folder: **/ (root)**
 5. Click **Save**
-6. Wait ~2 minutes — GitHub will show you a URL like:
+6. Wait ~2 minutes, GitHub will show you a URL like:
    `https://yourusername.github.io/spinvibes-golf`
-7. Test that URL in your browser — app should work!
+7. Test that URL in your browser, app should work!
 
 ---
 
-### STEP 5 — Point SpinVibes.com to GitHub Pages
+### STEP 5, Point SpinVibes.com to GitHub Pages
 
 #### In GitHub (do this first):
 1. Go to your repository **Settings → Pages**
@@ -95,21 +95,21 @@ spinvibes-golf/
 
 ---
 
-### STEP 6 — Enable HTTPS (SSL)
+### STEP 6, Enable HTTPS (SSL)
 1. Back in GitHub → **Settings → Pages**
 2. Once your custom domain is verified, check **Enforce HTTPS**
 3. Your site will be live at **https://spinvibes.com** 🎉
 
 ---
 
-## STEP 7 — Install the App on Your iPhone
+## STEP 7, Install the App on Your iPhone
 1. Open **Safari** on your iPhone (must be Safari, not Chrome)
 2. Go to **https://spinvibes.com**
 3. Tap the **Share** button (box with arrow pointing up)
 4. Scroll down and tap **Add to Home Screen**
 5. Name it **SpinVibes Golf** → tap **Add**
 6. The app icon appears on your home screen like any other app!
-7. Open it — it works fully offline from now on ✅
+7. Open it, it works fully offline from now on ✅
 
 ---
 
@@ -125,7 +125,7 @@ When we create new guides (course management, wedge chart, etc.):
 ---
 
 ## Troubleshooting
-- **Site not showing:** DNS can take up to 24 hours — be patient
+- **Site not showing:** DNS can take up to 24 hours, be patient
 - **Old version showing:** Hard refresh with Ctrl+Shift+R (or clear Safari cache)
 - **App not installing:** Must use Safari on iPhone, not Chrome or Firefox
 - **Offline not working:** Open the site in Safari first while online, then it caches

@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="SpinVibes Golf">
-  <meta name="description" content="Jeremy's Golf Pocket Guide — Sub-90 Journey">
+  <meta name="description" content="Jeremy's Golf Pocket Guide, Sub-90 Journey">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <title>SpinVibes Golf</title>
@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/light/style.css">
   <script>
-    // Runs before body renders — only restore profile if same browser session
+    // Runs before body renders, only restore profile if same browser session
     // sessionStorage clears when tab is closed, so fresh tabs always show landing
     const _p = localStorage.getItem('sv-profile');
     const _s = sessionStorage.getItem('sv-session');
@@ -26,7 +26,7 @@
     if (_p === 'mom'     && _s) document.documentElement.classList.add('pre-mom');
 </script>
   <style>
-    /* Pre-render profile state — set by inline <script> in <head> */
+    /* Pre-render profile state, set by inline <script> in <head> */
     html.has-profile #landing { display: none !important; }
     html.has-profile #app {
       display: flex !important;
@@ -411,7 +411,7 @@
     .stat-lbl { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
 
     /* ── HOME PAGE ── */
-    /* Default hero (Dad — gold) */
+    /* Default hero (Dad, gold) */
     .home-hero {
       background: #FEFAF0;
       padding: 28px 20px 24px;
@@ -605,7 +605,7 @@
       padding: 10px 12px;
       color: var(--cream);
       font-family: 'Archivo', sans-serif;
-      font-size: 16px; /* iOS auto-zooms inputs below 16px — must not be smaller. Was 0.85rem (~13.6px), beat .modal-input's 16px via specificity. */
+      font-size: 16px; /* iOS auto-zooms inputs below 16px, must not be smaller. Was 0.85rem (~13.6px), beat .modal-input's 16px via specificity. */
       margin-bottom: 10px;
     }
     /* iOS auto-zooms on focus when a field is below 16px. Keep textareas (caddie
@@ -636,7 +636,7 @@
       --muted:     #8FA396;
       --border:    rgba(255,255,255,0.09);
     }
-    /* Dark mode — fix hardcoded whites */
+    /* Dark mode, fix hardcoded whites */
     body.dark-mode #nav {
       background: var(--surface);
       border-top-color: var(--border);
@@ -765,7 +765,7 @@
     }
     #modeToggle:active { opacity: 0.7; }
 
-    /* ── EXPANDABLE SECTIONS — full-width hairline, no card ── */
+    /* ── EXPANDABLE SECTIONS, full-width hairline, no card ── */
     .exp-trigger {
       display:flex; align-items:center; justify-content:space-between;
       cursor:pointer; user-select:none; -webkit-user-select:none;
@@ -809,7 +809,7 @@
     body.dark-mode .diagram { background:rgba(255,255,255,0.04); }
     body.dark-mode .exp-mistake { background:rgba(214,79,58,0.12); }
 
-    /* Topbar logo always gold on dark green — no profile overrides */
+    /* Topbar logo always gold on dark green, no profile overrides */
 
     /* ── PROFILE SECTION WIDTH (page sections only, not nav buttons) ── */
     .page .dad-sect, .page .son-sect, .page .girl-sect,
@@ -841,7 +841,7 @@
       margin-bottom: 8px;
     }
 
-    /* .landing-card-girl dark block removed — replaced below with light palette */
+    /* .landing-card-girl dark block removed, replaced below with light palette */
 
     /* ── PROFILE SWITCHER ── avatar circles on dark topbar */
     #profileSwitch {
@@ -977,7 +977,7 @@
       background: rgba(255,255,255,0.05);
       border-color: rgba(255,255,255,0.22);
     }
-    /* Family grid cards — uniform dark roster rows */
+    /* Family grid cards, uniform dark roster rows */
     .landing-card-son,
     .landing-card-girl,
     .landing-card-mom,
@@ -1075,7 +1075,7 @@
       color: rgba(255,255,255,0.45);
       font-weight: 600;
     }
-    /* Family roster — same size as Dad's card, stacked */
+    /* Family roster, same size as Dad's card, stacked */
     .landing-family-grid {
       display: flex;
       flex-direction: column;
@@ -1127,7 +1127,7 @@
       opacity: 1;
       transform: translateX(3px);
     }
-    /* Orbs removed — clean light-mode landing */
+    /* Orbs removed, clean light-mode landing */
     .landing-orb {
       display: none;
     }
@@ -1171,7 +1171,7 @@
       margin-bottom: 8px;
     }
 
-    /* ── LANDING CARD MOM ── (copper — distinct from dad's gold) */
+    /* ── LANDING CARD MOM ── (copper, distinct from dad's gold) */
     .landing-card-mom .landing-card-name { color: #B86530; }
     .landing-card-mom .landing-card-desc { color: #8a4a20; }
 
@@ -1222,7 +1222,7 @@
 
     /* ── PORTRAIT MOBILE FIXES ── */
     @media (max-width: 599px) {
-      /* Keep topbar toggle visible on portrait — but slim it down to icon-only */
+      /* Keep topbar toggle visible on portrait, but slim it down to icon-only */
       #modeToggle {
         padding: 6px 8px;
         margin-right: 0;
@@ -1232,15 +1232,15 @@
         justify-content: center;
         gap: 0;
       }
-      /* Avatar circles already compact on small screens — no override needed */
+      /* Avatar circles already compact on small screens, no override needed */
 
-      /* Nav scrolls horizontally — all tabs visible, no hiding needed */
+      /* Nav scrolls horizontally, all tabs visible, no hiding needed */
     }
 
-    /* Float toggle never shown — mode toggle stays in topbar */
+    /* Float toggle never shown, mode toggle stays in topbar */
     #floatToggle { display: none; }
 
-    /* ── RESPONSIVE — DESKTOP / TABLET ── */
+    /* ── RESPONSIVE, DESKTOP / TABLET ── */
     @media (min-width: 600px) {
       body { background: #E8E6E2; }
       body.dark-mode { background: #000; }
@@ -1270,20 +1270,20 @@
       .home-hero { padding: 32px 24px 28px; }
       .guide-grid { padding: 18px 24px; gap: 12px; }
 
-      /* Nav — bigger tap targets and labels */
+      /* Nav, bigger tap targets and labels */
       .nav-btn { font-size: 0.65rem; gap: 5px; }
       .nav-btn svg { width: 22px; height: 22px; }
 
-      /* Topbar — prevent logo wrapping, slim down crowded right side */
+      /* Topbar, prevent logo wrapping, slim down crowded right side */
       #topbar { padding-left: 24px; padding-right: 24px; gap: 8px; }
       .topbar-logo { white-space: nowrap; font-size: 1.2rem; }
       .topbar-sub { display: none; }
       #offlineBadge { display: none; }
 
-      /* Cards — slightly more padding */
+      /* Cards, slightly more padding */
       .card { padding: 16px 18px; }
 
-      /* Landing cards — comfortable on wider screens */
+      /* Landing cards, comfortable on wider screens */
       .landing-cards { max-width: 460px; }
       .landing-card { padding: 20px 22px; }
       .landing-avatar { font-size: 3.6rem; }
@@ -1306,7 +1306,7 @@
         align-content: flex-start; /* prevent topbar from swallowing vertical space */
       }
 
-      /* Topbar — full width, fixed height, first row */
+      /* Topbar, full width, fixed height, first row */
       #topbar {
         order: 1;
         width: 100%;
@@ -1319,14 +1319,14 @@
       .topbar-sub { display: none; }
       #offlineBadge { display: none; }
 
-      /* Pages area — second row, fills remaining height */
+      /* Pages area, second row, fills remaining height */
       #pages {
         order: 3;
         min-width: 0;
         height: calc(100dvh - var(--desktop-topbar-h));
       }
 
-      /* Sidebar nav — second row, left */
+      /* Sidebar nav, second row, left */
       #nav {
         position: static;
         order: 2;
@@ -1342,7 +1342,7 @@
         align-items: stretch;
       }
 
-      /* Sidebar nav buttons — icon left, label right */
+      /* Sidebar nav buttons, icon left, label right */
       .nav-btn {
         flex: none;
         flex-direction: row;
@@ -1357,7 +1357,7 @@
       }
       .nav-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 
-      /* Pages — no bottom-nav offset needed */
+      /* Pages, no bottom-nav offset needed */
       .page { padding-bottom: 32px; }
 
       /* Content breathing room */
@@ -1371,7 +1371,7 @@
       }
       .card { padding: 18px 20px; }
 
-      /* Landing — center on wide screens */
+      /* Landing, center on wide screens */
       #landing { align-items: center; }
       #landing > *:not(.landing-orb) { width: 100%; max-width: 560px; }
       .landing-cards { max-width: 520px; }
@@ -1456,7 +1456,7 @@
     .btn-ghost:active { opacity: 0.7; }
     .btn-ghost:disabled { opacity: 0.3; pointer-events: none; }
 
-    /* Primary CTA button (Next Hole, Finish Round) — kelly green */
+    /* Primary CTA button (Next Hole, Finish Round), kelly green */
     .btn-gold {
       padding: 16px 28px;
       background: var(--green);
@@ -1941,7 +1941,7 @@
 
 
     /* ══════════════════════════════════════════════
-       SETTINGS OVERLAY — Sprint 3
+       SETTINGS OVERLAY, Sprint 3
     ══════════════════════════════════════════════ */
 
     /* Topbar */
