@@ -38,26 +38,25 @@
   .wrap{max-width:1060px;margin:0 auto;padding:0 24px;}
 
   /* nav */
-  .topnav{position:sticky;top:0;z-index:30;background:rgba(18,39,26,0.97);}
-  .topnav .row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;}
-  .brand{font-weight:800;letter-spacing:0.5px;font-size:1.15rem;color:#fff;display:flex;align-items:center;gap:8px;}
-  .brand .mk{width:9px;height:9px;border-radius:50%;background:var(--brass-2);box-shadow:0 0 0 3px rgba(196,160,88,0.2);}
-  .nav-open{border:1px solid rgba(255,255,255,0.25);border-radius:30px;padding:8px 17px;font-size:0.82rem;font-weight:600;color:#fff;text-decoration:none;}
-  .nav-open:hover{background:rgba(255,255,255,0.08);}
+  .topnav{position:sticky;top:0;z-index:30;background:rgba(244,239,227,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+  .topnav .row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;}
+  .brand{font-weight:800;letter-spacing:0.5px;font-size:1.15rem;color:var(--ink);display:flex;align-items:center;gap:8px;}
+  .brand .mk{width:9px;height:9px;border-radius:50%;background:var(--brass);box-shadow:0 0 0 3px rgba(166,130,60,0.18);}
+  .nav-open{border:1px solid var(--ink);border-radius:30px;padding:8px 17px;font-size:0.82rem;font-weight:600;color:var(--ink);text-decoration:none;}
+  .nav-open:hover{background:var(--ink);color:var(--paper);}
 
   /* hero */
-  .hero{background:var(--ink);color:#fff;padding:62px 0 70px;position:relative;}
-  .hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(196,160,88,0.5),transparent);}
+  .hero{background:var(--paper);color:var(--ink);padding:54px 0 60px;position:relative;border-bottom:1px solid var(--line);}
   .hero-grid{display:grid;grid-template-columns:1.05fr 0.95fr;gap:36px;align-items:center;}
   .eyebrow{font-size:0.68rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--brass-2);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
   .eyebrow::before{content:"";width:26px;height:1px;background:var(--brass);}
   .hero h1{font-weight:700;font-size:clamp(2.5rem,5.4vw,3.7rem);line-height:1.0;letter-spacing:-1px;margin-bottom:18px;}
-  .hero p.sub{font-size:1.14rem;color:rgba(255,255,255,0.78);max-width:40ch;margin-bottom:30px;line-height:1.55;}
+  .hero p.sub{font-size:1.14rem;color:var(--ink-soft);max-width:40ch;margin-bottom:30px;line-height:1.55;}
   .cta{display:inline-flex;align-items:center;gap:10px;background:var(--paper);color:var(--ink);text-decoration:none;font-weight:700;font-size:1.04rem;padding:15px 30px;border-radius:12px;transition:transform .15s,box-shadow .15s;box-shadow:0 6px 22px rgba(0,0,0,0.28);}
   .cta:hover{transform:translateY(-2px);}
   .cta.brass{background:var(--brass);color:#1c140a;}
   .cta-ink{background:var(--ink);color:var(--paper);}
-  .cta-note{display:block;margin-top:14px;font-size:0.82rem;color:rgba(255,255,255,0.45);}
+  .cta-note{display:block;margin-top:14px;font-size:0.82rem;color:var(--muted);}
   .hero-right{display:flex;justify-content:center;}
 
   /* phone */
@@ -144,10 +143,36 @@
   .closing::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(196,160,88,0.5),transparent);}
   .closing h2{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(2rem,4.4vw,2.9rem);letter-spacing:-0.5px;margin-bottom:14px;max-width:20ch;margin-inline:auto;line-height:1.08;}
   .closing p{color:rgba(255,255,255,0.74);font-size:1.04rem;margin-bottom:28px;max-width:48ch;margin-inline:auto;}
-  footer{background:var(--ink);color:rgba(255,255,255,0.45);text-align:center;padding:0 24px 48px;font-size:0.82rem;line-height:1.9;}
-  footer a{color:rgba(255,255,255,0.78);}
+  footer{background:var(--paper);color:var(--muted);text-align:center;padding:34px 24px 48px;font-size:0.82rem;line-height:1.9;border-top:1px solid var(--line);}
+  footer a{color:var(--ink);font-weight:600;}
+
+  /* kids showcase */
+  .kids{background:var(--paper-2);}
+  .track{position:relative;display:flex;margin:24px 0 4px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none;}
+  .track::-webkit-scrollbar{display:none;}
+  .tnode{position:relative;flex:0 0 auto;width:92px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .tnode::before{content:"";position:absolute;top:8px;right:50%;width:100%;height:2px;background:var(--brass);opacity:0.45;}
+  .tnode:first-child::before{display:none;}
+  .tnode .dot{position:relative;z-index:1;width:18px;height:18px;border-radius:50%;background:var(--brass);box-shadow:0 0 0 4px var(--paper-2);}
+  .tnode.end .dot{background:var(--ink);box-shadow:0 0 0 4px var(--paper-2),inset 0 0 0 4px var(--brass-2);}
+  .tnode .tn{font-size:0.6rem;font-weight:700;color:var(--ink);text-align:center;line-height:1.2;}
+  .tnode .tn.dim{color:var(--muted);font-weight:600;}
+  .sub-h{font-weight:800;font-size:0.95rem;margin:34px 0 13px;}
+  .badges{display:flex;flex-wrap:wrap;gap:22px 16px;}
+  .badge{display:flex;flex-direction:column;align-items:center;gap:8px;width:84px;}
+  .badge .disc{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.7rem;color:#fff;box-shadow:0 0 0 3px #C4A058,0 0 0 4px rgba(0,0,0,0.07),inset 0 0 0 2px rgba(255,255,255,0.28),0 6px 13px rgba(0,0,0,0.2);}
+  .badge .lbl{font-size:0.66rem;font-weight:700;text-align:center;color:var(--ink);line-height:1.2;}
+  .kid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:30px;}
+  .kid3 .c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;}
+  .kid3 i{color:var(--brass);font-size:1.4rem;}
+  .kid3 .k{font-weight:800;margin:9px 0 4px;font-size:0.92rem;}
+  .kid3 .v{font-size:0.84rem;color:var(--muted);line-height:1.5;}
+  .soon{margin-top:24px;background:var(--card);border:1px solid var(--brass);border-radius:16px;padding:17px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .soon-tag{background:var(--brass);color:#1c140a;font-size:0.64rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:5px 11px;border-radius:20px;flex:0 0 auto;}
+  .soon-list{font-size:0.9rem;color:var(--ink-soft);font-weight:600;line-height:1.5;}
 
   @media(max-width:760px){
+    .kid3{grid-template-columns:1fr;}
     .hero-grid{grid-template-columns:1fr;gap:38px;text-align:center;}
     .hero .eyebrow{justify-content:center;}
     .hero p.sub{margin-inline:auto;}
@@ -169,7 +194,7 @@
       <div class="eyebrow">For every golfer in the family</div>
       <h1 class="serif">The family golf app.</h1>
       <p class="sub">One app every golfer in your family grows in, each on their own plan. The kids get a game they beg to play. You get real golf.</p>
-      <a class="cta" href="https://golf.spinvibes.com">Get started <i class="ti ti-arrow-right"></i></a>
+      <a class="cta cta-ink" href="https://golf.spinvibes.com">Get started <i class="ti ti-arrow-right"></i></a>
       <span class="cta-note">Build your free plan in about 3 minutes.</span>
     </div>
     <div class="hero-right">
@@ -212,6 +237,48 @@
       </div></div>
     </div>
   </div></header>
+
+  <section class="band kids"><div class="wrap">
+    <div class="kicker">For the kids</div>
+    <h2 class="t serif">Kids level up by actually playing.</h2>
+    <p class="lede">Every round earns points. Kids climb nine levels from Fresh Caddie to Tour Bound, unlock badges, and chase a new challenge at every step. Nothing is bought, it's all earned on the course, the kind of progress they turn the phone around to show you.</p>
+
+    <div class="sub-h">Nine ranks to climb, Fresh Caddie to Tour Bound</div>
+    <div class="track">
+      <div class="tnode"><div class="dot"></div><div class="tn">Fresh Caddie</div></div>
+      <div class="tnode"><div class="dot"></div><div class="tn dim">Grip &amp; Ripper</div></div>
+      <div class="tnode"><div class="dot"></div><div class="tn dim">Ball Finder</div></div>
+      <div class="tnode"><div class="dot"></div><div class="tn dim">Straight Shooter</div></div>
+      <div class="tnode"><div class="dot"></div><div class="tn dim">Par Machine</div></div>
+      <div class="tnode"><div class="dot"></div><div class="tn dim">Course Reader</div></div>
+      <div class="tnode"><div class="dot"></div><div class="tn dim">Shot Shaper</div></div>
+      <div class="tnode"><div class="dot"></div><div class="tn dim">Course Boss</div></div>
+      <div class="tnode end"><div class="dot"></div><div class="tn">Tour Bound</div></div>
+    </div>
+
+    <div class="sub-h">The markers they earn along the way</div>
+    <div class="badges">
+      <span class="badge"><span class="disc" style="background:#1D9E75"><i class="ti ti-flag"></i></span><span class="lbl">First Round</span></span>
+      <span class="badge"><span class="disc" style="background:#639922"><i class="ti ti-target"></i></span><span class="lbl">Par Maker</span></span>
+      <span class="badge"><span class="disc" style="background:#D85A30"><i class="ti ti-feather"></i></span><span class="lbl">Birdie!</span></span>
+      <span class="badge"><span class="disc" style="background:#7F77DD"><i class="ti ti-users"></i></span><span class="lbl">Family Player</span></span>
+      <span class="badge"><span class="disc" style="background:#378ADD"><i class="ti ti-rocket"></i></span><span class="lbl">Scrambler</span></span>
+      <span class="badge"><span class="disc" style="background:#BA7517"><i class="ti ti-calendar"></i></span><span class="lbl">Regular</span></span>
+      <span class="badge"><span class="disc" style="background:#D4537E"><i class="ti ti-medal"></i></span><span class="lbl">Veteran</span></span>
+      <span class="badge"><span class="disc" style="background:#C4A058"><i class="ti ti-trophy"></i></span><span class="lbl">Tour Bound</span></span>
+    </div>
+
+    <div class="kid3">
+      <div class="c"><i class="ti ti-checkbox"></i><div class="k">A challenge at every level</div><div class="v">Make a par, two pars in a round, a first birdie. PGA-style goals, auto-verified from real rounds.</div></div>
+      <div class="c"><i class="ti ti-calendar-check"></i><div class="k">Daily check-ins</div><div class="v">A grown-up awards points for showing up and practicing, so the habit sticks between rounds.</div></div>
+      <div class="c"><i class="ti ti-message-2"></i><div class="k">Talks like a kid</div><div class="v">Age-gated coaching voice for 6–8 and 9–12, so it lands whether they're five or fifteen.</div></div>
+    </div>
+
+    <div class="soon">
+      <span class="soon-tag">Coming soon</span>
+      <span class="soon-list">Enamel markers to earn for their Clubhouse · one-minute daily drills they can do anywhere · a weekly family challenge.</span>
+    </div>
+  </div></section>
 
   <section class="band"><div class="wrap">
     <div class="kicker">One app, the whole family</div>
