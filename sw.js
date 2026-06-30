@@ -1,72 +1,21 @@
-// SpinVibes Golf — Service Worker v109
-// Strategy: network-first for HTML, cache-first for everything else
+// SpinVibes — self-destroying service worker.
+// The spinvibes.com PWA has been retired in favor of a welcome page that funnels
+// to the guide (golf.spinvibes.com) and the app (app.spinvibes.com). This SW
+// unregisters itself and clears all old caches so installed visitors land on the
+// new page instead of a cached copy of the old app.
+self.addEventListener('install', () => self.skipWaiting());
 
-const CACHE = 'spinvibes-golf-v155';
-
-const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/spinvibes_profile.svg',
-  '/spinvibes_logo.png',
-  'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap'
-];
-
-// Install: pre-cache all assets, activate immediately
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(ASSETS))
-  );
-  self.skipWaiting();
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.map((k) => caches.delete(k)));
+    await self.registration.unregister();
+    const clients = await self.clients.matchAll({ type: 'window' });
+    clients.forEach((c) => c.navigate(c.url));
+  })());
 });
 
-// Activate: wipe all old caches, claim all clients immediately
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
-});
-
-// Fetch strategy:
-//   - Navigation (HTML page): network first → cache fallback
-//   - Everything else: cache first → network fallback
-self.addEventListener('fetch', e => {
-  const isNavigation = e.request.mode === 'navigate' ||
-    (e.request.method === 'GET' && e.request.headers.get('accept') &&
-     e.request.headers.get('accept').includes('text/html'));
-
-  if (isNavigation) {
-    // Network-first: always try to get fresh HTML
-    e.respondWith(
-      fetch(e.request)
-        .then(response => {
-          const clone = response.clone();
-          caches.open(CACHE).then(cache => cache.put(e.request, clone));
-          return response;
-        })
-        .catch(() => caches.match(e.request).then(cached => cached || caches.match('/index.html')))
-    );
-    return;
-  }
-
-  // Cache-first for assets (fonts, icons, etc.)
-  e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(response => {
-        if (response && response.status === 200 && response.type === 'basic') {
-          const clone = response.clone();
-          caches.open(CACHE).then(cache => cache.put(e.request, clone));
-        }
-        return response;
-      });
-    })
-  );
-});
-
-// Listen for skipWaiting message from app
-self.addEventListener('message', e => {
-  if (e.data === 'skipWaiting') self.skipWaiting();
+// Network-first while winding down, so nothing is served stale.
+self.addEventListener('fetch', (event) => {
+  event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
 });
