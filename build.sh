@@ -1,47 +1,20 @@
 #!/bin/bash
-# SpinVibes Golf — Build Script
-# Concatenates src/ section files → index.html
-# Run this before every push. push.command does it automatically.
+# SpinVibes Golf — Build Script  ⚠️ RETIRED 2026-07-13
+# ─────────────────────────────────────────────────────────────────────
+# spinvibes.com is now the PUBLIC MARKETING / SIGN-UP page, hand-maintained
+# directly in index.html. It is NO LONGER concatenated from src/.
 #
-# NEVER edit index.html directly — it gets overwritten here.
-# Edit the relevant src/ file instead:
+# The old behavior (cat src/*.html > index.html) rebuilt the RETIRED family
+# prototype and OVERWROTE the marketing landing. On 2026-07-02 that actually
+# happened (commit f8cf73b) and nearly replaced the live site. This guard
+# now refuses to clobber index.html.
 #
-#   00-head.html          CSS variables, global styles, all of <head>
-#   01-landing.html       Supabase script, #landing page, #app shell open, #topbar, #pages open
-#   02-page-home.html     Home tab (all 5 profiles)
-#   03-page-range.html    Range tab
-#   04-page-stretch.html  Stretches tab
-#   05-page-shortgame.html Short Game tab (all 5 profiles)
-#   06-page-dad-progress.html  Dad My Game page + round modal
-#   07-page-caddie.html   Caddie tab
-#   08-page-strategy.html Strategy tab
-#   09-pages-mygame.html  Son/Girl/Mom/Grandma progress pages + /pages close
-#   06b-page-settings.html  Settings overlay — Sprint 3 (position:fixed, outside #pages)
-#   10-nav.html           #nav bar + /app close
-#   11-script.html        All JavaScript + </body></html>
+# The prototype source lives in src/ for reference only. To edit the public
+# site, edit index.html directly. To resurrect the prototype build, restore
+# the old cat pipeline from git history (commit before f8cf73b) — deliberately.
+# ─────────────────────────────────────────────────────────────────────
 
-set -e  # exit on any error
-
-SRC="$(dirname "$0")/src"
-OUT="$(dirname "$0")/index.html"
-
-echo "🔨 Building index.html from src/..."
-
-cat \
-  "$SRC/00-head.html" \
-  "$SRC/01-landing.html" \
-  "$SRC/02-page-home.html" \
-  "$SRC/03-page-range.html" \
-  "$SRC/04-page-stretch.html" \
-  "$SRC/05-page-shortgame.html" \
-  "$SRC/06-page-dad-progress.html" \
-  "$SRC/07-page-caddie.html" \
-  "$SRC/08-page-strategy.html" \
-  "$SRC/09-pages-mygame.html" \
-  "$SRC/06b-page-settings.html" \
-  "$SRC/10-nav.html" \
-  "$SRC/11-script.html" \
-  > "$OUT"
-
-LINES=$(wc -l < "$OUT")
-echo "✅ index.html built — $LINES lines"
+echo "⛔ build.sh is retired. spinvibes.com/index.html is hand-maintained now."
+echo "   Edit index.html directly. src/ is the retired prototype (reference only)."
+echo "   Nothing was overwritten."
+exit 0
